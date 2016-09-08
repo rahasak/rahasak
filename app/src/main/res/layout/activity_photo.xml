@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relative_layout">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/photo"></FrameLayout>
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/moving_layout"
+        android:background="@color/transparent">
+
+
+
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/fail"
+                android:id="@+id/cancel"
+                app:siBorderWidth="0dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                app:siSquare="true"
+                app:siBorderAlpha = "0.0"
+                android:layout_centerInParent="true"
+                android:background="@drawable/vibrating_image"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="30dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="60dp"
+                android:layout_alignBaseline="@+id/go_ripple" />
+
+
+
+
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/success"
+                android:id="@+id/start"
+                app:siBorderWidth="0dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                app:siSquare="true"
+                app:siBorderAlpha = "0.0"
+                android:foregroundGravity="center"
+                android:scaleType="fitXY"
+                android:background="@drawable/vibrating_image"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="30dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="60dp" />
+
+        <com.skyfishjy.library.RippleBackground
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:id="@+id/go_ripple"
+            app:rb_color="#F5F5F5"
+            app:rb_radius="32dp"
+            app:rb_rippleAmount="2"
+            app:rb_duration="1000"
+            app:rb_scale="3"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="false"
+            android:background="@color/transparent"
+            android:layout_centerHorizontal="true"
+            android:foregroundGravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true">
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/camera_choice_picker"
+                android:id="@+id/selector"
+                app:siBorderWidth="0dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                app:siSquare="true"
+                app:siBorderAlpha = "0.0"
+                android:foregroundGravity="center"
+                android:background="@drawable/vibrating_image"
+                android:scaleType="centerInside" />
+        </com.skyfishjy.library.RippleBackground>
+
+
+
+
+</RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.score.chatz"
+    android:versionCode="3"
+    android:versionName="1.3">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MAPS_RECEIVE" />
+
+    <!-- To boot complete broadcast receiver -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- External storage for caching -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- My Location -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Use to get the phone no -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- Use to read contact list -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- access to camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- access to mic -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- access to modify audio manager -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- keep screen active when camera is open -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+
+
+    <!-- access to vibrate phone -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+
+    <!-- Maps API needs OpenGL ES 2.0. -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <!-- android:name=".application.SenzApplication" -->
+    <application
+        android:name="android.support.multidex.MultiDexApplication"
+        android:icon="@drawable/rlogo_launcher"
+        android:label="@string/app_name">
+
+        <!-- production key -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCqn55xNTOJXT6DMHBiupuYOcYXhdbp_wU" />
+
+        <!-- debug key -->
+        <!-- <meta-data -->
+        <!-- android:name="com.google.android.maps.v2.API_KEY" -->
+        <!-- android:value="AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s" /> -->
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!-- - activities -->
+        <activity
+            android:name=".ui.SplashActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.CountryListActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        <activity
+            android:name=".ui.SenzMapActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".ui.ChatActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".ui.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme" />
+        <activity
+            android:name=".ui.AddUserActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme" />
+        <activity
+            android:name=".ui.RegistrationActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.PhotoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+        <activity
+            android:name=".ui.UserProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".ui.PhotoFullScreenActivity"
+            android:theme="@style/MyMaterialTheme" />
+        <activity android:name=".ui.RecordingActivity"
+            android:theme="@style/MyMaterialTheme"></activity>
+
+        <!-- Servicves -->
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true" />
+        <service
+            android:name="com.score.chatz.services.RemoteSenzService"
+            android:enabled="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.score.chatz.services.RemoteSenzService" />
+            </intent-filter>
+        </service>
+
+        <!-- Receievers -->
+        <receiver android:name="com.score.chatz.receivers.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="senz.action.RESTART" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.score.chatz.receivers.AlarmReceiver"
+            android:process=":remote">
+        </receiver>
+
+        <receiver android:name="com.score.chatz.receivers.DeathWatchReceiver">
+            <intent-filter>
+                <action android:name="senz.action.RESTART" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.score.chatz.receivers.SenzReceiver">
+            <intent-filter>
+                <action android:name="com.score.senz.NEW_SENZ" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

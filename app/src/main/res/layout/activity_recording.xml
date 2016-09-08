@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/android_grey">
+
+    <!--<LinearLayout
+        android:id="@+id/button_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:id="@+id/btnStart"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Start"
+            android:textColor="@color/android_green" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="7dp"
+            android:layout_marginTop="7dp"
+            android:background="@color/android_green" />
+
+        <Button
+            android:id="@+id/btnStop"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Stop"
+            android:textColor="@color/android_green" />
+    </LinearLayout>-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="100sp"
+        android:text="0"
+        android:textColor="@color/android_green"
+        android:typeface="monospace"
+        android:textStyle="bold"
+        android:id="@+id/timer"
+        android:layout_alignParentTop="false"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Share a secret under ten seconds."
+        android:id="@+id/textView9"
+        android:textColor="@color/android_green"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/timer"
+        android:layout_marginBottom="50dp" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/moving_layout"
+        android:background="@color/transparent">
+
+
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/fail"
+            android:id="@+id/cancel"
+            app:siBorderWidth="0dp"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"
+            app:siSquare="true"
+            app:siBorderAlpha = "0.0"
+            android:layout_centerInParent="true"
+            android:background="@drawable/vibrating_image"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="60dp"
+            android:layout_alignBaseline="@+id/go_ripple" />
+
+
+
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/success"
+            android:id="@+id/start"
+            app:siBorderWidth="0dp"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"
+            app:siSquare="true"
+            app:siBorderAlpha = "0.0"
+            android:foregroundGravity="center"
+            android:scaleType="fitXY"
+            android:background="@drawable/vibrating_image"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="60dp" />
+
+        <com.skyfishjy.library.RippleBackground
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:id="@+id/go_ripple"
+            app:rb_color="#F5F5F5"
+            app:rb_radius="32dp"
+            app:rb_rippleAmount="2"
+            app:rb_duration="1000"
+            app:rb_scale="3"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="false"
+            android:background="@color/transparent"
+            android:layout_centerHorizontal="true"
+            android:foregroundGravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true">
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/microphone_picker"
+                android:id="@+id/selector"
+                app:siBorderWidth="0dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                app:siSquare="true"
+                app:siBorderAlpha = "0.0"
+                android:foregroundGravity="center"
+                android:background="@drawable/vibrating_image"
+                android:scaleType="centerInside" />
+        </com.skyfishjy.library.RippleBackground>
+
+
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

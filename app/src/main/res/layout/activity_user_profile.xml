@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentTop="true"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="com.score.chatz.ui.UserProfileActivity">
+
+    <!--<android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@android:color/transparent" />-->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="4"
+        android:background="#ededed">
+
+        <!--<ImageView
+            android:id="@+id/clickable_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:adjustViewBounds="true"
+            android:background="@drawable/image_border"
+            android:focusableInTouchMode="false"
+            android:scaleType="centerInside"
+            android:src="@drawable/default_user" />-->
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/default_user"
+            android:id="@+id/clickable_image"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"
+            app:siBorderAlpha = "0.0"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:background="#FFF"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tap_image_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Tap on the above image to request a user picture."
+            android:textColor="@color/android_grey"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:text="Lakmal"
+            android:textColor="@color/android_grey"
+            android:textSize="20dp" />
+
+        <Button
+            android:id="@+id/share_secret_btn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/android_green"
+            android:text="Share a secret!"
+            android:textColor="@color/android_grey" />
+
+        <LinearLayout
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/perm_locations"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="5"
+                    android:adjustViewBounds="true"
+                    android:baselineAlignBottom="false"
+                    android:maxWidth="20dp"
+                    android:src="@drawable/perm_locations_active" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="3"
+                    android:text="@string/perm_location"
+                    android:textColor="@color/android_grey"
+                    android:textSize="13dp" />
+
+                <Switch
+                    android:id="@+id/perm_location_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="26" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/perm_camera"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="5"
+                    android:adjustViewBounds="true"
+                    android:baselineAlignBottom="false"
+                    android:maxWidth="20dp"
+                    android:src="@drawable/perm_camera_active" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="3"
+                    android:text="@string/perm_camera"
+                    android:textColor="@color/android_grey"
+                    android:textSize="13dp" />
+
+                <Switch
+                    android:id="@+id/perm_camera_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="26" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/perm_mic"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="5"
+                    android:adjustViewBounds="true"
+                    android:baselineAlignBottom="false"
+                    android:maxWidth="20dp"
+                    android:src="@drawable/perm_mic_active" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="3"
+                    android:text="@string/perm_mic"
+                    android:textColor="@color/android_grey"
+                    android:textSize="13dp" />
+
+                <Switch
+                    android:id="@+id/perm_mic_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="26" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
+

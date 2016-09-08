@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@color/white"
+    android:baselineAligned="false">
+
+<FrameLayout
+    android:layout_width="80dp"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <com.github.siyamed.shapeimageview.CircularImageView
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/default_user"
+        android:id="@+id/user_image"
+        app:siBorderWidth="0dp"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        app:siSquare="true"
+        app:siBorderAlpha = "0.0" />
+
+</FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_weight="8"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="10dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lakmal"
+            android:id="@+id/user_name"
+            android:layout_centerVertical="true"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:layout_toLeftOf="@+id/perm_locations" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/perm_locations"
+            android:src="@drawable/perm_locations_active"
+            android:adjustViewBounds="true"
+            android:layout_alignTop="@+id/user_name"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/perm_mic"
+            android:layout_centerVertical="true" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/perm_mic"
+            android:src="@drawable/perm_mic_active"
+            android:adjustViewBounds="true"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/perm_camera" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/perm_camera"
+            android:src="@drawable/perm_camera_active"
+            android:adjustViewBounds="true"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="right"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="false"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp" />
+
+    </RelativeLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@drawable/bottom_border"></FrameLayout>
+
+        </LinearLayout>
+  </FrameLayout>
+
+
+
+</LinearLayout>

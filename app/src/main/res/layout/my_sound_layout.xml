@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lakmal Caldera"
+                android:id="@+id/sender"
+                android:textColor="@color/black"
+                android:textSize="13dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="11:00 AM"
+                android:id="@+id/sent_time"
+                android:textColor="@color/android_grey"
+                android:textStyle="italic"
+                android:textSize="9sp"
+                android:layout_alignLeft="@+id/sender"
+                android:layout_below="@+id/sender" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <FrameLayout
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@color/android_green"
+                android:layout_margin="5dp">
+
+            </FrameLayout>
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/play"
+                android:gravity="left"
+                android:scaleType="fitCenter"
+                android:background="@drawable/image_border"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:src="@drawable/play_recording"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="15dp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Delivered"
+            android:textColor="@color/black"
+            android:id="@+id/deleviered_message"
+            android:textSize="10dp"
+            android:gravity="left"
+            android:layout_marginLeft="5dp"
+            android:textStyle="italic" />
+    </FrameLayout>
+
+</LinearLayout>
