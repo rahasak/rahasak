@@ -9,6 +9,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.interfaces.IComHandler;
 import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -46,6 +47,7 @@ public class SenzUserHandler extends BaseHandler implements IComHandler {
 
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
         senz.setSender(sender);
+        senz.setId(SenzUtils.getUniqueRandomNumber().toString());
 
         // if senz already exists in the db, SQLiteConstraintException should throw
         try {

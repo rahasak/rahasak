@@ -1,11 +1,13 @@
 package com.score.chatz.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
@@ -31,6 +33,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
 
 /**
  * Created by lakmalcaldera on 8/16/16.
@@ -38,7 +43,7 @@ import java.util.List;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = CameraPreview.class.getName();
-    ;
+
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
     private SenzStream.SENZ_STEAM_TYPE streamType;
@@ -155,6 +160,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 activity.finish();
             }
         });
+    }
+
+    public void onUserBusy(final PhotoActivity activity, final Senz originalSenz) {
+
+                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, getContext());
+                activity.finish();
+
     }
 
     private byte[] resizeBitmapByteArray(byte[] data, int deg) {

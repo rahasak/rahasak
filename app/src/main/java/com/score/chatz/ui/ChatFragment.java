@@ -27,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -43,7 +44,11 @@ import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.services.LocationAddressReceiver;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SecretsUtil;
+import com.score.chatz.utils.SenzProcessQueue;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -55,6 +60,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -163,7 +169,7 @@ public class ChatFragment extends Fragment {
         }
 
         getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.chatz.DATA_SENZ"));
-        getActivity().registerReceiver(updateReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
+        getActivity().registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
     }
 
     @Override
@@ -177,7 +183,8 @@ public class ChatFragment extends Fragment {
         }
 
         getActivity().unregisterReceiver(senzMessageReceiver);
-        getActivity().unregisterReceiver(updateReceiver);
+        getActivity().unregisterReceiver(userBusyNotifier);
+        //getActivity().unregisterReceiver(senzPollReceiver);
     }
 
     @Override
@@ -210,61 +217,120 @@ public class ChatFragment extends Fragment {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (text_message.getText().length() != 0)
-                    sendMessage();
+                if (NetworkUtil.isAvailableNetwork(getContext())) {
+                    if (text_message.getText().length() != 0) {
+                        // Get text
+                        String secretMessage = text_message.getText().toString();
+
+                        // clear text in ui
+                        text_message.setText("");
+
+                        // Create secret
+                        Secret newSecret = new Secret(secretMessage, null, null, new User("", receiver), new User("", sender));
+                        newSecret.setID(SenzUtils.getUniqueRandomNumber().toString());
+
+                        // Send secret
+                        sendMessage(newSecret);
+
+                        //Save secret
+                        saveSecretToDB(newSecret);
+
+                        //Update list view
+                        displayMessagesList();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         getLocBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getLocBtn.isEnabled())
-                    getSenz(new User("", sender));
+                if (NetworkUtil.isAvailableNetwork(getContext())) {
+                    if (getLocBtn.isEnabled())
+                        getSenz(new User("", sender));
+                } else {
+                    Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         getCamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getCamBtn.isEnabled())
-                    getPhoto(new User("", sender));
+                if (NetworkUtil.isAvailableNetwork(getContext())) {
+                    if (getCamBtn.isEnabled())
+                        getPhoto(new User("", sender));
+                } else {
+                    Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         getMicBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getMicBtn.isEnabled())
-                    getMic(new User("", sender));
+                if (NetworkUtil.isAvailableNetwork(getContext())) {
+                    if (getMicBtn.isEnabled())
+                        getMic(new User("", sender));
+                } else {
+                    Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
-        /*micBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openRecorder();
-            }
-        });*/
 
         updateMainBtnUi();
 
         return view;
     }
 
+    /**
+     * Save text secret to db
+     *
+     * @param secret
+     */
+    private void saveSecretToDB(Secret secret) {
+        SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
+        Long _timeStamp = System.currentTimeMillis();
+        secret.setTimeStamp(_timeStamp);
+        dbSource.createSecret(secret);
+    }
 
     private void displayMessagesList() {
         // get User from db
-        secretMessageList = dbSource.getSecretz(new User("", sender), new User("", receiver));
-
-        // construct list adapter
-        if (secretMessageList.size() > 0) {
+        if (secretMessageList == null || secretMessageList.size() == 0) {
+            secretMessageList = dbSource.getSecretz(new User("", sender), new User("", receiver));
             adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         } else {
-            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
-            listView.setAdapter(adapter);
-            //sensorListView.setEmptyView(emptyView);
+            List<Secret> latestList = dbSource.getSecretz(new User("", sender), new User("", receiver), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
+            secretMessageList.addAll(latestList);
+            adapter.notifyDataSetChanged();
+        }
+        removeOldItemsFromChat();
+    }
+
+    private void updateStatusOfMessage(String uid) {
+        for (Secret secret : secretMessageList) {
+            if (secret.getID().equalsIgnoreCase(uid)) {
+                secret.setIsDelivered(true);
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+
+    private void removeOldItemsFromChat() {
+        Iterator<Secret> iter = secretMessageList.iterator();
+        while (iter.hasNext()) {
+            Secret secret = iter.next();
+
+            if (!SecretsUtil.isSecretToBeShown(secret)) {
+                iter.remove();
+                dbSource.deleteSecret(secret);
+            }
         }
     }
 
@@ -276,13 +342,23 @@ public class ChatFragment extends Fragment {
         }
     };
 
-    private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got new user from Senz service");
-            update();
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
         }
     };
+
+
+
+    /*private BroadcastReceiver senzPollReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Poll from senz queue");
+
+        }
+    };*/
 
 
     private void update() {
@@ -295,12 +371,14 @@ public class ChatFragment extends Fragment {
      * Share current sensor
      * Need to send share query to server via web socket
      */
-    private void sendMessage() {
+    private void sendMessage(Secret secret) {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("chatzmsg", URLEncoder.encode(text_message.getText().toString(), "UTF-8"));
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("chatzmsg", URLEncoder.encode(secret.getText(), "UTF-8"));
+            String timeStamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
+            senzAttributes.put("time", timeStamp);
+            senzAttributes.put("uid", secret.getID());
 
             // new senz
             String id = "_ID";
@@ -340,16 +418,19 @@ public class ChatFragment extends Fragment {
                     // save senz in db
                     Log.d(TAG, "save sent chatz");
                     Log.d(TAG, "reeiver: " + receiver + ", " + "senz.getSender() : " + senz.getSender().getUsername());
-                    /*
-                     *  senz.getSender - you who are sending the message
-                     *  receiver - other person
-                     *
-                     */
-                    Secret newSecret = new Secret(text_message.getText().toString(), null, null, new User("", receiver), senz.getSender());
-                    SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
-                    dbSource.createSecret(newSecret);
-                    text_message.setText("");
-                    displayMessagesList();
+
+                    String uid = senz.getAttributes().get("uid");
+                    dbSource.markSecretDelievered(uid);
+                    updateStatusOfMessage(uid);
+                } else if (msg != null && msg.equalsIgnoreCase("photoSent")) {
+                    // save senz in db
+                    String uid = senz.getAttributes().get("uid");
+                    dbSource.markSecretDelievered(uid);
+                    updateStatusOfMessage(uid);
+                } else if (msg != null && msg.equalsIgnoreCase("soundSent")) {
+                    String uid = senz.getAttributes().get("uid");
+                    dbSource.markSecretDelievered(uid);
+                    updateStatusOfMessage(uid);
                 } else if (msg != null && msg.equalsIgnoreCase("MsgSentFail")) {
                     Toast.makeText(getActivity(), "User seems to be offline.", Toast.LENGTH_SHORT).show();
                 }

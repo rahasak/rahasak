@@ -53,4 +53,27 @@ public class TimeUtils {
         }
         return time;
     }
+
+    /**
+     * Return true is the date supplied is older than timeInMinues.
+     * @param date
+     * @param timeInMinutes
+     * @return
+     */
+    public static Boolean isDatePast(Date date, Integer timeInMinutes){
+        Boolean isPast = false;
+        try {
+            Date now = new Date();
+            long deltaSeconds = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - date.getTime());
+            if(deltaSeconds > (timeInMinutes * 60)){
+                isPast = true;
+            }else{
+                isPast = false;
+            }
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return isPast;
+    }
 }

@@ -1,5 +1,6 @@
 package com.score.chatz.ui;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
@@ -53,6 +54,8 @@ import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PhotoActivity extends AppCompatActivity implements View.OnTouchListener {
     protected static final String TAG = PhotoActivity.class.getName();
@@ -70,6 +73,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
     private CircularImageView cancelBtn;
     private ImageView startBtn;
     private RippleBackground goRipple;
+
+    private CountDownTimer cancelTimer;
+
+    private static final int TIME_TO_SERVE_REQUEST = 10000; // 5 seconds
 
 
     private float dX, dY, startX, startY;
@@ -104,6 +111,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         wakeLock.acquire();
 
         getSupportActionBar().hide();
+        startTimerToEndRequest();
     }
 
     @Override
@@ -173,6 +181,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                     stopVibrations();
                     if(isPhotoTaken == false) {
                         CameraUtils.shootSound(this);
+                        cancelTimerToServe();
                         mCameraPreview.takePhotoManually(instnce, originalSenz);
                         isPhotoTaken = true;
                     }
@@ -219,8 +228,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
 
     }
 
-    private void startCountdownToPhoto(){
-        new CountDownTimer(5000,1000){
+    private void startTimerToEndRequest(){
+        cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST,TIME_TO_SERVE_REQUEST){
             @Override
             public void onFinish() {
                 //initializeCamera();
@@ -232,6 +241,11 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
 
             }
         }.start();
+    }
+
+    private void cancelTimerToServe(){
+        if(cancelTimer != null)
+        cancelTimer.cancel();
     }
 
     public void onStart() {

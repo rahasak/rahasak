@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
+import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +43,8 @@ import java.nio.ShortBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.google.android.gms.appindexing.Action;
@@ -57,7 +60,9 @@ import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
+import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 import com.skyfishjy.library.RippleBackground;
 
@@ -67,6 +72,10 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private TextView mTimerTextView;
     private long mStartTime = 10;
     private Thread ticker;
+
+    private static final int TIME_TO_SERVE_REQUEST = 10000; // 5 seconds
+
+    private CountDownTimer cancelTimer;
 
     private User sender;
     private User receiver;
@@ -131,7 +140,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
         wakeLock.acquire();
-
+        startTimerToEndRequest();
 
     }
 
@@ -150,6 +159,28 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         //Release screen lock, so the phone can go back to sleep
         wakeLock.release();
         stopVibrations();
+    }
+
+    private void startTimerToEndRequest(){
+        final RecordingActivity _this = this;
+        cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST,TIME_TO_SERVE_REQUEST){
+            @Override
+            public void onFinish() {
+                //initializeCamera();
+                SenzSoundHandler.getInstance().sendBusyNotification( new Senz(null, null, null, sender, receiver, null), _this);
+                _this.finish();
+            }
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.i(TAG, "Time in count down -" + millisUntilFinished);
+
+            }
+        }.start();
+    }
+
+    private void cancelTimerToServe(){
+        if(cancelTimer != null)
+            cancelTimer.cancel();
     }
 
     private void setupSwipeBtns(){
@@ -200,6 +231,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                     if(hasRecordingStarted == false) {
                         hasRecordingStarted = true;
                         stopVibrations();
+                        cancelTimerToServe();
                         startRecording();
                         moving_layout.setVisibility(View.INVISIBLE);
                     }
@@ -247,16 +279,20 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
             isRecordingDone = true;
             audioRecorder.stopRecording();
             if (audioRecorder.getRecording() != null) {
-                Secret secret = getSoundSecret(receiver, sender, Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
+                Secret secret = getSoundSecret(sender, receiver, Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
+                Long _timeStamp = System.currentTimeMillis();
+                secret.setTimeStamp(_timeStamp);
+                String uid = SenzUtils.getUniqueRandomNumber().toString();
+                secret.setID(uid);
                 dbSource.createSecret(secret);
-                sendSecret(secret);
+                sendSecret(secret, uid);
             }
         }
         this.finish();
     }
 
-    private void sendSecret(Secret secret) {
-        SenzSoundHandler.getInstance().sendSound(secret, this);
+    private void sendSecret(Secret secret, String uid) {
+        SenzSoundHandler.getInstance().sendSound(secret, this, uid);
     }
 
     private Secret getSoundSecret(User sender, User receiver, String sound) {

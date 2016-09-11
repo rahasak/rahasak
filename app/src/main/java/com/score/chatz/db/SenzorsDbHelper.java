@@ -46,6 +46,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Secret.COLOMN_NAME_IMAGE + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_SOUND + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + TEXT_TYPE + " NOT NULL, " +
                     SenzorsDbContract.Secret.COLUMN_NAME_DELETE + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP + INT_TYPE +", "+
@@ -69,6 +70,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA + INT_TYPE +", "+
                     SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION + INT_TYPE +", "+
                     SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_MIC + INT_TYPE +", "+
+                    SenzorsDbContract.PermissionConfiguration.COLUMN_UNIQUE_ID + TEXT_TYPE + " NOT NULL" + ", " +
                     SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
                     "UNIQUE" + "(" + SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + ")" +
                     " )";

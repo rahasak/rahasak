@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteConstraintException;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -43,7 +46,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.HashMap;
 
-public class AddUserActivity extends AppCompatActivity {
+public class AddUserActivity extends BaseActivity {
 
     private static final String TAG = AddUserActivity.class.getName();
     private TextView headerTitle;
@@ -86,21 +89,7 @@ public class AddUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_user_activity);
-        getSupportActionBar().setCustomView(R.layout.add_user_action_bar);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-        headerTitle = (TextView) findViewById(R.id.header_center_text);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-        Toolbar toolbar=(Toolbar) getSupportActionBar().getCustomView().getParent();
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.getContentInsetEnd();
-        toolbar.setPadding(0, 0, 0, 0);
-
-
-        /*
-         * Main text on the page is broken down into parts for customization.
-         */
         invite_text_part_1 = (TextView) findViewById(R.id.textView);
         invite_text_part_2 = (TextView) findViewById(R.id.textView2);
         invite_text_part_3 = (TextView) findViewById(R.id.textView3);
@@ -112,14 +101,10 @@ public class AddUserActivity extends AppCompatActivity {
 
         editTextUserId = (EditText) findViewById(R.id.friend_id);
 
-        setupFonts();
-        setupBackBtn();
+        setupActionBar();
         setupAddUsersBtn();
-
-
+        setupFonts();
     }
-
-
 
     private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
         @Override
@@ -129,13 +114,18 @@ public class AddUserActivity extends AppCompatActivity {
         }
     };
 
+    private void setupActionBar(){
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        getSupportActionBar().setTitle("Invite");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
 
     @Override
     protected void onStart() {
         super.onStart();
-        // bind with senz service
-        // bind to service from here as well
-
+        this.registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
     }
 
 
@@ -162,6 +152,7 @@ public class AddUserActivity extends AppCompatActivity {
         this.unbindService(senzServiceConnection);
         //if (senzShareReceiver != null) unregisterReceiver(senzShareReceiver);
         if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
+        this.unregisterReceiver(userBusyNotifier);
         //if (senzMessageReceiver != null) unregisterReceiver(senzMessageReceiver);
     }
 
@@ -196,7 +187,7 @@ public class AddUserActivity extends AppCompatActivity {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
         typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-Light.otf");
         typefaceUltraThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-UltraLight.otf");
-        headerTitle.setTypeface(typefaceThin, Typeface.NORMAL);
+        //headerTitle.setTypeface(typefaceThin, Typeface.NORMAL);
         invite_text_part_1.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_2.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_3.setTypeface(typefaceUltraThin, Typeface.NORMAL);
@@ -302,7 +293,16 @@ public class AddUserActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 
 
@@ -401,5 +401,15 @@ public class AddUserActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
+    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+        }
+    };
+
+
 
 }

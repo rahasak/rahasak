@@ -3,8 +3,10 @@ package com.score.chatz.handlers;
 import android.content.Context;
 import android.os.RemoteException;
 
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.services.SenzServiceConnection;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -31,7 +33,7 @@ public class SenzSoundHandler extends BaseHandler {
         return instance;
     }
 
-    public void sendSound(final Secret secret, Context context) {
+    public void sendSound(final Secret secret, final Context context, final String uid) {
 
         //Get servicve connection
         final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
@@ -44,10 +46,11 @@ public class SenzSoundHandler extends BaseHandler {
 
                 try {
                     // compose senzes
+
                     Senz startSenz = getStartSoundSharingSenze(secret);
                     senzService.send(startSenz);
 
-                    ArrayList<Senz> photoSenzList = getSoundStreamingSenz(secret);
+                    ArrayList<Senz> photoSenzList = getSoundStreamingSenz(secret, context, uid);
                     //Senz photoSenz = getPhotoSenz(senz, image);
                     //senzService.send(photoSenz);
 
@@ -67,8 +70,11 @@ public class SenzSoundHandler extends BaseHandler {
         });
     }
 
-    private ArrayList<Senz> getSoundStreamingSenz(Secret secret) {
+    private ArrayList<Senz> getSoundStreamingSenz(Secret secret, Context context, String uid) {
         String soundString = secret.getSound();
+        //secret.setID(uid);
+        //new SenzorsDbSource(context).createSecret(secret);
+
         ArrayList<Senz> senzList = new ArrayList<>();
         String[] imgs = split(soundString, 1024);
         for (int i = 0; i < imgs.length; i++) {
@@ -81,9 +87,10 @@ public class SenzSoundHandler extends BaseHandler {
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             senzAttributes.put("chatzsound", imgs[i].trim());
+            senzAttributes.put("uid", uid);
 
 
-            Senz _senz = new Senz(id, signature, senzType, secret.getReceiver(), secret.getSender(), senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver() , senzAttributes);
             senzList.add(_senz);
         }
 
@@ -101,7 +108,7 @@ public class SenzSoundHandler extends BaseHandler {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getReceiver(), secret.getSender(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
         return _senz;
     }
 
@@ -116,7 +123,43 @@ public class SenzSoundHandler extends BaseHandler {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getReceiver(), secret.getSender(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
         return _senz;
+    }
+
+    public static void sendSoundRecievedConfirmation(final Senz senz, final Context context, final String uid, final Boolean isDone){
+        //Get servicve connection
+        final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
+
+        serviceConnection.executeAfterServiceConnected(new Runnable() {
+            @Override
+            public void run() {
+                // service instance
+                ISenzService senzService = serviceConnection.getInterface();
+                try {
+                    // create senz attributes
+                    HashMap<String, String> senzAttributes = new HashMap<>();
+                    senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+                    //This is unique identifier for each message
+                    senzAttributes.put("uid", uid);
+                    if (isDone) {
+                        senzAttributes.put("msg", "soundSent");
+                    } else {
+                        senzAttributes.put("msg", "soundSentFail");
+                    }
+                    // new senz
+                    String id = "_ID";
+                    String signature = "_SIGNATURE";
+                    SenzTypeEnum senzType = SenzTypeEnum.DATA;
+                    Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+
+                    senzService.send(_senz);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 }

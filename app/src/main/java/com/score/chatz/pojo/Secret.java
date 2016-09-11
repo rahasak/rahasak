@@ -11,6 +11,7 @@ public class Secret {
     private User sender;
     private User receiver;
     private boolean isDelete;
+    private boolean isDelivered;
     private Long timeStamp;
     private String id;
     private String imageThumbnail;
@@ -56,12 +57,20 @@ public class Secret {
         isDelete = val;
     }
 
+    public void setIsDelivered(boolean val){
+        isDelivered = val;
+    }
+
     public void setTimeStamp(Long ts){
         timeStamp = ts;
     }
 
-    public boolean isDelete(){
+    public boolean isMarkForDelete(){
         return isDelete;
+    }
+
+    public boolean isDelivered(){
+        return isDelivered;
     }
 
     public Long getTimeStamp(){

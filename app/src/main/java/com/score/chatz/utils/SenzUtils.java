@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by eranga on 6/27/16.
@@ -69,6 +70,11 @@ public class SenzUtils {
         }
 
         return null;
+    }
+
+    public static String getUniqueRandomNumber(){
+        String uuid = java.util.UUID.randomUUID().toString();
+        return uuid;
     }
 
 

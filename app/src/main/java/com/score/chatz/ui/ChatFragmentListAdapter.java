@@ -9,6 +9,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.score.chatz.utils.BitmapTaskParams;
 import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.pojos.User;
 
@@ -65,9 +67,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         //Log.i(TAG, "WHO IS SENDER: " + ((Secret)getItem(position)).getSender().getUsername() + ", currentUser: " + currentUser.getUsername());
-        if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+        if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
             return NOT_MY_SOUND_TYPE;
-        }else if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
             return MY_SOUND_TYPE;
         }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
             return MY_MESSAGE_TYPE;
@@ -80,7 +82,6 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             return NOT_MY_PHOTO_TYPE;
         }
     }
-
 
     /**
      * Create list row viewv
@@ -102,41 +103,48 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             //inflate sensor list row layout
             //create view holder to store reference to child views
             holder = new ViewHolder();
+
             switch (type) {
                 case MY_MESSAGE_TYPE:
                     view = mInflater.inflate(R.layout.my_message_layout, viewGroup, false);
                     holder.message = (TextView) view.findViewById(R.id.message);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = MY_MESSAGE_TYPE;
                     break;
                 case NOT_MY_MESSAGE_TYPE:
                     view = mInflater.inflate(R.layout.not_my_message_layout, viewGroup, false);
                     holder.message = (TextView) view.findViewById(R.id.message);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = NOT_MY_MESSAGE_TYPE;
                     break;
                 case MY_PHOTO_TYPE:
                     view = mInflater.inflate(R.layout.my_photo_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = MY_PHOTO_TYPE;
                     break;
                 case NOT_MY_PHOTO_TYPE:
                     view = mInflater.inflate(R.layout.not_my_photo_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.not_my_image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = NOT_MY_PHOTO_TYPE;
                     break;
                 case MY_SOUND_TYPE:
                     view = mInflater.inflate(R.layout.my_sound_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = MY_SOUND_TYPE;
                     break;
                 case NOT_MY_SOUND_TYPE:
                     view = mInflater.inflate(R.layout.not_my_sound_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = NOT_MY_SOUND_TYPE;
                     break;
             }
@@ -187,6 +195,16 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             });
         }
 
+        if(!currentUser.getUsername().equalsIgnoreCase(secret.getSender().getUsername())){
+            viewHolder.status.setVisibility(View.INVISIBLE);
+        }
+
+        if(secret.isDelivered()){
+            viewHolder.status.setText("Message sent!!!");
+        }else{
+            viewHolder.status.setText("Message sending...");
+        }
+
         viewHolder.sender.setText(secret.getSender().getUsername());
     }
 
@@ -199,14 +217,11 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             task.execute(new BitmapTaskParams(data, 400, 400));
     }
 
-
-
-
-
     /**
      * Keep reference to children view to avoid unnecessary calls
      */
     static class ViewHolder {
+        TextView status;
         TextView message;
         TextView sender;
         TextView sentTime;

@@ -46,9 +46,6 @@ public class AllFriendListFragment  extends ListFragment implements AdapterView.
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //ArrayAdapter adapter = ArrayAdapter.createFromResource(getActivity(), R.array.users, R.layout.single_user_card_row);
-        //adapter = new UserPermissionListAdapter(getContext(), userPermissionList);
-        //setListAdapter(adapter);
         getListView().setOnItemClickListener(this);
         getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
     }
@@ -100,7 +97,6 @@ public class AllFriendListFragment  extends ListFragment implements AdapterView.
         } else {
             adapter = new UserPermissionListAdapter(getContext(), userPermissionList);
             getListView().setAdapter(adapter);
-            //sensorListView.setEmptyView(emptyView);
         }
     }
 

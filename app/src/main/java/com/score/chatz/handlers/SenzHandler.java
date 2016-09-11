@@ -18,6 +18,7 @@ import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -76,6 +77,7 @@ public class SenzHandler {
                 handleStream(senzMessage);
             } else {
                 Senz senz = SenzParser.parse(senzMessage);
+                senz.setId(SenzUtils.getUniqueRandomNumber().toString());
                 verifySenz(senz);
                 switch (senz.getSenzType()) {
                     case PING:
@@ -182,16 +184,33 @@ public class SenzHandler {
                 // save senz in db
                 User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
                 senz.setSender(sender);
-                Log.d(TAG, "save user permission");
-                try {
-                    dbSource.updateConfigurablePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), senz.getAttributes().get("locPerm"), senz.getAttributes().get("micPerm"));
-                } catch (SQLiteConstraintException e) {
-                    Log.e(TAG, e.toString());
-                }
-                //TODO Indicate to the user if success
-            } else {
-                //TODO Indicate to the user if fail
+
             }
+            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
+        }else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("MsgSent")) {
+
+            dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
+            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
+        }else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("photoSent")) {
+
+            dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
+            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
+        }else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("soundSent")) {
+
+            dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
+            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
+        } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("userBusy")) {
+            Intent intent = AppIntentHandler.getUserBusyIntent();
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
         } else if (senz.getAttributes().containsKey("chatzmsg")) {
             /*
              * Any new chatz message, incoming, save straight to db
@@ -213,7 +232,13 @@ public class SenzHandler {
                 // save stream to db
                 try {
                     if (senz.getAttributes().containsKey("chatzphoto")) {
-                        dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver()));
+                        Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
+                        String uid = senz.getAttributes().get("uid");
+                        newSecret.setID(uid);
+                        Long _timeStamp = System.currentTimeMillis();
+                        newSecret.setTimeStamp(_timeStamp);
+                        dbSource.createSecret(newSecret);
+                        SenzPhotoHandler.sendPhotoRecievedConfirmation(senz, context, uid, true);
                     }
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
@@ -228,6 +253,15 @@ public class SenzHandler {
             // save stream to db
             try {
                 if (senz.getAttributes().containsKey("profilezphoto")) {
+
+                    /*Secret newSecret = new Secret(null, senz.getAttributes().get("profilezphoto"), senz.getAttributes().get("profilezphoto"), senz.getSender(), senz.getReceiver());
+                    String uid = senz.getAttributes().get("uid");
+                    newSecret.setID(uid);
+                    Long _timeStamp = System.currentTimeMillis();
+                    newSecret.setTimeStamp(_timeStamp);
+                    dbSource.createSecret(newSecret);
+                    SenzPhotoHandler.sendPhotoRecievedConfirmation(senz, context, uid, true);*/
+
                     User sender = senz.getSender();
                     dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
                 }
@@ -245,9 +279,16 @@ public class SenzHandler {
             try {
                 if (senz.getAttributes().containsKey("chatzsound")) {
                     User sender = senz.getSender();
-                    Secret secret = new Secret(null, null, null, senz.getReceiver(), senz.getSender());
+                    Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
                     secret.setSound(senz.getAttributes().get("chatzsound"));
+                    Long _timeStamp = System.currentTimeMillis();
+                    secret.setTimeStamp(_timeStamp);
+
+                    String uid = senz.getAttributes().get("uid");
+                    secret.setID(uid);
+
                     dbSource.createSecret(secret);
+                    SenzSoundHandler.sendSoundRecievedConfirmation(senz, context, uid, true);
                 }
             } catch (SQLiteConstraintException e) {
                 Log.e(TAG, e.toString());

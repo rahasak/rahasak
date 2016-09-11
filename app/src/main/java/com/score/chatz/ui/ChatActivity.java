@@ -1,7 +1,10 @@
 package com.score.chatz.ui;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -22,6 +25,7 @@ import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import org.apache.http.HttpResponse;
@@ -75,10 +79,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setupActionBar(){
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        getSupportActionBar().setTitle("Rahas");
+        getSupportActionBar().setTitle("@"+sender.getUsername());
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_arrow);
     }
 
     @Override
@@ -106,4 +109,5 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
+
 }

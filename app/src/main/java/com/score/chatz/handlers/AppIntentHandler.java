@@ -40,6 +40,16 @@ public class AppIntentHandler {
         return  intent;
     }
 
+    public static Intent getUserBusyIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.USER_BUSY));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return  intent;
+    }
+
     public static Intent getCameraIntent(Context context){
         Intent intent = new Intent();
         intent.setClass(context, PhotoActivity.class);
@@ -71,6 +81,9 @@ public class AppIntentHandler {
             case UPDATE_SENZ:
                 intentString = "com.score.chatz.USER_UPDATE";
                 break;
+            case USER_BUSY:
+                intentString = "com.score.chatz.USER_BUSY";
+                break;
             default:
                 throw new InvalidIntentType();
         }
@@ -88,6 +101,6 @@ public class AppIntentHandler {
     }
 
     enum INTENT_TYPE {
-        DATA_SENZ, UPDATE_SENZ
+        DATA_SENZ, UPDATE_SENZ, USER_BUSY
     }
 }

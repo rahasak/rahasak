@@ -1,6 +1,9 @@
 package com.score.chatz.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -15,6 +18,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbContract;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import android.support.v4.app.FragmentActivity;
@@ -28,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
     private static final String TAG = SplashActivity.class.getName();
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -175,6 +179,36 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+
+    /*getActivity().unregisterReceiver(userBusyNotifier);
+    getActivity().registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
+    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+        }
+    };*/
+
+    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+        }
+    };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.unregisterReceiver(userBusyNotifier);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        this.registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
+    }
 }
 
 

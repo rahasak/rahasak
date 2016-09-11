@@ -38,4 +38,9 @@
     <string name="no_registered_user">No Registered User. You must be a registered User to use this App.</string>
     <string name="perm_mic">Mic</string>
 
+    <string name="no_internet">No Network Connection</string>
+
+    <string name="sorry">Sorry!!</string>
+    <string name="is_busy_now">is busy right now.</string>
+
 </resources>

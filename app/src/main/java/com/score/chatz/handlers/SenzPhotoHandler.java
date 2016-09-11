@@ -12,10 +12,14 @@ import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -107,10 +111,12 @@ public class SenzPhotoHandler extends BaseHandler implements IComHandler {
                 Log.i(TAG, "USER INFO - senz.getSender() : " + senz.getSender().getUsername() + ", senz.getReceiver() : " + senz.getReceiver().getUsername());
                 try {
                     // compose senzes
+                    String uid = SenzUtils.getUniqueRandomNumber().toString();
+
                     Senz startSenz = getStartPhotoSharingSenze(senz);
                     senzService.send(startSenz);
 
-                    ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context);
+                    ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context, uid);
 
                     Senz stopSenz = getStopPhotoSharingSenz(senz);
 
@@ -128,7 +134,7 @@ public class SenzPhotoHandler extends BaseHandler implements IComHandler {
         });
     }
 
-    private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image, Context context) {
+    private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image, Context context, String uid) {
         String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
         String thumbnail = CameraUtils.resizeBase64Image(imageAsString);
 
@@ -137,7 +143,11 @@ public class SenzPhotoHandler extends BaseHandler implements IComHandler {
 
         if (senz.getAttributes().containsKey("chatzphoto")) {
             //Save photo to db before sending if its a chatzphoto
-            new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender()));
+            Secret newSecret = new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender());
+            Long _timeStamp = System.currentTimeMillis();
+            newSecret.setTimeStamp(_timeStamp);
+            newSecret.setID(uid);
+            new SenzorsDbSource(context).createSecret(newSecret);
         }
 
         for (int i = 0; i < imgs.length; i++) {
@@ -154,6 +164,8 @@ public class SenzPhotoHandler extends BaseHandler implements IComHandler {
             } else if (senz.getAttributes().containsKey("profilezphoto")) {
                 senzAttributes.put("profilezphoto", imgs[i].trim());
             }
+
+            senzAttributes.put("uid", uid);
 
             Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
             senzList.add(_senz);
@@ -187,6 +199,8 @@ public class SenzPhotoHandler extends BaseHandler implements IComHandler {
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("stream", "off");
 
+
+
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
@@ -219,5 +233,41 @@ public class SenzPhotoHandler extends BaseHandler implements IComHandler {
             Log.d(TAG, "Camera might already be in use... exception: " + ex);
             throw new CameraBusyException();
         }
+    }
+
+    public static void sendPhotoRecievedConfirmation(final Senz senz, final Context context, final String uid, final Boolean isDone){
+        //Get servicve connection
+        final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
+
+        serviceConnection.executeAfterServiceConnected(new Runnable() {
+            @Override
+            public void run() {
+                // service instance
+                ISenzService senzService = serviceConnection.getInterface();
+                try {
+                    // create senz attributes
+                    HashMap<String, String> senzAttributes = new HashMap<>();
+                    senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+                    //This is unique identifier for each message
+                    senzAttributes.put("uid", uid);
+                    if (isDone) {
+                        senzAttributes.put("msg", "photoSent");
+                    } else {
+                        senzAttributes.put("msg", "photoSentFail");
+                    }
+                    // new senz
+                    String id = "_ID";
+                    String signature = "_SIGNATURE";
+                    SenzTypeEnum senzType = SenzTypeEnum.DATA;
+                    Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+
+                    senzService.send(_senz);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 }

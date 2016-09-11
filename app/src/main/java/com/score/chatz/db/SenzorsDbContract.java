@@ -22,6 +22,7 @@ public class SenzorsDbContract {
     /* Inner class that defines secret table */
     public static abstract class Secret implements BaseColumns {
         public static final String TABLE_NAME = "secret";
+        public static final String COLUMN_UNIQUE_ID = "uid";
         public static final String COLUMN_NAME_TEXT = "text";
         public static final String COLOMN_NAME_IMAGE = "image";
         public static final String COLUMN_NAME_SOUND = "sound";
@@ -47,6 +48,7 @@ public class SenzorsDbContract {
      * Add more permissions here in the future */
     public static abstract class PermissionConfiguration implements BaseColumns {
         public static final String TABLE_NAME = "permission_config";
+        public static final String COLUMN_UNIQUE_ID = "uid";
         public static final String COLUMN_NAME_LOCATION = "location";
         public static final String COLUMN_NAME_CAMERA = "camera";
         public static final String COLUMN_NAME_MIC = "mic";

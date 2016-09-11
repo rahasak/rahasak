@@ -44,6 +44,7 @@ import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.BitmapTaskParams;
 import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -52,7 +53,7 @@ import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 
-public class UserProfileActivity extends AppCompatActivity {
+public class UserProfileActivity extends BaseActivity {
     private static final String TAG = UserProfileActivity.class.getName();
     private User user;
     private TextView username;
@@ -65,7 +66,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private Button shareSecretBtn;
     private TextView tapImageText;
     private ImageView userImage;
-    private static SenzorsDbSource db;
+    SenzorsDbSource dbSource;
 
     // service interface
     private ISenzService senzService = null;
@@ -101,9 +102,11 @@ public class UserProfileActivity extends AppCompatActivity {
         userzPerm = getUserConfigPerm(user);
         currentUserGivenPerm = getUserAndPermission(user);
 
+        dbSource = new SenzorsDbSource(this);
+
         try {
             currentUser = PreferenceUtils.getUser(this);
-        }catch (NoUserException ex){
+        } catch (NoUserException ex) {
             Log.e(TAG, "No registered user.");
         }
 
@@ -117,15 +120,15 @@ public class UserProfileActivity extends AppCompatActivity {
 
     }
 
-    private void setupGetProfileImageBtn(){
+    private void setupGetProfileImageBtn() {
         tapImageText = (TextView) findViewById(R.id.tap_image_text);
         ImageView imgBtn = (ImageView) findViewById(R.id.clickable_image);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentUserGivenPerm.getCamPerm() == true) {
+                if (currentUserGivenPerm.getCamPerm() == true) {
                     getPhoto(userzPerm.getUser());
-                }else{
+                } else {
                     //Toast.makeText(UserProfileActivity.this, "Sorry. This user has not shared camera permissions with you.", Toast.LENGTH_LONG).show();
                 }
             }
@@ -135,7 +138,7 @@ public class UserProfileActivity extends AppCompatActivity {
     /*
      * Get photo of user
      */
-    private void getPhoto(User receiver){
+    private void getPhoto(User receiver) {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -154,19 +157,19 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void setupClickableImage(){
+    private void setupClickableImage() {
         //Update permissions
         currentUserGivenPerm = getUserAndPermission(user);
-        if(currentUserGivenPerm.getCamPerm() == true) {
+        if (currentUserGivenPerm.getCamPerm() == true) {
             tapImageText.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             tapImageText.setVisibility(View.INVISIBLE);
         }
     }
 
-    private void setupActionBar(){
+    private void setupActionBar() {
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        getSupportActionBar().setTitle("Profile");
+        getSupportActionBar().setTitle("@"+user.getUsername());
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_arrow);
@@ -189,8 +192,22 @@ public class UserProfileActivity extends AppCompatActivity {
 
         // Unbind from the service
         this.unbindService(senzServiceConnection);
+        this.unregisterReceiver(userBusyNotifier);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        this.registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
+    }
+
+    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -203,13 +220,14 @@ public class UserProfileActivity extends AppCompatActivity {
 
     }
 
-    private void setupUserPermissions(){
+    private void setupUserPermissions() {
+        final Context context = getApplicationContext();
         userzPerm = getUserConfigPerm(user);
 
         username.setText(userzPerm.getUser().getUsername());
 
-        if(userzPerm.getUser().getUserImage() != null) {
-            loadBitmap(db.getImageFromDB(user.getUsername()), userImage);
+        if (userzPerm.getUser().getUserImage() != null) {
+            loadBitmap(dbSource.getImageFromDB(user.getUsername()), userImage);
         }
 
         cameraSwitch.setChecked(userzPerm.getCamPerm());
@@ -217,34 +235,46 @@ public class UserProfileActivity extends AppCompatActivity {
         locationSwitch.setChecked(userzPerm.getLocPerm());
         cameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    //Send permCam true to user
-                    sendPermission(user, "true", null, null);
-                }else{
-                    //Send permCam false to user
-                    sendPermission(user, "false", null, null);
+                if (NetworkUtil.isAvailableNetwork(context)) {
+                    if (isChecked == true) {
+                        //Send permCam true to user
+                        sendPermission(user, "true", null, null);
+                    } else {
+                        //Send permCam false to user
+                        sendPermission(user, "false", null, null);
+                    }
+                } else {
+                    Toast.makeText(context, R.string.no_internet, Toast.LENGTH_SHORT).show();
                 }
             }
         });
         locationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    //Send permLoc true to user
-                    sendPermission(user, null, "true", null);
-                }else{
-                    //Send permLoc false to user
-                    sendPermission(user, null, "false", null);
+                if (NetworkUtil.isAvailableNetwork(context)) {
+                    if (isChecked == true) {
+                        //Send permLoc true to user
+                        sendPermission(user, null, "true", null);
+                    } else {
+                        //Send permLoc false to user
+                        sendPermission(user, null, "false", null);
+                    }
+                } else {
+                    Toast.makeText(context, R.string.no_internet, Toast.LENGTH_SHORT).show();
                 }
             }
         });
         micSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    //Send permMic true to user
-                    sendPermission(user, null, null, "true");
-                }else{
-                    //Send permMic false to user
-                    sendPermission(user, null, null, "false");
+                if (NetworkUtil.isAvailableNetwork(context)) {
+                    if (isChecked == true) {
+                        //Send permMic true to user
+                        sendPermission(user, null, null, "true");
+                    } else {
+                        //Send permMic false to user
+                        sendPermission(user, null, null, "false");
+                    }
+                } else {
+                    Toast.makeText(context, R.string.no_internet, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -258,23 +288,23 @@ public class UserProfileActivity extends AppCompatActivity {
             task.execute(new BitmapTaskParams(data, 1000, 1000));
     }
 
-    private UserPermission getUserConfigPerm(User user){
-        if(db == null) {
-            db = new SenzorsDbSource(this);
-            return db.getUserConfigPermission(user);
-        }else{
-            return db.getUserConfigPermission(user);
+    private UserPermission getUserConfigPerm(User user) {
+        if (dbSource == null) {
+            dbSource = new SenzorsDbSource(this);
+            return dbSource.getUserConfigPermission(user);
+        } else {
+            return dbSource.getUserConfigPermission(user);
         }
     }
 
-    private UserPermission getUserAndPermission(User user){
-        return new SenzorsDbSource(this).getUserAndPermission(user);
+    private UserPermission getUserAndPermission(User user) {
+        return dbSource.getUserAndPermission(user);
     }
 
 
-    private void setupGoToChatViewBtn(){
+    private void setupGoToChatViewBtn() {
         shareSecretBtn = (Button) findViewById(R.id.share_secret_btn);
-        shareSecretBtn.setOnClickListener(new View.OnClickListener(){
+        shareSecretBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
                 intent.putExtra("SENDER", user.getUsername());
@@ -289,14 +319,14 @@ public class UserProfileActivity extends AppCompatActivity {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("msg", "newPerm");
-            if(camPerm != null) {
-                senzAttributes.put("camPerm", camPerm); //Default Values, later in ui allow user to configure this on share
+            if (camPerm != null) {
+                senzAttributes.put("camPerm", camPerm);
             }
-            if(locPerm != null) {
-                senzAttributes.put("locPerm", locPerm); //Dafault Values
+            if (locPerm != null) {
+                senzAttributes.put("locPerm", locPerm);
             }
-            if(micPerm != null) {
-                senzAttributes.put("micPerm", micPerm); //Dafault Values
+            if (micPerm != null) {
+                senzAttributes.put("micPerm", micPerm);
             }
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
@@ -305,6 +335,8 @@ public class UserProfileActivity extends AppCompatActivity {
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
             Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+            senz.setSender(currentUser);
+            savePermToDB(senz);
 
             senzService.send(senz);
         } catch (RemoteException e) {
@@ -312,7 +344,19 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void registerAllReceivers(){
+    private void savePermToDB(Senz senz) {
+        if (senz.getAttributes().containsKey("locPerm")) {
+            dbSource.updateConfigurablePermissions(senz.getReceiver(), null, senz.getAttributes().get("locPerm"), null);
+        }
+        if (senz.getAttributes().containsKey("camPerm")) {
+            dbSource.updateConfigurablePermissions(senz.getReceiver(), senz.getAttributes().get("camPerm"), null, null);
+        }
+        if (senz.getAttributes().containsKey("micPerm")) {
+            dbSource.updateConfigurablePermissions(senz.getReceiver(), null, null, senz.getAttributes().get("micPerm"));
+        }
+    }
+
+    private void registerAllReceivers() {
         registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_SHARED"));
         //Register for fail messages, incase other user is not online
         registerReceiver(senzDataReceiver, new IntentFilter("com.score.chatz.DATA_SENZ")); //Incoming data share
@@ -324,14 +368,18 @@ public class UserProfileActivity extends AppCompatActivity {
             Senz senz = intent.getExtras().getParcelable("SENZ");
             if (senz.getAttributes().containsKey("msg")) {
                 // msg response received
-                ActivityUtils.cancelProgressDialog();
                 String msg = senz.getAttributes().get("msg");
                 if (msg != null && msg.equalsIgnoreCase("USER_NOT_ONLINE")) {
                     //Reset display
                     setupUserPermissions();
                 }
             }
-            updateActivity();
+
+            String userImageData = dbSource.getImageFromDB(user.getUsername());
+            if(userImageData != null)
+            loadBitmap(userImageData, userImage);
+            setupClickableImage();
+            //updateActivity();
         }
     }
 
@@ -341,7 +389,7 @@ public class UserProfileActivity extends AppCompatActivity {
         setupClickableImage();
     }
 
-    private void unregisterAllReceivers(){
+    private void unregisterAllReceivers() {
         if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
         if (userSharedReceiver != null) unregisterReceiver(userSharedReceiver);
 
@@ -352,7 +400,7 @@ public class UserProfileActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got user shared intent from Senz service");
-            handleSharedUser(intent);
+            //handleSharedUser(intent);
         }
     };
 

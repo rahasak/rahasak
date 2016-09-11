@@ -251,9 +251,10 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB, secret.getThumbnail());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER, secret.getReceiver().getUsername());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_SENDER, secret.getSender().getUsername());
+            values.put(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID, secret.getID());
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
-            Long _timeStamp = System.currentTimeMillis();
-            values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, _timeStamp);
+            values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_SOUND, secret.getSound());
 
             // Insert the new row, if fails throw an error
@@ -264,6 +265,32 @@ public class SenzorsDbSource {
             db.endTransaction();
         }
 
+    }
+
+    /**
+     * Mark message as delivered
+     * @param uid unique identifier of message
+     */
+    public void markSecretDelievered (String uid) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 1);
+
+            // update
+            db.update(SenzorsDbContract.Secret.TABLE_NAME,
+                    values,
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
+                    new String[]{uid});
+
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
     }
 
     /**
@@ -301,6 +328,9 @@ public class SenzorsDbSource {
 
         // content values to inset
         ContentValues values = new ContentValues();
+
+        values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_UNIQUE_ID, senz.getId());
+
         if (senz.getAttributes().containsKey("permCam")) {
             values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA, ((String)senz.getAttributes().get("permCam")).equalsIgnoreCase("true") ? 1 : 0);
         }
@@ -326,8 +356,8 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, text, image, thumbnail, sender, receiver, deleted, timestamp, sound " +
-                "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, timestamp, sound " +
+                "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
 
         // secret attr
@@ -337,6 +367,68 @@ public class SenzorsDbSource {
         String _secretSender;
         String _secretReceiver;
         int _secretDelete;
+        int _secretIsDelivered;
+        Long _secretTimestamp;
+        String _thumbnail;
+        String _secretSound;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            // get secret attributes
+            _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
+            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
+            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
+            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
+            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+            _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
+            _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
+            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
+            _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
+
+            // create secret
+            Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
+            secret.setDelete(_secretDelete == 1 ? true : false);
+            secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
+            secret.setTimeStamp(_secretTimestamp);
+            secret.setID(_secretId);
+            secret.setSound(_secretSound);
+
+            // fill secret list
+            secretList.add(secret);
+        }
+
+        // clean
+        cursor.close();
+
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
+    }
+
+    /**
+     * Get limited secrets, use for lazy loading
+     * @param sender
+     * @param receiver
+     * @param limit
+     * @return secrets list
+     */
+    public ArrayList<Secret> getSecretz(User sender, User receiver, Integer limit) {
+        Log.i(TAG, "Get Secrets: getting all secret messages, sender - " + sender.getUsername() + ", receiver - " + receiver.getUsername());
+        ArrayList<Secret> secretList = new ArrayList();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, timestamp, sound " +
+                "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id ASC LIMIT ?";
+        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername(), limit.toString() });
+
+        // secret attr
+        String _secretId;
+        String _secretText;
+        String _secretImage;
+        String _secretSender;
+        String _secretReceiver;
+        int _secretDelete;
+        int _secretIsDelivered;
         Long _secretTimestamp;
         String _thumbnail;
         String _secretSound;
@@ -346,12 +438,13 @@ public class SenzorsDbSource {
             HashMap<String, String> chatzAttributes = new HashMap<>();
 
             // get secret attributes
-            _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret._ID));
+            _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
             _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
             _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
             _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
+            _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
             _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
@@ -360,6 +453,72 @@ public class SenzorsDbSource {
             // create secret
             Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
             secret.setDelete(_secretDelete == 1 ? true : false);
+            secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
+            secret.setTimeStamp(_secretTimestamp);
+            secret.setID(_secretId);
+            secret.setSound(_secretSound);
+
+            // fill secret list
+            secretList.add(secret);
+        }
+
+        // clean
+        cursor.close();
+
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
+    }
+
+
+    /**
+     * get list of secrets from given last timestamp
+     * @param sender
+     * @param receiver
+     * @param timestamp timestamp after which all secrets shall be loaded
+     * @return
+     */
+    public ArrayList<Secret> getSecretz(User sender, User receiver, Long timestamp) {
+        Log.i(TAG, "Get Secrets: getting all secret messages, sender - " + sender.getUsername() + ", receiver - " + receiver.getUsername());
+        ArrayList<Secret> secretList = new ArrayList();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, timestamp, sound " +
+                "FROM secret WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) AND timestamp > ? ORDER BY _id ASC";
+        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername(), timestamp.toString()});
+
+        // secret attr
+        String _secretId;
+        String _secretText;
+        String _secretImage;
+        String _secretSender;
+        String _secretReceiver;
+        int _secretDelete;
+        int _secretIsDelivered;
+        Long _secretTimestamp;
+        String _thumbnail;
+        String _secretSound;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            HashMap<String, String> chatzAttributes = new HashMap<>();
+
+            // get secret attributes
+            _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
+            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
+            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
+            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
+            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+            _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
+            _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
+            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
+            _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
+
+
+            // create secret
+            Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
+            secret.setDelete(_secretDelete == 1 ? true : false);
+            secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
             secret.setSound(_secretSound);
@@ -385,12 +544,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        /*String query = "SELECT * " +
-                "FROM secret as s " +
-                "RIGHT JOIN user as u " +
-                "ON u.username = s.sender " +
-                "WHERE s.sender != ? GROUP BY s.sender ORDER BY s._id DESC";*/
-        String query = "SELECT MAX(_id), text, image, thumbnail, sender, receiver, timestamp FROM secret " +
+        String query = "SELECT MAX(_id), text, image, thumbnail, sender, receiver, timestamp, sound FROM secret " +
                 "WHERE sender != ? GROUP BY sender ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername()});
 
@@ -402,6 +556,7 @@ public class SenzorsDbSource {
         String _secretSenderImage;
         String _secretThumbnail;
         Long _timeStamp;
+        String _secretSound;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -415,12 +570,64 @@ public class SenzorsDbSource {
             _secretThumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
             _timeStamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretSenderImage = getImageFromDB(_secretSender);
+            _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
 
             // create secret
             User senderUser = new User("", _secretSender);
             senderUser.setUserImage(_secretSenderImage);
             Secret secret = new Secret(_secretText, _secretImage, _secretThumbnail, senderUser, new User("", _secretReceiver));
             secret.setTimeStamp(_timeStamp);
+            secret.setSound(_secretSound);
+
+            // fill secret list
+            secretList.add(secret);
+        }
+
+        // clean
+        cursor.close();
+
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
+    }
+
+    public ArrayList<Secret> getAllOtherSercets(User sender, Long timestamp) {
+        ArrayList<Secret> secretList = new ArrayList();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT MAX(_id), text, image, thumbnail, sender, receiver, timestamp, sound FROM secret " +
+                "WHERE sender != ? AND timestamp > ? GROUP BY sender ORDER BY _id DESC";
+        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), timestamp.toString()});
+
+        // secret attr
+        String _secretText;
+        String _secretImage;
+        String _secretSender;
+        String _secretReceiver;
+        String _secretSenderImage;
+        String _secretThumbnail;
+        Long _timeStamp;
+        String _secretSound;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            HashMap<String, String> chatzAttributes = new HashMap<>();
+
+            // get chatz attributes
+            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
+            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
+            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
+            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+            _secretThumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
+            _timeStamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _secretSenderImage = getImageFromDB(_secretSender);
+            _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
+
+            // create secret
+            User senderUser = new User("", _secretSender);
+            senderUser.setUserImage(_secretSenderImage);
+            Secret secret = new Secret(_secretText, _secretImage, _secretThumbnail, senderUser, new User("", _secretReceiver));
+            secret.setTimeStamp(_timeStamp);
+            secret.setSound(_secretSound);
 
             // fill secret list
             secretList.add(secret);

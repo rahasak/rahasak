@@ -12,6 +12,7 @@ import com.score.chatz.interfaces.IComHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -51,6 +52,9 @@ public class SenzMessageHandler extends BaseHandler implements IComHandler {
             Log.d(TAG, "save incoming chatz");
             String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
             Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
+            newSecret.setID(SenzUtils.getUniqueRandomNumber().toString());
+            Long _timeStamp = System.currentTimeMillis();
+            newSecret.setTimeStamp(_timeStamp);
             dbSource.createSecret(newSecret);
 
             senz.setSender(sender);
@@ -72,6 +76,9 @@ public class SenzMessageHandler extends BaseHandler implements IComHandler {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+            //This is unique identifier for each message
+            senzAttributes.put("uid", senz.getAttributes().get("uid"));
             if (isDone) {
                 senzAttributes.put("msg", "MsgSent");
             } else {

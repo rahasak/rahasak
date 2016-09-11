@@ -138,9 +138,12 @@
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".ui.PhotoFullScreenActivity"
-            android:theme="@style/MyMaterialTheme" />
+            android:theme="@style/MyMaterialTheme"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".ui.RecordingActivity"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/MyMaterialTheme"
+            android:screenOrientation="portrait"></activity>
 
         <!-- Servicves -->
         <service

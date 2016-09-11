@@ -66,6 +66,7 @@ public class SenzStream {
     public String getSenzString(){
         String senzString = getStartOfStream(streamType);
         senzString += getImageFromStream();
+        senzString += getUIDOfStream(streamType);
         senzString += getEndOfStream(streamType);
         return senzString;
     }
@@ -151,6 +152,49 @@ public class SenzStream {
         }
 
         return "DATA " + startOfStream;
+    }
+
+    /**
+     * Return the start of the stream based on which type of stream
+     * @param type
+     * @return
+     */
+    private String getUIDOfStream(SENZ_STEAM_TYPE type){
+        String uidStream = null;
+        Pattern pattern = null;
+        Matcher matcher = null;
+
+        switch (type){
+            case CHATZPHOTO:
+                pattern = Pattern.compile("(#uid\\s[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+\\s)");
+                matcher = pattern.matcher(image);
+                if (matcher.find())
+                {
+                    uidStream = matcher.group(1);
+                }
+                //uidStream += "#chatzphoto ";
+                break;
+            case PROFILEZPHOTO:
+                pattern = Pattern.compile("(#uid\\s[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+\\s)");
+                matcher = pattern.matcher(image);
+                if (matcher.find())
+                {
+                    uidStream = matcher.group(1);
+                }
+                //startOfStream += "#profilezphoto ";
+                break;
+            case CHATZSOUND:
+                pattern = Pattern.compile("(#uid\\s[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+\\s)");
+                matcher = pattern.matcher(image);
+                if (matcher.find())
+                {
+                    uidStream = matcher.group(1);
+                }
+                //startOfStream += "#chatzsound ";
+                break;
+        }
+
+        return " " + uidStream;
     }
 
     /**

@@ -9,6 +9,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.interfaces.IComHandler;
 import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -83,7 +84,6 @@ public class SenzPermissionHandler extends BaseHandler implements IComHandler {
                 if (senz.getAttributes().containsKey("micPerm")) {
                     senzAttributes.put("micPerm", senz.getAttributes().get("micPerm"));
                 }
-
             } else {
                 senzAttributes.put("msg", "ShareFail");
             }
