@@ -5,42 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/android_grey">
 
-    <!--<LinearLayout
-        android:id="@+id/button_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:gravity="bottom"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp">
-
-        <Button
-            android:id="@+id/btnStart"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Start"
-            android:textColor="@color/android_green" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="7dp"
-            android:layout_marginTop="7dp"
-            android:background="@color/android_green" />
-
-        <Button
-            android:id="@+id/btnStop"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Stop"
-            android:textColor="@color/android_green" />
-    </LinearLayout>-->
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -156,6 +120,27 @@
 
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/translucent_black">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/rlogo_launcher"
+            android:layout_marginRight="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/photo_request"
+            android:text="Photo Request by : Eranga"
+            android:textColor="@color/white" />
+    </LinearLayout>
 
 
 </RelativeLayout>

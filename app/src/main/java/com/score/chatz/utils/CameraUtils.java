@@ -53,8 +53,14 @@ public class CameraUtils {
         Bitmap rotatedBitmap = null;
         if(imageBitmap != null) {
 
-            //Setup matrix rotate image
+            //setup adjustment matrix
             Matrix matrix = new Matrix();
+
+            //Setup flip image
+            float[] mirrorY = { -1, 0, 0, 0, 1, 0, 0, 0, 1};
+            matrix.setValues(mirrorY);
+
+            //Setup matrix rotate image
             matrix.postRotate(degrees);
 
             //Resize

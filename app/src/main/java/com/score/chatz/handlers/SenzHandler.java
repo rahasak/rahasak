@@ -127,7 +127,11 @@ public class SenzHandler {
                 SenzPhotoHandler.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
 
         } else if (senz.getAttributes().containsKey("chatzmic")) {
-            openRecorder(senz.getSender().getUsername());
+            if(RecordingActivity.isAcitivityActive() == false) {
+                openRecorder(senz.getSender().getUsername());
+            }else{
+                SenzSoundHandler.sendBusyNotification(senz, context);
+            }
         } else if (senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")) {
             Intent serviceIntent = new Intent(context, LocationService.class);
             serviceIntent.putExtra("USER", senz.getSender());
@@ -263,6 +267,7 @@ public class SenzHandler {
                     SenzPhotoHandler.sendPhotoRecievedConfirmation(senz, context, uid, true);*/
 
                     User sender = senz.getSender();
+                    if(sender != null)
                     dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
                 }
             } catch (SQLiteConstraintException e) {

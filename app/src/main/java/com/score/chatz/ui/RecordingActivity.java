@@ -72,8 +72,10 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private TextView mTimerTextView;
     private long mStartTime = 10;
     private Thread ticker;
+    private boolean isRecordingCancelled;
+    private static boolean isActivityActive;
 
-    private static final int TIME_TO_SERVE_REQUEST = 10000; // 5 seconds
+    private static final int TIME_TO_SERVE_REQUEST = 30000;
 
     private CountDownTimer cancelTimer;
 
@@ -123,6 +125,14 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         String senderString = intent.getStringExtra("SENDER");
         sender = new User("", senderString);
 
+        if(isAcitivityActive()== true){
+            cancelTimerToServe();
+            SenzSoundHandler.getInstance().sendBusyNotification( new Senz(null, null, null, sender, receiver, null), this);
+            this.finish();
+        }else {
+            isActivityActive = true;
+
+
         dbSource = new SenzorsDbSource(this);
 
         audioRecorder = new AudioRecorder();
@@ -136,12 +146,18 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         startBtnAnimations();
         startVibrations();
         setupHandlesForSwipeBtnContainers();
+        setupPhotoRequestTitle();
 
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
         wakeLock.acquire();
         startTimerToEndRequest();
+        }
 
+    }
+
+    private void setupPhotoRequestTitle(){
+        ((TextView)findViewById(R.id.photo_request)).setText(getResources().getString(R.string.sound_request) + " @" + sender.getUsername());
     }
 
     @Override
@@ -157,6 +173,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     protected void onDestroy() {
         super.onDestroy();
         //Release screen lock, so the phone can go back to sleep
+        if(wakeLock != null)
         wakeLock.release();
         stopVibrations();
     }
@@ -237,8 +254,13 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                     }
                 }else if(cancelBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
                     // Inside cancel button region
-                    stopVibrations();
-                    stopRecording();
+                    if(isRecordingCancelled == false) {
+                        isRecordingCancelled = true;
+                        cancelTimerToServe();
+                        SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
+                        stopVibrations();
+                        stopRecording();
+                    }
                 }
                 break;
             case (MotionEvent.ACTION_UP):
@@ -332,7 +354,13 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     @Override
     public void onStop() {
         super.onStop();
+        isActivityActive = false;
     }
+
+    public static boolean isAcitivityActive(){
+        return isActivityActive;
+    }
+
 }
 
 

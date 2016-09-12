@@ -43,4 +43,7 @@
     <string name="sorry">Sorry!!</string>
     <string name="is_busy_now">is busy right now.</string>
 
+    <string name="photo_request">Photo requested by:</string>
+    <string name="sound_request">Say a secret to:</string>
+
 </resources>

@@ -48,6 +48,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private SenzStream.SENZ_STEAM_TYPE streamType;
 
+    private boolean isCameraBusy;
+
+    private static CameraPreview instance;
+
     //Constructor that obtains context and camera
     public CameraPreview(Context _context, Camera camera, SenzStream.SENZ_STEAM_TYPE streamType) {
         super(_context);
@@ -57,6 +61,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
         this.streamType = streamType;
+        instance = this;
+    }
+
+    public static CameraPreview getSingleton(Context _context, Camera camera, SenzStream.SENZ_STEAM_TYPE streamType){
+        if(instance == null){
+          return new CameraPreview(_context,  camera,  streamType);
+        }else{
+            return instance;
+        }
     }
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
@@ -95,26 +108,27 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if (mCamera != null)
+        /*if (mCamera != null) {
+            isCameraBusy = true;
             mCamera.release();
-        mCamera = getCameraInstant();
-        Camera.Parameters parameters = mCamera.getParameters();
-        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-        parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
-        mCamera.setParameters(parameters);
+        }else {*/
+        isCameraBusy =true;
+            mCamera = getCameraInstant();
+            Camera.Parameters parameters = mCamera.getParameters();
+            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+            parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
+            mCamera.setParameters(parameters);
+            try {
+                mCamera.setPreviewDisplay(surfaceHolder);
+                mCamera.setDisplayOrientation(90);
 
+                mCamera.startPreview();
+            } catch (IOException e) {
+                // left blank for now
+                Log.d(TAG, "Error setting camera preview: " + e.getMessage());
 
-
-        try {
-            mCamera.setPreviewDisplay(surfaceHolder);
-            mCamera.setDisplayOrientation(90);
-
-            mCamera.startPreview();
-        } catch (IOException e) {
-            // left blank for now
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-
-        }
+            }
+        //}
     }
 
     public void takePhoto(final PhotoActivity activity, final Senz originalSenz) {
@@ -123,7 +137,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
                 byte[] resizedImage = null;
-                bytes = resizeBitmapByteArray(bytes, -90);
+                bytes = resizeBitmapByteArray(bytes, 90);
                 if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
                     resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
@@ -144,13 +158,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
                 byte[] resizedImage = null;
-                bytes = resizeBitmapByteArray(bytes, -90);
+                bytes = resizeBitmapByteArray(bytes, 90);
                 if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
                     resizedImage = CameraUtils.getCompressedImage(bytes, 180); //Compress image ~ 5kbs
                 } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
                     resizedImage = CameraUtils.getCompressedImage(bytes, 180); //Compress image ~ 50kbs
                 }
+
+                isCameraBusy = false;
 
                 SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
@@ -160,13 +176,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 activity.finish();
             }
         });
-    }
-
-    public void onUserBusy(final PhotoActivity activity, final Senz originalSenz) {
-
-                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, getContext());
-                activity.finish();
-
     }
 
     private byte[] resizeBitmapByteArray(byte[] data, int deg) {
@@ -185,6 +194,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             mCamera.release();
+            isCameraBusy =false;
         }
     }
 
@@ -226,5 +236,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // cannot get camera or does not exist
         }
         return camera;
+    }
+
+    public boolean isCameraBusy(){
+        return isCameraBusy;
     }
 }

@@ -37,11 +37,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.google.android.gms.vision.CameraSource;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.utils.AnimationUtils;
@@ -63,6 +65,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
     private android.hardware.Camera mCamera;
     private CameraPreview mCameraPreview;
     private boolean isPhotoTaken;
+    private boolean isPhotoCancelled;
 
     private PhotoActivity instnce;
     private Senz originalSenz;
@@ -76,10 +79,11 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
 
     private CountDownTimer cancelTimer;
 
-    private static final int TIME_TO_SERVE_REQUEST = 10000; // 5 seconds
+    private static final int TIME_TO_SERVE_REQUEST = 30000;
 
 
     private float dX, dY, startX, startY;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,10 +94,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_photo);
         instnce = this;
-        mCameraPreview = new CameraPreview(this, mCamera, (SenzStream.SENZ_STEAM_TYPE) getIntent().getExtras().get("StreamType"));
-
-        FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
-        preview.addView(mCameraPreview);
+        mCameraPreview = CameraPreview.getSingleton(this, mCamera, (SenzStream.SENZ_STEAM_TYPE) getIntent().getExtras().get("StreamType"));
 
         try {
             originalSenz = (Senz) getIntent().getParcelableExtra("Senz");
@@ -101,36 +102,61 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
             ex.printStackTrace();
         }
 
-        setupSwipeBtns();
-        startBtnAnimations();
-        startVibrations();
-        setupHandlesForSwipeBtnContainers();
+        if(mCameraPreview.isCameraBusy() == true) {
+            SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+            this.finish();
+        }else{
+            FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
+            try {
+                preview.addView(mCameraPreview);
+            }catch (IllegalStateException ex){
+                ex.printStackTrace();
+                ViewGroup parent = (ViewGroup) mCameraPreview.getParent();
+                if (parent != null) {
+                    parent.removeView(mCameraPreview);
+                }
+                preview.addView(mCameraPreview);
+            }
 
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-        wakeLock.acquire();
+            setupSwipeBtns();
+            startBtnAnimations();
+            startVibrations();
+            setupHandlesForSwipeBtnContainers();
+            setupPhotoRequestTitle();
 
-        getSupportActionBar().hide();
-        startTimerToEndRequest();
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+            wakeLock.acquire();
+
+            getSupportActionBar().hide();
+            startTimerToEndRequest();
+        }
+    }
+
+    private void setupPhotoRequestTitle(){
+        ((TextView)findViewById(R.id.photo_request)).setText(getResources().getString(R.string.photo_request) + " @" + originalSenz.getSender().getUsername());
     }
 
     @Override
     public void onWindowFocusChanged (boolean hasFocus){
         super.onWindowFocusChanged(hasFocus);
-        if(hasFocus){
-            startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
-            cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
-        }
+        //if(mCameraPreview.isCameraBusy() == false) {
+            if (hasFocus) {
+                startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
+                cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
+            }
+        //}
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //Release screen lock, so the phone can go back to sleep
-        wakeLock.release();
-        stopVibrations();
-        if(mCamera != null)
-            mCamera.release();
+            //Release screen lock, so the phone can go back to sleep
+            if(wakeLock != null)
+            wakeLock.release();
+            stopVibrations();
+            if (mCamera != null)
+                mCamera.release();
     }
 
     private void setupSwipeBtns(){
@@ -187,8 +213,13 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                     }
                 }else if(cancelBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
                     // Inside cancel button region
-                    stopVibrations();
-                    this.finish();
+                    if(isPhotoCancelled == false) {
+                        isPhotoCancelled = true;
+                        cancelTimerToServe();
+                        SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+                        stopVibrations();
+                        this.finish();
+                    }
                 }
                 break;
             case (MotionEvent.ACTION_UP):
@@ -229,11 +260,12 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
     }
 
     private void startTimerToEndRequest(){
+        final PhotoActivity _this = this;
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST,TIME_TO_SERVE_REQUEST){
             @Override
             public void onFinish() {
-                //initializeCamera();
-                mCameraPreview.takePhoto(instnce, originalSenz);
+                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, _this);
+                _this.finish();
             }
             @Override
             public void onTick(long millisUntilFinished) {
