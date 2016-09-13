@@ -109,7 +109,8 @@
         <activity
             android:name=".ui.ChatActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/Theme.AppCompat"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.HomeActivity"
             android:screenOrientation="portrait"

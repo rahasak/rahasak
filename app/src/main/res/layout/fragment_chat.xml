@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     tools:context="com.score.chatz.ui.ChatFragment"
     android:background="@color/white"
-    android:id="@+id/parent_container">
+    android:id="@+id/parent_container"
+    android:tag="chatFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

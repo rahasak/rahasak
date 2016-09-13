@@ -102,4 +102,13 @@ public class Secret {
                 " Secret Image : " + this.getImage());
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Secret)) {
+            return false;
+        }
+        Secret that = (Secret) other;
+        return this.id.equalsIgnoreCase(that.id);
+    }
+
 }

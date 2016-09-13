@@ -97,7 +97,7 @@ public class AllChatListFragment extends ListFragment implements AdapterView.OnI
         adapter = new AllChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        removeOldItemsFromChat();
+        //removeOldItemsFromChat();
     }
 
     private void removeOldItemsFromChat() {

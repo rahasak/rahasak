@@ -32,7 +32,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         Intent intent = getIntent();
         image = intent.getStringExtra("IMAGE");
 
-        if(intent.getStringExtra("QUICK_PREVIEW").equalsIgnoreCase("true")){
+        if(intent.hasExtra("QUICK_PREVIEW")){
             startTimerToCloseView();
         }
 

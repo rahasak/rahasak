@@ -1,6 +1,7 @@
 package com.score.chatz.handlers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.RemoteException;
 import android.util.Log;
@@ -63,7 +64,9 @@ public class SenzMessageHandler extends BaseHandler implements IComHandler {
 
             NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "New message received from @" + senz.getSender().getUsername());
             sendConfirmation(senz, senzService, senz.getReceiver(), true);
+
             broadcastDataSenz(senz, context);
+
         } catch (SQLiteConstraintException | UnsupportedEncodingException e) {
             sendConfirmation(senz, senzService, senz.getReceiver(), false);
             Log.e(TAG, e.toString());

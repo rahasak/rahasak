@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Lakmal on 8/9/16.
@@ -37,7 +38,7 @@ import java.util.Date;
 public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     private static final String TAG = ChatFragmentListAdapter.class.getName();
     Context context;
-    ArrayList<Secret> userSecretList;
+    List<Secret> userSecretList;
     static final int MY_MESSAGE_TYPE = 0;
     static final int NOT_MY_MESSAGE_TYPE = 1;
     static final int MY_PHOTO_TYPE = 2;
@@ -47,7 +48,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     static User currentUser;
     private LayoutInflater mInflater;
 
-    public ChatFragmentListAdapter(Context _context, ArrayList<Secret> secretList) {
+    public ChatFragmentListAdapter(Context _context, List<Secret> secretList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
         context = _context;
         userSecretList = secretList;

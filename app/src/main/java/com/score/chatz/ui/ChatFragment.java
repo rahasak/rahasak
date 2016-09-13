@@ -12,6 +12,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
@@ -93,7 +94,7 @@ public class ChatFragment extends Fragment {
     // custom font
     private Typeface typeface;
     boolean isServiceBound = false;
-    private ArrayList<Secret> secretMessageList;
+    private List<Secret> secretMessageList;
     private ChatFragmentListAdapter adapter;
 
     // service interface
@@ -144,49 +145,23 @@ public class ChatFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflater.inflate(R.menu.chatz_menu, menu);
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         displayMessagesList();
+        startDeletingChatMessages();
     }
 
-    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-            handleMessage(intent);
-        }
-    };
+    private void startDeletingChatMessages(){
+        for (Secret secret : secretMessageList) {
 
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+            startTimerToDelete(secret);
         }
-    };
-
-    private BroadcastReceiver senzPacketTimeoutReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            dbSource.markSecretDeliveryFailed(senz.getAttributes().get("uid"));
-            updateMessageFailed(senz.getAttributes().get("uid"));
-        }
-    };
+    }
 
     @Override
     public void onStart() {
         super.onStart();
-
         // bind to senz service
         if (!isServiceBound) {
             Intent intent = new Intent();
@@ -194,11 +169,8 @@ public class ChatFragment extends Fragment {
             getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
-
-        getActivity().registerReceiver(senzMessageReceiver, AppIntentHandler.getIntentFilter(AppIntentHandler.INTENT_TYPE.DATA_SENZ));
-        getActivity().registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
-        getActivity().registerReceiver(senzPacketTimeoutReceiver, AppIntentHandler.getIntentFilter(AppIntentHandler.INTENT_TYPE.PACKET_TIMEOUT));
     }
+
 
     @Override
     public void onStop() {
@@ -209,17 +181,13 @@ public class ChatFragment extends Fragment {
             getActivity().unbindService(senzServiceConnection);
             isServiceBound = false;
         }
-
-        getActivity().unregisterReceiver(senzMessageReceiver);
-        getActivity().unregisterReceiver(userBusyNotifier);
-        getActivity().unregisterReceiver(senzPacketTimeoutReceiver);
-        //getActivity().unregisterReceiver(senzPollReceiver);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        view.setTag("chatFragment");
         FragmentManager fm = getActivity().getSupportFragmentManager();
 
         dbSource = new SenzorsDbSource(getContext());
@@ -327,7 +295,7 @@ public class ChatFragment extends Fragment {
     private void displayMessagesList() {
         // get User from db
         if (secretMessageList == null || secretMessageList.size() == 0) {
-            secretMessageList = dbSource.getSecretz(new User("", sender), new User("", receiver));
+            secretMessageList = java.util.Collections.synchronizedList(dbSource.getSecretz(new User("", sender), new User("", receiver)));
             adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
@@ -336,7 +304,34 @@ public class ChatFragment extends Fragment {
             secretMessageList.addAll(latestList);
             adapter.notifyDataSetChanged();
         }
-        removeOldItemsFromChat();
+        //removeOldItemsFromChat();
+        startDeletingChatMessages();
+    }
+
+    private void startTimerToDelete(final Secret secret){
+        new CountDownTimer(10000, 10000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                //Ticking away to delete
+            }
+
+            @Override
+            public void onFinish() {
+                removeItemFromChat(secret);
+            }
+        }.start();
+    }
+
+    private void removeItemFromChat(Secret _secret){
+        for (Iterator<Secret> iterator = secretMessageList.iterator(); iterator.hasNext(); ) {
+            Secret secret = iterator.next();
+            if(secret.equals(_secret)){
+                dbSource.deleteSecret(secret);
+                iterator.remove();
+                adapter.notifyDataSetChanged();
+            }
+        }
+
     }
 
     private void updateStatusOfMessage(String uid) {
@@ -369,25 +364,6 @@ public class ChatFragment extends Fragment {
             }
         }
     }
-
-
-
-
-
-    /*private BroadcastReceiver senzPollReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Poll from senz queue");
-
-        }
-    };*/
-
-
-    private void update() {
-        displayMessagesList();
-        updateMainBtnUi();
-    }
-
 
     /**
      * Share current sensor
@@ -429,7 +405,7 @@ public class ChatFragment extends Fragment {
      *
      * @param intent intent
      */
-    private void handleMessage(Intent intent) {
+    public void handleMessage(Intent intent) {
         String action = intent.getAction();
 
         if (action.equalsIgnoreCase("com.score.chatz.DATA_SENZ")) {
@@ -459,6 +435,8 @@ public class ChatFragment extends Fragment {
                 }
             } else if (senz.getAttributes().containsKey("chatzphoto")) {
                 displayMessagesList();
+            } else if (senz.getAttributes().containsKey("chatzmsg")) {
+                displayMessagesList();
             } else if (senz.getAttributes().containsKey("chatzsound")) {
                 displayMessagesList();
             } else if (senz.getAttributes().containsKey("lat")) {
@@ -476,6 +454,8 @@ public class ChatFragment extends Fragment {
                 getActivity().startActivity(mapIntent);
                 getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
             }
+
+            updateMainBtnUi();
         }
     }
 
@@ -618,5 +598,9 @@ public class ChatFragment extends Fragment {
         }
     }
 
-
+    public void onPacketTimeout(Senz senz){
+        dbSource.markSecretDeliveryFailed(senz.getAttributes().get("uid"));
+        updateMessageFailed(senz.getAttributes().get("uid"));
+        updateMainBtnUi();
+    }
 }

@@ -137,8 +137,6 @@ public class AddUserActivity extends BaseActivity {
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
 
         this.registerReceiver(senzDataReceiver, new IntentFilter("com.score.chatz.DATA_SENZ")); //Incoming data share
-        //this.registerReceiver(senzMessageReceiver, new IntentFilter("com.score.chatz.SENZ_SHARE")); //Incoming senz share
-        //registerReceiver(senzShareReceiver, new IntentFilter("com.score.chatz.SENZ_SHARE"));
     }
 
     /**
