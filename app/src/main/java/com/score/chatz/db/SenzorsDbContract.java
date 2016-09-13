@@ -32,6 +32,7 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_DELETE = "deleted";
         public static final String COLUMN_TIMESTAMP = "timestamp";
         public static final String COLUMN_NAME_DELIVERED = "delivered";
+        public static final String COLUMN_NAME_DELIVERY_FAILED = "delivery_fail";
     }
 
     /* Inner class that defines permission control for the user

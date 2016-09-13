@@ -52,7 +52,7 @@ public class SenzMessageHandler extends BaseHandler implements IComHandler {
             Log.d(TAG, "save incoming chatz");
             String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
             Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
-            newSecret.setID(SenzUtils.getUniqueRandomNumber().toString());
+            newSecret.setID(senz.getAttributes().get("uid"));
             Long _timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(_timeStamp);
             dbSource.createSecret(newSecret);

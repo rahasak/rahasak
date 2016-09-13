@@ -2,6 +2,7 @@ package com.score.chatz.handlers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -50,6 +51,31 @@ public class AppIntentHandler {
         return  intent;
     }
 
+    public static Intent getpacketTimeoutIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.PACKET_TIMEOUT));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return  intent;
+    }
+
+    /**
+     * Return the intent filter for the intent_type.
+     * @param type
+     * @return
+     */
+    public static IntentFilter getIntentFilter(INTENT_TYPE type) {
+        IntentFilter intentFilter = null;
+        try{
+            intentFilter = new IntentFilter(getIntentType(type));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return intentFilter;
+    }
+
     public static Intent getCameraIntent(Context context){
         Intent intent = new Intent();
         intent.setClass(context, PhotoActivity.class);
@@ -84,6 +110,9 @@ public class AppIntentHandler {
             case USER_BUSY:
                 intentString = "com.score.chatz.USER_BUSY";
                 break;
+            case PACKET_TIMEOUT:
+                intentString = "com.score.chatz.PACKET_TIMEOUT";
+                break;
             default:
                 throw new InvalidIntentType();
         }
@@ -100,7 +129,7 @@ public class AppIntentHandler {
         return new Intent(intentString);
     }
 
-    enum INTENT_TYPE {
-        DATA_SENZ, UPDATE_SENZ, USER_BUSY
+    public enum INTENT_TYPE {
+        DATA_SENZ, UPDATE_SENZ, USER_BUSY, PACKET_TIMEOUT
     }
 }

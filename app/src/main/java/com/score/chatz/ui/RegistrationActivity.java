@@ -151,7 +151,7 @@ public class RegistrationActivity extends AppCompatActivity {
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font color=#000000>Are you sure you want to register on SenZ with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font color=#000000>Are you sure you want to register with Rahask using </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage);
         } catch (InvalidInputFieldsException e) {
             Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();

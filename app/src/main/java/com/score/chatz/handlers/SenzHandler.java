@@ -79,6 +79,7 @@ public class SenzHandler {
                 Senz senz = SenzParser.parse(senzMessage);
                 senz.setId(SenzUtils.getUniqueRandomNumber().toString());
                 verifySenz(senz);
+                SenzStatusTracker.onPacketArrived(senz);
                 switch (senz.getSenzType()) {
                     case PING:
                         Log.d(TAG, "PING received");

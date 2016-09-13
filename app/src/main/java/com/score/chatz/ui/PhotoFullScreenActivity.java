@@ -1,9 +1,11 @@
 package com.score.chatz.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -17,8 +19,10 @@ import com.score.chatz.utils.PreferenceUtils;
 
 public class PhotoFullScreenActivity extends AppCompatActivity {
 
-    ImageView imageView;
-    String image;
+    private ImageView imageView;
+    private String image;
+
+    private static final int CLOSE_QUICK_VIEW_TIME = 3000; // 3 seconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,10 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         image = intent.getStringExtra("IMAGE");
+
+        if(intent.getStringExtra("QUICK_PREVIEW").equalsIgnoreCase("true")){
+            startTimerToCloseView();
+        }
 
         imageView = (ImageView) findViewById(R.id.imageView);
         //loadBitmap(image, imageView);
@@ -48,6 +56,21 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 1000, 1000)));
         else
             task.execute(new BitmapTaskParams(data, 1000, 1000));
+    }
+
+    private void startTimerToCloseView(){
+        final Activity _this = this;
+        new CountDownTimer(CLOSE_QUICK_VIEW_TIME, CLOSE_QUICK_VIEW_TIME) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                _this.finish();
+            }
+        }.start();
     }
 
 }

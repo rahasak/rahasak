@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
+import com.score.chatz.handlers.SenzStatusTracker;
 import com.score.chatz.receivers.AlarmReceiver;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
@@ -100,7 +101,9 @@ public class RemoteSenzService extends Service {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
+            SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
             writeSenz(senz);
+
         }
 
         @Override
@@ -279,6 +282,9 @@ public class RemoteSenzService extends Service {
                         }
                         String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
 
+
+                            SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
+
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
@@ -294,6 +300,8 @@ public class RemoteSenzService extends Service {
                             writer.flush();
                         } else {
                             Log.e(TAG, "Socket disconnected");
+                            resetSoc();
+                            initSoc();
                         }
                     }
                 } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
@@ -323,6 +331,7 @@ public class RemoteSenzService extends Service {
         protected void onPostExecute(Object o) {
             Log.e(TAG, "Stop SenzComm");
             resetSoc();
+            new SenzComm().execute();
         }
     }
 

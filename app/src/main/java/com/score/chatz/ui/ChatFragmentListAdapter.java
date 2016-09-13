@@ -205,6 +205,10 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.status.setText("Message sending...");
         }
 
+        if(secret.isDeliveryFailed()){
+            viewHolder.status.setText("Message failed to deliver!!!");
+        }
+
         viewHolder.sender.setText(secret.getSender().getUsername());
     }
 

@@ -166,7 +166,7 @@ public class SenzStream {
 
         switch (type){
             case CHATZPHOTO:
-                pattern = Pattern.compile("(#uid\\s[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+\\s)");
+                pattern = Pattern.compile("(#uid\\s[0-9]+\\s)");
                 matcher = pattern.matcher(image);
                 if (matcher.find())
                 {
@@ -175,7 +175,7 @@ public class SenzStream {
                 //uidStream += "#chatzphoto ";
                 break;
             case PROFILEZPHOTO:
-                pattern = Pattern.compile("(#uid\\s[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+\\s)");
+                pattern = Pattern.compile("(#uid\\s[0-9]+\\s)");
                 matcher = pattern.matcher(image);
                 if (matcher.find())
                 {
@@ -184,7 +184,7 @@ public class SenzStream {
                 //startOfStream += "#profilezphoto ";
                 break;
             case CHATZSOUND:
-                pattern = Pattern.compile("(#uid\\s[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+-[0-9A-Za-z]+\\s)");
+                pattern = Pattern.compile("(#uid\\s[0-9]+\\s)");
                 matcher = pattern.matcher(image);
                 if (matcher.find())
                 {

@@ -175,7 +175,7 @@ public class AddUserActivity extends BaseActivity {
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font color=#000000>Are you sure you want to register on SenZ with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font color=#000000>Are you sure you want to share secrets with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage);
         } catch (InvalidInputFieldsException e) {
             Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();
@@ -255,8 +255,8 @@ public class AddUserActivity extends BaseActivity {
                     onPostShare(senz);
                 } else {
                     String user = editTextUserId.getText().toString().trim();
-                    String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
-                    displayInformationMessageDialog("#Share Fail", message);
+                    String message = "<font color=#000000>Seems we couldn't connect you with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
+                    displayInformationMessageDialog("Fail", message);
                 }
             }
         }
@@ -267,13 +267,9 @@ public class AddUserActivity extends BaseActivity {
      * Clear input fields and reset activity components
      */
     private void onPostShare(Senz senz) {
-        // Create user with senz sender(he is a friend)
-        //SenzorsDbSource dbSource = new SenzorsDbSource(this);
-        //dbSource.getOrCreateUser(senz.getSender().getUsername());
-
-        editTextUserId.setText("");
         this.goBackToHome();
-        Toast.makeText(this, "Successfully shared SenZ", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Successfully added " + editTextUserId.getText().toString().trim(), Toast.LENGTH_LONG).show();
+        editTextUserId.setText("");
     }
 
 
@@ -324,7 +320,7 @@ public class AddUserActivity extends BaseActivity {
         // set dialog texts
         TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
         TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
-        messageHeaderTextView.setText("Confirm username");
+        messageHeaderTextView.setText("Adding friend confirmation");
         messageTextView.setText(Html.fromHtml(message));
 
         // set custom font

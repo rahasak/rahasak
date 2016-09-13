@@ -16,6 +16,7 @@ public class Secret {
     private String id;
     private String imageThumbnail;
     private String sound;
+    private boolean isDeliveryFailed;
 
     public Secret(String text, String image, String thumb, User sender, User receiver) {
         this.text = text;
@@ -57,6 +58,10 @@ public class Secret {
         isDelete = val;
     }
 
+    public void setDeliveryFailed(boolean val){
+        isDeliveryFailed = val;
+    }
+
     public void setIsDelivered(boolean val){
         isDelivered = val;
     }
@@ -71,6 +76,10 @@ public class Secret {
 
     public boolean isDelivered(){
         return isDelivered;
+    }
+
+    public boolean isDeliveryFailed(){
+        return isDeliveryFailed;
     }
 
     public Long getTimeStamp(){

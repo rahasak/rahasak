@@ -161,9 +161,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 bytes = resizeBitmapByteArray(bytes, 90);
                 if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 180); //Compress image ~ 5kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
                 } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 180); //Compress image ~ 50kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
                 }
 
                 isCameraBusy = false;
@@ -171,6 +171,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
                 i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
+                i.putExtra("QUICK_PREVIEW", "true");
                 activity.startActivity(i);
                 activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 activity.finish();

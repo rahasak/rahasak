@@ -253,6 +253,7 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_SENDER, secret.getSender().getUsername());
             values.put(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID, secret.getID());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED, 0);
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
             values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_SOUND, secret.getSound());
@@ -279,6 +280,32 @@ public class SenzorsDbSource {
             // content values to inset
             ContentValues values = new ContentValues();
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 1);
+
+            // update
+            db.update(SenzorsDbContract.Secret.TABLE_NAME,
+                    values,
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
+                    new String[]{uid});
+
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
+    }
+
+    /**
+     * Mark message as delivery Failed
+     * @param uid unique identifier of message
+     */
+    public void markSecretDeliveryFailed (String uid) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED, 1);
 
             // update
             db.update(SenzorsDbContract.Secret.TABLE_NAME,
@@ -356,7 +383,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, timestamp, sound " +
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, delivery_fail, timestamp, sound " +
                 "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
 
@@ -368,6 +395,7 @@ public class SenzorsDbSource {
         String _secretReceiver;
         int _secretDelete;
         int _secretIsDelivered;
+        int _secretDeliveryFailed;
         Long _secretTimestamp;
         String _thumbnail;
         String _secretSound;
@@ -381,6 +409,7 @@ public class SenzorsDbSource {
             _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
+            _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
@@ -390,6 +419,7 @@ public class SenzorsDbSource {
             Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
             secret.setDelete(_secretDelete == 1 ? true : false);
             secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
+            secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
             secret.setSound(_secretSound);
@@ -417,7 +447,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, timestamp, sound " +
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, delivery_fail, timestamp, sound " +
                 "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id ASC LIMIT ?";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername(), limit.toString() });
 
@@ -429,6 +459,7 @@ public class SenzorsDbSource {
         String _secretReceiver;
         int _secretDelete;
         int _secretIsDelivered;
+        int _secretDeliveryFailed;
         Long _secretTimestamp;
         String _thumbnail;
         String _secretSound;
@@ -445,6 +476,7 @@ public class SenzorsDbSource {
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
+            _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
             _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
@@ -454,6 +486,7 @@ public class SenzorsDbSource {
             Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
             secret.setDelete(_secretDelete == 1 ? true : false);
             secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
+            secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
             secret.setSound(_secretSound);
@@ -482,7 +515,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, timestamp, sound " +
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, delivery_fail, timestamp, sound " +
                 "FROM secret WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) AND timestamp > ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername(), timestamp.toString()});
 
@@ -494,6 +527,7 @@ public class SenzorsDbSource {
         String _secretReceiver;
         int _secretDelete;
         int _secretIsDelivered;
+        int _secretDeliveryFailed;
         Long _secretTimestamp;
         String _thumbnail;
         String _secretSound;
@@ -510,6 +544,7 @@ public class SenzorsDbSource {
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
+            _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
             _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
@@ -519,6 +554,7 @@ public class SenzorsDbSource {
             Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
             secret.setDelete(_secretDelete == 1 ? true : false);
             secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
+            secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
             secret.setSound(_secretSound);
