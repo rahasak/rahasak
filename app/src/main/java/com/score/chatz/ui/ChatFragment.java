@@ -326,7 +326,7 @@ public class ChatFragment extends Fragment {
         for (Iterator<Secret> iterator = secretMessageList.iterator(); iterator.hasNext(); ) {
             Secret secret = iterator.next();
             if(secret.equals(_secret)){
-                dbSource.deleteSecret(secret);
+                new SenzorsDbSource(getContext()).deleteSecret(secret);
                 iterator.remove();
                 adapter.notifyDataSetChanged();
             }

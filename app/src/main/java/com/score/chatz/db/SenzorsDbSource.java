@@ -1000,10 +1000,14 @@ public class SenzorsDbSource {
     public void deleteSecret(Secret secret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
+        db.beginTransaction();
+
         // delete senz of given user
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
-                SenzorsDbContract.Secret._ID + "=?",
+                SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + "=?",
                 new String[]{secret.getID()});
+
+        db.endTransaction();
     }
 
     /**
