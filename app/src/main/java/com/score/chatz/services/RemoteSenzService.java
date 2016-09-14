@@ -212,7 +212,13 @@ public class RemoteSenzService extends Service {
                     Log.d(TAG, "Senz received " + senz);
 
                     // handle senz
-                    SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
+                    if (senz.trim().equalsIgnoreCase("PING")) {
+                        writer.println("PONG");
+                        writer.flush();
+                    } else {
+                        // handle senz
+                        SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
+                    }
                 } else {
                     Log.e(TAG, "empty senz received");
                 }
