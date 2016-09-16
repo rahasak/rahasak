@@ -46,9 +46,9 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    public static final String SENZ_HOST = "10.2.2.49";
+    //public static final String SENZ_HOST = "10.2.2.49";
     //public static final String SENZ_HOST = "udp.mysensors.info";
-    //private static final String SENZ_HOST = "52.77.228.195";
+    private static final String SENZ_HOST = "52.77.228.195";
 
     public static final int SENZ_PORT = 7070;
 
@@ -213,8 +213,8 @@ public class RemoteSenzService extends Service {
 
                     // handle senz
                     if (senz.trim().equalsIgnoreCase("TAK")) {
-                        writer.println("TIK");
-                        writer.flush();
+                        //writer.println("TIK");
+                        //writer.flush();
                     } else {
                         // handle senz
                         SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
@@ -295,13 +295,6 @@ public class RemoteSenzService extends Service {
 
                         //  sends the message to the server
                         if (isOnline) {
-                            if (i > (senzList.size() - 2)) {
-                                try {
-                                    Thread.sleep(2000);
-                                } catch (InterruptedException ex) {
-                                    Log.e(TAG, "Exception - " + ex);
-                                }
-                            }
                             writer.println(message);
                             writer.flush();
                         } else {
