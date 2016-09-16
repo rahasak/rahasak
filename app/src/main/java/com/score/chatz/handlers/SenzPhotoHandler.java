@@ -45,25 +45,6 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
         return instance;
     }
 
-    public void handleSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
-
-        //If camera not available send unsuccess confirmation to user
-        if (CameraUtils.isCameraFrontAvailable(context)) {
-            //Start camera activity
-            try {
-                launchCamera(context, senz);
-            } catch (CameraBusyException ex) {
-                Log.e(TAG, "Camera is busy right now.");
-                sendConfirmation(null, senzService, senz.getSender(), false);
-            }
-
-        } else {
-            //Camera not available on this phone
-            sendConfirmation(null, senzService, senz.getSender(), false);
-
-        }
-    }
-
     /**
      * Share back to user if unsuccessful
      *
@@ -293,6 +274,8 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                 newSecret.setTimeStamp(_timeStamp);
                 dbSource.createSecret(newSecret);
                 sendPhotoRecievedConfirmation(senz, context, uid, true);
+
+                broadcastDataSenz(senz, context);
             }
         } catch (SQLiteConstraintException e) {
             Log.e(TAG, e.toString());
@@ -306,6 +289,8 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                 User sender = senz.getSender();
                 if (sender != null)
                     dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
+
+                broadcastDataSenz(senz, context);
             }
         } catch (SQLiteConstraintException e) {
             Log.e(TAG, e.toString());

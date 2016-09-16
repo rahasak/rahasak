@@ -104,7 +104,6 @@ public class ChatFragment extends Fragment {
 
     private void startDeletingChatMessages(){
         for (Secret secret : secretMessageList) {
-
             startTimerToDelete(secret);
         }
     }

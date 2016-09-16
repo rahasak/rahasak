@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.UserPermission;
@@ -111,11 +112,7 @@ public class UserProfileActivity extends BaseActivity {
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentUserGivenPerm.getCamPerm() == true) {
                     getPhoto(userzPerm.getUser());
-                } else {
-                    //Toast.makeText(UserProfileActivity.this, "Sorry. This user has not shared camera permissions with you.", Toast.LENGTH_LONG).show();
-                }
             }
         });
     }
@@ -124,7 +121,6 @@ public class UserProfileActivity extends BaseActivity {
      * Get photo of user
      */
     private void getPhoto(User receiver) {
-        try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
@@ -136,10 +132,7 @@ public class UserProfileActivity extends BaseActivity {
             SenzTypeEnum senzType = SenzTypeEnum.GET;
             Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
-            senzService.send(senz);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+            send(senz);
     }
 
     private void setupClickableImage() {
@@ -177,22 +170,13 @@ public class UserProfileActivity extends BaseActivity {
 
         // Unbind from the service
         this.unbindService(senzServiceConnection);
-        this.unregisterReceiver(userBusyNotifier);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        this.registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
     }
 
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
 
     @Override
     protected void onResume() {
@@ -300,7 +284,6 @@ public class UserProfileActivity extends BaseActivity {
 
 
     public void sendPermission(User receiver, String camPerm, String locPerm, String micPerm) {
-        try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("msg", "newPerm");
@@ -323,10 +306,7 @@ public class UserProfileActivity extends BaseActivity {
             senz.setSender(currentUser);
             savePermToDB(senz);
 
-            senzService.send(senz);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+            send(senz);
     }
 
     private void savePermToDB(Senz senz) {
@@ -342,9 +322,7 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     private void registerAllReceivers() {
-        registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_SHARED"));
-        //Register for fail messages, incase other user is not online
-        registerReceiver(senzDataReceiver, new IntentFilter("com.score.chatz.DATA_SENZ")); //Incoming data share
+        registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ)); //Incoming data share
     }
 
     private void handleMessage(Intent intent) {
@@ -368,26 +346,9 @@ public class UserProfileActivity extends BaseActivity {
         }
     }
 
-
-    private void updateActivity() {
-        setupUserPermissions();
-        setupClickableImage();
-    }
-
     private void unregisterAllReceivers() {
         if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
-        if (userSharedReceiver != null) unregisterReceiver(userSharedReceiver);
-
     }
-
-
-    private BroadcastReceiver userSharedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got user shared intent from Senz service");
-            //handleSharedUser(intent);
-        }
-    };
 
     private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
         @Override
@@ -397,15 +358,9 @@ public class UserProfileActivity extends BaseActivity {
         }
     };
 
-    private void handleSharedUser(Intent intent) {
-        updateActivity();
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterAllReceivers();
     }
-
-
 }
