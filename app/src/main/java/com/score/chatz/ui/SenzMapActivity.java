@@ -2,20 +2,15 @@ package com.score.chatz.ui;
 
 import android.app.ActionBar;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -23,7 +18,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -31,18 +25,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
-import com.score.chatz.utils.LocationUtils;
 import com.score.chatz.R;
 import com.score.chatz.utils.ActivityUtils;
-import com.score.chatz.utils.NetworkUtil;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,18 +53,20 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
     private static final String TAG = SenzMapActivity.class.getName();
 
-    RelativeLayout myLocation;
-    RelativeLayout myRoute;
-
     private LocationManager locationManager;
+
+    // keep providers
+    private boolean isGPSEnabled;
+    private boolean isNetworkEnabled;
 
     private LatLng friendLatLan;
     private LatLng myLatLan;
 
     private GoogleMap map;
     private Marker marker;
-    private Circle circle;
-    private ImageView backBtn;
+
+    RelativeLayout myLocation;
+    RelativeLayout myRoute;
 
     Polyline line;
 
@@ -88,10 +82,8 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         myLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //displayMyLocation(new LatLng(7.842891, 80.809937));
                 ActivityUtils.showProgressDialog(SenzMapActivity.this, "Please wait...");
-                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, SenzMapActivity.this);
+                requestLocation();
             }
         });
 
@@ -99,62 +91,48 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         myRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (myLatLan == null) {
+                    Toast.makeText(getApplicationContext(), "Please select your location first", Toast.LENGTH_LONG).show();
 
-                //Toast.makeText(getApplicationContext(),"work",Toast.LENGTH_LONG).show();
-                if (myLatLan ==null){
-                    Toast.makeText(getApplicationContext(),"Please select your location first",Toast.LENGTH_LONG).show();
-
-                }
-                else {
+                } else {
                     new MapDerection().execute(makeURL(myLatLan.latitude, myLatLan.longitude, friendLatLan.latitude, friendLatLan.longitude));
                 }
             }
         });
-
-
 
         setUpActionBar();
         initLocationCoordinates();
         setUpMapIfNeeded();
     }
 
+    private void requestLocation() {
+        // start to listen location updates from here
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-    private void goBackToHome(){
-        Log.d(TAG, "go home clicked");
-        this.finish();
-    }
+        // getting GPS and Network status
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-             case android.R.id.home:
-                this.finish();
-                return true;
-
+        if (!isGPSEnabled && !isNetworkEnabled) {
+            Log.d(TAG, "No location provider enable");
+        } else {
+            if (isGPSEnabled) {
+                Log.d(TAG, "Getting location via GPS");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            }
+            if (isNetworkEnabled) {
+                Log.d(TAG, "Getting location via Network");
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            }
         }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        if (locationManager != null) locationManager.removeUpdates(this);
+        if (isGPSEnabled) locationManager.removeUpdates(SenzMapActivity.this);
+        if (isNetworkEnabled) locationManager.removeUpdates(SenzMapActivity.this);
     }
 
     /**
@@ -171,15 +149,15 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
      */
     private void setUpActionBar() {
         ActionBar actionBar = getActionBar();
-        //int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-        //TextView actionBarTitle = (TextView) (this.findViewById(titleId));
-
-        //Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
-        //actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-        //actionBarTitle.setTypeface(typefaceThin);
-
-        //actionBar.setDisplayHomeAsUpEnabled(true);
-        //actionBar.setTitle("#Location");
+//        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+//        TextView actionBarTitle = (TextView) (this.findViewById(titleId));
+//
+//        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
+//        actionBarTitle.setTextColor(getResources().getColor(R.color.white));
+//        actionBarTitle.setTypeface(typefaceThin);
+//
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+//        actionBar.setTitle("#Location");
     }
 
     /**
@@ -231,21 +209,11 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
         // remove existing markers
         if (marker != null) marker.remove();
-        if (circle != null) circle.remove();
 
         // add location marker
         try {
             marker = map.addMarker(new MarkerOptions().position(this.friendLatLan).title("Friend").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_friend)));
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.friendLatLan, 10));
-
-            // ... get a map
-            // Add a circle
-//            circle = map.addCircle(new CircleOptions()
-//                    .center(this.friendLatLan)
-//                    .radius(14000)
-//                    .strokeColor(0xFF0000FF)
-//                    .strokeWidth(0.5f)
-//                    .fillColor(0x110000FF));
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
             Log.d(TAG, "MoveToLocation: invalid lat lon parameters");
@@ -260,13 +228,6 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
     private void displayMyLocation(LatLng latLng) {
         marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_me)));
 
-//        circle = map.addCircle(new CircleOptions()
-//                .center(latLng)
-//                .radius(14000)
-//                .strokeColor(0xFF0000FF)
-//                .strokeWidth(0.5f)
-//                .fillColor(0x110000FF));
-
         // set zoom level
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(latLng);
@@ -280,10 +241,12 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
     @Override
     public void onLocationChanged(Location location) {
         ActivityUtils.cancelProgressDialog();
-        locationManager.removeUpdates(this);
-        myLatLan =new LatLng(location.getLatitude(), location.getLongitude());
-        displayMyLocation(myLatLan);
 
+        if (isGPSEnabled) locationManager.removeUpdates(SenzMapActivity.this);
+        if (isNetworkEnabled) locationManager.removeUpdates(SenzMapActivity.this);
+
+        myLatLan = new LatLng(location.getLatitude(), location.getLongitude());
+        displayMyLocation(myLatLan);
     }
 
     @Override
@@ -301,25 +264,28 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
     }
 
-    public String makeURL (double sourcelat, double sourcelog, double destlat, double destlog ){
+    /**
+     * TODO refactor
+     **/
+    public String makeURL(double sourcelat, double sourcelog, double destlat, double destlog) {
         StringBuilder urlString = new StringBuilder();
         urlString.append("https://maps.googleapis.com/maps/api/directions/json");
         urlString.append("?origin=");// from
         urlString.append(Double.toString(sourcelat));
         urlString.append(",");
         urlString
-                .append(Double.toString( sourcelog));
+                .append(Double.toString(sourcelog));
         urlString.append("&destination=");// to
         urlString
-                .append(Double.toString( destlat));
+                .append(Double.toString(destlat));
         urlString.append(",");
-        urlString.append(Double.toString( destlog));
+        urlString.append(Double.toString(destlog));
         urlString.append("&sensor=false&mode=driving&alternatives=true");
         urlString.append("&key=AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s");
         return urlString.toString();
     }
 
-    private class MapDerection extends AsyncTask<String,Void,String>{
+    private class MapDerection extends AsyncTask<String, Void, String> {
 
 
         @Override
@@ -338,15 +304,15 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
                 JSONObject jsnObj = new JSONObject(s);
                 JSONArray Jroute = jsnObj.getJSONArray("routes");
-                for (int i=0; i<1; i++){
+                for (int i = 0; i < 1; i++) {
                     JSONArray Jlegs = ((JSONObject) Jroute.get(i)).getJSONArray("legs");
-                    for (int j=0; j<Jlegs.length(); j++){
+                    for (int j = 0; j < Jlegs.length(); j++) {
                         JSONArray Jsteps = ((JSONObject) Jlegs.get(j)).getJSONArray("steps");
-                        for (int n=0; n<Jsteps.length(); n++){
-                            String polyline = (String) ((JSONObject)((JSONObject) Jsteps.get(n)).get("polyline")).get("points");
-                            List<LatLng> data= PolyUtil.decode(polyline);
+                        for (int n = 0; n < Jsteps.length(); n++) {
+                            String polyline = (String) ((JSONObject) ((JSONObject) Jsteps.get(n)).get("polyline")).get("points");
+                            List<LatLng> data = PolyUtil.decode(polyline);
                             PolylineOptions poly = new PolylineOptions()
-                                    .color(Color.rgb(0,92,130))
+                                    .color(Color.rgb(0, 92, 130))
                                     .width(7)
                                     .visible(true)
                                     .zIndex(30);
@@ -367,7 +333,7 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
             return GET(url[0]);
         }
 
-        public String GET(String url){
+        public String GET(String url) {
             InputStream inputStream = null;
             String result = "";
             try {
@@ -383,7 +349,7 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
                 inputStream = httpResponse.getEntity().getContent();
 
                 // convert inputstream to string
-                if(inputStream != null)
+                if (inputStream != null)
                     result = convertInputStreamToString(inputStream);
                 else
                     result = "Did not work!";
@@ -396,17 +362,16 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         }
 
         private String convertInputStreamToString(InputStream inputStream) throws IOException {
-            BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line = "";
             String result = "";
-            while((line = bufferedReader.readLine()) != null)
+            while ((line = bufferedReader.readLine()) != null)
                 result += line;
 
 
             return result;
-
         }
     }
-
+    /** TODO refactor to here */
 
 }

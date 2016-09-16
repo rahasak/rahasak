@@ -29,8 +29,6 @@
     <!-- keep screen active when camera is open -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-
-
     <!-- access to vibrate phone -->
     <uses-permission android:name="android.permission.VIBRATE"/>
 
