@@ -46,9 +46,9 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    //public static final String SENZ_HOST = "10.2.2.49";
+    public static final String SENZ_HOST = "10.2.2.49";
     //public static final String SENZ_HOST = "udp.mysensors.info";
-    private static final String SENZ_HOST = "52.77.228.195";
+    //private static final String SENZ_HOST = "52.77.228.195";
 
     public static final int SENZ_PORT = 7070;
 
@@ -155,13 +155,13 @@ public class RemoteSenzService extends Service {
         // register local ping alarm receiver
         IntentFilter alarmFilter = new IntentFilter();
         alarmFilter.addAction("PING_ALARM");
-        registerReceiver(pingAlarmReceiver, alarmFilter);
+        //registerReceiver(pingAlarmReceiver, alarmFilter);
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
-        unregisterReceiver(pingAlarmReceiver);
+        //unregisterReceiver(pingAlarmReceiver);
     }
 
     private void initPing() {
@@ -212,8 +212,8 @@ public class RemoteSenzService extends Service {
                     Log.d(TAG, "Senz received " + senz);
 
                     // handle senz
-                    if (senz.trim().equalsIgnoreCase("PING")) {
-                        writer.println("PONG");
+                    if (senz.trim().equalsIgnoreCase("TAK")) {
+                        writer.println("TIK");
                         writer.flush();
                     } else {
                         // handle senz
@@ -272,8 +272,8 @@ public class RemoteSenzService extends Service {
                     PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
 
                     //for (Senz senz : senzList) {
-                        for(int i = 0 ; i < senzList.size(); i++){
-                            Senz senz = senzList.get(i);
+                    for (int i = 0; i < senzList.size(); i++) {
+                        Senz senz = senzList.get(i);
                         // if sender not already set find user(sender) and set it to senz first
                         if (senz.getSender() == null || senz.getSender().toString().isEmpty())
                             senz.setSender(PreferenceUtils.getUser(getBaseContext()));
@@ -289,16 +289,16 @@ public class RemoteSenzService extends Service {
                         String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
 
 
-                            SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
+                        SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
 
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
                         if (isOnline) {
-                            if(i > (senzList.size() - 2)){
+                            if (i > (senzList.size() - 2)) {
                                 try {
                                     Thread.sleep(2000);
-                                }catch (InterruptedException ex){
+                                } catch (InterruptedException ex) {
                                     Log.e(TAG, "Exception - " + ex);
                                 }
                             }
@@ -306,8 +306,6 @@ public class RemoteSenzService extends Service {
                             writer.flush();
                         } else {
                             Log.e(TAG, "Socket disconnected");
-                            resetSoc();
-                            initSoc();
                         }
                     }
                 } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
@@ -323,7 +321,7 @@ public class RemoteSenzService extends Service {
         protected Object doInBackground(Object[] params) {
             if (!isOnline) {
                 initSoc();
-                initPing();
+                //initPing();
                 sendPing();
                 initReader();
             } else {
@@ -337,7 +335,6 @@ public class RemoteSenzService extends Service {
         protected void onPostExecute(Object o) {
             Log.e(TAG, "Stop SenzComm");
             resetSoc();
-            new SenzComm().execute();
         }
     }
 
