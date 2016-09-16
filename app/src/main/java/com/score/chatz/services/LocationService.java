@@ -34,8 +34,12 @@ public class LocationService extends Service implements LocationListener {
 
     private User receiver;
 
+    // keep providers
+    private boolean isGPSEnabled;
+    private boolean isNetworkEnabled;
+
     // keeps weather service already bound or not
-    boolean isServiceBound = false;
+    private boolean isServiceBound = false;
 
     // service interface
     private ISenzService senzService = null;
@@ -70,8 +74,8 @@ public class LocationService extends Service implements LocationListener {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         // getting GPS and Network status
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         if (!isGPSEnabled && !isNetworkEnabled) {
             Log.d(TAG, "No location provider enable");
@@ -114,7 +118,8 @@ public class LocationService extends Service implements LocationListener {
     public void onDestroy() {
         super.onDestroy();
 
-        locationManager.removeUpdates(this);
+        if (isGPSEnabled) locationManager.removeUpdates(LocationService.this);
+        if (isNetworkEnabled) locationManager.removeUpdates(LocationService.this);
     }
 
 
@@ -123,7 +128,9 @@ public class LocationService extends Service implements LocationListener {
         Log.d(TAG, String.valueOf(location.getLatitude()));
         Log.d(TAG, String.valueOf(location.getLongitude()));
 
-        locationManager.removeUpdates(this);
+        if (isGPSEnabled) locationManager.removeUpdates(LocationService.this);
+        if (isNetworkEnabled) locationManager.removeUpdates(LocationService.this);
+
         sendLocation(location);
 
         // unbind the service
