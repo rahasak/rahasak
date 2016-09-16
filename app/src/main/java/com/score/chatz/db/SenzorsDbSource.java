@@ -515,7 +515,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, delivery_fail, timestamp, sound " +
+        String query = "SELECT _id, uid, text, image, thumbnail, sender, receiver, deleted, delivered, delivery_fail, timestamp, timestamp_seen, sound " +
                 "FROM secret WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) AND timestamp > ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername(), timestamp.toString()});
 
@@ -529,6 +529,7 @@ public class SenzorsDbSource {
         int _secretIsDelivered;
         int _secretDeliveryFailed;
         Long _secretTimestamp;
+        Long _secretTimestampSeen;
         String _thumbnail;
         String _secretSound;
 
@@ -546,6 +547,7 @@ public class SenzorsDbSource {
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _secretTimestampSeen = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN));
             _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
             _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
 
@@ -555,6 +557,7 @@ public class SenzorsDbSource {
             secret.setDelete(_secretDelete == 1 ? true : false);
             secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
             secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
+            secret.setSeenTimeStamp(_secretTimestampSeen);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
             secret.setSound(_secretSound);
@@ -596,8 +599,6 @@ public class SenzorsDbSource {
 
         // extract attributes
         while (cursor.moveToNext()) {
-            HashMap<String, String> chatzAttributes = new HashMap<>();
-
             // get chatz attributes
             _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
             _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
@@ -624,115 +625,6 @@ public class SenzorsDbSource {
 
         Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
         return secretList;
-    }
-
-    public ArrayList<Secret> getAllOtherSercets(User sender, Long timestamp) {
-        ArrayList<Secret> secretList = new ArrayList();
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(_id), text, image, thumbnail, sender, receiver, timestamp, sound FROM secret " +
-                "WHERE sender != ? AND timestamp > ? GROUP BY sender ORDER BY _id DESC";
-        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), timestamp.toString()});
-
-        // secret attr
-        String _secretText;
-        String _secretImage;
-        String _secretSender;
-        String _secretReceiver;
-        String _secretSenderImage;
-        String _secretThumbnail;
-        Long _timeStamp;
-        String _secretSound;
-
-        // extract attributes
-        while (cursor.moveToNext()) {
-            HashMap<String, String> chatzAttributes = new HashMap<>();
-
-            // get chatz attributes
-            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
-            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
-            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
-            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
-            _secretThumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
-            _timeStamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
-            _secretSenderImage = getImageFromDB(_secretSender);
-            _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
-
-            // create secret
-            User senderUser = new User("", _secretSender);
-            senderUser.setUserImage(_secretSenderImage);
-            Secret secret = new Secret(_secretText, _secretImage, _secretThumbnail, senderUser, new User("", _secretReceiver));
-            secret.setTimeStamp(_timeStamp);
-            secret.setSound(_secretSound);
-
-            // fill secret list
-            secretList.add(secret);
-        }
-
-        // clean
-        cursor.close();
-
-        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
-        return secretList;
-    }
-
-    /**
-     * Get all sensors, two types of sensors here
-     * 1. my sensors
-     * 2. friends sensors
-     *
-     * @return sensor list
-     */
-    public List<Senz> getSenzes() {
-        Log.d(TAG, "GetSensors: getting all sensor");
-        List<Senz> sensorList = new ArrayList();
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // join query to retrieve data
-        String query = "SELECT senz._id, senz.name, senz.value, user._id, user.username " +
-                "FROM senz " +
-                "LEFT OUTER JOIN user " +
-                "ON senz.user = user._id";
-        Cursor cursor = db.rawQuery(query, null);
-
-        // sensor/user attributes
-        String _senzId;
-        String _senzName;
-        String _senzValue;
-        String _userId;
-        String _username;
-
-        // extract attributes
-        while (cursor.moveToNext()) {
-            HashMap<String, String> senzAttributes = new HashMap<>();
-
-            // get senz attributes
-            _senzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Location._ID));
-            _senzName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Location.COLUMN_NAME_NAME));
-            _senzValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Location.COLUMN_NAME_VALUE));
-
-            // get user attributes
-            _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-
-            senzAttributes.put(_senzName, _senzValue);
-
-            // create senz
-            Senz senz = new Senz();
-            senz.setId(_senzId);
-            senz.setAttributes(senzAttributes);
-            senz.setSender(new User(_userId, _username));
-
-            // fill senz list
-            sensorList.add(senz);
-        }
-
-        // clean
-        cursor.close();
-
-        Log.d(TAG, "GetSensors: sensor count " + sensorList.size());
-        return sensorList;
     }
 
     /**
@@ -912,87 +804,6 @@ public class SenzorsDbSource {
     }
 
     /**
-     * Get list of all users/friends and also their configurable permissions in a List
-     * @return
-     */
-    public List<UserPermission> getUsersAndTheirConfigurablePermissions() {
-        List<UserPermission> permissionList = new ArrayList();
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // join query to retrieve data
-        String query = "SELECT user._id, user.username, permission_config.location, permission_config.camera, permission_config.mic " +
-                "FROM user " +
-                "INNER JOIN permission_config " +
-                "ON user.username = permission_config.user";
-        Cursor cursor = db.rawQuery(query, null);
-
-        // sensor/user attributes
-        String _username;
-        boolean _location;
-        boolean _camera;
-        boolean _mic;
-        String _userId;
-
-        // extract attributes
-        while (cursor.moveToNext()) {
-
-            // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false ;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA))== 1 ? true : false ;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC))== 1 ? true : false ;
-
-            // get user attributes
-            _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-
-            // create senz
-            User user = new User(_userId, _username);
-            UserPermission userPerm = new UserPermission(user, _camera, _location, _mic);
-
-            // fill senz list
-            permissionList.add(userPerm);
-        }
-
-        // clean
-        cursor.close();
-
-        return permissionList;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<User> readAllUsers() {
-        Log.d(TAG, "GetSensors: getting all sensor");
-        List<User> userList = new ArrayList<User>();
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, null, null, null, null, null, null);
-
-        // user attributes
-        String _id;
-        String _username;
-
-        // extract attributes
-        while (cursor.moveToNext()) {
-            _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-
-            // we don't add mysensors user as a friend(its a server :))
-            if (!_username.equalsIgnoreCase("mysensors")) userList.add(new User(_id, _username));
-        }
-
-        // clean
-        cursor.close();
-
-        Log.d(TAG, "user count " + userList.size());
-
-        return userList;
-    }
-
-    /**
      * Delete sec from database,
      *
      * @param
@@ -1010,19 +821,27 @@ public class SenzorsDbSource {
         db.endTransaction();
     }
 
-    /**
-     * Delete senz from database,
-     *
-     * @param senz senz
-     */
-    public void deleteSenz(Senz senz) {
+    public void updateSeenTimestamp(Secret secret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        // delete senz of given user
-        db.delete(SenzorsDbContract.Location.TABLE_NAME,
-                SenzorsDbContract.Location.COLUMN_NAME_USER + "=?" + " AND " +
-                        SenzorsDbContract.Location.COLUMN_NAME_NAME + "=?",
-                new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});
+        try {
+            db.beginTransaction();
+
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN, secret.getSeenTimeStamp());
+
+            // update
+            db.update(SenzorsDbContract.Secret.TABLE_NAME,
+                    values,
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
+                    new String[]{secret.getID()});
+
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
     }
 
     public void insertImageToDB(String username, String encodedImage) {

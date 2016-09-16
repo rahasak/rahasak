@@ -13,7 +13,7 @@ public class SecretsUtil {
     private static final String TAG = SecretsUtil.class.getName();
 
     //Time to display message in chatview in minutes
-    private static final int LENGTH_OF_TIME_TO_DISPLAY_SECRET = 5;
+    private static final int LENGTH_OF_TIME_TO_DISPLAY_SECRET = 1;
 
     public static boolean isSecretToBeShown(Secret secret){
         boolean showSecret;

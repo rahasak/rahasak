@@ -30,6 +30,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private SenzStream.SENZ_STEAM_TYPE streamType;
 
+    private static final int IMAGE_SIZE = 300; // ~ 300kbs
+
     private boolean isCameraBusy;
 
     private static CameraPreview instance;
@@ -113,27 +115,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //}
     }
 
-    public void takePhoto(final PhotoActivity activity, final Senz originalSenz) {
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-
-                byte[] resizedImage = null;
-                bytes = resizeBitmapByteArray(bytes, 90);
-                if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
-                    //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
-                } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
-                }
-
-                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
-
-                activity.finish();
-            }
-        });
-    }
-
     public void takePhotoManually(final PhotoActivity activity, final Senz originalSenz) {
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
@@ -143,9 +124,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 bytes = resizeBitmapByteArray(bytes, 90);
                 if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 300); //Compress image ~ 5kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, IMAGE_SIZE);
                 } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 300); //Compress image ~ 50kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, IMAGE_SIZE);
                 }
 
                 isCameraBusy = false;

@@ -31,6 +31,7 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_RECEIVER = "receiver";
         public static final String COLUMN_NAME_DELETE = "deleted";
         public static final String COLUMN_TIMESTAMP = "timestamp";
+        public static final String COLUMN_TIMESTAMP_SEEN = "timestamp_seen";
         public static final String COLUMN_NAME_DELIVERED = "delivered";
         public static final String COLUMN_NAME_DELIVERY_FAILED = "delivery_fail";
     }
@@ -62,12 +63,4 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_USERNAME = "username";
         public static final String COLOMN_NAME_IMAGE = "image";
     }
-
-    /* Inner class that defines the shared_user table contents */
-    public static abstract class SharedUser implements BaseColumns {
-        public static final String TABLE_NAME = "shared_user";
-        public static final String COLUMN_NAME_USER = "user";
-        public static final String COLUMN_NAME_SENSOR = "sensor";
-    }
-
 }

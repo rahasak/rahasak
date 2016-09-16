@@ -47,6 +47,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -69,8 +70,10 @@ public class ChatFragment extends Fragment {
     private ImageButton getCamBtn;
     private ImageButton getMicBtn;
 
-    SenzorsDbSource dbSource;
+    private SenzorsDbSource dbSource;
     User currentUser;
+
+    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 5;
 
     private ListView listView;
     private List<Secret> secretMessageList;
@@ -99,12 +102,15 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         displayMessagesList();
-        startDeletingChatMessages();
+        markMessagesAsSeen();
     }
 
-    private void startDeletingChatMessages(){
+    private void markMessagesAsSeen(){
         for (Secret secret : secretMessageList) {
-            startTimerToDelete(secret);
+            if(secret.getSeenTimeStamp() == null){
+                secret.setSeenTimeStamp(System.currentTimeMillis());
+                dbSource.updateSeenTimestamp(secret);
+            }
         }
     }
 
@@ -232,35 +238,9 @@ public class ChatFragment extends Fragment {
             List<Secret> latestList = dbSource.getSecretz(new User("", sender), new User("", receiver), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
             secretMessageList.addAll(latestList);
             adapter.notifyDataSetChanged();
+            markMessagesAsSeen();
         }
-        //removeOldItemsFromChat();
-        startDeletingChatMessages();
-    }
-
-    private void startTimerToDelete(final Secret secret){
-        new CountDownTimer(10000, 10000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                //Ticking away to delete
-            }
-
-            @Override
-            public void onFinish() {
-                removeItemFromChat(secret);
-            }
-        }.start();
-    }
-
-    private void removeItemFromChat(Secret _secret){
-        for (Iterator<Secret> iterator = secretMessageList.iterator(); iterator.hasNext(); ) {
-            Secret secret = iterator.next();
-            if(secret.equals(_secret)){
-                new SenzorsDbSource(getContext()).deleteSecret(secret);
-                iterator.remove();
-                adapter.notifyDataSetChanged();
-            }
-        }
-
+        removeOldItemsFromChat();
     }
 
     private void updateStatusOfMessage(String uid) {
@@ -283,15 +263,17 @@ public class ChatFragment extends Fragment {
 
 
     private void removeOldItemsFromChat() {
-        Iterator<Secret> iter = secretMessageList.iterator();
+        ListIterator<Secret> iter = secretMessageList.listIterator();
         while (iter.hasNext()) {
             Secret secret = iter.next();
-
-            if (!SecretsUtil.isSecretToBeShown(secret)) {
-                iter.remove();
-                dbSource.deleteSecret(secret);
+            if(secretMessageList.size() > NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
+                if (!SecretsUtil.isSecretToBeShown(secret) && iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
+                    iter.remove();
+                    dbSource.deleteSecret(secret);
+                }
             }
         }
+        adapter.notifyDataSetChanged();
     }
 
     /**

@@ -13,6 +13,7 @@ public class Secret {
     private boolean isDelete;
     private boolean isDelivered;
     private Long timeStamp;
+    private Long seenTimeStamp;
     private String id;
     private String imageThumbnail;
     private String sound;
@@ -70,6 +71,10 @@ public class Secret {
         timeStamp = ts;
     }
 
+    public void setSeenTimeStamp(Long sts){
+        seenTimeStamp = sts;
+    }
+
     public boolean isMarkForDelete(){
         return isDelete;
     }
@@ -84,6 +89,10 @@ public class Secret {
 
     public Long getTimeStamp(){
         return timeStamp;
+    }
+
+    public Long getSeenTimeStamp(){
+        return seenTimeStamp;
     }
 
     public void setID(String val){
