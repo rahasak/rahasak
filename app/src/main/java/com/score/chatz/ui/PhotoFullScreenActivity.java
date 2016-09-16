@@ -2,7 +2,6 @@ package com.score.chatz.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -11,11 +10,9 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.score.chatz.R;
-import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.utils.BitmapTaskParams;
-import com.score.chatz.utils.BitmapWorkerTask;
+import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
-import com.score.chatz.utils.PreferenceUtils;
 
 public class PhotoFullScreenActivity extends AppCompatActivity {
 

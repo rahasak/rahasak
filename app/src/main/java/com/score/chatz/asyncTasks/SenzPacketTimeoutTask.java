@@ -1,18 +1,12 @@
 package com.score.chatz.asyncTasks;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.score.chatz.handlers.AppIntentHandler;
 import com.score.chatz.handlers.SenzStatusTracker;
 import com.score.senzc.pojos.Senz;
-
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 
 /**
  * Created by Lakmal on 9/12/16.

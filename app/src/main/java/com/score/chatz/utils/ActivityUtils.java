@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.senzc.pojos.User;
@@ -113,6 +114,15 @@ public class ActivityUtils {
         textView.setLayoutParams(layoutParams);
 
         return textView;
+    }
+
+    /**
+     * Show a toast when required!!!
+     * @param message
+     * @param context
+     */
+    public static void showToast(String message, Context context){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
 }

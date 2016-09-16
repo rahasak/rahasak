@@ -2,33 +2,23 @@ package com.score.chatz.ui;
 
 
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.text.Editable;
 import android.text.Html;
-import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -39,18 +29,13 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.handlers.AppIntentHandler;
-import com.score.chatz.handlers.SenzStatusTracker;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.services.LocationAddressReceiver;
-import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SecretsUtil;
-import com.score.chatz.utils.SenzProcessQueue;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -58,9 +43,7 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +56,7 @@ import java.util.List;
 public class ChatFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String TAG = ShareFragment.class.getName();
+    private static final String TAG = ChatFragment.class.getName();
     private static final String RECEIVER = "RECEIVER";
     private static final String SENDER = "SENDER";
 

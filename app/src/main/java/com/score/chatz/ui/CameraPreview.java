@@ -1,41 +1,23 @@
 package com.score.chatz.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
-import android.os.Bundle;
-import android.os.HandlerThread;
-import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
-import android.util.Size;
-import android.view.ContextMenu;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.score.chatz.R;
-import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.handlers.SenzHandler;
-import com.score.chatz.handlers.SenzPhotoHandler;
-import com.score.chatz.pojo.Secret;
+import com.score.chatz.handlers.SenzPhotoHandlerReceiving;
 import com.score.chatz.pojo.SenzStream;
-import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.CameraUtils;
-import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Handler;
 
 /**
  * Created by lakmalcaldera on 8/16/16.
@@ -145,7 +127,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
                 }
 
-                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
+                SenzPhotoHandlerReceiving.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
 
                 activity.finish();
             }
@@ -168,7 +150,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
                 isCameraBusy = false;
 
-                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
+                SenzPhotoHandlerReceiving.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
                 i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
                 i.putExtra("QUICK_PREVIEW", "true");

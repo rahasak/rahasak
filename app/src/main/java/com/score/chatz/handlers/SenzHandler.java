@@ -2,35 +2,23 @@ package com.score.chatz.handlers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteConstraintException;
-import android.os.RemoteException;
-import android.util.Base64;
 import android.util.Log;
 
-import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.ui.RecordingActivity;
-import com.score.chatz.utils.CameraUtils;
-import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
-import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -113,19 +101,19 @@ public class SenzHandler {
     }
 
     /**
-     * SenzUserHandler will handle all new or updates to permissions
+     * SenzUserHandlerReceiving will handle all new or updates to permissions
      * @param senz
      */
     private void handleShareSenz(Senz senz){
-        Log.i(TAG, "Delegating to SenzUserHandler :)");
-        SenzUserHandler.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
+        Log.i(TAG, "Delegating to SenzUserHandlerReceiving :)");
+        SenzUserHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
     }
 
     private void handleGetSenz(final Senz senz) {
         Log.d(TAG, senz.getSender() + " : " + senz.getSenzType().toString());
 
         if (senz.getAttributes().containsKey("profilezphoto") || senz.getAttributes().containsKey("chatzphoto")) {
-                SenzPhotoHandler.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
+                SenzPhotoHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
 
         } else if (senz.getAttributes().containsKey("chatzmic")) {
             if(RecordingActivity.isAcitivityActive() == false) {
@@ -176,7 +164,7 @@ public class SenzHandler {
              * Send permission accepted message to indicate to other user, update was succesfull
              */
             //Add New Permission
-            SenzPermissionHandler.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
+            SenzPermissionHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
             Intent intent = new Intent("com.score.chatz.DATA_SENZ");
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
@@ -213,7 +201,7 @@ public class SenzHandler {
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("userBusy")) {
-            Intent intent = AppIntentHandler.getUserBusyIntent();
+            Intent intent = IntentProvider.getUserBusyIntent();
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
         } else if (senz.getAttributes().containsKey("chatzmsg")) {
@@ -221,7 +209,7 @@ public class SenzHandler {
              * Any new chatz message, incoming, save straight to db
              */
             //Add chat message
-            SenzMessageHandler.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
+            SenzMessageHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
             Intent intent = new Intent("com.score.chatz.DATA_SENZ");
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
@@ -243,7 +231,7 @@ public class SenzHandler {
                         Long _timeStamp = System.currentTimeMillis();
                         newSecret.setTimeStamp(_timeStamp);
                         dbSource.createSecret(newSecret);
-                        SenzPhotoHandler.sendPhotoRecievedConfirmation(senz, context, uid, true);
+                        SenzPhotoHandlerReceiving.sendPhotoRecievedConfirmation(senz, context, uid, true);
                     }
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
@@ -265,7 +253,7 @@ public class SenzHandler {
                     Long _timeStamp = System.currentTimeMillis();
                     newSecret.setTimeStamp(_timeStamp);
                     dbSource.createSecret(newSecret);
-                    SenzPhotoHandler.sendPhotoRecievedConfirmation(senz, context, uid, true);*/
+                    SenzPhotoHandlerReceiving.sendPhotoRecievedConfirmation(senz, context, uid, true);*/
 
                     User sender = senz.getSender();
                     if(sender != null)

@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
 
-import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 
@@ -20,13 +18,13 @@ public class BaseHandler {
     private static final String TAG = BaseHandler.class.getName();
 
     protected static void broadcastDataSenz(Senz senz, Context context){
-        Intent intent = AppIntentHandler.getDataSenzIntent();
+        Intent intent = IntentProvider.getDataSenzIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }
 
     protected static void broadcastUpdateSenz(Senz senz, Context context){
-        Intent intent = AppIntentHandler.getUpdateSenzIntent();
+        Intent intent = IntentProvider.getUpdateSenzIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }

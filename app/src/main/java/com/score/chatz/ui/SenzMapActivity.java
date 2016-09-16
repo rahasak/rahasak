@@ -111,23 +111,11 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
             }
         });
 
-        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.location_action_bar, null));
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+
 
         setUpActionBar();
         initLocationCoordinates();
         setUpMapIfNeeded();
-        setupBackBtn();
-    }
-
-    private void setupBackBtn() {
-        backBtn = (ImageView) findViewById(R.id.goBackToHomeImg);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                goBackToHome();
-            }
-        });
     }
 
 

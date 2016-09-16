@@ -1,12 +1,8 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,17 +13,13 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.utils.BitmapTaskParams;
-import com.score.chatz.utils.BitmapWorkerTask;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.TimeUtils;
-import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.io.ByteArrayOutputStream;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 

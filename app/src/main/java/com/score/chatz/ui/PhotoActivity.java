@@ -1,63 +1,29 @@
 package com.score.chatz.ui;
 
-import android.app.Activity;
-import android.content.ClipData;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.RippleDrawable;
-import android.hardware.Camera;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
-import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.RemoteException;
-import android.support.v4.view.WindowCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
-import com.google.android.gms.vision.CameraSource;
 import com.score.chatz.R;
-import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.handlers.SenzPhotoHandler;
-import com.score.chatz.pojo.Secret;
+import com.score.chatz.handlers.SenzPhotoHandlerReceiving;
 import com.score.chatz.pojo.SenzStream;
-import com.score.chatz.utils.AnimationUtils;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.VibrationUtils;
-import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.skyfishjy.library.RippleBackground;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class PhotoActivity extends AppCompatActivity implements View.OnTouchListener {
     protected static final String TAG = PhotoActivity.class.getName();
@@ -103,7 +69,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         }
 
         if(mCameraPreview.isCameraBusy() == true) {
-            SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+            SenzPhotoHandlerReceiving.getInstance().sendBusyNotification(originalSenz, this);
             this.finish();
         }else{
             FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
@@ -216,7 +182,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                     if(isPhotoCancelled == false) {
                         isPhotoCancelled = true;
                         cancelTimerToServe();
-                        SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+                        SenzPhotoHandlerReceiving.getInstance().sendBusyNotification(originalSenz, this);
                         stopVibrations();
                         this.finish();
                     }
@@ -264,7 +230,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST,TIME_TO_SERVE_REQUEST){
             @Override
             public void onFinish() {
-                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, _this);
+                SenzPhotoHandlerReceiving.getInstance().sendBusyNotification(originalSenz, _this);
                 _this.finish();
             }
             @Override

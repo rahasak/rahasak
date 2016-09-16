@@ -5,11 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.score.chatz.asyncTasks.SenzPacketTimeoutTask;
 import com.score.chatz.exceptions.NoSenzUidException;
@@ -88,7 +86,7 @@ public class SenzStatusTracker {
         }catch (NoSenzUidException ex){
             ex.printStackTrace();
         }
-        Intent intent = AppIntentHandler.getpacketTimeoutIntent();
+        Intent intent = IntentProvider.getpacketTimeoutIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }

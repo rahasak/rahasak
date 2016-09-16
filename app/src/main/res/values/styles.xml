@@ -18,71 +18,6 @@
 -->
 
 <resources>
-
-    <style name="Theme.Sensor" parent="@android:style/Theme.Holo">
-        <item name="android:actionBarItemBackground">@drawable/selectable_background_sensor</item>
-        <item name="android:popupMenuStyle">@style/PopupMenu.Sensor</item>
-        <item name="android:dropDownListViewStyle">@style/DropDownListView.Sensor</item>
-        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Sensor</item>
-        <item name="android:actionDropDownStyle">@style/DropDownNav.Sensor</item>
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.Sensor</item>
-        <item name="android:actionModeBackground">@drawable/cab_background_top_sensor</item>
-        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_sensor</item>
-        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Sensor</item>
-        
-        
-    </style>
-
-    <style name="ActionBar.Solid.Sensor" parent="@android:style/Widget.Holo.ActionBar.Solid">
-        <item name="android:background">@drawable/actionbar_backgroud</item>
-        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_sensor</item>
-        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_sensor</item>
-        <item name="android:progressBarStyle">@style/ProgressBar.Sensor</item>
-    </style>
-
-    <style name="ActionBar.Transparent.Sensor" parent="@android:style/Widget.Holo.ActionBar">
-        <item name="android:background">@drawable/ab_transparent_sensor</item>
-        <item name="android:progressBarStyle">@style/ProgressBar.Sensor</item>
-    </style>
-
-    <style name="PopupMenu.Sensor" parent="@android:style/Widget.Holo.ListPopupWindow">
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_sensor</item>	
-    </style>
-
-    <style name="DropDownListView.Sensor" parent="@android:style/Widget.Holo.ListView.DropDown">
-        <item name="android:listSelector">@drawable/selectable_background_sensor</item>
-    </style>
-
-    <style name="ActionBarTabStyle.Sensor" parent="@android:style/Widget.Holo.ActionBar.TabView">
-        <item name="android:background">@drawable/tab_indicator_ab_sensor</item>
-    </style>
-
-    <style name="DropDownNav.Sensor" parent="@android:style/Widget.Holo.Spinner">
-        <item name="android:background">@drawable/spinner_background_ab_sensor</item>
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_sensor</item>
-        <item name="android:dropDownSelector">@drawable/selectable_background_sensor</item>
-    </style>
-    
-    <style name="ProgressBar.Sensor" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/progress_horizontal_sensor</item>
-    </style>
-    
-    <style name="ActionButton.CloseMode.Sensor" parent="@android:style/Widget.Holo.ActionButton.CloseMode">
-        <item name="android:background">@drawable/btn_cab_done_sensor</item>
-    </style>
-
-    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
-    <style name="Theme.Sensor.Widget" parent="@android:style/Theme.Holo">
-        <item name="android:popupMenuStyle">@style/PopupMenu.Sensor</item>
-        <item name="android:dropDownListViewStyle">@style/DropDownListView.Sensor</item>
-    </style>
-
-
-
-
-
-
-
     <style name="RahasakTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarTabStyle">@style/RahasakTheme.ActionBar.Tab</item>
         <item name="android:actionBarTabBarStyle">@style/RahasakTheme.ActionBar.Tab</item>
@@ -92,7 +27,6 @@
     </style>
 
     <style name="RahasakTheme.ActionBar.Tab" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@drawable/tab_bar_background</item>
         <item name="windowActionBarOverlay">false</item>
     </style>
 
@@ -108,10 +42,6 @@
         <item name="windowActionBarOverlay">false</item>
     </style>
 
-
-
-
-
     <style name="MyMaterialTheme" parent="MyMaterialTheme.Base">
 
     </style>
@@ -125,33 +55,5 @@
         <item name="windowActionBarOverlay">false</item>
         <item name="android:actionBarStyle">@color/android_grey</item>
     </style>
-
-
-
-
-
-
-
-
-
-
-
-    <!--<style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-    </style>
-
-    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#000</item>
-        <item name="android:titleTextStyle">@style/Theme.MyAppTheme.ActionBar.TitleTextStyle</item>
-    </style>
-
-    <style name="Theme.MyAppTheme.ActionBar.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">#FFFFFF</item>
-    </style>-->
-
-
-
-
-
 
 </resources>

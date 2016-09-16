@@ -1,48 +1,22 @@
 package com.score.chatz.ui;
 
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.handlers.AppIntentHandler;
-import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.handlers.IntentProvider;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
 
 
 public class ChatActivity extends BaseActivity {
@@ -102,9 +76,9 @@ public class ChatActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         // bind to senz service
-        this.registerReceiver(senzMessageReceiver, AppIntentHandler.getIntentFilter(AppIntentHandler.INTENT_TYPE.DATA_SENZ));
-        this.registerReceiver(userBusyNotifier, AppIntentHandler.getIntentFilter(AppIntentHandler.INTENT_TYPE.USER_BUSY));
-        this.registerReceiver(senzPacketTimeoutReceiver, AppIntentHandler.getIntentFilter(AppIntentHandler.INTENT_TYPE.PACKET_TIMEOUT));
+        this.registerReceiver(senzMessageReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
+        this.registerReceiver(senzPacketTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.PACKET_TIMEOUT));
 
     }
 

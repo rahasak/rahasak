@@ -1,6 +1,5 @@
 package com.score.chatz.ui;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -8,15 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
@@ -30,80 +26,47 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.chatz.R;
-import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
-import com.score.chatz.services.RemoteSenzService;
+import com.score.chatz.handlers.IntentProvider;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.NotificationUtils;
-import com.score.chatz.utils.RSAUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.HashMap;
 
 public class AddUserActivity extends BaseActivity {
 
     private static final String TAG = AddUserActivity.class.getName();
-    private TextView headerTitle;
+
+    // Ui elements
     private ImageView backBtn;
     private TextView invite_text_part_1;
     private TextView invite_text_part_2;
     private TextView invite_text_part_3;
     private TextView invite_text_part_4;
-    private TextView invite_text_part_5;
-    private TextView invite_text_part_6;
     private Button addFriendBtn;
     private EditText editTextUserId;
-    private User registeringUser;
-    protected Typeface typeface;
-    protected Typeface typefaceThin;
-    protected Typeface typefaceUltraThin;
-    private  boolean isServiceBound;
-
-
-
-    // service interface
-    private ISenzService senzService = null;
-
-    // service connection
-    private ServiceConnection senzServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("TAG", "Connected with senz service");
-            senzService = ISenzService.Stub.asInterface(service);
-            isServiceBound = true;
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            senzService = null;
-            isServiceBound = false;
-            Log.d("TAG", "Disconnected from senz service");
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_user_activity);
+        setContentView(R.layout.activity_add_user);
 
+        setupUiElements();
+        setupActionBar();
+        setupAddUsersBtn();
+        setupFonts();
+    }
+
+    private void setupUiElements(){
         invite_text_part_1 = (TextView) findViewById(R.id.textView);
         invite_text_part_2 = (TextView) findViewById(R.id.textView2);
         invite_text_part_3 = (TextView) findViewById(R.id.textView3);
         invite_text_part_4 = (TextView) findViewById(R.id.textView4);
-        invite_text_part_5 = (TextView) findViewById(R.id.textView5);
-        invite_text_part_6 = (TextView) findViewById(R.id.textView6);
-        invite_text_part_6 = (TextView) findViewById(R.id.textView6);
-
-
         editTextUserId = (EditText) findViewById(R.id.friend_id);
-
-        setupActionBar();
-        setupAddUsersBtn();
-        setupFonts();
     }
 
     private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
@@ -121,22 +84,15 @@ public class AddUserActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
-        this.registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent = new Intent();
-        intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-        bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-
-        this.registerReceiver(senzDataReceiver, new IntentFilter("com.score.chatz.DATA_SENZ")); //Incoming data share
+        this.registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ)); //Incoming data share
     }
 
     /**
@@ -145,15 +101,10 @@ public class AddUserActivity extends BaseActivity {
     @Override
     public void onStop() {
         super.onStop();
-
         // Unbind from the service
         this.unbindService(senzServiceConnection);
-        //if (senzShareReceiver != null) unregisterReceiver(senzShareReceiver);
         if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
-        this.unregisterReceiver(userBusyNotifier);
-        //if (senzMessageReceiver != null) unregisterReceiver(senzMessageReceiver);
     }
-
 
     private void setupAddUsersBtn(){
         addFriendBtn = (Button) findViewById(R.id.add_friend_btn);
@@ -170,11 +121,17 @@ public class AddUserActivity extends BaseActivity {
 
     private void onClickShare(){
         String username = editTextUserId.getText().toString().trim();
-        registeringUser = new User("0", username);
+        User registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
             String confirmationMessage = "<font color=#000000>Are you sure you want to share secrets with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
-            displayConfirmationMessageDialog(confirmationMessage);
+            displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
+                    share();
+                }
+            });
         } catch (InvalidInputFieldsException e) {
             Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();
             e.printStackTrace();
@@ -182,28 +139,17 @@ public class AddUserActivity extends BaseActivity {
     }
 
     private void setupFonts(){
-        typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
-        typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-Light.otf");
-        typefaceUltraThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-UltraLight.otf");
-        //headerTitle.setTypeface(typefaceThin, Typeface.NORMAL);
         invite_text_part_1.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_2.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_3.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_4.setTypeface(typefaceUltraThin, Typeface.NORMAL);
-        invite_text_part_5.setTypeface(typefaceUltraThin, Typeface.NORMAL);
-        invite_text_part_6.setTypeface(typefaceUltraThin, Typeface.NORMAL);
     }
-
-
-
 
     /**
      * Share current sensor
      * Need to send share query to server via web socket
      */
     private void share() {
-
-
         if(isServiceBound == true) {
             try {
                 // create senz attributes
@@ -232,8 +178,6 @@ public class AddUserActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(), "Establishing connection to server. Please wait.", Toast.LENGTH_LONG).show();
         }
     }
-
-
 
     /**
      * Handle broadcast message receives
@@ -271,20 +215,9 @@ public class AddUserActivity extends BaseActivity {
     }
 
 
-
-
     private void goBackToHome(){
         Log.d(TAG, "go home clicked");
         this.finish();
-    }
-
-    private void setupBackBtn() {
-        backBtn = (ImageView) findViewById(R.id.goBackToHomeImg);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                goBackToHome();
-            }
-        });
     }
 
     @Override
@@ -297,113 +230,4 @@ public class AddUserActivity extends BaseActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-
-    /**
-     * Display message dialog when user request(click) to register
-     *
-     * @param message message to be display
-     */
-    public void displayConfirmationMessageDialog(String message) {
-        final Dialog dialog = new Dialog(AddUserActivity.this);
-
-        //set layout for dialog
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.share_confirm_message_dialog);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(true);
-
-        // set dialog texts
-        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
-        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
-        messageHeaderTextView.setText("Adding friend confirmation");
-        messageTextView.setText(Html.fromHtml(message));
-
-        // set custom font
-        messageHeaderTextView.setTypeface(typeface);
-        messageTextView.setTypeface(typeface);
-
-        //set ok button
-        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(typeface);
-        okButton.setTypeface(null, Typeface.BOLD);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (NetworkUtil.isAvailableNetwork(AddUserActivity.this)) {
-                    dialog.cancel();
-                    ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
-                    share();
-                } else {
-                    Toast.makeText(AddUserActivity.this, "No network connection available", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        // cancel button
-        Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
-        cancelButton.setTypeface(typeface);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-
-        dialog.show();
-    }
-
-
-
-
-
-
-    /**
-     * Display message dialog with registration status
-     *
-     * @param message message to be display
-     */
-    public void displayInformationMessageDialog(String title, String message) {
-        final Dialog dialog = new Dialog(this);
-
-        //set layout for dialog
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.information_message_dialog);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(true);
-
-        // set dialog texts
-        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
-        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
-        messageHeaderTextView.setText(title);
-        messageTextView.setText(Html.fromHtml(message));
-
-        // set custom font
-        messageHeaderTextView.setTypeface(typeface);
-        messageTextView.setTypeface(typeface);
-
-        //set ok button
-        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(typeface);
-        okButton.setTypeface(null, Typeface.BOLD);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-
-        dialog.show();
-    }
-
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
-
-
-
 }

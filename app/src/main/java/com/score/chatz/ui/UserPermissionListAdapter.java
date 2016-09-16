@@ -1,14 +1,9 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +14,9 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 
 import com.score.chatz.R;
 import com.score.chatz.pojo.UserPermission;
-import com.score.chatz.utils.BitmapTaskParams;
-import com.score.chatz.utils.BitmapWorkerTask;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.asyncTasks.BitmapWorkerTask;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
