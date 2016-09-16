@@ -143,9 +143,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 bytes = resizeBitmapByteArray(bytes, 90);
                 if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 300); //Compress image ~ 5kbs
                 } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 300); //Compress image ~ 50kbs
                 }
 
                 isCameraBusy = false;
