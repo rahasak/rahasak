@@ -26,7 +26,7 @@ import java.util.Date;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class AllChatListAdapter extends ArrayAdapter<Secret> {
+public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
 
     private static final String TAG = ChatFragmentListAdapter.class.getName();
     Context context;
@@ -37,7 +37,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
     static User currentUser;
     private LayoutInflater mInflater;
 
-    public AllChatListAdapter(Context _context, ArrayList<Secret> secretList) {
+    public LastItemChatListAdapter(Context _context, ArrayList<Secret> secretList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
         context = _context;
         userSecretList = secretList;

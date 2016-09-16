@@ -1,9 +1,6 @@
 package com.score.chatz.ui;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -15,7 +12,6 @@ import android.os.Bundle;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.PreferenceUtils;
-import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import android.support.v7.widget.Toolbar;
@@ -120,14 +116,14 @@ public class HomeActivity extends BaseActivity {
     private void setupTabLayouts() {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setCustomView(R.layout.home_active_tab);
-        tabLayout.getTabAt(1).setCustomView(R.layout.home_all_friends_tab);
+        tabLayout.getTabAt(0).setCustomView(R.layout.home_rahas_tab);
+        tabLayout.getTabAt(1).setCustomView(R.layout.home_friends_tab);
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new AllChatListFragment(), getResources().getString(R.string.home_page_tab_one));
-        adapter.addFragment(new RecentFriendListFragment(), getResources().getString(R.string.home_page_tab_two));
+        adapter.addFragment(new LastItemChatListFragment(), getResources().getString(R.string.home_page_tab_one));
+        adapter.addFragment(new FriendListFragment(), getResources().getString(R.string.home_page_tab_two));
         viewPager.setAdapter(adapter);
     }
 
@@ -158,34 +154,4 @@ public class HomeActivity extends BaseActivity {
             return mFragmentTitleList.get(position);
         }
     }
-
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        this.unregisterReceiver(userBusyNotifier);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        this.registerReceiver(userBusyNotifier, new IntentFilter("com.score.chatz.USER_BUSY"));
-    }
 }
-
-
-
-
-
-
-
-
-
-

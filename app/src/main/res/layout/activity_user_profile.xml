@@ -10,29 +10,12 @@
     android:orientation="vertical"
     tools:context="com.score.chatz.ui.UserProfileActivity">
 
-    <!--<android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@android:color/transparent" />-->
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="top"
         android:layout_weight="4"
         android:background="#ededed">
-
-        <!--<ImageView
-            android:id="@+id/clickable_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top"
-            android:adjustViewBounds="true"
-            android:background="@drawable/image_border"
-            android:focusableInTouchMode="false"
-            android:scaleType="centerInside"
-            android:src="@drawable/default_user" />-->
 
         <com.github.siyamed.shapeimageview.CircularImageView
             android:layout_width="200dp"

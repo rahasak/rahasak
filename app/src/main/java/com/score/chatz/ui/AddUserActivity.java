@@ -30,7 +30,6 @@ import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.handlers.IntentProvider;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -42,7 +41,6 @@ public class AddUserActivity extends BaseActivity {
     private static final String TAG = AddUserActivity.class.getName();
 
     // Ui elements
-    private ImageView backBtn;
     private TextView invite_text_part_1;
     private TextView invite_text_part_2;
     private TextView invite_text_part_3;
@@ -61,7 +59,7 @@ public class AddUserActivity extends BaseActivity {
         setupFonts();
     }
 
-    private void setupUiElements(){
+    private void setupUiElements() {
         invite_text_part_1 = (TextView) findViewById(R.id.textView);
         invite_text_part_2 = (TextView) findViewById(R.id.textView2);
         invite_text_part_3 = (TextView) findViewById(R.id.textView3);
@@ -69,15 +67,7 @@ public class AddUserActivity extends BaseActivity {
         editTextUserId = (EditText) findViewById(R.id.friend_id);
     }
 
-    private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-            handleMessage(intent);
-        }
-    };
-
-    private void setupActionBar(){
+    private void setupActionBar() {
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
         getSupportActionBar().setTitle("Invite");
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -95,18 +85,13 @@ public class AddUserActivity extends BaseActivity {
         this.registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ)); //Incoming data share
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onStop() {
         super.onStop();
-        // Unbind from the service
-        this.unbindService(senzServiceConnection);
         if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
     }
 
-    private void setupAddUsersBtn(){
+    private void setupAddUsersBtn() {
         addFriendBtn = (Button) findViewById(R.id.add_friend_btn);
         addFriendBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -119,7 +104,7 @@ public class AddUserActivity extends BaseActivity {
         });
     }
 
-    private void onClickShare(){
+    private void onClickShare() {
         String username = editTextUserId.getText().toString().trim();
         User registeringUser = new User("0", username);
         try {
@@ -138,7 +123,7 @@ public class AddUserActivity extends BaseActivity {
         }
     }
 
-    private void setupFonts(){
+    private void setupFonts() {
         invite_text_part_1.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_2.setTypeface(typefaceUltraThin, Typeface.NORMAL);
         invite_text_part_3.setTypeface(typefaceUltraThin, Typeface.NORMAL);
@@ -150,34 +135,62 @@ public class AddUserActivity extends BaseActivity {
      * Need to send share query to server via web socket
      */
     private void share() {
-        if(isServiceBound == true) {
-            try {
-                // create senz attributes
-                HashMap<String, String> senzAttributes = new HashMap<>();
-                senzAttributes.put("lat", "lat");
-                senzAttributes.put("lon", "lon");
-                senzAttributes.put("msg", "msg");
-                senzAttributes.put("chatzphoto", "chatzphoto");
-                senzAttributes.put("chatzmsg", "chatzmsg");
-                senzAttributes.put("camPerm", "false"); //Default Values, later in ui allow user to configure this on share
-                senzAttributes.put("locPerm", "false"); //Dafault Values
-                senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put(getResources().getString(R.string.lat), getResources().getString(R.string.lat));
+        senzAttributes.put(getResources().getString(R.string.lon), getResources().getString(R.string.lon));
+        senzAttributes.put(getResources().getString(R.string.msg), getResources().getString(R.string.msg));
+        senzAttributes.put(getResources().getString(R.string.chatzphoto), getResources().getString(R.string.chatzphoto));
+        senzAttributes.put(getResources().getString(R.string.chatzmsg), getResources().getString(R.string.chatzmsg));
+        senzAttributes.put(getResources().getString(R.string.camPerm), "false"); //Default Values, later in ui allow user to configure this on share
+        senzAttributes.put(getResources().getString(R.string.locPerm), "false"); //Dafault Values
+        senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
 
-                // new senz
-                String id = "_ID";
-                String signature = "_SIGNATURE";
-                SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-                User receiver = new User("", editTextUserId.getText().toString().trim());
-                Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+        User receiver = new User("", editTextUserId.getText().toString().trim());
+        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
-                senzService.send(senz);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }else{
-            Toast.makeText(getApplicationContext(), "Establishing connection to server. Please wait.", Toast.LENGTH_LONG).show();
+        // send to service
+        send(senz);
+    }
+
+    /**
+     * Clear input fields and reset activity components
+     */
+    private void onPostShare(Senz senz) {
+        this.goBackToHome();
+        ActivityUtils.showToast("Successfully added " + editTextUserId.getText().toString().trim(), this);
+        editTextUserId.setText("");
+    }
+
+
+    private void goBackToHome() {
+        Log.d(TAG, "go home clicked");
+        this.finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
+
+
+    private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            handleMessage(intent);
+        }
+    };
 
     /**
      * Handle broadcast message receives
@@ -201,33 +214,6 @@ public class AddUserActivity extends BaseActivity {
                     displayInformationMessageDialog("Fail", message);
                 }
             }
-        }
-    }
-
-
-    /**
-     * Clear input fields and reset activity components
-     */
-    private void onPostShare(Senz senz) {
-        this.goBackToHome();
-        Toast.makeText(this, "Successfully added " + editTextUserId.getText().toString().trim(), Toast.LENGTH_LONG).show();
-        editTextUserId.setText("");
-    }
-
-
-    private void goBackToHome(){
-        Log.d(TAG, "go home clicked");
-        this.finish();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 }

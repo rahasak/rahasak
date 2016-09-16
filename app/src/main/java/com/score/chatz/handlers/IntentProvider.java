@@ -30,16 +30,6 @@ public class IntentProvider {
         return  intent;
     }
 
-    public static Intent getUpdateSenzIntent() {
-        Intent intent = null;
-        try {
-            intent = getIntent(getIntentType(INTENT_TYPE.UPDATE_SENZ));
-        } catch (InvalidIntentType ex) {
-            Log.e(TAG, "No such intent, " + ex);
-        }
-        return  intent;
-    }
-
     public static Intent getUserBusyIntent() {
         Intent intent = null;
         try {
@@ -100,15 +90,15 @@ public class IntentProvider {
     private static String getIntentType(INTENT_TYPE intentType) throws InvalidIntentType {
         String intentString = null;
         switch (intentType) {
+            // Yummy!! Data packets from service
             case DATA_SENZ:
                 intentString = "com.score.chatz.DATA_SENZ";
                 break;
-            case UPDATE_SENZ:
-                intentString = "com.score.chatz.USER_UPDATE";
-                break;
+            // Ohhh!! User is too busy to respond
             case USER_BUSY:
                 intentString = "com.score.chatz.USER_BUSY";
                 break;
+            // Depressing!! That #$%! is not online!! :)
             case PACKET_TIMEOUT:
                 intentString = "com.score.chatz.PACKET_TIMEOUT";
                 break;

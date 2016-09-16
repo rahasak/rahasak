@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/transparent"
     android:orientation="vertical">
-
-
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,20 +11,11 @@
         android:layout_gravity="center_horizontal"
         android:gravity="bottom"
         android:paddingBottom="0dp">
-        <!--<ImageView
-            android:layout_height="wrap_content"
-            android:layout_width="20dp"
-            android:id="@+id/icon"
-            android:src="@drawable/clock"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp" />-->
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/home_page_tab_one"
+            android:text="@string/home_page_tab_two"
             android:layout_toRightOf="@+id/icon"
             android:allowUndo="false"
             android:layout_centerInParent="true"
@@ -40,8 +29,4 @@
             android:textStyle="normal"
             android:fontFamily="Helvetica" />
     </RelativeLayout>
-
-
 </LinearLayout>
-
-

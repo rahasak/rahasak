@@ -26,12 +26,9 @@ import com.score.chatz.R;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.handlers.IntentProvider;
 import com.score.chatz.handlers.SenzHandler;
-import com.score.chatz.services.RemoteSenzService;
 import com.score.chatz.utils.ActivityUtils;
-import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
-import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -53,7 +50,6 @@ public class RegistrationActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_registration);
 
         setupUI();
@@ -71,11 +67,11 @@ public class RegistrationActivity extends BaseActivity {
     /**
      * Register all intent receivers
      */
-    private void registerReceivers(){
+    private void registerReceivers() {
         registerReceiver(senzMessageReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
     }
 
-    private void unRegisterReceivers(){
+    private void unRegisterReceivers() {
         if (senzMessageReceiver != null) unregisterReceiver(senzMessageReceiver);
     }
 
@@ -86,21 +82,17 @@ public class RegistrationActivity extends BaseActivity {
         unRegisterReceivers();
     }
 
-    private void setupUI(){
+    private void setupUI() {
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
         welcomeTextView = (TextView) findViewById(R.id.welcome_text);
         welcomeTextView.setTypeface(typeface);
     }
 
-    private void setupRegisterBtn(){
+    private void setupRegisterBtn() {
         registerBtn = (Button) findViewById(R.id.register_btn);
         registerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (NetworkUtil.isAvailableNetwork(RegistrationActivity.this)) {
-                    onClickRegister();
-                } else {
-                    Toast.makeText(RegistrationActivity.this, "No network connection available", Toast.LENGTH_LONG).show();
-                }
+                onClickRegister();
             }
         });
     }
@@ -110,13 +102,13 @@ public class RegistrationActivity extends BaseActivity {
      * create user and validate fields from here
      */
     private void onClickRegister() {
-        // crate user
+        // create user
         String username = editTextUserId.getText().toString().trim();
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
             String confirmationMessage = "<font color=#000000>Are you sure you want to register with Rahask using </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
-            displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener(){
+            displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ActivityUtils.showProgressDialog(RegistrationActivity.this, "Please wait...");
@@ -124,7 +116,7 @@ public class RegistrationActivity extends BaseActivity {
                 }
             });
         } catch (InvalidInputFieldsException e) {
-            Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();
+            ActivityUtils.showToast("Invalid username", this);
             e.printStackTrace();
         }
     }
@@ -148,24 +140,22 @@ public class RegistrationActivity extends BaseActivity {
      * Send register senz to senz service via service binder
      */
     private void doRegistration() {
-        try {
-            // first create create senz
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
 
-            // new senz
-            String id = "_ID";
-            String signature = "";
-            SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-            User sender = new User("", registeringUser.getUsername());
-            User receiver = new User("", "senzswitch");
-            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
+        // first create create senz
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put(getResources().getString(R.string.pubkey), PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
 
-            senzService.send(senz);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        // new senz
+        String id = "_ID";
+        String signature = "";
+        SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+        User sender = new User("", registeringUser.getUsername());
+        User receiver = new User("", getResources().getString(R.string.switch_name));
+        Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
+
+        // Sending senz to service
+        send(senz);
     }
 
     private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
@@ -191,12 +181,12 @@ public class RegistrationActivity extends BaseActivity {
                 ActivityUtils.cancelProgressDialog();
                 String msg = senz.getAttributes().get("msg");
                 if (msg != null && msg.equalsIgnoreCase("REG_DONE")) {
-                    Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
+                    ActivityUtils.showToast("Successfully registered", this);
                     // save user
                     // navigate home
                     PreferenceUtils.saveUser(this, registeringUser);
                     navigateToHome();
-                } else if(msg != null && msg.equalsIgnoreCase("REG_FAIL")){
+                } else if (msg != null && msg.equalsIgnoreCase("REG_FAIL")) {
                     String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
                     displayInformationMessageDialog("Registration fail", informationMessage);
                 }

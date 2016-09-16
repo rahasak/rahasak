@@ -301,12 +301,6 @@ public class SenzHandler {
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
         }
-
-        /*
-         * The following method is used to notify all list view to update.
-         */
-        handleDataChanges(senz);
-
     }
 
     private void handleStream(String stream) {
@@ -342,13 +336,6 @@ public class SenzHandler {
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZSOUND);
             }
         }
-    }
-
-
-    private void handleDataChanges(Senz senz) {
-        Intent intent = new Intent("com.score.chatz.USER_UPDATE");
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);
     }
 
     public SenzServiceConnection getServiceConnection(){

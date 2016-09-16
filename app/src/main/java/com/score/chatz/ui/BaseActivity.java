@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -20,12 +21,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.handlers.IntentProvider;
 import com.score.chatz.interfaces.ISendingComHandler;
 import com.score.chatz.services.RemoteSenzService;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.NetworkUtil;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 
@@ -52,9 +55,6 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
 
-    // Base class instance
-    BaseActivity activity;
-
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -76,20 +76,23 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //Unbind from service
-        if (isServiceBound == true) unbindService(senzServiceConnection);
-        unregisterAllReceivers();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
+        //Start service
+        startService();
+        // Register all broadcast listeners
+        registerAllReceivers();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        //Unbind from service
+        if (isServiceBound == true) unbindService(senzServiceConnection);
+        unregisterAllReceivers();
     }
 
     @Override
@@ -98,12 +101,6 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
         //Setup Fonts!!!
         setupFonts();
-
-        //Start service
-        startService();
-
-        // Register all broadcast listeners
-        registerAllReceivers();
     }
 
     /**
@@ -114,7 +111,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         Intent serviceIntent = new Intent(this, RemoteSenzService.class);
         startService(serviceIntent);
 
-        Log.d(TAG, "service started from reg");
+        Log.d(TAG, "Service requested to start!!!");
 
         // bind to service from here as well
         Intent intent = new Intent();
@@ -218,6 +215,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     }
 
     private void registerAllReceivers(){
+        //Notify when user don't want to responsed to requests
         this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
     }
 
@@ -234,7 +232,19 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     };
 
     @Override
-    public void send() {
-
+    public void send(Senz senz) {
+        if (!NetworkUtil.isAvailableNetwork(this)) {
+            ActivityUtils.showToast("No network connection available.", this);
+        }else{
+            try {
+                if(isServiceBound == true) {
+                    senzService.send(senz);
+                }else{
+                    ActivityUtils.showToast("Failed to connected to service.", this);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -22,11 +22,11 @@ import java.util.ArrayList;
 /**
  * Created by Lakmal on 8/6/16.
  */
-    class UserPermissionListAdapter extends ArrayAdapter<UserPermission> {
+    class FriendListAdapter extends ArrayAdapter<UserPermission> {
         Context context;
         ArrayList<UserPermission> userPermissionList;
 
-        public UserPermissionListAdapter(Context _context, ArrayList<UserPermission> userPermsList) {
+        public FriendListAdapter(Context _context, ArrayList<UserPermission> userPermsList) {
             super(_context, R.layout.single_user_card_row, R.id.user_name, userPermsList);
             context = _context;
             userPermissionList = userPermsList;

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="lon">lon</string>
-    <string name="lat">lat</string>
+    <!-- Switch name -->
+    <item name="switch_name" type="string" >senzswitch</item>
+
+    <!-- Senz Attributes used in app -->
+    <item name="lat" type="string" >lat</item>
+    <item name="lon" type="string" >lon</item>
+    <item name="time" type="string" >time</item>
+    <item name="pubkey" type="string" >pubkey</item>
+
+    <item name="msg" type="string" >msg</item>
+    <item name="chatzphoto" type="string" >chatzphoto</item>
+    <item name="chatzmsg" type="string" >chatzmsg</item>
+    <item name="camPerm" type="string" >camPerm</item>
+    <item name="locPerm" type="string" >locPerm</item>
+
+
+
 </resources>

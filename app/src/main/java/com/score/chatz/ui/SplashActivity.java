@@ -1,22 +1,9 @@
 package com.score.chatz.ui;
-
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Html;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.TextView;
-
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.services.RemoteSenzService;
 import com.score.chatz.utils.PreferenceUtils;
 
 /**

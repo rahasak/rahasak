@@ -16,36 +16,30 @@ import android.widget.AdapterView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.handlers.IntentProvider;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class AllChatListFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class LastItemChatListFragment extends ListFragment implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = AllChatListFragment.class.getName();
+    private static final String TAG = LastItemChatListFragment.class.getName();
+
     private ArrayList<Secret> allSecretsList;
-    private AllChatListAdapter adapter;
+    private LastItemChatListAdapter adapter;
     private User currentUser;
     SenzorsDbSource dbSource;
-
-    public AllChatListFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         try {
             currentUser = PreferenceUtils.getUser(this.getContext());
         } catch (NoUserException ex) {
@@ -53,13 +47,13 @@ public class AllChatListFragment extends ListFragment implements AdapterView.OnI
         }
         dbSource = new SenzorsDbSource(getContext());
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.all_chat_messages_list_fragment, container, false);
+        return inflater.inflate(R.layout.last_item_chat_list_fragment, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
+        getContext().registerReceiver(userSharedReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
         getListView().setOnItemClickListener(this);
     }
 
@@ -92,12 +86,10 @@ public class AllChatListFragment extends ListFragment implements AdapterView.OnI
      * Basically setup list adapter if have items to display otherwise display empty view
      */
     private void displayUserList() {
-
         allSecretsList = (ArrayList<Secret>) dbSource.getAllOtherSercets(currentUser);
-        adapter = new AllChatListAdapter(getContext(), allSecretsList);
+        adapter = new LastItemChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        //removeOldItemsFromChat();
     }
 
     private void removeOldItemsFromChat() {
