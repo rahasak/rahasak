@@ -4,7 +4,6 @@ package com.score.chatz.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,7 +16,7 @@ import android.widget.AdapterView;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.handlers.IntentProvider;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.pojo.UserPermission;
 
 import java.util.ArrayList;

@@ -9,11 +9,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.handlers.IntentProvider;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;

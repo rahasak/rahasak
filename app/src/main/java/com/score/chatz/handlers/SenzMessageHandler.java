@@ -7,7 +7,10 @@ import android.util.Log;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.interfaces.IDataMessageSenzHandler;
 import com.score.chatz.interfaces.IReceivingComHandler;
+import com.score.chatz.interfaces.ISendAckHandler;
+import com.score.chatz.interfaces.ISendingComHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.senz.ISenzService;
@@ -22,51 +25,20 @@ import java.util.HashMap;
 /**
  * Created by Lakmal on 9/4/16.
  */
-public class SenzMessageHandlerReceiving extends BaseHandler implements IReceivingComHandler {
-    private static final String TAG = SenzMessageHandlerReceiving.class.getName();
-    private static SenzMessageHandlerReceiving instance;
+public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzHandler, ISendAckHandler {
+    private static final String TAG = SenzMessageHandler.class.getName();
+    private static SenzMessageHandler instance;
 
     /**
      * Singleton
      *
      * @return
      */
-    public static SenzMessageHandlerReceiving getInstance() {
-
+    public static SenzMessageHandler getInstance() {
             if (instance == null) {
-                instance = new SenzMessageHandlerReceiving();
+                instance = new SenzMessageHandler();
             }
-
         return instance;
-    }
-
-    @Override
-    public void handleSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
-        // save senz in db
-        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
-
-        try {
-            Log.d(TAG, "save incoming chatz");
-            String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
-            Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
-            newSecret.setID(senz.getAttributes().get("uid"));
-            Long _timeStamp = System.currentTimeMillis();
-            newSecret.setTimeStamp(_timeStamp);
-            dbSource.createSecret(newSecret);
-
-            senz.setSender(sender);
-            Log.d(TAG, "save messages");
-            // if senz already exists in the db, SQLiteConstraintException should throw
-
-            NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "New message received from @" + senz.getSender().getUsername());
-            sendConfirmation(senz, senzService, senz.getReceiver(), true);
-
-            broadcastDataSenz(senz, context);
-
-        } catch (SQLiteConstraintException | UnsupportedEncodingException e) {
-            sendConfirmation(senz, senzService, senz.getReceiver(), false);
-            Log.e(TAG, e.toString());
-        }
     }
 
     @Override
@@ -94,4 +66,42 @@ public class SenzMessageHandlerReceiving extends BaseHandler implements IReceivi
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onMessageSent(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
+        broadcastDataSenz(senz, context);
+    }
+
+    @Override
+    public void onNewMessage(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        // save senz in db
+        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
+
+        try {
+            Log.d(TAG, "save incoming chatz");
+            String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
+            Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
+            newSecret.setID(senz.getAttributes().get("uid"));
+            Long _timeStamp = System.currentTimeMillis();
+            newSecret.setTimeStamp(_timeStamp);
+            dbSource.createSecret(newSecret);
+
+            senz.setSender(sender);
+            Log.d(TAG, "save messages");
+            // if senz already exists in the db, SQLiteConstraintException should throw
+
+            NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "New message received from @" + senz.getSender().getUsername());
+            sendConfirmation(senz, senzService, senz.getReceiver(), true);
+
+            broadcastDataSenz(senz, context);
+
+        } catch (SQLiteConstraintException | UnsupportedEncodingException e) {
+            sendConfirmation(senz, senzService, senz.getReceiver(), false);
+            Log.e(TAG, e.toString());
+        }
+    }
+
+
+
 }

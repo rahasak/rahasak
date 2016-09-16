@@ -1,4 +1,4 @@
-package com.score.chatz.handlers;
+package com.score.chatz.application;
 
 
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.score.chatz.asyncTasks.SenzPacketTimeoutTask;
+import com.score.chatz.asyncTasks.SenzTimeoutTask;
 import com.score.chatz.exceptions.NoSenzUidException;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.pojos.Senz;
@@ -31,7 +31,7 @@ public class SenzStatusTracker {
     private static final String UID = "uid";
 
     //Store uid -> Senz in pairs, just before sending to other user.
-    private static final Map senzDirectory = java.util.Collections.synchronizedMap(new HashMap<String, SenzPacketTimeoutTask>());
+    private static final Map senzDirectory = java.util.Collections.synchronizedMap(new HashMap<String, SenzTimeoutTask>());
 
 
     /**
@@ -51,7 +51,7 @@ public class SenzStatusTracker {
      */
     public static void addSenz(Senz senz, Context context){
         if(!senzDirectory.containsKey(senz.getAttributes().get(UID))) {
-            SenzPacketTimeoutTask timeoutTask = new SenzPacketTimeoutTask(PACKET_TIMEOUT, senz, context);
+            SenzTimeoutTask timeoutTask = new SenzTimeoutTask(PACKET_TIMEOUT, senz, context);
             senzDirectory.put(senz.getAttributes().get(UID), timeoutTask);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 timeoutTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -64,8 +64,8 @@ public class SenzStatusTracker {
 
     private static void removeSenz(Senz senz) throws NoSenzUidException{
         if(senz.getAttributes().containsKey(UID)) {
-            for(Iterator<Map.Entry<String, SenzPacketTimeoutTask>> it = senzDirectory.entrySet().iterator(); it.hasNext(); ) {
-                Map.Entry<String, SenzPacketTimeoutTask> entry = it.next();
+            for(Iterator<Map.Entry<String, SenzTimeoutTask>> it = senzDirectory.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<String, SenzTimeoutTask> entry = it.next();
                 if(entry.getKey().equalsIgnoreCase(senz.getAttributes().get(UID))) {
                     entry.getValue().cancel(true);
                     it.remove();
@@ -96,7 +96,7 @@ public class SenzStatusTracker {
             @Override
             public void run() {
                 Log.i(TAG, "removing from senz directory - " + senz.getAttributes().get(UID) + ", count - " + SenzStatusTracker.senzDirectory.size());
-                    //((SenzPacketTimeoutTask) senzDirectory.get(senz.getAttributes().get(UID))).cancel(true);
+                    //((SenzTimeoutTask) senzDirectory.get(senz.getAttributes().get(UID))).cancel(true);
                     try {
                         removeSenz(senz);
                     } catch (NoSenzUidException ex) {

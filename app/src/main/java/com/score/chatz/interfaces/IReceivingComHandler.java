@@ -14,19 +14,22 @@ import com.score.senzc.pojos.User;
  */
 public interface IReceivingComHandler {
     /**
-     * Receive and handle messages
+     * Receive and handle GET messages
      * @param senz
      * @param senzService
      * @param dbSource
      * @param context
      */
-    void handleSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context);
+    void handleGetSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context);
 
     /**
-     * Confirma and reply back
+     * Receive and handle SHARE messages
+     * @param senz
      * @param senzService
-     * @param receiver
-     * @param isDone
+     * @param dbSource
+     * @param context
      */
-    void sendConfirmation(Senz senz, ISenzService senzService, User receiver, boolean isDone);
+    void handleShareSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context);
+
+    // Note - Get Requests are handle explicitly using IData Interfaces!!
 }

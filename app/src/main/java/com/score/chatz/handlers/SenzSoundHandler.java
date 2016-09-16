@@ -1,15 +1,22 @@
 package com.score.chatz.handlers;
 
 import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.interfaces.IDataSoundSenzHandler;
+import com.score.chatz.interfaces.IReceivingComHandler;
+import com.score.chatz.interfaces.ISendAckHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.services.SenzServiceConnection;
-import com.score.chatz.utils.SenzUtils;
+import com.score.chatz.ui.RecordingActivity;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +24,7 @@ import java.util.HashMap;
 /**
  * Created by Lakmal on 9/4/16.
  */
-public class SenzSoundHandler extends BaseHandler {
+public class SenzSoundHandler extends BaseHandler implements IReceivingComHandler, IDataSoundSenzHandler {
     private static final String TAG = SenzSoundHandler.class.getName();
     private static SenzSoundHandler instance;
 
@@ -31,6 +38,20 @@ public class SenzSoundHandler extends BaseHandler {
             instance = new SenzSoundHandler();
         }
         return instance;
+    }
+
+    @Override
+    public void handleGetSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        if(RecordingActivity.isAcitivityActive() == false) {
+            openRecorder(senz.getSender().getUsername(), context);
+        }else{
+            SenzSoundHandler.sendBusyNotification(senz, context);
+        }
+    }
+
+    @Override
+    public void handleShareSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+
     }
 
     public void sendSound(final Secret secret, final Context context, final String uid) {
@@ -127,7 +148,7 @@ public class SenzSoundHandler extends BaseHandler {
         return _senz;
     }
 
-    public static void sendSoundRecievedConfirmation(final Senz senz, final Context context, final String uid, final Boolean isDone){
+    private static void sendSoundRecievedConfirmation(final Senz senz, final Context context, final String uid, final Boolean isDone){
         //Get servicve connection
         final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
 
@@ -161,5 +182,41 @@ public class SenzSoundHandler extends BaseHandler {
 
             }
         });
+    }
+
+    private void openRecorder(String sender, Context context) {
+        Intent openRecordingActivity = new Intent();
+        openRecordingActivity.setClass(context, RecordingActivity.class);
+        openRecordingActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        openRecordingActivity.putExtra("SENDER", sender);
+        context.startActivity(openRecordingActivity);
+    }
+
+
+    @Override
+    public void onSoundSent(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
+        broadcastDataSenz(senz, context);
+    }
+
+    @Override
+    public void onNewChatSound(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        try {
+            if (senz.getAttributes().containsKey("chatzsound")) {
+                User sender = senz.getSender();
+                Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
+                secret.setSound(senz.getAttributes().get("chatzsound"));
+                Long _timeStamp = System.currentTimeMillis();
+                secret.setTimeStamp(_timeStamp);
+
+                String uid = senz.getAttributes().get("uid");
+                secret.setID(uid);
+
+                dbSource.createSecret(secret);
+                SenzSoundHandler.sendSoundRecievedConfirmation(senz, context, uid, true);
+            }
+        } catch (SQLiteConstraintException e) {
+            Log.e(TAG, e.toString());
+        }
     }
 }

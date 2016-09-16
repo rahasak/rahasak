@@ -16,7 +16,7 @@ import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
-import com.score.chatz.handlers.SenzStatusTracker;
+import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.receivers.AlarmReceiver;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;

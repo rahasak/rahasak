@@ -10,7 +10,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.score.chatz.R;
-import com.score.chatz.handlers.SenzPhotoHandlerReceiving;
+import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.utils.CameraUtils;
 import com.score.senzc.pojos.Senz;
@@ -127,7 +127,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
                 }
 
-                SenzPhotoHandlerReceiving.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
+                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
 
                 activity.finish();
             }
@@ -150,7 +150,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
                 isCameraBusy = false;
 
-                SenzPhotoHandlerReceiving.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
+                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
                 i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
                 i.putExtra("QUICK_PREVIEW", "true");

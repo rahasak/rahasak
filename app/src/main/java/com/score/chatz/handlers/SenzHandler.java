@@ -5,14 +5,17 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
+import com.score.chatz.application.IntentProvider;
+import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.interfaces.IDataUserSenzHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
-import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
+import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -28,7 +31,7 @@ import java.security.SignatureException;
  * <p/>
  * 1. SENZ_SHARE
  */
-public class SenzHandler {
+public class SenzHandler extends BaseHandler {
     private static final String TAG = SenzHandler.class.getName();
 
     private static Context context;
@@ -37,9 +40,6 @@ public class SenzHandler {
     private static SenzorsDbSource dbSource;
 
     private SenzStream senzStream;
-
-    private SenzHandler() {
-    }
 
     public static SenzHandler getInstance(Context context) {
         if (instance == null) {
@@ -54,7 +54,6 @@ public class SenzHandler {
             serviceIntent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
             SenzHandler.context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
-
         return instance;
     }
 
@@ -101,26 +100,21 @@ public class SenzHandler {
     }
 
     /**
-     * SenzUserHandlerReceiving will handle all new or updates to permissions
+     * SenzUserHandler will handle all new or updates to permissions
+     *
      * @param senz
      */
-    private void handleShareSenz(Senz senz){
-        Log.i(TAG, "Delegating to SenzUserHandlerReceiving :)");
-        SenzUserHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
+    private void handleShareSenz(Senz senz) {
+        Log.i(TAG, "Delegating to SenzUserHandler :)");
+        SenzUserHandler.getInstance().handleShareSenz(senz, serviceConnection.getInterface(), dbSource, context);
     }
 
     private void handleGetSenz(final Senz senz) {
         Log.d(TAG, senz.getSender() + " : " + senz.getSenzType().toString());
-
         if (senz.getAttributes().containsKey("profilezphoto") || senz.getAttributes().containsKey("chatzphoto")) {
-                SenzPhotoHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
-
+            SenzPhotoHandler.getInstance().handleGetSenz(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("chatzmic")) {
-            if(RecordingActivity.isAcitivityActive() == false) {
-                openRecorder(senz.getSender().getUsername());
-            }else{
-                SenzSoundHandler.sendBusyNotification(senz, context);
-            }
+            SenzSoundHandler.getInstance().handleGetSenz(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")) {
             Intent serviceIntent = new Intent(context, LocationService.class);
             serviceIntent.putExtra("USER", senz.getSender());
@@ -128,178 +122,49 @@ public class SenzHandler {
         }
     }
 
-    private void openRecorder(String sender) {
-        Intent openRecordingActivity = new Intent();
-        openRecordingActivity.setClass(context, RecordingActivity.class);
-        openRecordingActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        openRecordingActivity.putExtra("SENDER", sender);
-        context.startActivity(openRecordingActivity);
-    }
-
     private void handleDataSenz(Senz senz) {
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("ShareDone")) {
-            /*
-             * Share message from other user, to whom you send a share to.
-             */
-            //Add New User
-            // save senz in db
-            User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
-            dbSource.createPermissionsForUser(senz);
-            dbSource.createConfigurablePermissionsForUser(senz);
-            senz.setSender(sender);
-            Log.d(TAG, "save senz");
-            // if senz already exists in the db, SQLiteConstraintException should throw
-            try {
-                dbSource.createSenz(senz);
-                //NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "Permission to share with @" + senz.getSender().getUsername());
-            } catch (SQLiteConstraintException e) {
-                Log.e(TAG, e.toString());
-            }
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
+            // User Sharing done!!!!
+            SenzUserHandler.getInstance().onShareDone(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("newPerm")) {
-            /*
-             * New access permission you received from an a friend
-             * Send permission accepted message to indicate to other user, update was succesfull
-             */
-            //Add New Permission
-            SenzPermissionHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
+            // New Permission!!!!!
+            SenzPermissionHandler.getInstance().onNewPermission(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("sharePermDone")) {
-            /*
-             * New permission, set a user, is notified to be updated correctly, success message.
-             */
-            //Add New Permission
-            if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("sharePermDone")) {
-                // save senz in db
-                User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
-                senz.setSender(sender);
-
-            }
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
-        }else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("MsgSent")) {
-
-            dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
-        }else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("photoSent")) {
-
-            dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
-        }else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("soundSent")) {
-
-            dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
+            // Permission Sharing done!!!!!
+            SenzPermissionHandler.getInstance().onPermissionSharingDone(senz, serviceConnection.getInterface(), dbSource, context);
+        } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("MsgSent")) {
+            // Chat Message Sent Ack!!!!!
+            SenzMessageHandler.getInstance().onMessageSent(senz, serviceConnection.getInterface(), dbSource, context);
+        } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("photoSent")) {
+            // Chat Photo Sent Ack!!!!!
+            SenzPhotoHandler.getInstance().onPhotoSent(senz, serviceConnection.getInterface(), dbSource, context);
+        } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("soundSent")) {
+            // Sound Sent Ack!!!!!!
+            SenzSoundHandler.getInstance().onSoundSent(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("userBusy")) {
-            Intent intent = IntentProvider.getUserBusyIntent();
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
+            // Broadcast User don't want to respond to your annoying sensor requests!!!!!
+            broadcastUserBusySenz(senz, context);
         } else if (senz.getAttributes().containsKey("chatzmsg")) {
-            /*
-             * Any new chatz message, incoming, save straight to db
-             */
-            //Add chat message
-            SenzMessageHandlerReceiving.getInstance().handleSenz(senz, serviceConnection.getInterface(), dbSource, context);
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
+            // New Chat message rec!!!!!!!
+            SenzMessageHandler.getInstance().onNewMessage(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("stream")) {
             // handle streaming
             if (senz.getAttributes().get("stream").equalsIgnoreCase("ON")) {
                 Log.d(TAG, "Stream ON from " + senz.getSender().getUsername());
-
                 senzStream = new SenzStream(true, senz.getSender().getUsername(), new StringBuilder());
                 senzStream.setIsActive(true);
             }
         } else if (senz.getAttributes().containsKey("chatzphoto")) {
-                // save stream to db
-                try {
-                    if (senz.getAttributes().containsKey("chatzphoto")) {
-                        Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
-                        String uid = senz.getAttributes().get("uid");
-                        newSecret.setID(uid);
-                        Long _timeStamp = System.currentTimeMillis();
-                        newSecret.setTimeStamp(_timeStamp);
-                        dbSource.createSecret(newSecret);
-                        SenzPhotoHandlerReceiving.sendPhotoRecievedConfirmation(senz, context, uid, true);
-                    }
-                } catch (SQLiteConstraintException e) {
-                    Log.e(TAG, e.toString());
-                }
-
-                // broadcast
-                Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-                intent.putExtra("SENZ", senz);
-                context.sendBroadcast(intent);
-
+            // New Chat photo Rec!!!!!!!!
+            SenzPhotoHandler.getInstance().onNewChatPhoto(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("profilezphoto")) {
-            // save stream to db
-            try {
-                if (senz.getAttributes().containsKey("profilezphoto")) {
-
-                    /*Secret newSecret = new Secret(null, senz.getAttributes().get("profilezphoto"), senz.getAttributes().get("profilezphoto"), senz.getSender(), senz.getReceiver());
-                    String uid = senz.getAttributes().get("uid");
-                    newSecret.setID(uid);
-                    Long _timeStamp = System.currentTimeMillis();
-                    newSecret.setTimeStamp(_timeStamp);
-                    dbSource.createSecret(newSecret);
-                    SenzPhotoHandlerReceiving.sendPhotoRecievedConfirmation(senz, context, uid, true);*/
-
-                    User sender = senz.getSender();
-                    if(sender != null)
-                    dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
-                }
-            } catch (SQLiteConstraintException e) {
-                Log.e(TAG, e.toString());
-            }
-
-            // broadcast
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
-
-        }  else if (senz.getAttributes().containsKey("chatzsound")) {
-            // save stream to db
-            try {
-                if (senz.getAttributes().containsKey("chatzsound")) {
-                    User sender = senz.getSender();
-                    Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
-                    secret.setSound(senz.getAttributes().get("chatzsound"));
-                    Long _timeStamp = System.currentTimeMillis();
-                    secret.setTimeStamp(_timeStamp);
-
-                    String uid = senz.getAttributes().get("uid");
-                    secret.setID(uid);
-
-                    dbSource.createSecret(secret);
-                    SenzSoundHandler.sendSoundRecievedConfirmation(senz, context, uid, true);
-                }
-            } catch (SQLiteConstraintException e) {
-                Log.e(TAG, e.toString());
-            }
-
-            // broadcast
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
-
+            // New Profile photo Rec!!!!!!!!
+            SenzPhotoHandler.getInstance().onNewProfilePhoto(senz, serviceConnection.getInterface(), dbSource, context);
+        } else if (senz.getAttributes().containsKey("chatzsound")) {
+            // New Sound Rec!!!!!!!!
+            SenzSoundHandler.getInstance().onNewChatSound(senz, serviceConnection.getInterface(), dbSource, context);
         } else {
-            /*
-             * Default cases, handle such as registration success or, any other scenarios where need to specifically handle in the Activity.
-             */
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
+            broadcastDataSenz(senz, context);
         }
     }
 
@@ -310,8 +175,7 @@ public class SenzHandler {
                 senzStream.setIsActive(false);
                 //Stream has ended. Already receieved Stream oFF.. we need to notify the handleSenz method to process the stream
                 handleSenz(senzStream.getSenzString());
-
-            }else{
+            } else {
                 // streaming ON
                 setStreamType(stream);
                 Log.d(TAG, "Stream ON, chatzphoto Data SAVED : " + stream);
@@ -324,21 +188,22 @@ public class SenzHandler {
 
     /**
      * set the type of stream if not already done.
+     *
      * @param stream
      */
-    private void setStreamType(String stream){
-        if(senzStream.getStreamType() == null){
+    private void setStreamType(String stream) {
+        if (senzStream.getStreamType() == null) {
             if (stream.contains("#chatzphoto")) {
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
-            }else if (stream.contains("#profilezphoto")){
+            } else if (stream.contains("#profilezphoto")) {
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
-            }else if (stream.contains("#chatzsound")){
+            } else if (stream.contains("#chatzsound")) {
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZSOUND);
             }
         }
     }
 
-    public SenzServiceConnection getServiceConnection(){
+    public SenzServiceConnection getServiceConnection() {
         return serviceConnection;
     }
 }

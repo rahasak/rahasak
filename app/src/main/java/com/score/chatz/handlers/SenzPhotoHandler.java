@@ -2,12 +2,17 @@ package com.score.chatz.handlers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
+
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.CameraBusyException;
+import com.score.chatz.interfaces.IDataPhotoSenzHandler;
 import com.score.chatz.interfaces.IReceivingComHandler;
+import com.score.chatz.interfaces.ISendAckHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
@@ -24,18 +29,18 @@ import java.util.HashMap;
 /**
  * Created by Lakmal on 9/4/16.
  */
-public class SenzPhotoHandlerReceiving extends BaseHandler implements IReceivingComHandler {
-    private static final String TAG = SenzPhotoHandlerReceiving.class.getName();
-    private static SenzPhotoHandlerReceiving instance;
+public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, IDataPhotoSenzHandler, IReceivingComHandler {
+    private static final String TAG = SenzPhotoHandler.class.getName();
+    private static SenzPhotoHandler instance;
 
     /**
      * Singleton
      *
      * @return
      */
-    public static SenzPhotoHandlerReceiving getInstance() {
+    public static SenzPhotoHandler getInstance() {
         if (instance == null) {
-            instance = new SenzPhotoHandlerReceiving();
+            instance = new SenzPhotoHandler();
         }
         return instance;
     }
@@ -88,6 +93,7 @@ public class SenzPhotoHandlerReceiving extends BaseHandler implements IReceiving
 
     /**
      * Initiate send photo from here!!
+     *
      * @param image
      * @param senz
      * @param context
@@ -198,7 +204,6 @@ public class SenzPhotoHandlerReceiving extends BaseHandler implements IReceiving
         senzAttributes.put("stream", "off");
 
 
-
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
@@ -209,6 +214,7 @@ public class SenzPhotoHandlerReceiving extends BaseHandler implements IReceiving
 
     /**
      * Launch your camera from here!!
+     *
      * @param context
      * @param senz
      * @throws CameraBusyException
@@ -233,7 +239,7 @@ public class SenzPhotoHandlerReceiving extends BaseHandler implements IReceiving
         }
     }
 
-    public static void sendPhotoRecievedConfirmation(final Senz senz, final Context context, final String uid, final Boolean isDone){
+    public static void sendPhotoRecievedConfirmation(final Senz senz, final Context context, final String uid, final Boolean isDone) {
         //Get servicve connection
         final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
 
@@ -267,5 +273,64 @@ public class SenzPhotoHandlerReceiving extends BaseHandler implements IReceiving
 
             }
         });
+    }
+
+    @Override
+    public void onPhotoSent(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        dbSource.markSecretDelievered(senz.getAttributes().get("uid"));
+        broadcastDataSenz(senz, context);
+    }
+
+    @Override
+    public void onNewChatPhoto(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        try {
+            if (senz.getAttributes().containsKey("chatzphoto")) {
+                Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
+
+                String uid = senz.getAttributes().get("uid");
+                newSecret.setID(uid);
+                Long _timeStamp = System.currentTimeMillis();
+                newSecret.setTimeStamp(_timeStamp);
+                dbSource.createSecret(newSecret);
+                sendPhotoRecievedConfirmation(senz, context, uid, true);
+            }
+        } catch (SQLiteConstraintException e) {
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    @Override
+    public void onNewProfilePhoto(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        try {
+            if (senz.getAttributes().containsKey("profilezphoto")) {
+                User sender = senz.getSender();
+                if (sender != null)
+                    dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
+            }
+        } catch (SQLiteConstraintException e) {
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    @Override
+    public void handleGetSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        //If camera not available send unsuccess confirmation to user
+        if (CameraUtils.isCameraFrontAvailable(context)) {
+            //Start camera activity
+            try {
+                launchCamera(context, senz);
+            } catch (CameraBusyException ex) {
+                Log.e(TAG, "Camera is busy right now.");
+                sendConfirmation(null, senzService, senz.getSender(), false);
+            }
+        } else {
+            //Camera not available on this phone
+            sendConfirmation(null, senzService, senz.getSender(), false);
+        }
+    }
+
+    @Override
+    public void handleShareSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        //Nothing to share!!!
     }
 }

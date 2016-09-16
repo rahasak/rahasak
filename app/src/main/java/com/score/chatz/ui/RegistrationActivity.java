@@ -1,30 +1,18 @@
 package com.score.chatz.ui;
 
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.graphics.Typeface;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
-import com.score.chatz.handlers.IntentProvider;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;

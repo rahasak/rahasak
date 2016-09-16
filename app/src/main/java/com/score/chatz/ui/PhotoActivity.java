@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
-import com.score.chatz.handlers.SenzPhotoHandlerReceiving;
+import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.VibrationUtils;
@@ -69,7 +69,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         }
 
         if(mCameraPreview.isCameraBusy() == true) {
-            SenzPhotoHandlerReceiving.getInstance().sendBusyNotification(originalSenz, this);
+            SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
             this.finish();
         }else{
             FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
@@ -182,7 +182,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                     if(isPhotoCancelled == false) {
                         isPhotoCancelled = true;
                         cancelTimerToServe();
-                        SenzPhotoHandlerReceiving.getInstance().sendBusyNotification(originalSenz, this);
+                        SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
                         stopVibrations();
                         this.finish();
                     }
@@ -230,7 +230,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST,TIME_TO_SERVE_REQUEST){
             @Override
             public void onFinish() {
-                SenzPhotoHandlerReceiving.getInstance().sendBusyNotification(originalSenz, _this);
+                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, _this);
                 _this.finish();
             }
             @Override

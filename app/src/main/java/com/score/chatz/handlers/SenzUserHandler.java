@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.interfaces.IDataUserSenzHandler;
 import com.score.chatz.interfaces.IReceivingComHandler;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzUtils;
@@ -20,31 +21,27 @@ import java.util.HashMap;
 /**
  * Created by Lakmal on 9/4/16.
  */
-public class SenzUserHandlerReceiving extends BaseHandler implements IReceivingComHandler {
-    private static final String TAG = SenzUserHandlerReceiving.class.getName();
-    private static SenzUserHandlerReceiving instance;
+public class SenzUserHandler extends BaseHandler implements IReceivingComHandler, IDataUserSenzHandler {
+    private static final String TAG = SenzUserHandler.class.getName();
+    private static SenzUserHandler instance;
 
     /**
      * Singleton
      * @return
      */
-    public static SenzUserHandlerReceiving getInstance(){
+    public static SenzUserHandler getInstance(){
         if(instance == null){
-            instance = new SenzUserHandlerReceiving();
+            instance = new SenzUserHandler();
         }
         return instance;
     }
 
     /**
-     * Handle new permissions from other users
-     *
-     * @param senz        Incoming senz with updated permissions
+     * Handle share messages from other users!!!
+     * @param senz
      * @param senzService
      */
-    public void handleSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
-
-        Log.d(TAG, "Saving new user to db");
-
+    public void handleShareSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
         senz.setSender(sender);
         senz.setId(SenzUtils.getUniqueRandomNumber().toString());
@@ -68,6 +65,11 @@ public class SenzUserHandlerReceiving extends BaseHandler implements IReceivingC
             sendConfirmation(null, senzService, sender, false);
             Log.e(TAG, e.toString());
         }
+    }
+
+    @Override
+    public void handleGetSenz(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        // Nothing to do here for user!!
     }
 
     /**
@@ -103,5 +105,18 @@ public class SenzUserHandlerReceiving extends BaseHandler implements IReceivingC
         }
     }
 
-
+    @Override
+    public void onShareDone(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
+        dbSource.createPermissionsForUser(senz);
+        dbSource.createConfigurablePermissionsForUser(senz);
+        senz.setSender(sender);
+        Log.d(TAG, "save senz");
+        try {
+            dbSource.createSenz(senz);
+        } catch (SQLiteConstraintException e) {
+            Log.e(TAG, e.toString());
+        }
+        broadcastDataSenz(senz, context);
+    }
 }

@@ -1,4 +1,4 @@
-package com.score.chatz.handlers;
+package com.score.chatz.application;
 
 import android.content.Context;
 import android.content.Intent;

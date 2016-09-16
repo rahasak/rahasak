@@ -1,12 +1,10 @@
 package com.score.chatz.ui;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -21,10 +19,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.score.chatz.R;
-import com.score.chatz.handlers.IntentProvider;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.interfaces.ISendingComHandler;
 import com.score.chatz.services.RemoteSenzService;
 import com.score.chatz.utils.ActivityUtils;

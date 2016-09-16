@@ -1,33 +1,23 @@
 package com.score.chatz.ui;
 
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
-import com.score.chatz.handlers.IntentProvider;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.senzc.enums.SenzTypeEnum;

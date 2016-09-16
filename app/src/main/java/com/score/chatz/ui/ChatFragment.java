@@ -129,6 +129,9 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+    /**
+     * set up click handler for all action btns
+     */
     private void setupActionBtns(){
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override

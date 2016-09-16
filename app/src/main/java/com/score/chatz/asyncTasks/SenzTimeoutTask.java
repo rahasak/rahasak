@@ -5,19 +5,19 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.score.chatz.handlers.SenzStatusTracker;
+import com.score.chatz.application.SenzStatusTracker;
 import com.score.senzc.pojos.Senz;
 
 /**
  * Created by Lakmal on 9/12/16.
 */
-public class SenzPacketTimeoutTask extends AsyncTask<Void, Void, Void> {
+public class SenzTimeoutTask extends AsyncTask<Void, Void, Void> {
     private Integer timeout;
     private Boolean killerFlag;
     private Senz senzSend;
     private Context context;
 
-    public SenzPacketTimeoutTask(Integer to, Senz senz, Context con) {
+    public SenzTimeoutTask(Integer to, Senz senz, Context con) {
         timeout = to;
         killerFlag = true;
         senzSend = senz;
