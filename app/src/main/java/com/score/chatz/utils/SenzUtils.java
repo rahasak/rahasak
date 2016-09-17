@@ -73,9 +73,11 @@ public class SenzUtils {
     }
 
     public static String getUniqueRandomNumber(){
-        Long number = (long) Math.floor(Math.random() * 900000000L) + 10000000L;
-        //String uuid = java.util.UUID.randomUUID().toString();
-        return number.toString();
+        //Long number = (long) Math.floor(Math.random() * 900000000L) + 10000000L;
+        //return number.toString();
+        String uuid = java.util.UUID.randomUUID().toString();
+        return uuid;
+
     }
 
 

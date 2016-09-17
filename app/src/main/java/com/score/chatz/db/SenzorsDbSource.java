@@ -468,6 +468,7 @@ public class SenzorsDbSource {
             secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
             secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
+            secret.setSeenTimeStamp(_secretTimestampSeen);
             secret.setID(_secretId);
             // fill secret list
             secretList.add(secret);
@@ -805,7 +806,7 @@ public class SenzorsDbSource {
             // update
             db.update(SenzorsDbContract.Secret.TABLE_NAME,
                     values,
-                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + "=?",
                     new String[]{secret.getID()});
 
             db.setTransactionSuccessful();

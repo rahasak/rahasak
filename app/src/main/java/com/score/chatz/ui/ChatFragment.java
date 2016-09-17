@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -19,6 +20,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -73,7 +76,7 @@ public class ChatFragment extends Fragment {
     private SenzorsDbSource dbSource;
     User currentUser;
 
-    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 5;
+    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 3;
 
     private ListView listView;
     private List<Secret> secretMessageList;
@@ -102,16 +105,11 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         displayMessagesList();
-        markMessagesAsSeen();
     }
 
-    private void markMessagesAsSeen(){
-        for (Secret secret : secretMessageList) {
-            if(secret.getSeenTimeStamp() == null){
-                secret.setSeenTimeStamp(System.currentTimeMillis());
-                dbSource.updateSeenTimestamp(secret);
-            }
-        }
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -233,16 +231,31 @@ public class ChatFragment extends Fragment {
         // get User from db
         if (secretMessageList == null || secretMessageList.size() == 0) {
             secretMessageList = java.util.Collections.synchronizedList(dbSource.getSecretz(new User("", sender), new User("", receiver)));
-            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
+            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList, NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY);
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         } else {
             List<Secret> latestList = dbSource.getSecretz(new User("", sender), new User("", receiver), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
-            secretMessageList.addAll(latestList);
-            adapter.notifyDataSetChanged();
-            markMessagesAsSeen();
+            for(Secret secret : latestList){
+                secretMessageList.add(secret);
+                adapter.notifyDataSetChanged();
+            }
         }
-        removeOldItemsFromChat();
+        //removeOldItemsFromChat();
+    }
+
+
+
+    private View getViewByPosition(int pos, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+            return listView.getAdapter().getView(pos, null, listView);
+        } else {
+            final int childIndex = pos - firstListItemPosition;
+            return listView.getChildAt(childIndex);
+        }
     }
 
     private void updateStatusOfMessage(String uid) {
@@ -267,6 +280,7 @@ public class ChatFragment extends Fragment {
     private void removeOldItemsFromChat() {
         ListIterator<Secret> iter = secretMessageList.listIterator();
         while (iter.hasNext()) {
+            Integer index = iter.nextIndex();
             Secret secret = iter.next();
             if(secretMessageList.size() > NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
                 if (!SecretsUtil.isSecretToBeShown(secret) && iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
@@ -467,4 +481,6 @@ public class ChatFragment extends Fragment {
         updateMessageFailed(senz.getAttributes().get("uid"));
         setStateOnActionBtns();
     }
+
+
 }

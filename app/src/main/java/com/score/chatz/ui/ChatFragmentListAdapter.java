@@ -5,16 +5,20 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.AnimationUtils;
 import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
@@ -43,8 +47,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     static final int MY_SOUND_TYPE = 5;
     static User currentUser;
     private LayoutInflater mInflater;
+    private Integer DISPLAY_ITEM_COUNT;
 
-    public ChatFragmentListAdapter(Context _context, List<Secret> secretList) {
+    public ChatFragmentListAdapter(Context _context, List<Secret> secretList, Integer numberOfItemToDisplay) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
         context = _context;
         userSecretList = secretList;
@@ -54,6 +59,8 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             e.printStackTrace();
         }
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        DISPLAY_ITEM_COUNT = numberOfItemToDisplay;
+
     }
 
     @Override
@@ -210,6 +217,14 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         }
 
         viewHolder.sender.setText(secret.getWho().getUsername());
+    }
+
+    private void markMessagesAsSeen(final Secret secret){
+
+                if(secret.getSeenTimeStamp() == null || secret.getSeenTimeStamp() == 0){
+                    secret.setSeenTimeStamp(System.currentTimeMillis() + 100);
+                    new SenzorsDbSource(context).updateSeenTimestamp(secret);
+                }
     }
 
     private void loadBitmap(String data, ImageView imageView) {

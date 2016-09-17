@@ -112,9 +112,11 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         Log.d(TAG, "Service requested to start!!!");
 
         // bind to service from here as well
-        Intent intent = new Intent();
-        intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-        bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+        if(!isServiceBound) {
+            Intent intent = new Intent();
+            intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
+            bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     private void setupFonts(){
