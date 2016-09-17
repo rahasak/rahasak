@@ -12,7 +12,7 @@ import com.score.senzc.pojos.Senz;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SenzApplication extends MultiDexApplication {
+public class SenzApplication extends Application {
 
     private Senz senz;
 

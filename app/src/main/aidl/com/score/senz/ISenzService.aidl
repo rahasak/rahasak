@@ -12,5 +12,7 @@ interface ISenzService {
 
     void sendInOrder(in List<Senz> senzList);
 
+    void sendFromUri(in String Uri, in Senz originalSenz, in String uid);
+
 
 }

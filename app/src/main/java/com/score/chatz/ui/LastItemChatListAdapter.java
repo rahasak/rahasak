@@ -57,9 +57,10 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         Secret secret = (Secret)getItem(position);
-        if(((Secret)getItem(position)).getImage() != null){
+        //if(((Secret)getItem(position)).getImage() != null){
+        if(((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE")){
             return IMAGE_MESSAGE;
-        }else if(((Secret)getItem(position)).getSound() != null){
+        }else if(((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
             return SOUND_MESSAGE;
         }else {
             return TEXT_MESSAGE;
@@ -123,20 +124,20 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
 
     private void setUpRow(int i, Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        viewHolder.sender.setText(secret.getSender().getUsername());
+        viewHolder.sender.setText(secret.getWho().getUsername());
         if (viewHolder.messageType == TEXT_MESSAGE){
-            viewHolder.message.setText(secret.getText());
+            viewHolder.message.setText(secret.getBlob());
         }else if(viewHolder.messageType == SOUND_MESSAGE){
             //Nothing to do here!!
         }else{
-            if(secret.getImage() != null) {
-                loadBitmap(secret.getImage(), viewHolder.image);
+            if(secret.getBlob() != null) {
+                loadBitmap(secret.getBlob(), viewHolder.image);
             }
         }
 
         //Extracting user image
-        if(secret.getSender().getUserImage() != null) {
-            loadBitmap(secret.getSender().getUserImage(), viewHolder.userImage);
+        if(secret.getWho().getUserImage() != null) {
+            loadBitmap(secret.getWho().getUserImage(), viewHolder.userImage);
         }
 
         if(secret.getTimeStamp() != null){
@@ -146,7 +147,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
         }
 
         //User name
-        viewHolder.sender.setText("@"+secret.getSender().getUsername());
+        viewHolder.sender.setText("@"+secret.getWho().getUsername());
     }
 
     private void loadBitmap(String data, ImageView imageView) {

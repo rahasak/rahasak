@@ -150,7 +150,9 @@ public class ChatFragment extends Fragment {
                         text_message.setText("");
 
                         // Create secret
-                        Secret newSecret = new Secret(secretMessage, null, null, new User("", receiver), new User("", sender));
+                        //Secret newSecret = new Secret(secretMessage, null, null, new User("", receiver), new User("", sender));
+                        Secret newSecret = new Secret(secretMessage, "TEXT", new User("", receiver));
+                        newSecret.setReceiver(new User("", sender));
                         newSecret.setID(SenzUtils.getUniqueRandomNumber().toString());
 
                         // Send secret
@@ -284,7 +286,7 @@ public class ChatFragment extends Fragment {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("chatzmsg", URLEncoder.encode(secret.getText(), "UTF-8"));
+            senzAttributes.put("chatzmsg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
             String timeStamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
             senzAttributes.put("time", timeStamp);
             senzAttributes.put("uid", secret.getID());
@@ -433,28 +435,30 @@ public class ChatFragment extends Fragment {
     private void setStateOnActionBtns() {
         Log.i(TAG, "Getting permission of user - " + sender);
         UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
-        if (userPerm.getCamPerm() == true) {
-            getCamBtn.setImageResource(R.drawable.perm_camera_active);
-            getCamBtn.setEnabled(true);
-        } else {
-            getCamBtn.setImageResource(R.drawable.perm_camera_deactive);
-            getCamBtn.setEnabled(false);
-        }
+        if(userPerm != null) {
+            if (userPerm.getCamPerm() == true) {
+                getCamBtn.setImageResource(R.drawable.perm_camera_active);
+                getCamBtn.setEnabled(true);
+            } else {
+                getCamBtn.setImageResource(R.drawable.perm_camera_deactive);
+                getCamBtn.setEnabled(false);
+            }
 
-        if (userPerm.getLocPerm() == true) {
-            getLocBtn.setImageResource(R.drawable.perm_locations_active);
-            getLocBtn.setEnabled(true);
-        } else {
-            getLocBtn.setImageResource(R.drawable.perm_locations_deactive);
-            getLocBtn.setEnabled(false);
-        }
+            if (userPerm.getLocPerm() == true) {
+                getLocBtn.setImageResource(R.drawable.perm_locations_active);
+                getLocBtn.setEnabled(true);
+            } else {
+                getLocBtn.setImageResource(R.drawable.perm_locations_deactive);
+                getLocBtn.setEnabled(false);
+            }
 
-        if (userPerm.getMicPerm() == true) {
-            getMicBtn.setImageResource(R.drawable.perm_mic_active);
-            getMicBtn.setEnabled(true);
-        } else {
-            getMicBtn.setImageResource(R.drawable.perm_mic_deactive);
-            getMicBtn.setEnabled(false);
+            if (userPerm.getMicPerm() == true) {
+                getMicBtn.setImageResource(R.drawable.perm_mic_active);
+                getMicBtn.setEnabled(true);
+            } else {
+                getMicBtn.setImageResource(R.drawable.perm_mic_deactive);
+                getMicBtn.setEnabled(false);
+            }
         }
     }
 

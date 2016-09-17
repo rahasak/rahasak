@@ -319,8 +319,9 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private Secret getSoundSecret(User sender, User receiver, String sound) {
         //Swapping receiever and sender here cause we need to send the secret out
-        Secret secret = new Secret(null, null, null, receiver, sender);
-        secret.setSound(sound);
+        //Secret secret = new Secret(null, null, null, receiver, sender);
+        Secret secret = new Secret(sound, "SOUND", receiver);
+        secret.setReceiver(sender);
         return secret;
     }
 

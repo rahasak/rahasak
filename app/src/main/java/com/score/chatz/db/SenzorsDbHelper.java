@@ -18,7 +18,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "Rahaz.db";
 
     // data types, keywords and queries
@@ -39,21 +39,25 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.User.COLOMN_NAME_IMAGE + TEXT_TYPE +
                     " )";
 
+    private static final String SQL_CREATE_CHAT_USER =
+            "CREATE TABLE " + SenzorsDbContract.ChatUserMapper.TABLE_NAME + " (" +
+                    SenzorsDbContract.ChatUserMapper._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                    SenzorsDbContract.ChatUserMapper.COLUMN_USER + TEXT_TYPE + "UNIQUE NOT NULL" +
+                    " )";
+
     private static final String SQL_CREATE_SECRET =
             "CREATE TABLE " + SenzorsDbContract.Secret.TABLE_NAME + " (" +
                     SenzorsDbContract.Secret._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
-                    SenzorsDbContract.Secret.COLUMN_NAME_TEXT + TEXT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLOMN_NAME_IMAGE + TEXT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLUMN_NAME_SOUND + TEXT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_NAME_BLOB + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + TEXT_TYPE + " NOT NULL, " +
                     SenzorsDbContract.Secret.COLUMN_NAME_DELETE + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN + INT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLUMN_NAME_SENDER + TEXT_TYPE + " NOT NULL" + "," +
-                    SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER + TEXT_TYPE + " NOT NULL" +
+                    SenzorsDbContract.Secret.COLUMN_NAME_WHO + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_BLOB_TYPE + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK + TEXT_TYPE +
                     " )";
 
     private static final String SQL_CREATE_PERMISSION =
@@ -87,6 +91,9 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + SenzorsDbContract.Permission.TABLE_NAME;
     private static final String SQL_DELETE_PERMISSION_CONFIG =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.PermissionConfiguration.TABLE_NAME;
+    private static final String SQL_DELETE_CHAT_USER =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.ChatUserMapper.TABLE_NAME;
+
 
     /**
      * Init context
@@ -119,12 +126,14 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, SQL_CREATE_SECRET);
         Log.d(TAG, SQL_CREATE_PERMISSION);
         Log.d(TAG, SQL_CREATE_PERMISSION_CONFIG);
+        Log.d(TAG, SQL_CREATE_CHAT_USER);
 
         db.execSQL(SQL_CREATE_LOCATION);
         db.execSQL(SQL_CREATE_USER);
         db.execSQL(SQL_CREATE_SECRET);
         db.execSQL(SQL_CREATE_PERMISSION);
         db.execSQL(SQL_CREATE_PERMISSION_CONFIG);
+        db.execSQL(SQL_CREATE_CHAT_USER);
     }
 
     /**
@@ -150,6 +159,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_CHATZ);
         db.execSQL(SQL_DELETE_PERMISSION);
         db.execSQL(SQL_DELETE_PERMISSION_CONFIG);
+        db.execSQL(SQL_DELETE_CHAT_USER);
 
 
         onCreate(db);

@@ -12,6 +12,9 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by Lakmal on 8/27/16.
@@ -120,7 +123,14 @@ public class CameraUtils {
         ByteArrayOutputStream baos= new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, thresholdCompression, baos);
 
-        return baos.toByteArray();
+        // send only if compressed
+        if(imageArray.length > baos.size()) {
+            return baos.toByteArray();
+        }
+
+        Log.d(TAG, "------------- ORIGI " + imageArray.length/1024);
+        Log.d(TAG, "------------- COMPRESSED " + baos.size()/1024);
+        return imageArray;
     }
 
     /**
@@ -130,6 +140,7 @@ public class CameraUtils {
      */
     public static byte[] getBytesFromImage(Bitmap image) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         return byteArray;
     }
@@ -255,6 +266,58 @@ public class CameraUtils {
             if (_shootMP == null)
                 _shootMP = MediaPlayer.create(context, Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
                 _shootMP.start();
+        }
+    }
+
+    /**
+     * Save photo to cache before send to another activity
+     * @param resourceId
+     * @param bitmap
+     * @param context
+     */
+    public static void savePhotoCache(final String resourceId, final Bitmap bitmap, Context context) {
+        if(bitmap==null)
+            return;
+        File imageDir = new File(context.getCacheDir(), "images/"+context.getApplicationContext().getPackageName());
+        if (!imageDir.isDirectory())
+            imageDir.mkdirs();
+
+        File cachedImage = new File(imageDir, resourceId);
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(cachedImage);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+        } catch (IOException e) {
+            Log.d(TAG, "Exception writing cache image", e);
+        } finally {
+            if (output != null)
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+    /**
+     * Get photo into another activity
+     * @param resourceId
+     * @param context
+     * @return
+     */
+    public static Bitmap getPhotoCache(final String resourceId, Context context) {
+        File imageDir = new File(context.getCacheDir(), "images/"+context.getApplicationContext().getPackageName());
+        if (!imageDir.isDirectory())
+            imageDir.mkdirs();
+        File imageFile = new File(imageDir, resourceId);
+        if (!imageFile.exists() || imageFile.length() == 0)
+            return null;
+        Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        if (bitmap != null) {
+            return bitmap;
+        }else {
+            imageFile.delete();
+            return null;
         }
     }
 }

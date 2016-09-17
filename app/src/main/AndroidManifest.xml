@@ -86,37 +86,45 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.ChatActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat"
             android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.HomeActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
             android:name=".ui.AddUserActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.RegistrationActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.PhotoActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity
             android:name=".ui.UserProfileActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".ui.PhotoFullScreenActivity"
+            android:launchMode="singleTask"
             android:theme="@style/MyMaterialTheme"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".ui.RecordingActivity"
+            android:launchMode="singleTask"
             android:theme="@style/MyMaterialTheme"
             android:screenOrientation="portrait"></activity>
 

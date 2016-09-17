@@ -101,14 +101,21 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                     Senz startSenz = getStartPhotoSharingSenze(senz);
                     senzService.send(startSenz);
 
-                    ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context, uid);
+
+                    String uriToFindImageForService = SenzUtils.getUniqueRandomNumber().toString();
+                    CameraUtils.savePhotoCache(uriToFindImageForService, CameraUtils.getBitmapFromBytes(Base64.encode(image, 0)), context);
+
+
+                     /*ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context, uid);
 
                     Senz stopSenz = getStopPhotoSharingSenz(senz);
 
                     ArrayList<Senz> senzList = new ArrayList<Senz>();
                     senzList.addAll(photoSenzList);
                     senzList.add(stopSenz);
-                    senzService.sendInOrder(senzList);
+
+                    //senzService.sendInOrder(senzList);*/
+                    senzService.sendFromUri(uriToFindImageForService, senz, uid);
 
 
                 } catch (RemoteException e) {
@@ -128,7 +135,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
 
         if (senz.getAttributes().containsKey("chatzphoto")) {
             //Save photo to db before sending if its a chatzphoto
-            Secret newSecret = new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender());
+            //Secret newSecret = new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender());
+            Secret newSecret = new Secret(imageAsString, "IMAGE", senz.getReceiver());
+            newSecret.setReceiver(senz.getReceiver());
             Long _timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(_timeStamp);
             newSecret.setID(uid);
@@ -266,7 +275,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
     public void onNewChatPhoto(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
         try {
             if (senz.getAttributes().containsKey("chatzphoto")) {
-                Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
+                //Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
+                Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", senz.getSender());
+                newSecret.setReceiver(senz.getReceiver());
 
                 String uid = senz.getAttributes().get("uid");
                 newSecret.setID(uid);

@@ -81,7 +81,9 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
         try {
             Log.d(TAG, "save incoming chatz");
             String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
-            Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
+            //Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
+            Secret newSecret = new Secret(msg, "TEXT",senz.getSender());
+            newSecret.setReceiver(senz.getReceiver());
             newSecret.setID(senz.getAttributes().get("uid"));
             Long _timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(_timeStamp);

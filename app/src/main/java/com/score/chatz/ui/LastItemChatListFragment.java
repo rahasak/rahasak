@@ -106,7 +106,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra("SENDER", allSecretsList.get(position).getSender().getUsername());
+        intent.putExtra("SENDER", allSecretsList.get(position).getWho().getUsername());
         startActivity(intent);
     }
 

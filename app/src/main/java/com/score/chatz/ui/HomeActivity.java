@@ -14,6 +14,7 @@ import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * First Activity after Splash screen!!!
  */
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getName();
 
@@ -153,5 +154,15 @@ public class HomeActivity extends BaseActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

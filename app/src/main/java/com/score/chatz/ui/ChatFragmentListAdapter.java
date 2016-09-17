@@ -18,7 +18,9 @@ import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.pojos.User;
 
@@ -62,15 +64,15 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         //Log.i(TAG, "WHO IS SENDER: " + ((Secret)getItem(position)).getSender().getUsername() + ", currentUser: " + currentUser.getUsername());
-        if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+        if(!((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
             return NOT_MY_SOUND_TYPE;
-        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+        }else if(((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
             return MY_SOUND_TYPE;
-        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
+        }else if(((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && !(((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
             return MY_MESSAGE_TYPE;
-        }else if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
+        }else if(!((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && !(((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
             return NOT_MY_MESSAGE_TYPE;
-        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() != null){
+        }else if(((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && (((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
             return MY_PHOTO_TYPE;
         }else {
             //holder.image = (ImageView) view.findViewById(R.id.message);
@@ -155,21 +157,24 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
     private void setUpRow(int i, final Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        viewHolder.sender.setText("@"+secret.getSender().getUsername());
+        viewHolder.sender.setText("@"+secret.getWho().getUsername());
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
-            viewHolder.message.setText(secret.getText());
+            viewHolder.message.setText(secret.getBlob());
         }else if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE){
             /*viewHolder.image.setImageResource(R.drawable.confidential);*/
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, PhotoFullScreenActivity.class);
-                    intent.putExtra("IMAGE", secret.getImage());
+                    //intent.putExtra("IMAGE", secret.getImage());
+                    String uid = SenzUtils.getUniqueRandomNumber().toString();
+                    intent.putExtra("IMAGE_RES_ID", uid);
+                    CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(secret.getBlob().getBytes(), 0)), getContext());
                     context.startActivity(intent);
                 }
             });
-            if(secret.getImage() != null) {
-                loadBitmap(secret.getImage(), viewHolder.image);
+            if(secret.getBlob() != null) {
+                loadBitmap(secret.getBlob(), viewHolder.image);
             }
         }
 
@@ -185,12 +190,12 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AudioUtils.play(Base64.decode(secret.getSound(), 0), getContext());
+                    AudioUtils.play(Base64.decode(secret.getBlob(), 0), getContext());
                 }
             });
         }
 
-        if(!currentUser.getUsername().equalsIgnoreCase(secret.getSender().getUsername())){
+        if(!currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername())){
             viewHolder.status.setVisibility(View.INVISIBLE);
         }
 
@@ -204,7 +209,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.status.setText("Message failed to deliver!!!");
         }
 
-        viewHolder.sender.setText(secret.getSender().getUsername());
+        viewHolder.sender.setText(secret.getWho().getUsername());
     }
 
     private void loadBitmap(String data, ImageView imageView) {

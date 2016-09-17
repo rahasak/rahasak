@@ -92,7 +92,7 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
     }
 
     private ArrayList<Senz> getSoundStreamingSenz(Secret secret, Context context, String uid) {
-        String soundString = secret.getSound();
+        String soundString = secret.getBlob();
         //secret.setID(uid);
         //new SenzorsDbSource(context).createSecret(secret);
 
@@ -111,7 +111,7 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
             senzAttributes.put("uid", uid);
 
 
-            Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver() , senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver() , senzAttributes);
             senzList.add(_senz);
         }
 
@@ -129,7 +129,7 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver(), senzAttributes);
         return _senz;
     }
 
@@ -144,7 +144,7 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver(), senzAttributes);
         return _senz;
     }
 
@@ -204,8 +204,8 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
         try {
             if (senz.getAttributes().containsKey("chatzsound")) {
                 User sender = senz.getSender();
-                Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
-                secret.setSound(senz.getAttributes().get("chatzsound"));
+                //Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
+                Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", senz.getSender());
                 Long _timeStamp = System.currentTimeMillis();
                 secret.setTimeStamp(_timeStamp);
 

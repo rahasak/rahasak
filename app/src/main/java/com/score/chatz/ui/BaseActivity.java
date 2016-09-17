@@ -73,23 +73,19 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //Unbind from service
+        if (isServiceBound == true) unbindService(senzServiceConnection);
+        unregisterAllReceivers();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        //Start service
-        startService();
-        // Register all broadcast listeners
-        registerAllReceivers();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        //Unbind from service
-        if (isServiceBound == true) unbindService(senzServiceConnection);
-        unregisterAllReceivers();
     }
 
     @Override
@@ -98,6 +94,11 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
         //Setup Fonts!!!
         setupFonts();
+
+        //Start service
+        startService();
+        // Register all broadcast listeners
+        registerAllReceivers();
     }
 
     /**

@@ -6,53 +6,41 @@ package com.score.chatz.pojo;
 
 import com.score.senzc.pojos.User;
 public class Secret {
-    private String text;
-    private String image;
-    private User sender;
+    private String blob;
+    private User who;
     private User receiver;
+    private String type;
     private boolean isDelete;
     private boolean isDelivered;
     private Long timeStamp;
     private Long seenTimeStamp;
     private String id;
-    private String imageThumbnail;
-    private String sound;
     private boolean isDeliveryFailed;
 
-    public Secret(String text, String image, String thumb, User sender, User receiver) {
-        this.text = text;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.image = image;
-        this.imageThumbnail = thumb;
+    public Secret(String blob, String type, User who) {
+        this.blob = blob;
+        this.who = who;
+        this.type = type;
     }
 
-    public String getText() {
-        return text;
+    public String getBlob() {
+        return blob;
     }
 
-    public User getSender() {
-        return sender;
+    public User getWho() {
+        return who;
+    }
+
+    public String getType(){
+        return type;
+    }
+
+    public void setReceiver(User rec){
+        receiver = rec;
     }
 
     public User getReceiver() {
         return receiver;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public String getThumbnail() {
-        return imageThumbnail;
-    }
-
-    public void setSound(String _sound){
-        this.sound = _sound;
-    }
-
-    public String getSound(){
-        return sound;
     }
 
     public void setDelete(boolean val){
@@ -73,10 +61,6 @@ public class Secret {
 
     public void setSeenTimeStamp(Long sts){
         seenTimeStamp = sts;
-    }
-
-    public boolean isMarkForDelete(){
-        return isDelete;
     }
 
     public boolean isDelivered(){
@@ -101,14 +85,6 @@ public class Secret {
 
     public String getID(){
         return id;
-    }
-
-    @Override
-    public String toString() {
-        return ("Secret Text:"+this.getText()+
-                " Secret Sender: "+ this.getSender().getUsername() +
-                " Secret Receiver: "+ this.getReceiver().getUsername() +
-                " Secret Image : " + this.getImage());
     }
 
     @Override

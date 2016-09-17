@@ -13,6 +13,7 @@ import com.score.chatz.R;
 import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.pojos.Senz;
 
 import java.io.ByteArrayOutputStream;
@@ -133,7 +134,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
                 SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
-                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
+                //i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
+                String uid = SenzUtils.getUniqueRandomNumber().toString();
+                i.putExtra("IMAGE_RES_ID", uid);
+                CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(resizedImage, 0)), getContext());
                 i.putExtra("QUICK_PREVIEW", "true");
                 activity.startActivity(i);
                 activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);

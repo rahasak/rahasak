@@ -7,19 +7,23 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Base64;
 import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.receivers.AlarmReceiver;
+import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
+import com.score.chatz.utils.RemoteServiceUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -38,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -103,12 +108,26 @@ public class RemoteSenzService extends Service {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
             SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
             writeSenz(senz);
-
         }
 
         @Override
         public void sendInOrder(List<Senz> senzList) throws RemoteException {
             writeSenzList(senzList);
+        }
+
+        @Override
+        public void sendFromUri(String uri, Senz senz, String uid) throws RemoteException {
+            if(senz.getAttributes().containsKey("chatzphoto") || senz.getAttributes().containsKey("profilezphoto")) {
+                Bitmap image = CameraUtils.getPhotoCache(uri, getApplicationContext());
+                byte[] imageBytes = CameraUtils.getBytesFromImage(image);
+                ArrayList<Senz> photoSenzList = RemoteServiceUtils.getPhotoStreamingSenz(senz, imageBytes, getApplicationContext(), uid);
+                Senz stopSenz = RemoteServiceUtils.getStopPhotoSharingSenz(senz);
+                ArrayList<Senz> senzList = new ArrayList<Senz>();
+                senzList.addAll(photoSenzList);
+                senzList.add(stopSenz);
+                Log.d(TAG, "----------- full size" + senzList.size());
+                writeSenzList(senzList);
+            }
         }
     };
 

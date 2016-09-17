@@ -23,17 +23,21 @@ public class SenzorsDbContract {
     public static abstract class Secret implements BaseColumns {
         public static final String TABLE_NAME = "secret";
         public static final String COLUMN_UNIQUE_ID = "uid";
-        public static final String COLUMN_NAME_TEXT = "text";
-        public static final String COLOMN_NAME_IMAGE = "image";
-        public static final String COLUMN_NAME_SOUND = "sound";
-        public static final String COLOMN_NAME_IMAGE_THUMB = "thumbnail";
-        public static final String COLUMN_NAME_SENDER = "sender";
-        public static final String COLUMN_NAME_RECEIVER = "receiver";
+        public static final String COLUMN_NAME_BLOB = "blob";
+        public static final String COLUMN_BLOB_TYPE = "type";
+        public static final String COLUMN_NAME_WHO = "who";
         public static final String COLUMN_NAME_DELETE = "deleted";
         public static final String COLUMN_TIMESTAMP = "timestamp";
         public static final String COLUMN_TIMESTAMP_SEEN = "timestamp_seen";
         public static final String COLUMN_NAME_DELIVERED = "delivered";
         public static final String COLUMN_NAME_DELIVERY_FAILED = "delivery_fail";
+        public static final String COLUMN_NAME_CHAT_MAPPER_FK = "cmfk";
+    }
+
+    /* Inner class that defines secret user mapping table */
+    public static abstract class ChatUserMapper implements BaseColumns {
+        public static final String TABLE_NAME = "chat_user_mapper";
+        public static final String COLUMN_USER = "user";
     }
 
     /* Inner class that defines permission control for the user
@@ -62,5 +66,10 @@ public class SenzorsDbContract {
         public static final String TABLE_NAME = "user";
         public static final String COLUMN_NAME_USERNAME = "username";
         public static final String COLOMN_NAME_IMAGE = "image";
+    }
+
+    //  Types of blob stored in secret table
+    enum BLOB_TYPES{
+        IMAGE, SOUND, TEXT
     }
 }
