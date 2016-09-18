@@ -13,7 +13,7 @@ import com.score.chatz.utils.PreferenceUtils;
  *
  * @author eranga herath(erangaeb@gmail.com)
  */
-public class SplashActivity extends AppCompatActivity{
+public class SplashActivity extends BaseActivity{
     private final int SPLASH_DISPLAY_LENGTH = 3000;
     private static final String TAG = SplashActivity.class.getName();
 

@@ -87,6 +87,10 @@ public class Secret {
         return id;
     }
 
+    public void removeData(){
+        this.blob = null;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof Secret)) {

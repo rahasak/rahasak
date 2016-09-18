@@ -284,6 +284,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                 Long _timeStamp = System.currentTimeMillis();
                 newSecret.setTimeStamp(_timeStamp);
                 dbSource.createSecret(newSecret);
+
                 sendPhotoRecievedConfirmation(senz, context, uid, true);
 
                 broadcastDataSenz(senz, context);

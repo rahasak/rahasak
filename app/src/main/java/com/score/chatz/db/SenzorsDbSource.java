@@ -436,7 +436,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, who, deleted, delivered, delivery_fail, timestamp " +
+        String query = "SELECT _id, uid, blob, type, who, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
                 "FROM secret WHERE (who = ? OR who = ?) ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername()});
 
@@ -449,6 +449,7 @@ public class SenzorsDbSource {
         int _secretIsDelivered;
         int _secretDeliveryFailed;
         Long _secretTimestamp;
+        Long _secretTimestampSeen;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -461,6 +462,7 @@ public class SenzorsDbSource {
             _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _secretTimestampSeen = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN));
 
             // create secret
             Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretWho));

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * First Activity after Splash screen!!!
  */
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     private static final String TAG = HomeActivity.class.getName();
 

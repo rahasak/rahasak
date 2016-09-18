@@ -75,17 +75,24 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         super.onDestroy();
         //Unbind from service
         if (isServiceBound == true) unbindService(senzServiceConnection);
-        unregisterAllReceivers();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        registerAllReceivers();
+        // bind to service from here as well
+        if(!isServiceBound) {
+            Intent intent = new Intent();
+            intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
+            bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        unregisterAllReceivers();
     }
 
     @Override
@@ -95,10 +102,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         //Setup Fonts!!!
         setupFonts();
 
-        //Start service
         startService();
-        // Register all broadcast listeners
-        registerAllReceivers();
     }
 
     /**
@@ -110,13 +114,6 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         startService(serviceIntent);
 
         Log.d(TAG, "Service requested to start!!!");
-
-        // bind to service from here as well
-        if(!isServiceBound) {
-            Intent intent = new Intent();
-            intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-            bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-        }
     }
 
     private void setupFonts(){

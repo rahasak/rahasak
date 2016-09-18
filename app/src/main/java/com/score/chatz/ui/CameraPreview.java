@@ -31,7 +31,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private SenzStream.SENZ_STEAM_TYPE streamType;
 
-    private static final int IMAGE_SIZE = 300; // ~ 300kbs
+    private static final int IMAGE_SIZE = 110; // ~ 300kbs
 
     private boolean isCameraBusy;
 
