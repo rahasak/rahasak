@@ -197,13 +197,12 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
                         @Override
                         public void onMapReady(GoogleMap googleMap) {
                             map = googleMap;
+                            // Check if we were successful in obtaining the map.
+                            if (map != null) {
+                                moveToLocation();
+                            }
                         }
                     });
-
-            // Check if we were successful in obtaining the map.
-            if (map != null) {
-                moveToLocation();
-            }
         }
     }
 
