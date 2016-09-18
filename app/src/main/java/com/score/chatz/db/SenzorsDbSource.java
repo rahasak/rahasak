@@ -283,8 +283,6 @@ public class SenzorsDbSource {
             secret.setWho(secret.getReceiver());
         }
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        try {
-            db.beginTransaction();
 
             // content values to inset
             ContentValues values = new ContentValues();
@@ -303,10 +301,6 @@ public class SenzorsDbSource {
             if (rowCount == 0) {
                 db.insert(SenzorsDbContract.LatestChat.TABLE_NAME, null, values);
             }
-
-        } finally {
-            db.endTransaction();
-        }
     }
 
     /**
