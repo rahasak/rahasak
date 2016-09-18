@@ -206,6 +206,7 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
                 User sender = senz.getSender();
                 //Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
                 Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", senz.getSender());
+                secret.setReceiver(senz.getReceiver());
                 Long _timeStamp = System.currentTimeMillis();
                 secret.setTimeStamp(_timeStamp);
 

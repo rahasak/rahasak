@@ -56,6 +56,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_WHO + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_NAME_WHOM + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_BLOB_TYPE + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK + TEXT_TYPE +
                     " )";

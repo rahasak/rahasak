@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -57,7 +58,7 @@ import java.util.ListIterator;
  * Use the {@link ChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment{
 
     private static final String TAG = ChatFragment.class.getName();
 
@@ -76,7 +77,7 @@ public class ChatFragment extends Fragment {
     private SenzorsDbSource dbSource;
     User currentUser;
 
-    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 3;
+    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 10;
 
     private ListView listView;
     private List<Secret> secretMessageList;
@@ -129,6 +130,8 @@ public class ChatFragment extends Fragment {
 
         setupActionBtns();
         setStateOnActionBtns();
+
+
         return view;
     }
 
@@ -241,7 +244,7 @@ public class ChatFragment extends Fragment {
                 adapter.notifyDataSetChanged();
             }
         }
-        //removeOldItemsFromChat();
+        removeOldItemsFromChat();
     }
 
 

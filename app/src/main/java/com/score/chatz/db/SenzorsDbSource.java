@@ -269,6 +269,8 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED, 0);
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
             values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_WHOM, secret.getReceiver().getUsername());
+
             if(!isSecretCurrentUsers) {
                 values.put(SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK, getIdFromChatMapperForUser(secret.getWho()));
             }else{
@@ -300,7 +302,6 @@ public class SenzorsDbSource {
     }
 
     public String getIdFromChatMapperForUser(User user){
-        UserPermission userPerm = null;
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         // query
         String query = "SELECT _id, user " +
@@ -558,7 +559,7 @@ public class SenzorsDbSource {
         /*String query = "SELECT MAX(timestamp), _id, text, image, thumbnail, sender, receiver, timestamp, sound FROM (SELECT * FROM secret WHERE sender = ? OR receiver = ?)" +
                 "GROUP BY receiver, sender ORDER BY _id DESC)";*/
 
-        String query = "SELECT MAX(_id), cmfk, blob, type, who, timestamp FROM secret " +
+        String query = "SELECT MAX(_id), cmfk, blob, type, who, whom, timestamp FROM secret " +
                                 "GROUP BY cmfk ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query, null);
 
@@ -567,6 +568,7 @@ public class SenzorsDbSource {
         String _secretBlob;
         String _secretBlobType;
         String _secretWho;
+        String _secretTo;
         Long _secretTimestamp;
         String _secretSenderImage;
 
@@ -577,14 +579,18 @@ public class SenzorsDbSource {
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretWho = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_WHO));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _secretTo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_WHOM));
             _secretSenderImage = getImageFromDB(_secretWho);
 
             // create secret
             User senderUser = new User("", _secretWho);
             senderUser.setUserImage(_secretSenderImage);
-            //Secret secret = new Secret(_secretText, _secretImage, _secretThumbnail, senderUser, new User("", _secretReceiver));
             Secret secret = new Secret(_secretBlob, _secretBlobType, senderUser);
             secret.setTimeStamp(_secretTimestamp);
+
+            if(_secretWho.equalsIgnoreCase(sender.getUsername())){
+                secret.setReceiver(new User("", _secretTo));
+            }
 
             // fill secret list
             secretList.add(secret);

@@ -24,6 +24,7 @@ import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.pojos.User;
@@ -31,6 +32,7 @@ import com.score.senzc.pojos.User;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Lakmal on 8/9/16.
@@ -216,6 +218,21 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.status.setText("Message failed to deliver!!!");
         }
 
+        /*if(secret.getSeenTimeStamp() == 0 || secret.getSeenTimeStamp() == null){
+            Animation bottomUp = android.view.animation.AnimationUtils.loadAnimation(getContext(),
+                    R.anim.message_in);
+            view.startAnimation(bottomUp);
+            markMessagesAsSeen(secret);
+        }else if(!SecretsUtil.isSecretToBeShown(secret) && !(i >= (userSecretList.size() - DISPLAY_ITEM_COUNT - 1))){
+            Log.i(TAG, "DELETING INDEX OF VIEW CHAT ACTIVITY - " + i + ", secret - " + secret.getBlob());
+            Animation fadeOut = android.view.animation.AnimationUtils.loadAnimation(getContext(),
+                    R.anim.fade_out);
+            view.startAnimation(fadeOut);
+        }*/
+
+
+
+
         viewHolder.sender.setText(secret.getWho().getUsername());
     }
 
@@ -225,6 +242,10 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     secret.setSeenTimeStamp(System.currentTimeMillis() + 100);
                     new SenzorsDbSource(context).updateSeenTimestamp(secret);
                 }
+    }
+
+    private void deleteSecret(final Secret secret){
+            new SenzorsDbSource(context).deleteSecret(secret);
     }
 
     private void loadBitmap(String data, ImageView imageView) {
