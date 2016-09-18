@@ -216,6 +216,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
         if(secret.isDeliveryFailed()){
             viewHolder.status.setText("Message failed to deliver!!!");
+            view.setBackgroundResource(R.color.translucent_red);
+        }else{
+            view.setBackgroundResource(R.color.white);
         }
 
         /*if(secret.getSeenTimeStamp() == 0 || secret.getSeenTimeStamp() == null){
