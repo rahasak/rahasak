@@ -7,8 +7,15 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
@@ -53,6 +60,28 @@ public class ChatActivity extends BaseActivity {
         getSupportActionBar().setTitle("@"+sender.getUsername());
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar mActionBar = getSupportActionBar();
+        /*mActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+
+        View mCustomView = mInflater.inflate(R.layout.chat_action_bar, null);
+        TextView mTitleTextView = (TextView) mCustomView.findViewById(R.id.title_text);
+        mTitleTextView.setText("Rahas Chat");
+
+        ImageButton imageButton = (ImageButton) mCustomView
+                .findViewById(R.id.imageButton);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                openProfileView();
+            }
+        });
+
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);*/
     }
 
     @Override
@@ -61,9 +90,18 @@ public class ChatActivity extends BaseActivity {
             case android.R.id.home:
                 this.finish();
                 return true;
+            case R.id.action_open_profile:
+                openProfileView();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_action_bar, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -101,4 +139,9 @@ public class ChatActivity extends BaseActivity {
         }
     };
 
+    private void openProfileView(){
+        Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.putExtra("SENDER", sender.getUsername());
+        startActivity(intent);
+    }
 }

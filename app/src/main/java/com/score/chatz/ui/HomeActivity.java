@@ -1,6 +1,7 @@
 package com.score.chatz.ui;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -56,6 +57,11 @@ public class HomeActivity extends BaseActivity {
         } catch (NoUserException ex) {
             Log.d(TAG, "No Registered User");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void setupToolbar() {

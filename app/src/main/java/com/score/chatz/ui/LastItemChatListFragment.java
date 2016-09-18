@@ -3,6 +3,7 @@ package com.score.chatz.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
@@ -47,6 +49,16 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         dbSource = new SenzorsDbSource(getContext());
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.last_item_chat_list_fragment, container, false);
+    }
+
+    private void setupEmptyTextFont(){
+        ((TextView)getActivity().findViewById(R.id.empty_view_chat)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupEmptyTextFont();
     }
 
     @Override
