@@ -54,22 +54,6 @@ public class UserProfileActivity extends BaseActivity {
     private ImageView userImage;
     SenzorsDbSource dbSource;
 
-    // service interface
-    private ISenzService senzService = null;
-
-    // service connection
-    private ServiceConnection senzServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("TAG", "Connected with senz service");
-            senzService = ISenzService.Stub.asInterface(service);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            senzService = null;
-            Log.d("TAG", "Disconnected from senz service");
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,9 +151,6 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     public void onStop() {
         super.onStop();
-
-        // Unbind from the service
-        this.unbindService(senzServiceConnection);
     }
 
     @Override
@@ -181,12 +162,6 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        Intent intent = new Intent();
-        intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-        bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-
-
     }
 
     private void setupUserPermissions() {
