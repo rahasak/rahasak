@@ -249,7 +249,7 @@ public class SenzorsDbSource {
             ex.printStackTrace();
         }
         boolean isSecretCurrentUsers = false;
-        // Create a record in the chat mapper if User of scecret is not the current user!!!
+        // Is this secret belong to current user?
         if(currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
             isSecretCurrentUsers = true;
 
@@ -291,6 +291,14 @@ public class SenzorsDbSource {
      * @param username
      */
     private void createMappingForUser(String username){
+        try {
+            if(PreferenceUtils.getUser(context).getUsername().equalsIgnoreCase(username)){
+                // Current user should not register on this table!!!
+                return;
+            }
+        }catch(NoUserException ex){
+            ex.printStackTrace();
+        }
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // content values to inset
@@ -580,17 +588,22 @@ public class SenzorsDbSource {
             _secretWho = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_WHO));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretTo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_WHOM));
-            _secretSenderImage = getImageFromDB(_secretWho);
+
 
             // create secret
             User senderUser = new User("", _secretWho);
-            senderUser.setUserImage(_secretSenderImage);
+
             Secret secret = new Secret(_secretBlob, _secretBlobType, senderUser);
             secret.setTimeStamp(_secretTimestamp);
 
             if(_secretWho.equalsIgnoreCase(sender.getUsername())){
                 secret.setReceiver(new User("", _secretTo));
+                _secretSenderImage = getImageFromDB(_secretTo);
+            }else{
+                _secretSenderImage = getImageFromDB(_secretWho);
             }
+
+            senderUser.setUserImage(_secretSenderImage);
 
             // fill secret list
             secretList.add(secret);
