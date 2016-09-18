@@ -142,5 +142,17 @@
             android:textColor="@color/white" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/done_btn"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:background="@color/android_green"
+        android:text="Done!"
+        android:textColor="@color/android_grey"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp" />
+
 
 </RelativeLayout>

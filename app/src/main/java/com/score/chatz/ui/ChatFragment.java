@@ -458,6 +458,7 @@ public class ChatFragment extends Fragment{
             Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
             ((ChatActivity)getActivity()).send(senz);
+            ((ChatActivity)getActivity()).displayInformationMessageDialog("Audio Request", "Audio Request has been sent!");
     }
 
     private void setStateOnActionBtns() {

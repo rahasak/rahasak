@@ -3,11 +3,6 @@ package com.score.chatz.ui;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Rect;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.media.AudioTrack;
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationManagerCompat;
@@ -17,13 +12,6 @@ import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.View;
 import android.content.Intent;
-import android.media.MediaRecorder;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,24 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.ShortBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.github.siyamed.shapeimageview.CircularImageView;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
@@ -57,8 +28,6 @@ import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.handlers.SenzSoundHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioRecorder;
-import com.score.chatz.utils.AudioUtils;
-import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
@@ -93,6 +62,8 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private View moving_layout;
     private boolean hasRecordingStarted;
 
+    Button doneBtn;
+
 
     private Rect startBtnRectRelativeToScreen;
     private Rect cancelBtnRectRelativeToScreen;
@@ -125,45 +96,58 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         String senderString = intent.getStringExtra("SENDER");
         sender = new User("", senderString);
 
-        if(isAcitivityActive()== true){
+        if (isAcitivityActive() == true) {
             cancelTimerToServe();
-            SenzSoundHandler.getInstance().sendBusyNotification( new Senz(null, null, null, sender, receiver, null), this);
+            SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
             this.finish();
-        }else {
+        } else {
             isActivityActive = true;
 
 
-        dbSource = new SenzorsDbSource(this);
+            dbSource = new SenzorsDbSource(this);
 
-        audioRecorder = new AudioRecorder();
+            audioRecorder = new AudioRecorder();
 
-        isRecordingDone = false;
+            isRecordingDone = false;
 
-        Log.i(TAG, "SENDER FROM RECORDING ACTIVITY - " + sender.getUsername());
-        Log.i(TAG, "RECEIVERE FROM RECORDING ACTIVITY - " + receiver.getUsername());
+            Log.i(TAG, "SENDER FROM RECORDING ACTIVITY - " + sender.getUsername());
+            Log.i(TAG, "RECEIVERE FROM RECORDING ACTIVITY - " + receiver.getUsername());
 
-        setupSwipeBtns();
-        startBtnAnimations();
-        startVibrations();
-        setupHandlesForSwipeBtnContainers();
-        setupPhotoRequestTitle();
 
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-        wakeLock.acquire();
-        startTimerToEndRequest();
+            setupDontBtn();
+            setupSwipeBtns();
+            startBtnAnimations();
+            startVibrations();
+            setupHandlesForSwipeBtnContainers();
+            setupPhotoRequestTitle();
+
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+            wakeLock.acquire();
+            startTimerToEndRequest();
         }
 
     }
 
-    private void setupPhotoRequestTitle(){
-        ((TextView)findViewById(R.id.photo_request)).setText(getResources().getString(R.string.sound_request) + " @" + sender.getUsername());
+    private void setupDontBtn() {
+        doneBtn = (Button) findViewById(R.id.done_btn);
+        doneBtn.setVisibility(View.INVISIBLE);
+        doneBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopRecording();
+            }
+        });
+    }
+
+    private void setupPhotoRequestTitle() {
+        ((TextView) findViewById(R.id.photo_request)).setText(getResources().getString(R.string.sound_request) + " @" + sender.getUsername());
     }
 
     @Override
-    public void onWindowFocusChanged (boolean hasFocus){
+    public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if(hasFocus){
+        if (hasFocus) {
             startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
             cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
         }
@@ -173,20 +157,21 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     protected void onDestroy() {
         super.onDestroy();
         //Release screen lock, so the phone can go back to sleep
-        if(wakeLock != null)
-        wakeLock.release();
+        if (wakeLock != null)
+            wakeLock.release();
         stopVibrations();
     }
 
-    private void startTimerToEndRequest(){
+    private void startTimerToEndRequest() {
         final RecordingActivity _this = this;
-        cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST,TIME_TO_SERVE_REQUEST){
+        cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
                 //initializeCamera();
-                SenzSoundHandler.getInstance().sendBusyNotification( new Senz(null, null, null, sender, receiver, null), _this);
+                SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), _this);
                 _this.finish();
             }
+
             @Override
             public void onTick(long millisUntilFinished) {
                 Log.i(TAG, "Time in count down -" + millisUntilFinished);
@@ -195,21 +180,21 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         }.start();
     }
 
-    private void cancelTimerToServe(){
-        if(cancelTimer != null)
+    private void cancelTimerToServe() {
+        if (cancelTimer != null)
             cancelTimer.cancel();
     }
 
-    private void setupSwipeBtns(){
+    private void setupSwipeBtns() {
         cancelBtn = (CircularImageView) findViewById(R.id.cancel);
         startBtn = (ImageView) findViewById(R.id.start);
     }
 
-    private void startVibrations(){
+    private void startVibrations() {
         VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
     }
 
-    private void stopVibrations(){
+    private void stopVibrations() {
         VibrationUtils.stopVibration(this);
     }
 
@@ -217,16 +202,16 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         goRipple.setOnTouchListener(this);
     }
 
-    private void startBtnAnimations(){
+    private void startBtnAnimations() {
         Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake);
-        goRipple=(RippleBackground)findViewById(R.id.go_ripple);
+        goRipple = (RippleBackground) findViewById(R.id.go_ripple);
         goRipple.startRippleAnimation();
         goRipple.startAnimation(anim);
     }
 
     public boolean onTouch(View v, MotionEvent event) {
-        int x = (int)event.getRawX();
-        int y = (int)event.getRawY();
+        int x = (int) event.getRawX();
+        int y = (int) event.getRawY();
         switch (event.getAction()) {
             case (MotionEvent.ACTION_DOWN):
                 v.clearAnimation();
@@ -243,18 +228,19 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                         .y(event.getRawY() + dY)
                         .setDuration(0)
                         .start();
-                if(startBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
+                if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside start button region
-                    if(hasRecordingStarted == false) {
+                    if (hasRecordingStarted == false) {
                         hasRecordingStarted = true;
                         stopVibrations();
                         cancelTimerToServe();
                         startRecording();
                         moving_layout.setVisibility(View.INVISIBLE);
+                        doneBtn.setVisibility(View.VISIBLE);
                     }
-                }else if(cancelBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
+                } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside cancel button region
-                    if(isRecordingCancelled == false) {
+                    if (isRecordingCancelled == false) {
                         isRecordingCancelled = true;
                         cancelTimerToServe();
                         SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
@@ -297,7 +283,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private void stopRecording() {
         // stops the recording activity
-        if(isRecordingDone == false) {
+        if (isRecordingDone == false) {
             isRecordingDone = true;
             audioRecorder.stopRecording();
             if (audioRecorder.getRecording() != null) {
@@ -358,7 +344,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         isActivityActive = false;
     }
 
-    public static boolean isAcitivityActive(){
+    public static boolean isAcitivityActive() {
         return isActivityActive;
     }
 

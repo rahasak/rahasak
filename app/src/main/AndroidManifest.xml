@@ -30,7 +30,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- access to vibrate phone -->
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -89,7 +89,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.HomeActivity"
             android:launchMode="singleTask"
@@ -120,21 +120,24 @@
         <activity
             android:name=".ui.PhotoFullScreenActivity"
             android:launchMode="singleTask"
-            android:theme="@style/MyMaterialTheme"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".ui.RecordingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme" />
+        <activity
+            android:name=".ui.RecordingActivity"
             android:launchMode="singleTask"
-            android:theme="@style/MyMaterialTheme"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme"></activity>
+        <activity android:name=".ui.AudioFullScreenActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme"></activity>
 
         <!-- Servicves -->
         <service
             android:name=".services.LocationService"
             android:enabled="true" />
         <service
-            android:name="com.score.chatz.services.RemoteSenzService"
+            android:name=".services.RemoteSenzService"
             android:enabled="true"
             android:process=":remote">
             <intent-filter>
@@ -143,23 +146,21 @@
         </service>
 
         <!-- Receievers -->
-        <receiver android:name="com.score.chatz.receivers.BootCompleteReceiver">
+        <receiver android:name=".receivers.BootCompleteReceiver">
             <intent-filter>
                 <action android:name="senz.action.RESTART" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <receiver android:name="com.score.chatz.receivers.AlarmReceiver"
-            android:process=":remote">
-        </receiver>
-
-        <receiver android:name="com.score.chatz.receivers.DeathWatchReceiver">
+        <receiver
+            android:name=".receivers.AlarmReceiver"
+            android:process=":remote"></receiver>
+        <receiver android:name=".receivers.DeathWatchReceiver">
             <intent-filter>
                 <action android:name="senz.action.RESTART" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.score.chatz.receivers.SenzReceiver">
+        <receiver android:name=".receivers.SenzReceiver">
             <intent-filter>
                 <action android:name="com.score.senz.NEW_SENZ" />
             </intent-filter>

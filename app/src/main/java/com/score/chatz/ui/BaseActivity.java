@@ -105,6 +105,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     @Override
     protected void onResume() {
         super.onResume();
+        startService();
     }
 
     private void bindToSerice(){
@@ -116,7 +117,6 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     @Override
     protected void onPause() {
         super.onPause();
-
     }
 
     /**
