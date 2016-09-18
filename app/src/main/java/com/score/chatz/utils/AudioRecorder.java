@@ -6,6 +6,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.score.chatz.asyncTasks.RahasPlayer;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -29,7 +31,7 @@ public class AudioRecorder {
     public void startRecording(final Context context) {
 
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                AudioUtils.RECORDER_SAMPLERATE, RECORDER_CHANNELS,
+                AudioUtils.RECORDER_SAMPLE_RATE, RECORDER_CHANNELS,
                 RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
 
         recorder.startRecording();
@@ -77,7 +79,8 @@ public class AudioRecorder {
         }
         try {
             recordedData.close();
-            AudioUtils.play(recordedData.toByteArray(), context);
+            //AudioUtils.play(recordedData.toByteArray(), context);
+            new RahasPlayer(recordedData.toByteArray(), context).execute("Rahasa");
         } catch (IOException e) {
             e.printStackTrace();
         }

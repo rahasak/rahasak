@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.asyncTasks.RahasPlayer;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
@@ -199,7 +200,10 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AudioUtils.play(Base64.decode(secret.getBlob(), 0), getContext());
+                    //AudioUtils.play(Base64.decode(secret.getBlob(), 0), getContext());
+
+                    // play via async task
+                    new RahasPlayer(Base64.decode(secret.getBlob(), 0), getContext()).execute("Rahsa");
                 }
             });
         }
