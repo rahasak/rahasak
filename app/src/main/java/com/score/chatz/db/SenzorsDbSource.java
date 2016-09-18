@@ -17,7 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -245,12 +244,12 @@ public class SenzorsDbSource {
         User currentUser = null;
         try {
             currentUser = PreferenceUtils.getUser(context);
-        }catch (NoUserException ex){
+        } catch (NoUserException ex) {
             ex.printStackTrace();
         }
         boolean isSecretCurrentUsers = false;
         // Is this secret belong to current user?
-        if(currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
+        if (currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
             isSecretCurrentUsers = true;
 
         Log.d(TAG, "AddSecret, adding secret from - " + secret.getWho().getUsername());
@@ -271,9 +270,9 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_WHOM, secret.getReceiver().getUsername());
 
-            if(!isSecretCurrentUsers) {
+            if (!isSecretCurrentUsers) {
                 values.put(SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK, getIdFromChatMapperForUser(secret.getWho()));
-            }else{
+            } else {
                 values.put(SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK, getIdFromChatMapperForUser(secret.getReceiver()));
             }
 
@@ -288,28 +287,28 @@ public class SenzorsDbSource {
 
     /**
      * Add an entry to the chat user mapping table
+     *
      * @param username
      */
-    private void createMappingForUser(String username){
+    private void createMappingForUser(String username) {
         try {
-            if(PreferenceUtils.getUser(context).getUsername().equalsIgnoreCase(username)){
+            if (PreferenceUtils.getUser(context).getUsername().equalsIgnoreCase(username)) {
                 // Current user should not register on this table!!!
-                return;
+                SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+                // content values to inset
+                ContentValues values = new ContentValues();
+                values.put(SenzorsDbContract.ChatUserMapper.COLUMN_USER, username);
+
+                // Insert the new row, if fails throw an error
+                db.insert(SenzorsDbContract.ChatUserMapper.TABLE_NAME, null, values);
             }
-        }catch(NoUserException ex){
+        } catch (NoUserException ex) {
             ex.printStackTrace();
         }
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.ChatUserMapper.COLUMN_USER, username);
-
-        // Insert the new row, if fails throw an error
-        db.insert(SenzorsDbContract.ChatUserMapper.TABLE_NAME, null, values);
     }
 
-    public String getIdFromChatMapperForUser(User user){
+    public String getIdFromChatMapperForUser(User user) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         // query
         String query = "SELECT _id, user " +
@@ -447,7 +446,7 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, who, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
                 "FROM secret WHERE (who = ? AND whom = ?) OR (who = ? AND whom = ? ) ORDER BY _id ASC";
-        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(),receiver.getUsername(), sender.getUsername()});
+        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
 
         // secret attr
         String _secretId;
@@ -507,7 +506,7 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, who, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
                 "FROM secret WHERE (who = ? AND whom = ?) OR (who = ? AND whom = ? ) AND timestamp > ? ORDER BY _id ASC";
-        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(),receiver.getUsername(), sender.getUsername(), timestamp.toString()});
+        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername(), timestamp.toString()});
 
         // secret attr
         String _secretId;
@@ -568,7 +567,7 @@ public class SenzorsDbSource {
                 "GROUP BY receiver, sender ORDER BY _id DESC)";*/
 
         String query = "SELECT MAX(_id), cmfk, blob, type, who, whom, timestamp FROM secret " +
-                                "GROUP BY cmfk ORDER BY _id DESC";
+                "GROUP BY cmfk ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query, null);
 
         // secret attr
@@ -596,10 +595,10 @@ public class SenzorsDbSource {
             Secret secret = new Secret(_secretBlob, _secretBlobType, senderUser);
             secret.setTimeStamp(_secretTimestamp);
 
-            if(_secretWho.equalsIgnoreCase(sender.getUsername())){
+            if (_secretWho.equalsIgnoreCase(sender.getUsername())) {
                 secret.setReceiver(new User("", _secretTo));
                 _secretSenderImage = getImageFromDB(_secretTo);
-            }else{
+            } else {
                 _secretSenderImage = getImageFromDB(_secretWho);
             }
 
