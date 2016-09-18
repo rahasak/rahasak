@@ -2,22 +2,16 @@ package com.score.chatz.handlers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.interfaces.IDataUserSenzHandler;
-import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
-import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -64,7 +58,7 @@ public class SenzHandler extends BaseHandler {
                 handleStream(senzMessage);
             } else {
                 Senz senz = SenzParser.parse(senzMessage);
-                senz.setId(SenzUtils.getUniqueRandomNumber().toString());
+                senz.setId(SenzUtils.getUniqueRandomNumber());
                 verifySenz(senz);
                 SenzStatusTracker.onPacketArrived(senz);
                 switch (senz.getSenzType()) {

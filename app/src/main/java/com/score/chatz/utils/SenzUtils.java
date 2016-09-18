@@ -77,8 +77,6 @@ public class SenzUtils {
         return number.toString();
         //String uuid = java.util.UUID.randomUUID().toString();
         //return uuid;
-
     }
-
 
 }

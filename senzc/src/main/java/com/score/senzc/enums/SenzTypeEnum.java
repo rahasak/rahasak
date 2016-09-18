@@ -9,4 +9,5 @@ public enum SenzTypeEnum {
     SHARE,
     DATA,
     PUT,
+    STREAM,
 }

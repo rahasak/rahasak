@@ -53,7 +53,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
      * @param isDone
      */
     public void sendConfirmation(Senz _senz, ISenzService senzService, User receiver, boolean isDone) {
-        if (isDone == false) {
+        if (!isDone) {
             try {
                 // create senz attributes
                 HashMap<String, String> senzAttributes = new HashMap<>();
@@ -80,8 +80,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
      * @param context
      */
     public void sendPhoto(final byte[] image, final Senz senz, final Context context) {
-
-        //Get servicve connection
+        // service connection
         final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
 
         serviceConnection.executeAfterServiceConnected(new Runnable() {
@@ -90,53 +89,54 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                 // service instance
                 ISenzService senzService = serviceConnection.getInterface();
 
-                // service instance
                 Log.d(TAG, "send response(share back) for photo : " + image);
+                Log.i(TAG, "user info, sender : " + senz.getSender().getUsername() + ", receiver : " + senz.getReceiver().getUsername());
 
-                Log.i(TAG, "USER INFO - senz.getSender() : " + senz.getSender().getUsername() + ", senz.getReceiver() : " + senz.getReceiver().getUsername());
                 try {
-                    // compose senzes
-                    String uid = SenzUtils.getUniqueRandomNumber().toString();
+                    // compose senz
+                    String uid = SenzUtils.getUniqueRandomNumber();
 
-                    Senz startSenz = getStartPhotoSharingSenze(senz);
-                    senzService.send(startSenz);
+                    // stream on senz
+                    // stream content
+                    // stream off senz
+                    Senz startStreamSenz = getStartStreamSenz(senz);
+                    ArrayList<Senz> photoSenzList = getPhotoStreamSenz(senz, image, context, uid);
+                    Senz stopStreamSenz = getStopStreamSenz(senz);
 
-
-                    String uriToFindImageForService = SenzUtils.getUniqueRandomNumber().toString();
-                    CameraUtils.savePhotoCache(uriToFindImageForService, CameraUtils.getBitmapFromBytes(Base64.encode(image, 0)), context);
-
-
-                     ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context, uid);
-
-                    Senz stopSenz = getStopPhotoSharingSenz(senz);
-
-                    ArrayList<Senz> senzList = new ArrayList<Senz>();
+                    // populate list
+                    ArrayList<Senz> senzList = new ArrayList<>();
+                    senzList.add(startStreamSenz);
                     senzList.addAll(photoSenzList);
-                    senzList.add(stopSenz);
+                    senzList.add(stopStreamSenz);
 
                     senzService.sendInOrder(senzList);
+
+                    // TODO save photo in cache and send the uri to the service
+                    //String uriToFindImageForService = SenzUtils.getUniqueRandomNumber();
+                    //CameraUtils.savePhotoCache(uriToFindImageForService, CameraUtils.getBitmapFromBytes(Base64.encode(image, 0)), context);
                     //senzService.sendFromUri(uriToFindImageForService, senz, uid);
-
-
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }
 
-    private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image, Context context, String uid) {
-        String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
-        String thumbnail = CameraUtils.resizeBase64Image(imageAsString);
+    /**
+     * Decompose image stream in to multiple data/stream senz's
+     *
+     * @param senz    original senz
+     * @param image   image content
+     * @param context app context
+     * @param uid     unique id
+     * @return list of decomposed senz's
+     */
+    private ArrayList<Senz> getPhotoStreamSenz(Senz senz, byte[] image, Context context, String uid) {
+        String imageString = Base64.encodeToString(image, Base64.DEFAULT);
 
-        ArrayList<Senz> senzList = new ArrayList<>();
-        String[] imgs = split(imageAsString, 1024);
-
+        // save photo to db before sending if its a chatzphoto
         if (senz.getAttributes().containsKey("chatzphoto")) {
-            //Save photo to db before sending if its a chatzphoto
-            //Secret newSecret = new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender());
-            Secret newSecret = new Secret(imageAsString, "IMAGE", senz.getReceiver());
+            Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver());
             newSecret.setReceiver(senz.getReceiver());
             Long _timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(_timeStamp);
@@ -144,7 +144,10 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
             new SenzorsDbSource(context).createSecret(newSecret);
         }
 
-        for (int i = 0; i < imgs.length; i++) {
+        ArrayList<Senz> senzList = new ArrayList<>();
+        String[] packets = split(imageString, 1024);
+
+        for (String packet : packets) {
             // new senz
             String id = "_ID";
             String signature = "_SIGNATURE";
@@ -154,9 +157,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             if (senz.getAttributes().containsKey("chatzphoto")) {
-                senzAttributes.put("chatzphoto", imgs[i].trim());
+                senzAttributes.put("chatzphoto", packet.trim());
             } else if (senz.getAttributes().containsKey("profilezphoto")) {
-                senzAttributes.put("profilezphoto", imgs[i].trim());
+                senzAttributes.put("profilezphoto", packet.trim());
             }
 
             senzAttributes.put("uid", uid);
@@ -168,9 +171,13 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
         return senzList;
     }
 
-
-    private Senz getStartPhotoSharingSenze(Senz senz) {
-        //senz is the original senz
+    /**
+     * Create start stream senz
+     *
+     * @param senz original senz
+     * @return senz
+     */
+    private Senz getStartStreamSenz(Senz senz) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
@@ -180,33 +187,35 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Log.i(TAG, "Senz receiver - " + senz.getReceiver());
-        Log.i(TAG, "Senz sender - " + senz.getSender());
-        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
-        return _senz;
+
+        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
     }
 
-    private Senz getStopPhotoSharingSenz(Senz senz) {
+    /**
+     * Create stop stream senz
+     *
+     * @param senz original senz
+     * @return senz
+     */
+    private Senz getStopStreamSenz(Senz senz) {
         // create senz attributes
-        //senz is the original senz
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("stream", "off");
-
 
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
-        return _senz;
+
+        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
     }
 
     /**
      * Launch your camera from here!!
      *
-     * @param context
-     * @param senz
+     * @param context app context
+     * @param senz    senz
      * @throws CameraBusyException
      */
     public void launchCamera(Context context, Senz senz) throws CameraBusyException {
