@@ -50,6 +50,16 @@ public class IntentProvider {
         return  intent;
     }
 
+    public static Intent getNewDataToDisplayIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.NEW_DATA_TO_DISPLAY));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return  intent;
+    }
+
     /**
      * Return the intent filter for the intent_type.
      * @param type
@@ -102,6 +112,10 @@ public class IntentProvider {
             case PACKET_TIMEOUT:
                 intentString = "com.score.chatz.PACKET_TIMEOUT";
                 break;
+            // Depressing!! That #$%! is not online!! :)
+            case NEW_DATA_TO_DISPLAY:
+                intentString = "com.score.chatz.NEW_DATA_TO_DISPLAY";
+                break;
             default:
                 throw new InvalidIntentType();
         }
@@ -119,6 +133,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        DATA_SENZ, UPDATE_SENZ, USER_BUSY, PACKET_TIMEOUT
+        DATA_SENZ, USER_BUSY, PACKET_TIMEOUT, NEW_DATA_TO_DISPLAY
     }
 }

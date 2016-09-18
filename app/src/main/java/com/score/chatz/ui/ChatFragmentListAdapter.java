@@ -214,14 +214,15 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.status.setText("Message sending...");
         }
 
-        if(secret.isDeliveryFailed()){
+        if(secret.isDeliveryFailed() && secret.getWho().getUsername().equalsIgnoreCase(currentUser.getUsername())){
             viewHolder.status.setText("Message failed to deliver!!!");
             view.setBackgroundResource(R.color.translucent_red);
         }else{
             view.setBackgroundResource(R.color.white);
         }
 
-        /*if(secret.getSeenTimeStamp() == 0 || secret.getSeenTimeStamp() == null){
+        /* Animation for the view!!!!
+        if(secret.getSeenTimeStamp() == 0 || secret.getSeenTimeStamp() == null){
             Animation bottomUp = android.view.animation.AnimationUtils.loadAnimation(getContext(),
                     R.anim.message_in);
             view.startAnimation(bottomUp);

@@ -15,6 +15,7 @@ import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -413,11 +414,19 @@ public class ChatFragment extends Fragment{
             ((ChatActivity)getActivity()).send(senz);
     }
 
+    private void sendUserToWaitingPage(){
+        Intent i = new Intent(getActivity(), PhotoFullScreenActivity.class);
+        getContext().startActivity(i);
+    }
+
 
     /*
      * Get photo of user
      */
     private void getPhoto(User receiver) {
+
+            sendUserToWaitingPage();
+
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());

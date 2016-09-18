@@ -297,6 +297,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                 sendPhotoRecievedConfirmation(senz, context, uid, true);
 
                 broadcastDataSenz(senz, context);
+
+                // Notify if acitvity to display new data!! fullscreen or playaback!!
+                broadcastNewDataToDisplaySenz(senz, context);
             }
         } catch (SQLiteConstraintException e) {
             Log.e(TAG, e.toString());

@@ -24,6 +24,12 @@ public class BaseHandler {
         context.sendBroadcast(intent);
     }
 
+    protected static void broadcastNewDataToDisplaySenz(Senz senz, Context context){
+        Intent intent = IntentProvider.getNewDataToDisplayIntent();
+        intent.putExtra("SENZ", senz);
+        context.sendBroadcast(intent);
+    }
+
     protected static void broadcastUserBusySenz(Senz senz, Context context){
         Intent intent = IntentProvider.getUserBusyIntent();
         intent.putExtra("SENZ", senz);
