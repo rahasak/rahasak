@@ -12,20 +12,24 @@ public class AudioUtils {
 
     public static final int RECORDER_SAMPLERATE = 8000;
 
-    public static void play(byte[] mp3SoundByteArray, Context context)
+    public static void play(final byte[] mp3SoundByteArray, final Context context)
     {
-        disableSpeaker(context);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                disableSpeaker(context);
 
-        int bufferSize = AudioTrack.getMinBufferSize(RECORDER_SAMPLERATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+                int bufferSize = AudioTrack.getMinBufferSize(RECORDER_SAMPLERATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-        AudioTrack mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, RECORDER_SAMPLERATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+                AudioTrack mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, RECORDER_SAMPLERATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
 
-        mAudioTrack.play();
+                mAudioTrack.play();
 
-        mAudioTrack.write(mp3SoundByteArray, 0, mp3SoundByteArray.length);
+                mAudioTrack.write(mp3SoundByteArray, 0, mp3SoundByteArray.length);
 
-        enableSpeaker(context);
-
+                enableSpeaker(context);
+            }
+        }).start();
     }
 
     public static void disableSpeaker(Context context){

@@ -215,6 +215,8 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
 
                 dbSource.createSecret(secret);
                 SenzSoundHandler.sendSoundRecievedConfirmation(senz, context, uid, true);
+
+                broadcastDataSenz(senz, context);
             }
         } catch (SQLiteConstraintException e) {
             Log.e(TAG, e.toString());
