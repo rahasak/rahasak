@@ -43,7 +43,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
         userSecretList = secretList;
         try {
             currentUser = PreferenceUtils.getUser(getContext());
-        }catch (NoUserException e) {
+        } catch (NoUserException e) {
             e.printStackTrace();
         }
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -56,13 +56,13 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
 
     @Override
     public int getItemViewType(int position) {
-        Secret secret = (Secret)getItem(position);
+        Secret secret = (Secret) getItem(position);
         //if(((Secret)getItem(position)).getImage() != null){
-        if(((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE")){
+        if (((Secret) getItem(position)).getType().equalsIgnoreCase("IMAGE")) {
             return IMAGE_MESSAGE;
-        }else if(((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
+        } else if (((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
             return SOUND_MESSAGE;
-        }else {
+        } else {
             return TEXT_MESSAGE;
         }
     }
@@ -125,29 +125,32 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
     private void setUpRow(int i, Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         viewHolder.sender.setText(secret.getWho().getUsername());
-        if (viewHolder.messageType == TEXT_MESSAGE){
+        if (viewHolder.messageType == TEXT_MESSAGE) {
             viewHolder.message.setText(secret.getBlob());
-        }else if(viewHolder.messageType == SOUND_MESSAGE){
+        } else if (viewHolder.messageType == SOUND_MESSAGE) {
             //Nothing to do here!!
-        }else{
-            if(secret.getBlob() != null) {
+        } else {
+            if (secret.getBlob() != null) {
                 loadBitmap(secret.getBlob(), viewHolder.image);
             }
         }
 
         //Extracting user image
-        if(secret.getWho().getUserImage() != null) {
+        if (secret.getWho().getUserImage() != null) {
             loadBitmap(secret.getWho().getUserImage(), viewHolder.userImage);
         }
 
-        if(secret.getTimeStamp() != null){
+        if (secret.getTimeStamp() != null) {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
         }
 
         //User name
-        viewHolder.sender.setText("@"+secret.getWho().getUsername());
+        if (!currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
+            viewHolder.sender.setText("@" + secret.getWho().getUsername());
+        else
+            viewHolder.sender.setText("@" + secret.getReceiver().getUsername());
     }
 
     private void loadBitmap(String data, ImageView imageView) {

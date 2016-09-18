@@ -446,8 +446,8 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, who, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
-                "FROM secret WHERE (who = ? OR who = ?) ORDER BY _id ASC";
-        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername()});
+                "FROM secret WHERE (who = ? AND whom = ?) OR (who = ? AND whom = ? ) ORDER BY _id ASC";
+        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(),receiver.getUsername(), sender.getUsername()});
 
         // secret attr
         String _secretId;
@@ -506,8 +506,8 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, who, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
-                "FROM secret WHERE (who = ? OR who = ?) AND timestamp > ? ORDER BY _id ASC";
-        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(), timestamp.toString()});
+                "FROM secret WHERE (who = ? AND whom = ?) OR (who = ? AND whom = ? ) AND timestamp > ? ORDER BY _id ASC";
+        Cursor cursor = db.rawQuery(query, new String[]{sender.getUsername(), receiver.getUsername(),receiver.getUsername(), sender.getUsername(), timestamp.toString()});
 
         // secret attr
         String _secretId;

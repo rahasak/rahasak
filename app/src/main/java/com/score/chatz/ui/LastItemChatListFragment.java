@@ -103,18 +103,6 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         adapter.notifyDataSetChanged();
     }
 
-    private void removeOldItemsFromChat() {
-        Iterator<Secret> iter = allSecretsList.iterator();
-        while (iter.hasNext()) {
-            Secret secret = iter.next();
-
-            if (!SecretsUtil.isSecretToBeShown(secret)) {
-                iter.remove();
-                dbSource.deleteSecret(secret);
-            }
-        }
-    }
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
@@ -125,6 +113,4 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         }
         startActivity(intent);
     }
-
-
 }
