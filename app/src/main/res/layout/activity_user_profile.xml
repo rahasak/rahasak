@@ -57,7 +57,7 @@
             android:textColor="@color/android_grey"
             android:textSize="20dp" />
 
-        <Button
+        <!--<Button
             android:id="@+id/share_secret_btn"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -66,7 +66,7 @@
             android:layout_marginTop="20dp"
             android:background="@color/android_green"
             android:text="Share a secret!"
-            android:textColor="@color/android_grey" />
+            android:textColor="@color/android_grey" />-->
 
         <LinearLayout
             android:layout_width="280dp"

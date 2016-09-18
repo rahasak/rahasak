@@ -80,7 +80,7 @@ public class UserProfileActivity extends BaseActivity {
             Log.e(TAG, "No registered user.");
         }
 
-        setupGoToChatViewBtn();
+        //setupGoToChatViewBtn();
         setupUserPermissions();
         registerAllReceivers();
         setupActionBar();
@@ -141,7 +141,9 @@ public class UserProfileActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                Intent intent = new Intent(this, ChatActivity.class);
+                intent.putExtra("SENDER", user.getUsername());
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -246,7 +248,7 @@ public class UserProfileActivity extends BaseActivity {
     }
 
 
-    private void setupGoToChatViewBtn() {
+    /*private void setupGoToChatViewBtn() {
         shareSecretBtn = (Button) findViewById(R.id.share_secret_btn);
         shareSecretBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -255,7 +257,7 @@ public class UserProfileActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
-    }
+    }*/
 
 
     public void sendPermission(User receiver, String camPerm, String locPerm, String micPerm) {
