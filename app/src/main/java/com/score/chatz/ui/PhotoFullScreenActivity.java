@@ -20,7 +20,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private ImageView imageView;
     private String image;
 
-    private static final int CLOSE_QUICK_VIEW_TIME = 3000; // 3 seconds
+    private static final int CLOSE_QUICK_VIEW_TIME = 2000; // 2 seconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

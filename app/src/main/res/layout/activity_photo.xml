@@ -103,6 +103,7 @@
         android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center"
+        android:id="@+id/sender_info"
         android:background="@color/translucent_black">
 
         <ImageView
@@ -118,5 +119,16 @@
             android:text="Photo Request by : Eranga"
             android:textColor="@color/white" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/quick_count_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3"
+        android:textSize="120sp"
+        android:textColor="@color/android_green"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp" />
 
 </RelativeLayout>

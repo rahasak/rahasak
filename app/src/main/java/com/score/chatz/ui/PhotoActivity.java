@@ -1,5 +1,6 @@
 package com.score.chatz.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.CountDownTimer;
@@ -20,6 +21,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.SenzStream;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.VibrationUtils;
 import com.score.senzc.pojos.Senz;
@@ -33,6 +35,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
     private boolean isPhotoTaken;
     private boolean isPhotoCancelled;
 
+    private View callingUserInfo;
+    private View buttonControls;
+    private TextView quickCountdownText;
+
     private PhotoActivity instnce;
     private Senz originalSenz;
     private PowerManager.WakeLock wakeLock;
@@ -45,7 +51,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
 
     private CountDownTimer cancelTimer;
 
-    private static final int TIME_TO_SERVE_REQUEST = 30000;
+    private static final int TIME_TO_SERVE_REQUEST = 30000; // 30 seconds
+    private static final int TIME_TO_QUICK_PHOTO = 3; // 3 seconds
 
 
     private float dX, dY, startX, startY;
@@ -84,6 +91,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                 preview.addView(mCameraPreview);
             }
 
+            setupUiHandlers();
             setupSwipeBtns();
             startBtnAnimations();
             startVibrations();
@@ -99,6 +107,18 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         }
     }
 
+    private void setupUiHandlers(){
+        quickCountdownText = (TextView) findViewById(R.id.quick_count_down);
+        quickCountdownText.setVisibility(View.INVISIBLE);
+        callingUserInfo = findViewById(R.id.sender_info);
+        buttonControls = findViewById(R.id.moving_layout);
+    }
+
+    private void hideUiControls(){
+        callingUserInfo.setVisibility(View.INVISIBLE);
+        buttonControls.setVisibility(View.INVISIBLE);
+    }
+
     private void setupPhotoRequestTitle(){
         ((TextView)findViewById(R.id.photo_request)).setText(getResources().getString(R.string.photo_request) + " @" + originalSenz.getSender().getUsername());
     }
@@ -106,12 +126,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
     @Override
     public void onWindowFocusChanged (boolean hasFocus){
         super.onWindowFocusChanged(hasFocus);
-        //if(mCameraPreview.isCameraBusy() == false) {
             if (hasFocus) {
                 startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
                 cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
             }
-        //}
     }
 
     @Override
@@ -172,9 +190,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                     // Inside start button region
                     stopVibrations();
                     if(isPhotoTaken == false) {
-                        CameraUtils.shootSound(this);
                         cancelTimerToServe();
-                        mCameraPreview.takePhotoManually(instnce, originalSenz);
+                        startQuickCountdownToPhoto(this);
                         isPhotoTaken = true;
                     }
                 }else if(cancelBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
@@ -199,6 +216,49 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                 break;
         }
         return true;
+    }
+
+    private void startQuickCountdownToPhoto(final Activity context){
+        quickCountdownText.setVisibility(View.VISIBLE);
+        hideUiControls();
+        new Thread(new Runnable() {
+            int mStartTime = TIME_TO_QUICK_PHOTO;
+            @Override
+            public void run() {
+                while (mStartTime != 0) {
+                    updateQuicCountTimer(mStartTime);
+                    mStartTime--;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Log.e(TAG, "Ticker thread interrupted");
+                    }
+                }
+                if(mStartTime == 0){
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            takePhoto();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void takePhoto(){
+        quickCountdownText.setVisibility(View.INVISIBLE);
+        CameraUtils.shootSound(this);
+        mCameraPreview.takePhotoManually(instnce, originalSenz);
+    }
+
+    private void updateQuicCountTimer(final int count) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                quickCountdownText.setText(count + "");
+            }
+        });
     }
 
 
