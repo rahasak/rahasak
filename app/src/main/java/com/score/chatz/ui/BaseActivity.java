@@ -81,12 +81,6 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     protected void onStart() {
         super.onStart();
         registerAllReceivers();
-        // bind to service from here as well
-        if(!isServiceBound) {
-            Intent intent = new Intent();
-            intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-            bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-        }
     }
 
     @Override
@@ -103,6 +97,26 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         setupFonts();
 
         startService();
+        if(!isServiceBound) {
+            bindToSerice();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    private void bindToSerice(){
+        Intent intent = new Intent();
+        intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
+        bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 
     /**
