@@ -175,10 +175,10 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, PhotoFullScreenActivity.class);
-                    //intent.putExtra("IMAGE", secret.getImage());
-                    String uid = SenzUtils.getUniqueRandomNumber().toString();
+                    intent.putExtra("IMAGE", secret.getBlob());
+                    /*String uid = SenzUtils.getUniqueRandomNumber().toString();
                     intent.putExtra("IMAGE_RES_ID", uid);
-                    CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(secret.getBlob().getBytes(), 0)), getContext());
+                    CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(secret.getBlob().getBytes(), 0)), getContext());*/
                     context.startActivity(intent);
                 }
             });

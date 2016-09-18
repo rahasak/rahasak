@@ -18,7 +18,7 @@ import com.score.chatz.utils.CameraUtils;
 public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private ImageView imageView;
-    private Bitmap image;
+    private String image;
 
     private static final int CLOSE_QUICK_VIEW_TIME = 3000; // 3 seconds
 
@@ -28,24 +28,21 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_photo_full_screen);
 
         Intent intent = getIntent();
-        //image = intent.getStringExtra("IMAGE");
-        image = CameraUtils.getPhotoCache(intent.getStringExtra("IMAGE_RES_ID"), getApplicationContext());
+        image = intent.getStringExtra("IMAGE");
+        //image = CameraUtils.getPhotoCache(intent.getStringExtra("IMAGE_RES_ID"), getApplicationContext());
 
         if(intent.hasExtra("QUICK_PREVIEW")){
             startTimerToCloseView();
         }
 
         imageView = (ImageView) findViewById(R.id.imageView);
-        //loadBitmap(image, imageView);
-        imageView.setImageBitmap(image);
+        //imageView.setImageBitmap(image);
+        imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(image.getBytes()));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        //If the activity is destroy on rotation
-        imageView.setImageBitmap(image);
     }
 
     private void loadBitmap(String data, ImageView imageView) {

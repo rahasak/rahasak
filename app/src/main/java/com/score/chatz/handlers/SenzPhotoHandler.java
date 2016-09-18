@@ -106,7 +106,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                     CameraUtils.savePhotoCache(uriToFindImageForService, CameraUtils.getBitmapFromBytes(Base64.encode(image, 0)), context);
 
 
-                     /*ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context, uid);
+                     ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image, context, uid);
 
                     Senz stopSenz = getStopPhotoSharingSenz(senz);
 
@@ -114,8 +114,8 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                     senzList.addAll(photoSenzList);
                     senzList.add(stopSenz);
 
-                    //senzService.sendInOrder(senzList);*/
-                    senzService.sendFromUri(uriToFindImageForService, senz, uid);
+                    senzService.sendInOrder(senzList);
+                    //senzService.sendFromUri(uriToFindImageForService, senz, uid);
 
 
                 } catch (RemoteException e) {
