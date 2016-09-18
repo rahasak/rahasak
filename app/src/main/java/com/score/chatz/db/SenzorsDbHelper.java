@@ -18,7 +18,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "Rahaz.db";
 
     // data types, keywords and queries
@@ -40,9 +40,12 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     " )";
 
     private static final String SQL_CREATE_CHAT_USER =
-            "CREATE TABLE " + SenzorsDbContract.ChatUserMapper.TABLE_NAME + " (" +
-                    SenzorsDbContract.ChatUserMapper._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.ChatUserMapper.COLUMN_USER + TEXT_TYPE + "UNIQUE NOT NULL" +
+            "CREATE TABLE " + SenzorsDbContract.LatestChat.TABLE_NAME + " (" +
+                    SenzorsDbContract.LatestChat._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                    SenzorsDbContract.LatestChat.COLUMN_USER + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
+                    SenzorsDbContract.LatestChat.COLUMN_BLOB + TEXT_TYPE + "," +
+                    SenzorsDbContract.LatestChat.COLUMN_TYPE + TEXT_TYPE + "," +
+                    SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP + INT_TYPE +
                     " )";
 
     private static final String SQL_CREATE_SECRET =
@@ -93,7 +96,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_PERMISSION_CONFIG =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.PermissionConfiguration.TABLE_NAME;
     private static final String SQL_DELETE_CHAT_USER =
-            "DROP TABLE IF EXISTS " + SenzorsDbContract.ChatUserMapper.TABLE_NAME;
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.LatestChat.TABLE_NAME;
 
 
     /**

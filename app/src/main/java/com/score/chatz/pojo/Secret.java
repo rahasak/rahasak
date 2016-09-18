@@ -31,6 +31,10 @@ public class Secret {
         return who;
     }
 
+    public void setWho(User user) {
+         who = user;
+    }
+
     public String getType(){
         return type;
     }

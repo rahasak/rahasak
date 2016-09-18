@@ -36,9 +36,13 @@ public class SenzorsDbContract {
     }
 
     /* Inner class that defines secret user mapping table */
-    public static abstract class ChatUserMapper implements BaseColumns {
-        public static final String TABLE_NAME = "chat_user_mapper";
+    public static abstract class LatestChat implements BaseColumns {
+        public static final String TABLE_NAME = "latest_chat";
         public static final String COLUMN_USER = "user";
+        public static final String COLUMN_BLOB = "blob";
+        public static final String COLUMN_TYPE = "type";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+
     }
 
     /* Inner class that defines permission control for the user

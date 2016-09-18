@@ -81,9 +81,6 @@ public class SenzorsDbSource {
             long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
             //db.close();
 
-
-            createMappingForUser(username);
-
             Log.d(TAG, "no user, so user created: " + username + " " + id);
             return new User(Long.toString(id), username);
         }
@@ -270,60 +267,46 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_WHOM, secret.getReceiver().getUsername());
 
-            if (!isSecretCurrentUsers) {
-                values.put(SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK, getIdFromChatMapperForUser(secret.getWho()));
-            } else {
-                values.put(SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK, getIdFromChatMapperForUser(secret.getReceiver()));
-            }
-
             // Insert the new row, if fails throw an error
             db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
+        insertRecordOfLastestChat(secret, isSecretCurrentUsers);
 
     }
 
-    /**
-     * Add an entry to the chat user mapping table
-     *
-     * @param username
-     */
-    private void createMappingForUser(String username) {
+    private void insertRecordOfLastestChat(Secret secret, boolean isSecretCurrentUsers) {
+        if (isSecretCurrentUsers) {
+            //If the message belongs to current user, then set the owner of message to the other fella!!
+            secret.setWho(secret.getReceiver());
+        }
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         try {
-            if (PreferenceUtils.getUser(context).getUsername().equalsIgnoreCase(username)) {
-                // Current user should not register on this table!!!
-                SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+            db.beginTransaction();
 
-                // content values to inset
-                ContentValues values = new ContentValues();
-                values.put(SenzorsDbContract.ChatUserMapper.COLUMN_USER, username);
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.LatestChat.COLUMN_USER, secret.getWho().getUsername());
+            values.put(SenzorsDbContract.LatestChat.COLUMN_BLOB, secret.getBlob());
+            values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
+            values.put(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP, secret.getTimeStamp());
 
-                // Insert the new row, if fails throw an error
-                db.insert(SenzorsDbContract.ChatUserMapper.TABLE_NAME, null, values);
+            //First update the table
+            int rowCount = db.update(SenzorsDbContract.LatestChat.TABLE_NAME,
+                    values,
+                    SenzorsDbContract.LatestChat.COLUMN_USER + " =?",
+                    new String[]{secret.getWho().getUsername()});
+
+            //If not rows were affected!!then insert
+            if (rowCount == 0) {
+                db.insert(SenzorsDbContract.LatestChat.TABLE_NAME, null, values);
             }
-        } catch (NoUserException ex) {
-            ex.printStackTrace();
-        }
-    }
 
-    public String getIdFromChatMapperForUser(User user) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        // query
-        String query = "SELECT _id, user " +
-                "FROM chat_user_mapper " +
-                "WHERE user = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
-        // user attributes
-        String _id = null;
-        // extract attributes
-        if (cursor.moveToFirst()) {
-            _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.ChatUserMapper._ID));
+        } finally {
+            db.endTransaction();
         }
-        // clean
-        cursor.close();
-        return _id;
     }
 
     /**
@@ -566,43 +549,39 @@ public class SenzorsDbSource {
         /*String query = "SELECT MAX(timestamp), _id, text, image, thumbnail, sender, receiver, timestamp, sound FROM (SELECT * FROM secret WHERE sender = ? OR receiver = ?)" +
                 "GROUP BY receiver, sender ORDER BY _id DESC)";*/
 
-        String query = "SELECT MAX(_id), cmfk, blob, type, who, whom, timestamp FROM secret " +
-                "GROUP BY cmfk ORDER BY _id DESC";
+        String query = "SELECT _id, blob, type, user, timestamp FROM latest_chat " +
+                "ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query, null);
 
         // secret attr
-        String _secretId;
         String _secretBlob;
         String _secretBlobType;
-        String _secretWho;
-        String _secretTo;
+        String _secretUser;
         Long _secretTimestamp;
-        String _secretSenderImage;
 
         // extract attributes
         while (cursor.moveToNext()) {
             // get secret attributes
-            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
-            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
-            _secretWho = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_WHO));
-            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
-            _secretTo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_WHOM));
+            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_BLOB));
+            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TYPE));
+            _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_USER));
+            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP));
 
 
             // create secret
-            User senderUser = new User("", _secretWho);
+            User senderUser = new User("", _secretUser);
 
+            senderUser.setUserImage(getImageFromDB(_secretUser));
             Secret secret = new Secret(_secretBlob, _secretBlobType, senderUser);
             secret.setTimeStamp(_secretTimestamp);
 
-            if (_secretWho.equalsIgnoreCase(sender.getUsername())) {
+            /*if (_secretWho.equalsIgnoreCase(sender.getUsername())) {
                 secret.setReceiver(new User("", _secretTo));
                 _secretSenderImage = getImageFromDB(_secretTo);
             } else {
                 _secretSenderImage = getImageFromDB(_secretWho);
-            }
+            }*/
 
-            senderUser.setUserImage(_secretSenderImage);
 
             // fill secret list
             secretList.add(secret);
