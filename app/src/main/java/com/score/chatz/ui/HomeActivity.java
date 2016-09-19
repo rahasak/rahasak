@@ -48,6 +48,7 @@ public class HomeActivity extends BaseActivity {
         setupViewPager();
         setupTabLayouts();
         initFloatingButton();
+        startService();
 
         // Adding current user's name to the top right corner of the action bar!!!
         try {

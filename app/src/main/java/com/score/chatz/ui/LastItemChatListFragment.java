@@ -97,7 +97,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
      * Basically setup list adapter if have items to display otherwise display empty view
      */
     private void displayUserList() {
-        allSecretsList = (ArrayList<Secret>) dbSource.getAllOtherSercets(currentUser);
+        allSecretsList = (ArrayList<Secret>) dbSource.getLatestChatMessages();
         adapter = new LastItemChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -106,11 +106,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        if(currentUser.getUsername().equalsIgnoreCase(allSecretsList.get(position).getWho().getUsername())){
-            intent.putExtra("SENDER", allSecretsList.get(position).getReceiver().getUsername());
-        }else {
-            intent.putExtra("SENDER", allSecretsList.get(position).getWho().getUsername());
-        }
+        intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
         startActivity(intent);
     }
 }

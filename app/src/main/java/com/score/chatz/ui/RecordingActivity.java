@@ -29,6 +29,7 @@ import com.score.chatz.handlers.SenzSoundHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
 import com.score.senzc.pojos.Senz;
@@ -306,7 +307,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private Secret getSoundSecret(User sender, User receiver, String sound) {
         //Swapping receiever and sender here cause we need to send the secret out
         //Secret secret = new Secret(null, null, null, receiver, sender);
-        Secret secret = new Secret(sound, "SOUND", receiver);
+        Secret secret = new Secret(sound, "SOUND", SecretsUtil.getTheUser(sender, receiver, getApplicationContext()), false);
         secret.setReceiver(sender);
         return secret;
     }

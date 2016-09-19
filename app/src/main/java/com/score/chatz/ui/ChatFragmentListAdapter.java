@@ -73,16 +73,16 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
     @Override
     public int getItemViewType(int position) {
-        //Log.i(TAG, "WHO IS SENDER: " + ((Secret)getItem(position)).getSender().getUsername() + ", currentUser: " + currentUser.getUsername());
-        if(!((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
+        //isSender means the secret belongs to your friend
+        if(((Secret)getItem(position)).isSender() && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
             return NOT_MY_SOUND_TYPE;
-        }else if(((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
+        }else if(!((Secret)getItem(position)).isSender() && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
             return MY_SOUND_TYPE;
-        }else if(((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && !(((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
+        }else if(!((Secret)getItem(position)).isSender() && (((Secret)getItem(position)).getType().equalsIgnoreCase("TEXT"))){
             return MY_MESSAGE_TYPE;
-        }else if(!((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && !(((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
+        }else if(((Secret)getItem(position)).isSender() && (((Secret)getItem(position)).getType().equalsIgnoreCase("TEXT"))){
             return NOT_MY_MESSAGE_TYPE;
-        }else if(((Secret)getItem(position)).getWho().getUsername().equalsIgnoreCase(currentUser.getUsername()) && (((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
+        }else if(!((Secret)getItem(position)).isSender() && (((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
             return MY_PHOTO_TYPE;
         }else {
             //holder.image = (ImageView) view.findViewById(R.id.message);
@@ -167,7 +167,15 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
     private void setUpRow(int i, final Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        viewHolder.sender.setText("@"+secret.getWho().getUsername());
+        User selectedUser;
+        if(secret.isSender()) {
+            selectedUser = secret.getUser();
+        }else{
+            selectedUser = currentUser;
+        }
+
+        viewHolder.sender.setText("@" + selectedUser.getUsername());
+
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
             viewHolder.message.setText(secret.getBlob());
         }else if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE){
@@ -208,7 +216,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             });
         }
 
-        if(!currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername())){
+        if(!currentUser.getUsername().equalsIgnoreCase(selectedUser.getUsername())){
             viewHolder.status.setVisibility(View.INVISIBLE);
         }
 
@@ -218,38 +226,12 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.status.setText("Message sending...");
         }
 
-        if(secret.isDeliveryFailed() && secret.getWho().getUsername().equalsIgnoreCase(currentUser.getUsername())){
+        if(secret.isDeliveryFailed() && !secret.isSender()){
             viewHolder.status.setText("Message failed to deliver!!!");
             view.setBackgroundResource(R.color.translucent_red);
         }else{
             view.setBackgroundResource(R.color.white);
         }
-
-        /* Animation for the view!!!!
-        if(secret.getSeenTimeStamp() == 0 || secret.getSeenTimeStamp() == null){
-            Animation bottomUp = android.view.animation.AnimationUtils.loadAnimation(getContext(),
-                    R.anim.message_in);
-            view.startAnimation(bottomUp);
-            markMessagesAsSeen(secret);
-        }else if(!SecretsUtil.isSecretToBeShown(secret) && !(i >= (userSecretList.size() - DISPLAY_ITEM_COUNT - 1))){
-            Log.i(TAG, "DELETING INDEX OF VIEW CHAT ACTIVITY - " + i + ", secret - " + secret.getBlob());
-            Animation fadeOut = android.view.animation.AnimationUtils.loadAnimation(getContext(),
-                    R.anim.fade_out);
-            view.startAnimation(fadeOut);
-        }*/
-
-
-
-
-        viewHolder.sender.setText(secret.getWho().getUsername());
-    }
-
-    private void markMessagesAsSeen(final Secret secret){
-
-                if(secret.getSeenTimeStamp() == null || secret.getSeenTimeStamp() == 0){
-                    secret.setSeenTimeStamp(System.currentTimeMillis() + 100);
-                    new SenzorsDbSource(context).updateSeenTimestamp(secret);
-                }
     }
 
     private void deleteSecret(final Secret secret){

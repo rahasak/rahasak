@@ -45,6 +45,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.LatestChat.COLUMN_USER + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
                     SenzorsDbContract.LatestChat.COLUMN_BLOB + TEXT_TYPE + "," +
                     SenzorsDbContract.LatestChat.COLUMN_TYPE + TEXT_TYPE + "," +
+                    SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER + INT_TYPE +", "+
                     SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP + INT_TYPE +
                     " )";
 
@@ -54,14 +55,13 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Secret.COLUMN_NAME_BLOB + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + TEXT_TYPE + " NOT NULL, " +
                     SenzorsDbContract.Secret.COLUMN_NAME_DELETE + INT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN + INT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLUMN_NAME_WHO + TEXT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLUMN_NAME_WHOM + TEXT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLUMN_BLOB_TYPE + TEXT_TYPE +", "+
-                    SenzorsDbContract.Secret.COLUMN_NAME_CHAT_MAPPER_FK + TEXT_TYPE +
+                    SenzorsDbContract.Secret.COLUMN_NAME_USER + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_BLOB_TYPE + TEXT_TYPE +
                     " )";
 
     private static final String SQL_CREATE_PERMISSION =

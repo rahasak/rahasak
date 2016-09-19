@@ -122,7 +122,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     /**
      * Start long running background service
      */
-    private void startService(){
+    protected void startService(){
         // start service from here
         Intent serviceIntent = new Intent(this, RemoteSenzService.class);
         startService(serviceIntent);

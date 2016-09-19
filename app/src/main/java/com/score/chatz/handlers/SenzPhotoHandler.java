@@ -17,6 +17,7 @@ import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -136,8 +137,10 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
 
         // save photo to db before sending if its a chatzphoto
         if (senz.getAttributes().containsKey("chatzphoto")) {
-            Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver());
-            newSecret.setReceiver(senz.getReceiver());
+            //Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver());
+            User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
+            Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
+            newSecret.setReceiver(senz.getSender());
             Long _timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(_timeStamp);
             newSecret.setID(uid);
@@ -285,7 +288,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
         try {
             if (senz.getAttributes().containsKey("chatzphoto")) {
                 //Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
-                Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", senz.getSender());
+                //Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", senz.getSender());
+                User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
+                Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
                 newSecret.setReceiver(senz.getReceiver());
 
                 String uid = senz.getAttributes().get("uid");

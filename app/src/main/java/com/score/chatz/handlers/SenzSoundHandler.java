@@ -13,6 +13,7 @@ import com.score.chatz.interfaces.ISendAckHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.ui.RecordingActivity;
+import com.score.chatz.utils.SecretsUtil;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -68,14 +69,14 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
                 try {
                     // compose senzes
 
-                    Senz startSenz = getStartSoundSharingSenze(secret);
+                    Senz startSenz = getStartSoundSharingSenze(secret, context);
                     senzService.send(startSenz);
 
                     ArrayList<Senz> photoSenzList = getSoundStreamingSenz(secret, context, uid);
                     //Senz photoSenz = getPhotoSenz(senz, image);
                     //senzService.send(photoSenz);
 
-                    Senz stopSenz = getStopSoundSharingSenz(secret);
+                    Senz stopSenz = getStopSoundSharingSenz(secret, context);
                     //senzService.send(stopSenz);
 
                     ArrayList<Senz> senzList = new ArrayList<Senz>();
@@ -111,14 +112,14 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
             senzAttributes.put("uid", uid);
 
 
-            Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver() , senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getUser(), senzAttributes);
             senzList.add(_senz);
         }
 
         return senzList;
     }
 
-    private Senz getStartSoundSharingSenze(Secret secret) {
+    private Senz getStartSoundSharingSenze(Secret secret, Context context) {
         //senz is the original senz
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -129,11 +130,11 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getReceiver(), senzAttributes);
         return _senz;
     }
 
-    private Senz getStopSoundSharingSenz(Secret secret) {
+    private Senz getStopSoundSharingSenz(Secret secret, Context context) {
         // create senz attributes
         //senz is the original senz
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -144,7 +145,7 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getReceiver(), senzAttributes);
         return _senz;
     }
 
@@ -205,7 +206,9 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
             if (senz.getAttributes().containsKey("chatzsound")) {
                 User sender = senz.getSender();
                 //Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
-                Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", senz.getSender());
+                //Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", senz.getSender());
+                User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
+                Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
                 secret.setReceiver(senz.getReceiver());
                 Long _timeStamp = System.currentTimeMillis();
                 secret.setTimeStamp(_timeStamp);

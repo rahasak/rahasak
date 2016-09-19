@@ -86,6 +86,16 @@ public class ChatFragment extends Fragment{
     private List<Secret> secretMessageList;
     private ChatFragmentListAdapter adapter;
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        savedInstanceState.putString(RECEIVER, receiver);
+        savedInstanceState.putString(SENDER, sender);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     public static ChatFragment newInstance(User sender, User receiver) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
@@ -98,11 +108,18 @@ public class ChatFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            receiver = getArguments().getString(RECEIVER);
-            sender = getArguments().getString(SENDER);
-        }
         setHasOptionsMenu(true);
+        // Check whether we're recreating a previously destroyed instance
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            receiver = savedInstanceState.getString(RECEIVER);
+            sender = savedInstanceState.getString(SENDER);
+        } else {
+            if (getArguments() != null) {
+                receiver = getArguments().getString(RECEIVER);
+                sender = getArguments().getString(SENDER);
+            }
+        }
     }
 
     @Override
@@ -155,7 +172,13 @@ public class ChatFragment extends Fragment{
 
                         // Create secret
                         //Secret newSecret = new Secret(secretMessage, null, null, new User("", receiver), new User("", sender));
-                        Secret newSecret = new Secret(secretMessage, "TEXT", new User("", receiver));
+
+                        //Secret newSecret = new Secret(secretMessage, "TEXT", new User("", receiver));
+
+                        User user = SecretsUtil.getTheUser(new User("", receiver), new User("", sender), getContext());
+                        Secret newSecret = new Secret(secretMessage, "TEXT", user, SecretsUtil.isThisTheUsersSecret(user, new User("", receiver)));
+
+
                         newSecret.setReceiver(new User("", sender));
                         newSecret.setID(SenzUtils.getUniqueRandomNumber().toString());
 
@@ -236,12 +259,12 @@ public class ChatFragment extends Fragment{
     private void displayMessagesList() {
         // get User from db
         if (secretMessageList == null || secretMessageList.size() == 0) {
-            secretMessageList = java.util.Collections.synchronizedList(dbSource.getSecretz(new User("", sender), new User("", receiver)));
+            secretMessageList = java.util.Collections.synchronizedList(dbSource.getSecretz(new User("", sender)));
             adapter = new ChatFragmentListAdapter(getContext(), secretMessageList, NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY);
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         } else {
-            List<Secret> latestList = dbSource.getSecretz(new User("", sender), new User("", receiver), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
+            List<Secret> latestList = dbSource.getSecretz(new User("", sender), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
             for(Secret secret : latestList){
                 secretMessageList.add(secret);
                 adapter.notifyDataSetChanged();

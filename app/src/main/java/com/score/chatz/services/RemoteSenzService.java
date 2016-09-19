@@ -117,7 +117,7 @@ public class RemoteSenzService extends Service {
 
         @Override
         public void sendFromUri(String uri, Senz senz, String uid) throws RemoteException {
-            if(senz.getAttributes().containsKey("chatzphoto") || senz.getAttributes().containsKey("profilezphoto")) {
+            /*if(senz.getAttributes().containsKey("chatzphoto") || senz.getAttributes().containsKey("profilezphoto")) {
                 Bitmap image = CameraUtils.getPhotoCache(uri, getApplicationContext());
                 byte[] imageBytes = CameraUtils.getBytesFromImage(image);
                 ArrayList<Senz> photoSenzList = RemoteServiceUtils.getPhotoStreamingSenz(senz, imageBytes, getApplicationContext(), uid);
@@ -127,7 +127,7 @@ public class RemoteSenzService extends Service {
                 senzList.add(stopSenz);
                 Log.d(TAG, "----------- full size" + senzList.size());
                 writeSenzList(senzList);
-            }
+            }*/
         }
     };
 

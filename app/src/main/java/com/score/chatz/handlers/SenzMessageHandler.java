@@ -13,6 +13,7 @@ import com.score.chatz.interfaces.ISendAckHandler;
 import com.score.chatz.interfaces.ISendingComHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.SecretsUtil;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -82,7 +83,8 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
             Log.d(TAG, "save incoming chatz");
             String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
             //Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
-            Secret newSecret = new Secret(msg, "TEXT",senz.getSender());
+            User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
+            Secret newSecret = new Secret(msg, "TEXT", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
             newSecret.setReceiver(senz.getReceiver());
             newSecret.setID(senz.getAttributes().get("uid"));
             Long _timeStamp = System.currentTimeMillis();

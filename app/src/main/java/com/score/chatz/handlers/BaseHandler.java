@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.os.RemoteException;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.services.SenzServiceConnection;
+import com.score.chatz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 

@@ -16,7 +16,7 @@ import java.util.HashMap;
  * Created by lakmal.caldera on 9/17/2016.
  */
 public class RemoteServiceUtils {
-    private static final String TAG = RemoteServiceUtils.class.getName();
+    /*private static final String TAG = RemoteServiceUtils.class.getName();
 
     private static String[] split(String src, int len) {
         String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
@@ -141,5 +141,5 @@ public class RemoteServiceUtils {
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
         Senz _senz = new Senz(id, signature, senzType, secret.getWho(), secret.getReceiver(), senzAttributes);
         return _senz;
-    }
+    }*/
 }

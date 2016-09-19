@@ -7,7 +7,7 @@ package com.score.chatz.pojo;
 import com.score.senzc.pojos.User;
 public class Secret {
     private String blob;
-    private User who;
+    private User user;
     private User receiver;
     private String type;
     private boolean isDelete;
@@ -16,23 +16,29 @@ public class Secret {
     private Long seenTimeStamp;
     private String id;
     private boolean isDeliveryFailed;
+    private boolean isSender;
 
-    public Secret(String blob, String type, User who) {
+    public Secret(String blob, String type, User user, boolean isSender) {
         this.blob = blob;
-        this.who = who;
+        this.user = user;
         this.type = type;
+        this.isSender = isSender;
+    }
+
+    public boolean isSender(){
+        return isSender;
     }
 
     public String getBlob() {
         return blob;
     }
 
-    public User getWho() {
-        return who;
+    public User getUser() {
+        return user;
     }
 
-    public void setWho(User user) {
-         who = user;
+    public void setUser(User user) {
+         this.user = user;
     }
 
     public String getType(){

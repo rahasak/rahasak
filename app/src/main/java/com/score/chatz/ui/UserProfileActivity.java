@@ -54,6 +54,28 @@ public class UserProfileActivity extends BaseActivity {
     private ImageView userImage;
     SenzorsDbSource dbSource;
 
+    private final static String SENDER = "SENDER";
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        savedInstanceState.putParcelable(SENDER, user);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            user = savedInstanceState.getParcelable(SENDER);
+            setupUserPermissions();
+            setupClickableImage();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +84,7 @@ public class UserProfileActivity extends BaseActivity {
         Intent intent = getIntent();
         String senderString = intent.getStringExtra("SENDER");
         user = new User("", senderString);
+
 
         username = (TextView) findViewById(R.id.user_name);
         userImage = (ImageView) findViewById(R.id.clickable_image);

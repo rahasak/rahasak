@@ -124,7 +124,6 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
 
     private void setUpRow(int i, Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        viewHolder.sender.setText(secret.getWho().getUsername());
         if (viewHolder.messageType == TEXT_MESSAGE) {
             viewHolder.message.setText(secret.getBlob());
         } else if (viewHolder.messageType == SOUND_MESSAGE) {
@@ -135,10 +134,6 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
             }
         }
 
-        //Extracting user image
-        if (secret.getWho().getUserImage() != null) {
-            loadBitmap(secret.getWho().getUserImage(), viewHolder.userImage);
-        }
 
         if (secret.getTimeStamp() != null) {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
@@ -147,10 +142,24 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
         }
 
         //User name
-        if (!currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
+        /*if (!currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
             viewHolder.sender.setText("@" + secret.getWho().getUsername());
         else
-            viewHolder.sender.setText("@" + secret.getReceiver().getUsername());
+            viewHolder.sender.setText("@" + secret.getReceiver().getUsername());*/
+
+        User selectedUser;
+        if(secret.isSender()) {
+            selectedUser = secret.getUser();
+        }else{
+            selectedUser = currentUser;
+        }
+
+        viewHolder.sender.setText("@" + selectedUser.getUsername());
+        //Extracting user image
+        if (selectedUser.getUserImage() != null) {
+            loadBitmap(selectedUser.getUserImage(), viewHolder.userImage);
+        }
+
     }
 
     private void loadBitmap(String data, ImageView imageView) {
