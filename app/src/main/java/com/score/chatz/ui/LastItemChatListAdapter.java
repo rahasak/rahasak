@@ -141,18 +141,8 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
         }
 
-        //User name
-        /*if (!currentUser.getUsername().equalsIgnoreCase(secret.getWho().getUsername()))
-            viewHolder.sender.setText("@" + secret.getWho().getUsername());
-        else
-            viewHolder.sender.setText("@" + secret.getReceiver().getUsername());*/
 
-        User selectedUser;
-        if(secret.isSender()) {
-            selectedUser = secret.getUser();
-        }else{
-            selectedUser = currentUser;
-        }
+        User selectedUser = secret.getUser();
 
         viewHolder.sender.setText("@" + selectedUser.getUsername());
         //Extracting user image
