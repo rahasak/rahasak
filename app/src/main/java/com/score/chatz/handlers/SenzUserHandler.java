@@ -57,7 +57,7 @@ public class SenzUserHandler extends BaseHandler implements IReceivingComHandler
             sendConfirmation(null, senzService, sender, true);
 
             //3. Show notification to current user
-            NotificationUtils.showNotification(context, "@"+senz.getSender().getUsername(), "You have been invited to share secrets!");
+            NotificationUtils.showNotification(context, "@"+senz.getSender().getUsername(), "You have been invited to share secrets!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.USER_SHARE);
 
             //4. Broadcast intent to app
             broadcastDataSenz(senz, context);

@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityManagerCompat;
 import android.support.v4.app.NotificationCompat;
 
 import com.score.chatz.R;
+import com.score.chatz.ui.ChatActivity;
 import com.score.chatz.ui.HomeActivity;
 
 import java.util.List;
@@ -37,9 +38,15 @@ public class NotificationUtils {
      * @param context context
      * @return notification
      */
-    public static Notification getNotification(Context context, int icon, String title, String message) {
+    public static Notification getNotification(Context context, int icon, String title, String message, String sender, NOTIFICATION_TYPE type) {
         // set up pending intent
-        Intent intent = new Intent(context, HomeActivity.class);
+        Intent intent;
+        if(type == NOTIFICATION_TYPE.MESSAGE) {
+            intent  = new Intent(context, ChatActivity.class);
+            intent.putExtra("SENDER", sender);
+        }else{
+            intent = new Intent(context, HomeActivity.class);
+        }
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -69,10 +76,10 @@ public class NotificationUtils {
      * @param title   notification title
      * @param message message to be display
      */
-    public static void showNotification(Context context, String title, String message) {
+    public static void showNotification(Context context, String title, String message, String sender, NOTIFICATION_TYPE type) {
         // display notification
         if(isBackgroundRunning(context) || !isAppInteractable(context) || isScreenLocked(context)) {
-            Notification notification = NotificationUtils.getNotification(context, R.drawable.rlogo_launcher, title, message);
+            Notification notification = NotificationUtils.getNotification(context, R.drawable.rlogo_launcher, title, message, sender, type);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
@@ -86,10 +93,10 @@ public class NotificationUtils {
      * @param message incoming query
      */
     public static void updateNotification(Context context, String message) {
-        Notification notification = getNotification(context, R.drawable.logo_green, context.getString(R.string.new_senz), message);
+        /*Notification notification = getNotification(context, R.drawable.logo_green, context.getString(R.string.new_senz), message);
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(MESSAGE_NOTIFICATION_ID, notification);
+        notificationManager.notify(MESSAGE_NOTIFICATION_ID, notification);*/
     }
 
     /**
@@ -158,6 +165,10 @@ public class NotificationUtils {
             //it is not locked
             return false;
         }
+    }
+
+    public enum NOTIFICATION_TYPE{
+        MESSAGE, PERMISSION, USER_SHARE
     }
 
 }

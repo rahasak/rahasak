@@ -86,25 +86,25 @@ public class SenzPermissionHandler extends BaseHandler implements ISendAckHandle
             if (senz.getAttributes().containsKey("locPerm")) {
                 dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("locPerm"), null);
                 if(senz.getAttributes().get("locPerm").equalsIgnoreCase("true")) {
-                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "You been granted location permission!");
+                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "You been granted location permission!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
                 }else{
-                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "Your location privilege has been revoked!");
+                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "Your location privilege has been revoked!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
                 }
             }
             if (senz.getAttributes().containsKey("camPerm")) {
                 dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), null, null);
                 if(senz.getAttributes().get("camPerm").equalsIgnoreCase("true")) {
-                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "You been granted camera permission!");
+                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "You been granted camera permission!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
                 }else{
-                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "Your camera privilege has been revoked!");
+                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "Your camera privilege has been revoked!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
                 }
             }
             if (senz.getAttributes().containsKey("micPerm")) {
                 dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("micPerm"));
                 if(senz.getAttributes().get("micPerm").equalsIgnoreCase("true")) {
-                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "You been granted mic permission!");
+                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "You been granted mic permission!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
                 }else{
-                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "Your mic privilege has been revoked!");
+                    NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), "Your mic privilege has been revoked!", senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
                 }
             }
 

@@ -94,7 +94,7 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
             Log.d(TAG, "save messages");
             // if senz already exists in the db, SQLiteConstraintException should throw
 
-            NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), msg);
+            NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), msg, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
             sendConfirmation(senz, senzService, senz.getReceiver(), true);
 
             broadcastDataSenz(senz, context);
