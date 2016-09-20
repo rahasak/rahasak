@@ -82,7 +82,6 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
         try {
             Log.d(TAG, "save incoming chatz");
             String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
-            //Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
             User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
             Secret newSecret = new Secret(msg, "TEXT", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
             newSecret.setReceiver(senz.getReceiver());
@@ -95,7 +94,7 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
             Log.d(TAG, "save messages");
             // if senz already exists in the db, SQLiteConstraintException should throw
 
-            NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "New message received from @" + senz.getSender().getUsername());
+            NotificationUtils.showNotification(context, "@" + senz.getSender().getUsername(), msg);
             sendConfirmation(senz, senzService, senz.getReceiver(), true);
 
             broadcastDataSenz(senz, context);

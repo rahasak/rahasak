@@ -17,6 +17,7 @@ import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -137,7 +138,6 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
 
         // save photo to db before sending if its a chatzphoto
         if (senz.getAttributes().containsKey("chatzphoto")) {
-            //Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver());
             User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
             Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
             newSecret.setReceiver(senz.getSender());
@@ -287,8 +287,6 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
     public void onNewChatPhoto(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
         try {
             if (senz.getAttributes().containsKey("chatzphoto")) {
-                //Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver());
-                //Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", senz.getSender());
                 User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
                 Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
                 newSecret.setReceiver(senz.getReceiver());
@@ -305,6 +303,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
 
                 // Notify if acitvity to display new data!! fullscreen or playaback!!
                 broadcastNewDataToDisplaySenz(senz, context);
+
             }
         } catch (SQLiteConstraintException e) {
             Log.e(TAG, e.toString());

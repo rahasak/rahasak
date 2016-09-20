@@ -1,15 +1,23 @@
 package com.score.chatz.utils;
 
+import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.v4.app.ActivityManagerCompat;
 import android.support.v4.app.NotificationCompat;
 
 import com.score.chatz.R;
 import com.score.chatz.ui.HomeActivity;
+
+import java.util.List;
 
 /**
  * Utility class for create and update notifications
@@ -46,7 +54,10 @@ public class NotificationUtils {
 
         builder.setVibrate(new long[] { 1000, 1000});
 
-        builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+        Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
+
+        //builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+        builder.setSound(sound);
 
         return builder.build();
     }
@@ -60,10 +71,12 @@ public class NotificationUtils {
      */
     public static void showNotification(Context context, String title, String message) {
         // display notification
-        Notification notification = NotificationUtils.getNotification(context, R.drawable.rlogo_launcher, title, message);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+        if(isBackgroundRunning(context) || !isAppInteractable(context) || isScreenLocked(context)) {
+            Notification notification = NotificationUtils.getNotification(context, R.drawable.rlogo_launcher, title, message);
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+        }
     }
 
     /**
@@ -87,6 +100,64 @@ public class NotificationUtils {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(MESSAGE_NOTIFICATION_ID);
         notificationManager.cancel(SERVICE_NOTIFICATION_ID);
+    }
+
+    private static boolean isBackgroundRunning(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+            if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                for (String activeProcess : processInfo.pkgList) {
+                    if (activeProcess.equals(context.getPackageName())) {
+                        // App is now not in foreground!!!
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if app is sleeping or screen lock is on!!!
+     * @param context
+     * @return
+     */
+    private static boolean isAppInteractable(Context context){
+        //Acquire power manager
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
+        boolean isActive = false;
+
+        //Check versions!!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (pm.isInteractive()) {
+                isActive = true;
+            }
+        }
+        else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH){
+            if(pm.isScreenOn()){
+                isActive = true;
+            }
+        }
+
+        return isActive;
+    }
+
+    /**
+     * Check if screen is locked or not!!
+     * @param context
+     * @return
+     */
+    private static boolean isScreenLocked(Context context){
+        KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        if( myKM.inKeyguardRestrictedInputMode()) {
+            //it is locked
+            return true;
+        } else {
+            //it is not locked
+            return false;
+        }
     }
 
 }
