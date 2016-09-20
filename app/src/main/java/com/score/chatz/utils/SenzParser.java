@@ -38,29 +38,25 @@ public class SenzParser {
             } else if (token.startsWith("#")) {
                 // we remove # from token and store as a key
                 String key = token.substring(1);
-                if (token.equals("#time") || token.equals("#pubkey")) {
-                    // #time 2453234, #pubkey ac23edf432fdg
+                String nextToken = tokens[i + 1];
+
+                if (nextToken.startsWith("#") | nextToken.startsWith("@")) {
+                    // #lat #lon
+                    // #lat @user
+                    senz.getAttributes().put(key, "");
+                } else {
+                    // #lat 3.24 #lon 3.23
                     senz.getAttributes().put(key, tokens[i + 1]);
                     i++;
-                } else {
-                    if (senz.getSenzType() == SenzTypeEnum.DATA) {
-                        // #lat 3.2343 #lon 4.3434
-                        senz.getAttributes().put(key, tokens[i + 1]);
-                        i++;
-                    } else {
-                        // #lat #lon
-                        senz.getAttributes().put(key, "");
-                    }
                 }
             }
         }
 
-//        System.out.println(senz.getSender());
-//        System.out.println(senz.getReceiver());
+//        System.out.println(senz.getSender().getUsername());
+//        System.out.println(senz.getReceiver().getUsername());
 //        System.out.println(senz.getSenzType());
 //        System.out.println(senz.getSignature());
 //        System.out.println(senz.getAttributes().entrySet());
-//        System.out.println("------------");
 
         return senz;
     }
@@ -96,59 +92,16 @@ public class SenzParser {
         return senzMessage.replaceAll("\n", "").replaceAll("\r", "");
     }
 
-    public static void main(String args[]) {
-        String senzMessage1 = "DATA" + " " +
-                "#pubkey" + " " + "keyyyyy" + " " +
-                "#time" + " " + "timestamp" + " " +
-                "@senz" + " " +
-                "^0775432015" + " " +
-                "signatureeee";
-
-        String senzMessage2 = "SHARE" + " " +
-                "#lat" + " " +
-                "#lon" + " " +
-                "#time" + " " + "timestamp" + " " +
-                "@senz" + " " +
-                "^0775432015" + " " +
-                "signatureeee";
-
-        //parse(senzMessage1);
-        //parse(senzMessage2);
-
-//        Senz senz = new Senz();
-//        senz.setSender("03452");
-//        senz.setReceiver("mysen");
-//        senz.setSenzType(SenzTypeEnum.SHARE);
+//    public static void main(String args[]) {
+//        String senzMessage3 = "DATA " +
+//                "#msg UserCreated " +
+//                "#pubkey sd23453451234sfsdfd==  " +
+//                "#time 1441806897.71 " +
+//                "#msg1 #msg2 rtt " +
+//                "@senzswitch " +
+//                "^era " +
+//                "v50I88VzgvBvubCjGitTMO9";
 //
-//        HashMap<String, String> senzAttributes = new HashMap<>();
-//        senzAttributes.put("pubkey", "public_key");
-//        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-//        senz.setAttributes(senzAttributes);
-
-        String senzMessage3 = "DATA " +
-                "#msg UserCreated " +
-                "#pubkey sd23453451234sfsdfd==  " +
-                "#time 1441806897.71 " +
-                "^senzswitch " +
-                "v50I88VzgvBvubCjGitTMO9";
-
-        parse(senzMessage3);
-
-        Senz senz = new Senz();
-        senz.setSender(new User("", "222"));
-        senz.setReceiver(new User("", "111"));
-        senz.setSenzType(SenzTypeEnum.SHARE);
-
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("lat", "lat");
-        senzAttributes.put("lat", "lon");
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senz.setAttributes(senzAttributes);
-
-        String senzPaylod = getSenzPayload(senz);
-        String signature = "digsig";
-        String senzMessage = getSenzMessage(senzPaylod, signature);
-        System.out.println(senzPaylod);
-        System.out.println(senzMessage);
-    }
+//        parse(senzMessage3);
+//    }
 }
