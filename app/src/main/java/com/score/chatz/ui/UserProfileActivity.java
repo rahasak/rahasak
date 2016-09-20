@@ -109,6 +109,7 @@ public class UserProfileActivity extends BaseActivity {
         setupActionBar();
         setupGetProfileImageBtn();
         setupClickableImage();
+        startService();
 
 
     }

@@ -48,6 +48,7 @@ public class ChatActivity extends BaseActivity {
         FragmentManager fm = getSupportFragmentManager();
         mainFragment = (ChatFragment) fm.findFragmentById(R.id.container_main);
         setupActionBar();
+        startService();
 
         if (mainFragment == null) {
             mainFragment = ChatFragment.newInstance(sender, receiver);
