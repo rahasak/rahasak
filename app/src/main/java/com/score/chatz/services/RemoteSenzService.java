@@ -1,29 +1,22 @@
 package com.score.chatz.services;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Base64;
 import android.util.Log;
 
+import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
-import com.score.chatz.application.SenzStatusTracker;
-import com.score.chatz.receivers.AlarmReceiver;
-import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
-import com.score.chatz.utils.RemoteServiceUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -42,7 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -82,17 +74,6 @@ public class RemoteSenzService extends Service {
                 // means disconnected
                 resetSoc();
             }
-        }
-    };
-
-    // broadcast receiver to send ping message
-    private final BroadcastReceiver pingAlarmReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Ping alarm received in senz service");
-
-            // ping senz
-            sendPing();
         }
     };
 
@@ -170,25 +151,11 @@ public class RemoteSenzService extends Service {
         IntentFilter networkFilter = new IntentFilter();
         networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, networkFilter);
-
-        // register local ping alarm receiver
-        IntentFilter alarmFilter = new IntentFilter();
-        alarmFilter.addAction("PING_ALARM");
-        //registerReceiver(pingAlarmReceiver, alarmFilter);
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
-        //unregisterReceiver(pingAlarmReceiver);
-    }
-
-    private void initPing() {
-        // register ping alarm receiver
-        Intent intentAlarm = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * 60 * 10, 1000 * 60 * 10, pendingIntent);
     }
 
     private void initSoc() {
@@ -226,20 +193,14 @@ public class RemoteSenzService extends Service {
             String line;
             while (isOnline && (line = reader.readLine()) != null) {
                 if (!line.isEmpty()) {
-                    String senz = line.replaceAll("\n", "").replaceAll("\r", "");
+                    String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
 
                     Log.d(TAG, "Senz received " + senz);
 
                     // handle senz
-                    if (senz.trim().equalsIgnoreCase("TAK")) {
-                        //writer.println("TIK");
-                        //writer.flush();
-                    } else {
-                        // handle senz
+                    if (!senz.equalsIgnoreCase("TAK")) {
                         SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
                     }
-                } else {
-                    Log.e(TAG, "empty senz received");
                 }
             }
         } catch (IOException e) {
@@ -333,7 +294,6 @@ public class RemoteSenzService extends Service {
         protected Object doInBackground(Object[] params) {
             if (!isOnline) {
                 initSoc();
-                //initPing();
                 sendPing();
                 initReader();
             } else {
