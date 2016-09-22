@@ -348,14 +348,16 @@ public class ChatFragment extends Fragment {
 
     }
 
-    private void deleteAllMessagesExceptTheLast(){
-        ListIterator<Secret> iter = secretMessageList.listIterator();
-        while (iter.hasNext()) {
-            Secret secret = iter.next();
+    private void deleteAllMessagesExceptTheLast() {
+        if (secretMessageList.size() > 1) {
+            ListIterator<Secret> iter = secretMessageList.listIterator();
+            while (iter.hasNext()) {
+                Secret secret = iter.next();
                 if (iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGES_REMAINING) {
                     iter.remove();
                     dbSource.deleteSecret(secret);
                 }
+            }
         }
     }
 
@@ -385,7 +387,7 @@ public class ChatFragment extends Fragment {
             secretMessageList.add(newSecret);
             adapter.notifyDataSetChanged();
             playSoundOnNewMessage();
-        }catch(UnsupportedEncodingException ex){
+        } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
         }
     }
