@@ -83,6 +83,8 @@ public class ChatFragment extends Fragment {
     User currentUser;
 
     private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 7;
+    private static final int NUMBER_OF_CHAT_MESSAGES_REMAINING = 1;
+
 
     private ListView listView;
     private List<Secret> secretMessageList;
@@ -133,6 +135,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        deleteAllMessagesExceptTheLast();
     }
 
     @Override
@@ -343,6 +346,17 @@ public class ChatFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
+    }
+
+    private void deleteAllMessagesExceptTheLast(){
+        ListIterator<Secret> iter = secretMessageList.listIterator();
+        while (iter.hasNext()) {
+            Secret secret = iter.next();
+                if (iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGES_REMAINING) {
+                    iter.remove();
+                    dbSource.deleteSecret(secret);
+                }
+        }
     }
 
     /**

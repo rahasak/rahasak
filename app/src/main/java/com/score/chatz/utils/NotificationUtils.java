@@ -39,6 +39,7 @@ public class NotificationUtils {
      * @return notification
      */
     public static Notification getNotification(Context context, int icon, String title, String message, String sender, NOTIFICATION_TYPE type) {
+
         // set up pending intent
         Intent intent;
         if(type == NOTIFICATION_TYPE.MESSAGE) {
@@ -47,6 +48,7 @@ public class NotificationUtils {
         }else{
             intent = new Intent(context, HomeActivity.class);
         }
+
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -59,7 +61,9 @@ public class NotificationUtils {
                 .setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntent);
 
-        builder.setVibrate(new long[] { 1000, 1000});
+        if(type != NOTIFICATION_TYPE.MESSAGE) {
+            builder.setVibrate(new long[]{1000, 1000});
+        }
 
         Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
 
