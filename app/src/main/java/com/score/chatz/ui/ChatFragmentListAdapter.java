@@ -5,35 +5,27 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.asyncTasks.RahasPlayer;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.pojo.Secret;
-import com.score.chatz.utils.AnimationUtils;
-import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.pojo.BitmapTaskParams;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.PreferenceUtils;
-import com.score.chatz.utils.SecretsUtil;
-import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.pojos.User;
 
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by Lakmal on 8/9/16.
@@ -50,20 +42,17 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     static final int MY_SOUND_TYPE = 5;
     static User currentUser;
     private LayoutInflater mInflater;
-    private Integer DISPLAY_ITEM_COUNT;
 
-    public ChatFragmentListAdapter(Context _context, List<Secret> secretList, Integer numberOfItemToDisplay) {
+    public ChatFragmentListAdapter(Context _context, List<Secret> secretList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
         context = _context;
         userSecretList = secretList;
         try {
             currentUser = PreferenceUtils.getUser(getContext());
-        }catch (NoUserException e) {
+        } catch (NoUserException e) {
             e.printStackTrace();
         }
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        DISPLAY_ITEM_COUNT = numberOfItemToDisplay;
-
     }
 
     @Override
@@ -74,17 +63,17 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         //isSender means the secret belongs to your friend
-        if(((Secret)getItem(position)).isSender() && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
+        if (((Secret) getItem(position)).isSender() && ((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
             return NOT_MY_SOUND_TYPE;
-        }else if(!((Secret)getItem(position)).isSender() && ((Secret)getItem(position)).getType().equalsIgnoreCase("SOUND")){
+        } else if (!((Secret) getItem(position)).isSender() && ((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
             return MY_SOUND_TYPE;
-        }else if(!((Secret)getItem(position)).isSender() && (((Secret)getItem(position)).getType().equalsIgnoreCase("TEXT"))){
+        } else if (!((Secret) getItem(position)).isSender() && (((Secret) getItem(position)).getType().equalsIgnoreCase("TEXT"))) {
             return MY_MESSAGE_TYPE;
-        }else if(((Secret)getItem(position)).isSender() && (((Secret)getItem(position)).getType().equalsIgnoreCase("TEXT"))){
+        } else if (((Secret) getItem(position)).isSender() && (((Secret) getItem(position)).getType().equalsIgnoreCase("TEXT"))) {
             return NOT_MY_MESSAGE_TYPE;
-        }else if(!((Secret)getItem(position)).isSender() && (((Secret)getItem(position)).getType().equalsIgnoreCase("IMAGE"))){
+        } else if (!((Secret) getItem(position)).isSender() && (((Secret) getItem(position)).getType().equalsIgnoreCase("IMAGE"))) {
             return MY_PHOTO_TYPE;
-        }else {
+        } else {
             //holder.image = (ImageView) view.findViewById(R.id.message);
             return NOT_MY_PHOTO_TYPE;
         }
@@ -168,17 +157,17 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     private void setUpRow(int i, final Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         User selectedUser;
-        if(secret.isSender()) {
+        if (secret.isSender()) {
             selectedUser = secret.getUser();
-        }else{
+        } else {
             selectedUser = currentUser;
         }
 
         viewHolder.sender.setText("@" + selectedUser.getUsername());
 
-        if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
+        if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE) {
             viewHolder.message.setText(secret.getBlob());
-        }else if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE){
+        } else if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE) {
             /*viewHolder.image.setImageResource(R.drawable.confidential);*/
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -191,12 +180,12 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     context.startActivity(intent);
                 }
             });
-            if(secret.getBlob() != null) {
+            if (secret.getBlob() != null) {
                 loadBitmap(secret.getBlob(), viewHolder.image);
             }
         }
 
-        if(secret.getTimeStamp() != null){
+        if (secret.getTimeStamp() != null) {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
@@ -216,26 +205,26 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             });
         }
 
-        if(!currentUser.getUsername().equalsIgnoreCase(selectedUser.getUsername())){
+        if (!currentUser.getUsername().equalsIgnoreCase(selectedUser.getUsername())) {
             viewHolder.status.setVisibility(View.INVISIBLE);
         }
 
-        if(secret.isDelivered()){
+        if (secret.isDelivered()) {
             viewHolder.status.setText("Message sent!!!");
-        }else{
+        } else {
             viewHolder.status.setText("Message sending...");
         }
 
-        if(secret.isDeliveryFailed() && !secret.isSender()){
+        if (secret.isDeliveryFailed() && !secret.isSender()) {
             viewHolder.status.setText("Message failed to deliver!!!");
             view.setBackgroundResource(R.color.translucent_red);
-        }else{
+        } else {
             view.setBackgroundResource(R.color.white);
         }
     }
 
-    private void deleteSecret(final Secret secret){
-            new SenzorsDbSource(context).deleteSecret(secret);
+    private void deleteSecret(final Secret secret) {
+        new SenzorsDbSource(context).deleteSecret(secret);
     }
 
     private void loadBitmap(String data, ImageView imageView) {

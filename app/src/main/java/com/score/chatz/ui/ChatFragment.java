@@ -1,37 +1,17 @@
 package com.score.chatz.ui;
 
 
-import android.app.Dialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Typeface;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -45,7 +25,6 @@ import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
-import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -54,7 +33,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -84,7 +62,6 @@ public class ChatFragment extends Fragment {
 
     private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 7;
     private static final int NUMBER_OF_CHAT_MESSAGES_REMAINING = 1;
-
 
     private ListView listView;
     private List<Secret> secretMessageList;
@@ -155,7 +132,6 @@ public class ChatFragment extends Fragment {
 
         setupActionBtns();
         setStateOnActionBtns();
-
 
         return view;
     }
@@ -265,17 +241,10 @@ public class ChatFragment extends Fragment {
         // get User from db
         if (secretMessageList == null || secretMessageList.size() == 0) {
             secretMessageList = java.util.Collections.synchronizedList(dbSource.getSecretz(new User("", sender)));
-            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList, NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY);
+            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
             listView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
-        } else {
-            List<Secret> latestList = dbSource.getSecretz(new User("", sender), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
-            for (Secret secret : latestList) {
-                secretMessageList.add(secret);
-                adapter.notifyDataSetChanged();
-            }
         }
-        removeOldItemsFromChat();
     }
 
     private void updateStatusOfMessage(String uid) {
@@ -496,18 +465,12 @@ public class ChatFragment extends Fragment {
         ((ChatActivity) getActivity()).send(senz);
     }
 
-    private void sendUserToWaitingPage() {
-        Intent i = new Intent(getActivity(), PhotoFullScreenActivity.class);
-        getContext().startActivity(i);
-    }
-
 
     /*
      * Get photo of user
      */
     private void getPhoto(User receiver) {
-
-        sendUserToWaitingPage();
+        navigateToWaiting();
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -522,7 +485,6 @@ public class ChatFragment extends Fragment {
 
         ((ChatActivity) getActivity()).send(senz);
     }
-
 
     /*
      * Get mic of user
@@ -547,7 +509,7 @@ public class ChatFragment extends Fragment {
         Log.i(TAG, "Getting permission of user - " + sender);
         UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
         if (userPerm != null) {
-            if (userPerm.getCamPerm() == true) {
+            if (userPerm.getCamPerm()) {
                 getCamBtn.setImageResource(R.drawable.perm_camera_active);
                 getCamBtn.setEnabled(true);
             } else {
@@ -555,7 +517,7 @@ public class ChatFragment extends Fragment {
                 getCamBtn.setEnabled(false);
             }
 
-            if (userPerm.getLocPerm() == true) {
+            if (userPerm.getLocPerm()) {
                 getLocBtn.setImageResource(R.drawable.perm_locations_active);
                 getLocBtn.setEnabled(true);
             } else {
@@ -563,7 +525,7 @@ public class ChatFragment extends Fragment {
                 getLocBtn.setEnabled(false);
             }
 
-            if (userPerm.getMicPerm() == true) {
+            if (userPerm.getMicPerm()) {
                 getMicBtn.setImageResource(R.drawable.perm_mic_active);
                 getMicBtn.setEnabled(true);
             } else {
@@ -571,6 +533,11 @@ public class ChatFragment extends Fragment {
                 getMicBtn.setEnabled(false);
             }
         }
+    }
+
+    private void navigateToWaiting() {
+        Intent i = new Intent(getActivity(), PhotoFullScreenActivity.class);
+        getContext().startActivity(i);
     }
 
     public void onPacketTimeout(Senz senz) {

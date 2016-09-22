@@ -31,12 +31,12 @@ import com.score.senzc.pojos.Senz;
 
 /**
  * This the mother of all activities.. its contains things that are reusable by all activities.. things such as
- *  1.  popups,
- *  2.  fonts,
- *  3.  communications,
- *  4.  Common messages,
- *  5.  Initiating background service, etc...
- *
+ * 1.  popups,
+ * 2.  fonts,
+ * 3.  communications,
+ * 4.  Common messages,
+ * 5.  Initiating background service, etc...
+ * <p>
  * Created by lakmal.caldera on 9/11/2016.
  */
 public class BaseActivity extends AppCompatActivity implements ISendingComHandler {
@@ -74,7 +74,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     protected void onDestroy() {
         super.onDestroy();
         //Unbind from service
-        if (isServiceBound == true) unbindService(senzServiceConnection);
+        if (isServiceBound) unbindService(senzServiceConnection);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         setupFonts();
 
         startService();
-        if(!isServiceBound) {
+        if (!isServiceBound) {
             bindToSerice();
         }
     }
@@ -108,7 +108,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         startService();
     }
 
-    private void bindToSerice(){
+    private void bindToSerice() {
         Intent intent = new Intent();
         intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
@@ -122,7 +122,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     /**
      * Start long running background service
      */
-    protected void startService(){
+    protected void startService() {
         // start service from here
         Intent serviceIntent = new Intent(this, RemoteSenzService.class);
         startService(serviceIntent);
@@ -130,7 +130,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         Log.d(TAG, "Service requested to start!!!");
     }
 
-    private void setupFonts(){
+    private void setupFonts() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
         typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-Light.otf");
         typefaceUltraThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-UltraLight.otf");
@@ -176,7 +176,8 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
     /**
      * Generic display confirmation pop up
-     * @param message - Message to ask
+     *
+     * @param message   - Message to ask
      * @param okClicked - instance of View.OnClickListener to handle okbutton clicked
      */
     public void displayConfirmationMessageDialog(String message, final View.OnClickListener okClicked) {
@@ -203,14 +204,12 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
         okButton.setTypeface(typeface);
         okButton.setTypeface(null, Typeface.BOLD);
-        okButton.setOnClickListener(new View.OnClickListener(){
+        okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 okClicked.onClick(v);
                 dialog.cancel();
             }
-
-
         });
 
         // cancel button
@@ -225,12 +224,12 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         dialog.show();
     }
 
-    private void registerAllReceivers(){
+    private void registerAllReceivers() {
         //Notify when user don't want to responsed to requests
         this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
     }
 
-    private void unregisterAllReceivers(){
+    private void unregisterAllReceivers() {
         this.unregisterReceiver(userBusyNotifier);
     }
 
@@ -238,7 +237,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         @Override
         public void onReceive(Context context, Intent intent) {
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
         }
     };
 
@@ -246,11 +245,11 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     public void send(Senz senz) {
         if (!NetworkUtil.isAvailableNetwork(this)) {
             ActivityUtils.showToast("No network connection available.", this);
-        }else{
+        } else {
             try {
-                if(isServiceBound == true) {
+                if (isServiceBound) {
                     senzService.send(senz);
-                }else{
+                } else {
                     ActivityUtils.showToast("Failed to connected to service.", this);
                 }
             } catch (RemoteException e) {

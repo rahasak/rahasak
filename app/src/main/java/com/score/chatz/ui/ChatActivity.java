@@ -5,81 +5,102 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.ListView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.score.chatz.R;
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.services.LocationAddressReceiver;
+import com.score.chatz.utils.SenzUtils;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
 
-public class ChatActivity extends BaseActivity {
+public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = ChatActivity.class.getName();
 
-    private User receiver;
-    private User sender;
-    private ChatFragment mainFragment;
+    // UI components
+    private EditText txtSecret;
+    private ImageButton btnSend;
+    private ImageButton btnLocation;
+    private ImageButton btnPhoto;
+    private ImageButton btnMic;
+
+    // secret list
+    private ListView listView;
+    private ChatFragmentListAdapter secretAdapter;
+
+    private User thisUser;
+    private List<Secret> secretList;
+
+    // senz message
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
+    // senz timeout
+    private BroadcastReceiver senzTimeoutReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Time out for senz");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzTimeoutReceived(senz);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        startService();
-
-        Intent intent = getIntent();
-        try {
-            receiver = PreferenceUtils.getUser(getApplicationContext());
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
-        String senderString = intent.getStringExtra("SENDER");
-        sender = new User("", senderString);
-        FragmentManager fm = getSupportFragmentManager();
-        mainFragment = (ChatFragment) fm.findFragmentById(R.id.container_main);
-        setupActionBar();
-        startService();
-
-        if (mainFragment == null) {
-            mainFragment = ChatFragment.newInstance(sender, receiver);
-            fm.beginTransaction().add(R.id.container_main, mainFragment).commit();
-        }
-    }
-
-    private void setupActionBar(){
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        getSupportActionBar().setTitle("@"+sender.getUsername());
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        initUi();
+        initUser();
+        initActionBar();
+        initSecretList();
+        updatePermissions();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(this, HomeActivity.class);
-                startActivity(intent);
+                navigateToHome();
                 return true;
             case R.id.action_open_profile:
-                openProfileView();
+                navigateToProfile();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -91,40 +112,344 @@ public class ChatActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         // bind to senz service
-        this.registerReceiver(senzMessageReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
-        this.registerReceiver(senzPacketTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.PACKET_TIMEOUT));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(senzTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.PACKET_TIMEOUT));
 
+        // init list again
+        initSecretList();
     }
-
 
     @Override
     public void onStop() {
         super.onStop();
-        this.unregisterReceiver(senzMessageReceiver);
-        this.unregisterReceiver(senzPacketTimeoutReceiver);
+        unregisterReceiver(senzReceiver);
+        unregisterReceiver(senzTimeoutReceiver);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-            //handleMessage(intent);
-            ((ChatFragment) getSupportFragmentManager().findFragmentById(R.id.container_main)).handleMessage(intent);
+        // keep only last message
+        deleteAllSecretsExceptTheLast();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btnSend) {
+            onClickSend();
+        } else if (v == btnLocation) {
+            onClickLocation();
+        } else if (v == btnPhoto) {
+            onClickPhoto();
+        } else if (v == btnMic) {
+            onClickMic();
         }
-    };
+    }
 
-    private BroadcastReceiver senzPacketTimeoutReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            mainFragment.onPacketTimeout(senz);
-        }
-    };
+    private void initUi() {
+        // init
+        txtSecret = (EditText) findViewById(R.id.text_message);
+        btnSend = (ImageButton) findViewById(R.id.sendBtn);
+        btnLocation = (ImageButton) findViewById(R.id.getLocBtn);
+        btnPhoto = (ImageButton) findViewById(R.id.getCamBtn);
+        btnMic = (ImageButton) findViewById(R.id.getMicBtn);
 
-    private void openProfileView(){
+        // set click listeners
+        btnSend.setOnClickListener(this);
+        btnLocation.setOnClickListener(this);
+        btnPhoto.setOnClickListener(this);
+        btnMic.setOnClickListener(this);
+
+        listView = (ListView) findViewById(R.id.messages_list_view);
+    }
+
+    private void initUser() {
+        String username = getIntent().getStringExtra("SENDER");
+        thisUser = new User("", username);
+    }
+
+    private void initActionBar() {
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        getSupportActionBar().setTitle("@" + thisUser.getUsername());
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void initSecretList() {
+        secretList = new SenzorsDbSource(this).getSecretz(thisUser);
+        secretAdapter = new ChatFragmentListAdapter(this, secretList);
+        listView.setAdapter(secretAdapter);
+    }
+
+    private void navigateToProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
-        intent.putExtra("SENDER", sender.getUsername());
+        intent.putExtra("SENDER", thisUser.getUsername());
         startActivity(intent);
+    }
+
+    private void navigateToHome() {
+        this.finish();
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToPhotoWait() {
+        Intent intent = new Intent(this, PhotoFullScreenActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateMicWait() {
+        // TODO
+    }
+
+    private void onClickSend() {
+        String secretMsg = txtSecret.getText().toString().trim();
+        if (!secretMsg.isEmpty()) {
+            // clear text
+            txtSecret.setText("");
+
+            // create secret
+            Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
+            secret.setReceiver(thisUser);
+            secret.setTimeStamp(System.currentTimeMillis());
+            secret.setID(SenzUtils.getUniqueRandomNumber());
+
+            // send secret
+            // save secret
+            sendSecret(secret);
+            saveSecretInDb(secret);
+
+            // update list view
+            secretList.add(secret);
+            secretAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void onClickLocation() {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("lat", "lat");
+        senzAttributes.put("lon", "lon");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+
+        send(senz);
+    }
+
+    private void onClickPhoto() {
+        navigateToPhotoWait();
+
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("chatzphoto", "chatzphoto");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+
+        send(senz);
+    }
+
+    private void onClickMic() {
+        navigateMicWait();
+
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("chatzmic", "chatzmic");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+
+        send(senz);
+    }
+
+    private void sendSecret(Secret secret) {
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("chatzmsg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
+            String timeStamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
+            senzAttributes.put("time", timeStamp);
+            senzAttributes.put("uid", secret.getID());
+
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+
+            send(senz);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveSecretInDb(Secret secret) {
+        SenzorsDbSource dbSource = new SenzorsDbSource(this);
+        dbSource.createSecret(secret);
+    }
+
+    public void onSenzReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("msg")) {
+            // status message
+            String msg = senz.getAttributes().get("msg");
+            if (msg != null && msg.equalsIgnoreCase("MsgSent")) {
+                onSenzStatusReceived(senz);
+            } else if (msg != null && msg.equalsIgnoreCase("photoSent")) {
+                onSenzStatusReceived(senz);
+            } else if (msg != null && msg.equalsIgnoreCase("soundSent")) {
+                onSenzStatusReceived(senz);
+            } else if (msg != null && msg.equalsIgnoreCase("MsgSentFail")) {
+                onSenzStatusReceived(senz);
+            } else if (msg != null && msg.equalsIgnoreCase("newPerm")) {
+                updatePermissions();
+            }
+        } else if (senz.getAttributes().containsKey("chatzmsg")) {
+            // chat message
+            onNewSenzReceived(senz);
+        } else if (senz.getAttributes().containsKey("chatzphoto")) {
+            onNewSenzReceived(senz);
+        } else if (senz.getAttributes().containsKey("chatzsound")) {
+            onNewSenzReceived(senz);
+        } else if (senz.getAttributes().containsKey("lat")) {
+            onLocationReceived(senz);
+        }
+    }
+
+    private void onNewSenzReceived(Senz senz) {
+        try {
+            Secret secret;
+            if (senz.getAttributes().containsKey("chatzmsg")) {
+                String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
+                secret = new Secret(msg, "TEXT", thisUser, true);
+            } else if (senz.getAttributes().containsKey("chatzsound")) {
+                secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", thisUser, true);
+            } else {
+                secret = new Secret(senz.getAttributes().get("chatzphoto"), "PHOTO", thisUser, true);
+            }
+            secret.setReceiver(senz.getReceiver());
+            secret.setTimeStamp(System.currentTimeMillis());
+            secret.setID(senz.getAttributes().get("uid"));
+
+            secretList.add(secret);
+            secretAdapter.notifyDataSetChanged();
+
+            playSound();
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void onLocationReceived(Senz senz) {
+        // location response received
+        double lat = Double.parseDouble(senz.getAttributes().get("lat"));
+        double lan = Double.parseDouble(senz.getAttributes().get("lon"));
+        LatLng latLng = new LatLng(lat, lan);
+
+        // start location address receiver
+        new LocationAddressReceiver(this, latLng, senz.getSender()).execute("PARAM");
+
+        // TODO start map first
+        // start map activity
+        Intent mapIntent = new Intent(this, SenzMapActivity.class);
+        mapIntent.putExtra("extra", latLng);
+        startActivity(mapIntent);
+        overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+    }
+
+    private void updatePermissions() {
+        UserPermission userPerm = new SenzorsDbSource(this).getUserPermission(thisUser);
+        if (userPerm != null) {
+            // location
+            if (userPerm.getLocPerm()) {
+                btnLocation.setImageResource(R.drawable.perm_locations_active);
+                btnLocation.setEnabled(true);
+            } else {
+                btnLocation.setImageResource(R.drawable.perm_locations_deactive);
+                btnLocation.setEnabled(false);
+            }
+
+            // camera
+            if (userPerm.getCamPerm()) {
+                btnPhoto.setImageResource(R.drawable.perm_camera_active);
+                btnPhoto.setEnabled(true);
+            } else {
+                btnPhoto.setImageResource(R.drawable.perm_camera_deactive);
+                btnPhoto.setEnabled(false);
+            }
+
+            // mic
+            if (userPerm.getMicPerm()) {
+                btnMic.setImageResource(R.drawable.perm_mic_active);
+                btnMic.setEnabled(true);
+            } else {
+                btnMic.setImageResource(R.drawable.perm_mic_deactive);
+                btnMic.setEnabled(false);
+            }
+        }
+    }
+
+    private void onSenzStatusReceived(Senz senz) {
+        // update senz in db
+        String uid = senz.getAttributes().get("uid");
+        new SenzorsDbSource(this).markSecretDelievered(uid);
+
+        for (Secret secret : secretList) {
+            if (secret.getID().equalsIgnoreCase(uid)) {
+                secret.setIsDelivered(true);
+                secretAdapter.notifyDataSetChanged();
+                playSound();
+            }
+        }
+    }
+
+    public void onSenzTimeoutReceived(Senz senz) {
+        String uid = senz.getAttributes().get("uid");
+        new SenzorsDbSource(this).markSecretDeliveryFailed(uid);
+
+        // update failed message in list
+        for (Secret secret : secretList) {
+            if (secret.getID().equalsIgnoreCase(uid)) {
+                secret.setDeliveryFailed(true);
+                secretAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private void playSound() {
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.message);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.reset();
+                mp.release();
+            }
+
+        });
+        mediaPlayer.start();
+    }
+
+    private void deleteAllSecretsExceptTheLast() {
+        // keep last secret
+        if (secretList.size() > 1) {
+            // remove last secret
+            secretList.remove(secretList.get(secretList.size() - 1));
+            for (Secret secret : secretList) {
+                new SenzorsDbSource(this).deleteSecret(secret);
+            }
+        }
     }
 }

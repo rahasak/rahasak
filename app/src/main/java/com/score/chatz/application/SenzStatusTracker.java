@@ -25,7 +25,7 @@ public class SenzStatusTracker {
     private static Context senzContext;
     private static SenzStatusTracker senzStatusTracker;
 
-    // store uid -> Senz in pairs, just before sending to other user.
+    // store uid -> Senz in pairs, just before sending to other user
     private static final Map<String, SenzTimer> senzDirectory = java.util.Collections.synchronizedMap(new HashMap<String, SenzTimer>());
 
     private SenzStatusTracker() {
