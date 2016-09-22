@@ -349,11 +349,13 @@ public class ChatFragment extends Fragment {
     }
 
     private void deleteAllMessagesExceptTheLast() {
+        // Only start this process if the list has more than one item
         if (secretMessageList.size() > 1) {
             ListIterator<Secret> iter = secretMessageList.listIterator();
             while (iter.hasNext()) {
                 Secret secret = iter.next();
-                if (iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGES_REMAINING) {
+                // Ensure that the last message is not deleted!!!!
+                if (iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGES_REMAINING && secretMessageList.size() > 1) {
                     iter.remove();
                     dbSource.deleteSecret(secret);
                 }
