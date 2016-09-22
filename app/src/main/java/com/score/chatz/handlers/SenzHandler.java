@@ -60,7 +60,7 @@ public class SenzHandler extends BaseHandler {
                 Senz senz = SenzParser.parse(senzMessage);
                 senz.setId(SenzUtils.getUniqueRandomNumber());
                 verifySenz(senz);
-                SenzStatusTracker.onPacketArrived(senz);
+                SenzStatusTracker.getInstance(context).stopSenzTrack(senz);
                 switch (senz.getSenzType()) {
                     case PING:
                         Log.d(TAG, "PING received");

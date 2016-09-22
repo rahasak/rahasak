@@ -51,7 +51,7 @@ public class SenzTimeoutTask extends AsyncTask<Void, Void, Void> {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    SenzStatusTracker.onTmeout(senzSend, context);
+                    //SenzStatusTracker.onTmeout(senzSend, context);
                 }
             });
         }

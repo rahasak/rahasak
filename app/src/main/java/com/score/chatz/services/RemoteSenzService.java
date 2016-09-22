@@ -87,7 +87,7 @@ public class RemoteSenzService extends Service {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
-            SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
+            SenzStatusTracker.getInstance(RemoteSenzService.this).startSenzTrack(senz);
             writeSenz(senz);
         }
 
@@ -267,9 +267,6 @@ public class RemoteSenzService extends Service {
                             senzSignature = "SIGNATURE";
                         }
                         String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-
-                        SenzStatusTracker.addSenz(SenzStatusTracker.addUidToSenz(senz), getApplicationContext());
 
                         Log.d(TAG, "Senz to be send: " + message);
 
