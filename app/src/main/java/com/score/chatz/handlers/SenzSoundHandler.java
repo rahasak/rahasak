@@ -201,14 +201,14 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
     }
 
     @Override
-    public void onNewChatSound(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+    public void onNewChatSound(Senz senz, ISenzService senzService, final SenzorsDbSource dbSource, Context context) {
         try {
             if (senz.getAttributes().containsKey("chatzsound")) {
                 User sender = senz.getSender();
                 //Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
                 //Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", senz.getSender());
                 User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
-                Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
+                final Secret secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
                 secret.setReceiver(senz.getReceiver());
                 Long _timeStamp = System.currentTimeMillis();
                 secret.setTimeStamp(_timeStamp);
@@ -216,7 +216,14 @@ public class SenzSoundHandler extends BaseHandler implements IReceivingComHandle
                 String uid = senz.getAttributes().get("uid");
                 secret.setID(uid);
 
-                dbSource.createSecret(secret);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //dbSource.deleteAllSecretsThatBelongToUser(newSecret.getUser());
+                        dbSource.createSecret(secret);
+                    }
+                }).start();
+
                 SenzSoundHandler.sendSoundRecievedConfirmation(senz, context, uid, true);
 
                 broadcastDataSenz(senz, context);

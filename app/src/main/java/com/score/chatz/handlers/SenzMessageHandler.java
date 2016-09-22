@@ -75,7 +75,7 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
     }
 
     @Override
-    public void onNewMessage(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+    public void onNewMessage(Senz senz, ISenzService senzService, final SenzorsDbSource dbSource, Context context) {
         // save senz in db
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
 
@@ -83,12 +83,20 @@ public class SenzMessageHandler extends BaseHandler implements IDataMessageSenzH
             Log.d(TAG, "save incoming chatz");
             String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
             User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
-            Secret newSecret = new Secret(msg, "TEXT", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
+            final Secret newSecret = new Secret(msg, "TEXT", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
             newSecret.setReceiver(senz.getReceiver());
             newSecret.setID(senz.getAttributes().get("uid"));
             Long _timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(_timeStamp);
-            dbSource.createSecret(newSecret);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //dbSource.deleteAllSecretsThatBelongToUser(newSecret.getUser());
+                    dbSource.createSecret(newSecret);
+                }
+            }).start();
+
 
             senz.setSender(sender);
             Log.d(TAG, "save messages");

@@ -284,18 +284,27 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
     }
 
     @Override
-    public void onNewChatPhoto(Senz senz, ISenzService senzService, SenzorsDbSource dbSource, Context context) {
+    public void onNewChatPhoto(Senz senz, ISenzService senzService, final SenzorsDbSource dbSource, Context context) {
         try {
             if (senz.getAttributes().containsKey("chatzphoto")) {
                 User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
-                Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
+                final Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
                 newSecret.setReceiver(senz.getReceiver());
 
                 String uid = senz.getAttributes().get("uid");
                 newSecret.setID(uid);
                 Long _timeStamp = System.currentTimeMillis();
                 newSecret.setTimeStamp(_timeStamp);
-                dbSource.createSecret(newSecret);
+
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //dbSource.deleteAllSecretsThatBelongToUser(newSecret.getUser());
+                        dbSource.createSecret(newSecret);
+                    }
+                }).start();
+
 
                 sendPhotoRecievedConfirmation(senz, context, uid, true);
 

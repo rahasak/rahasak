@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -50,6 +51,7 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,7 +63,7 @@ import java.util.ListIterator;
  * Use the {@link ChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatFragment extends Fragment{
+public class ChatFragment extends Fragment {
 
     private static final String TAG = ChatFragment.class.getName();
 
@@ -80,7 +82,7 @@ public class ChatFragment extends Fragment{
     private SenzorsDbSource dbSource;
     User currentUser;
 
-    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 10;
+    private static final int NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY = 7;
 
     private ListView listView;
     private List<Secret> secretMessageList;
@@ -158,7 +160,7 @@ public class ChatFragment extends Fragment{
     /**
      * set up click handler for all action btns
      */
-    private void setupActionBtns(){
+    private void setupActionBtns() {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -234,7 +236,7 @@ public class ChatFragment extends Fragment{
         });
     }
 
-    private void setupUi(View view){
+    private void setupUi(View view) {
         text_message = (EditText) view.findViewById(R.id.text_message);
         sendBtn = (ImageButton) view.findViewById(R.id.sendBtn);
         getCamBtn = (ImageButton) view.findViewById(R.id.getCamBtn);
@@ -265,7 +267,7 @@ public class ChatFragment extends Fragment{
             adapter.notifyDataSetChanged();
         } else {
             List<Secret> latestList = dbSource.getSecretz(new User("", sender), secretMessageList.get(secretMessageList.size() - 1).getTimeStamp());
-            for(Secret secret : latestList){
+            for (Secret secret : latestList) {
                 secretMessageList.add(secret);
                 adapter.notifyDataSetChanged();
             }
@@ -277,6 +279,8 @@ public class ChatFragment extends Fragment{
         for (Secret secret : secretMessageList) {
             if (secret.getID().equalsIgnoreCase(uid)) {
                 secret.setIsDelivered(true);
+                // Play sound
+                playSoundOnNewMessage();
             }
         }
         adapter.notifyDataSetChanged();
@@ -297,7 +301,7 @@ public class ChatFragment extends Fragment{
         while (iter.hasNext()) {
             Integer index = iter.nextIndex();
             Secret secret = iter.next();
-            if(secretMessageList.size() > NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
+            if (secretMessageList.size() > NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
                 if (!SecretsUtil.isSecretToBeShown(secret) && iter.nextIndex() != (secretMessageList.size() - 1) - NUMBER_OF_CHAT_MESSAGE_ON_DISPLAY) {
                     iter.remove();
                     dbSource.deleteSecret(secret);
@@ -328,7 +332,7 @@ public class ChatFragment extends Fragment{
             Senz senz = new Senz(id, signature, senzType, null, _sender, senzAttributes);
 
 
-            ((ChatActivity)getActivity()).send(senz);
+            ((ChatActivity) getActivity()).send(senz);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -339,6 +343,52 @@ public class ChatFragment extends Fragment{
     public void onDestroy() {
         super.onDestroy();
 
+    }
+
+    /**
+     * This method updates the list from the incoming intent for fast data loading!!!
+     *
+     * @param senz
+     */
+    private void updateListAdapter(Senz senz) {
+        try {
+            User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), getContext());
+            final Secret newSecret;
+            if (senz.getAttributes().containsKey("chatzmsg")) {
+                String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
+                newSecret = new Secret(msg, "TEXT", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
+            } else if (senz.getAttributes().containsKey("chatzsound")) {
+                newSecret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
+            } else {
+                newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "PHOTO", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
+            }
+            newSecret.setReceiver(senz.getReceiver());
+            Long _timeStamp = System.currentTimeMillis();
+            newSecret.setTimeStamp(_timeStamp);
+            newSecret.setID(senz.getAttributes().get("uid"));
+
+
+            secretMessageList.add(newSecret);
+            adapter.notifyDataSetChanged();
+            playSoundOnNewMessage();
+        }catch(UnsupportedEncodingException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private void playSoundOnNewMessage() {
+        MediaPlayer mp;
+        mp = MediaPlayer.create(getContext(), R.raw.message);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.reset();
+                mp.release();
+            }
+
+        });
+        mp.start();
     }
 
     /**
@@ -376,11 +426,16 @@ public class ChatFragment extends Fragment{
                     Toast.makeText(getActivity(), "User seems to be offline.", Toast.LENGTH_SHORT).show();
                 }
             } else if (senz.getAttributes().containsKey("chatzphoto")) {
-                displayMessagesList();
+                updateListAdapter(senz);
+                //displayMessagesList();
             } else if (senz.getAttributes().containsKey("chatzmsg")) {
-                displayMessagesList();
+
+                updateListAdapter(senz);
+                //displayMessagesList();
+
             } else if (senz.getAttributes().containsKey("chatzsound")) {
-                displayMessagesList();
+                updateListAdapter(senz);
+                //displayMessagesList();
             } else if (senz.getAttributes().containsKey("lat")) {
                 // location response received
                 double lat = Double.parseDouble(senz.getAttributes().get("lat"));
@@ -408,22 +463,22 @@ public class ChatFragment extends Fragment{
      * @param receiver senz receiver
      */
     private void getSenz(User receiver) {
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("lat", "lat");
-            senzAttributes.put("lon", "lon");
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("lat", "lat");
+        senzAttributes.put("lon", "lon");
 
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
-            ((ChatActivity)getActivity()).send(senz);
+        ((ChatActivity) getActivity()).send(senz);
     }
 
-    private void sendUserToWaitingPage(){
+    private void sendUserToWaitingPage() {
         Intent i = new Intent(getActivity(), PhotoFullScreenActivity.class);
         getContext().startActivity(i);
     }
@@ -434,20 +489,20 @@ public class ChatFragment extends Fragment{
      */
     private void getPhoto(User receiver) {
 
-            sendUserToWaitingPage();
+        sendUserToWaitingPage();
 
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("chatzphoto", "chatzphoto");
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("chatzphoto", "chatzphoto");
 
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
-            ((ChatActivity)getActivity()).send(senz);
+        ((ChatActivity) getActivity()).send(senz);
     }
 
 
@@ -455,25 +510,25 @@ public class ChatFragment extends Fragment{
      * Get mic of user
      */
     private void getMic(User receiver) {
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("chatzmic", "chatzmic");
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("chatzmic", "chatzmic");
 
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
-            ((ChatActivity)getActivity()).send(senz);
-            ((ChatActivity)getActivity()).displayInformationMessageDialog("Audio Request", "Audio Request has been sent!");
+        ((ChatActivity) getActivity()).send(senz);
+        ((ChatActivity) getActivity()).displayInformationMessageDialog("Audio Request", "Audio Request has been sent!");
     }
 
     private void setStateOnActionBtns() {
         Log.i(TAG, "Getting permission of user - " + sender);
         UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
-        if(userPerm != null) {
+        if (userPerm != null) {
             if (userPerm.getCamPerm() == true) {
                 getCamBtn.setImageResource(R.drawable.perm_camera_active);
                 getCamBtn.setEnabled(true);
@@ -500,7 +555,7 @@ public class ChatFragment extends Fragment{
         }
     }
 
-    public void onPacketTimeout(Senz senz){
+    public void onPacketTimeout(Senz senz) {
         dbSource.markSecretDeliveryFailed(senz.getAttributes().get("uid"));
         updateMessageFailed(senz.getAttributes().get("uid"));
         setStateOnActionBtns();

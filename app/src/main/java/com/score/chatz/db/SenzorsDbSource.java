@@ -749,6 +749,15 @@ public class SenzorsDbSource {
 
     }
 
+    public void deleteAllSecretsThatBelongToUser(User user){
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // delete senz of given user
+        db.delete(SenzorsDbContract.Secret.TABLE_NAME,
+                SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?",
+                new String[]{user.getUsername()});
+    }
+
     public void updateSeenTimestamp(Secret secret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
