@@ -96,7 +96,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         //Setup Fonts!!!
         setupFonts();
 
-        startService();
+        //startService();
         if (!isServiceBound) {
             bindToSerice();
         }
@@ -105,7 +105,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     @Override
     protected void onResume() {
         super.onResume();
-        startService();
+        //startService();
     }
 
     private void bindToSerice() {

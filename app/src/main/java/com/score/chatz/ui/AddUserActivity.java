@@ -47,7 +47,7 @@ public class AddUserActivity extends BaseActivity {
         setupActionBar();
         setupAddUsersBtn();
         setupFonts();
-        startService();
+        //startService();
     }
 
     private void setupUiElements() {

@@ -11,8 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
