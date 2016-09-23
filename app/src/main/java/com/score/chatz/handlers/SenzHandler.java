@@ -7,15 +7,18 @@ import android.util.Log;
 import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.SenzStream;
+import com.score.chatz.pojo.Stream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.util.HashMap;
 
 
 /**
@@ -34,6 +37,7 @@ public class SenzHandler extends BaseHandler {
     private static SenzorsDbSource dbSource;
 
     private SenzStream senzStream;
+    private Stream stream;
 
     public static SenzHandler getInstance(Context context) {
         if (instance == null) {
@@ -60,7 +64,8 @@ public class SenzHandler extends BaseHandler {
                 Senz senz = SenzParser.parse(senzMessage);
                 senz.setId(SenzUtils.getUniqueRandomNumber());
                 verifySenz(senz);
-                SenzStatusTracker.getInstance(context).stopSenzTrack(senz);
+                if (senz.getSenzType() != SenzTypeEnum.STREAM)
+                    SenzStatusTracker.getInstance(context).stopSenzTrack(senz);
                 switch (senz.getSenzType()) {
                     case PING:
                         Log.d(TAG, "PING received");
@@ -77,6 +82,10 @@ public class SenzHandler extends BaseHandler {
                     case DATA:
                         Log.d(TAG, "DATA received");
                         handleDataSenz(senz);
+                        break;
+                    case STREAM:
+                        Log.d(TAG, "STREAM received");
+                        handleStreamSenz(senz);
                         break;
                 }
             }
@@ -194,6 +203,32 @@ public class SenzHandler extends BaseHandler {
             } else if (stream.contains("#chatzsound")) {
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZSOUND);
             }
+        }
+    }
+
+    private void handleStreamSenz(Senz senz) {
+        if (senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("on")) {
+            // stream on, first stream
+            Log.d(TAG, "stream ON from " + senz.getSender().getUsername());
+            stream = new Stream(true, senz.getSender().getUsername(), new StringBuffer());
+        } else if (senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("off")) {
+            // stream off, last stream
+            Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
+            stream.setActive(false);
+
+            // handle it
+            HashMap<String, String> attrbutes = new HashMap<>();
+            attrbutes.put("chatzphoto", stream.getStream());
+            attrbutes.put("uid", senz.getAttributes().get("uid"));
+
+            Log.d(TAG, "chatzphoto: " + attrbutes.get("chatzphoto"));
+
+            Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attrbutes);
+            SenzPhotoHandler.getInstance().onNewChatPhoto(streamSenz, serviceConnection.getInterface(), dbSource, context);
+        } else {
+            // middle stream
+            Log.d(TAG, "stream mid from " + senz.getSender().getUsername() + "data " + senz.getAttributes().get("chatzphoto"));
+            stream.appendStream(senz.getAttributes().get("chatzphoto"));
         }
     }
 

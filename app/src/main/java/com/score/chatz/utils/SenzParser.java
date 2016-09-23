@@ -52,11 +52,11 @@ public class SenzParser {
             }
         }
 
-//        System.out.println(senz.getSender().getUsername());
-//        System.out.println(senz.getReceiver().getUsername());
-//        System.out.println(senz.getSenzType());
-//        System.out.println(senz.getSignature());
-//        System.out.println(senz.getAttributes().entrySet());
+        System.out.println(senz.getSender().getUsername());
+        System.out.println(senz.getReceiver().getUsername());
+        System.out.println(senz.getSenzType());
+        System.out.println(senz.getSignature());
+        System.out.println(senz.getAttributes().entrySet());
 
         return senz;
     }
@@ -92,16 +92,16 @@ public class SenzParser {
         return senzMessage.replaceAll("\n", "").replaceAll("\r", "");
     }
 
-//    public static void main(String args[]) {
-//        String senzMessage3 = "DATA " +
-//                "#msg UserCreated " +
-//                "#pubkey sd23453451234sfsdfd==  " +
-//                "#time 1441806897.71 " +
-//                "#msg1 #msg2 rtt " +
-//                "@senzswitch " +
-//                "^era " +
-//                "v50I88VzgvBvubCjGitTMO9";
-//
-//        parse(senzMessage3);
-//    }
+    public static void main(String args[]) {
+        String senzMessage3 = "STREAM " +
+                "#msg UserCreated " +
+                "#pubkey sd23453451234sfsdfd==  " +
+                "#time 1441806897.71 " +
+                "#msg1 #msg2 rtt " +
+                "@senzswitch " +
+                "^era " +
+                "v50I88VzgvBvubCjGitTMO9";
+
+        parse(senzMessage3);
+    }
 }

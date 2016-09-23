@@ -17,7 +17,6 @@ import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.CameraUtils;
-import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -138,11 +137,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
 
         // save photo to db before sending if its a chatzphoto
         if (senz.getAttributes().containsKey("chatzphoto")) {
-            User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
-            Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
-            newSecret.setReceiver(senz.getSender());
-            Long _timeStamp = System.currentTimeMillis();
-            newSecret.setTimeStamp(_timeStamp);
+            Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver(), false);
+            Long timeStamp = System.currentTimeMillis();
+            newSecret.setTimeStamp(timeStamp);
             newSecret.setID(uid);
             new SenzorsDbSource(context).createSecret(newSecret);
         }
@@ -154,7 +151,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
             // new senz
             String id = "_ID";
             String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+            SenzTypeEnum senzType = SenzTypeEnum.STREAM;
 
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -189,7 +186,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
 
         return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
     }
@@ -209,7 +206,7 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
 
         return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
     }
