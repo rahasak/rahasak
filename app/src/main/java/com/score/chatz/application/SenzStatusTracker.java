@@ -122,6 +122,7 @@ public class SenzStatusTracker {
         }
 
         private void onTimeout(final Senz senz) {
+            Log.d(TAG, "Timeout for senz: " + senz.getAttributes().get(UID) + " broadcast: " + broadcast);
             if (broadcast) {
                 removeSenz(senz);
 
