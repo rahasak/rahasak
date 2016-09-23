@@ -137,7 +137,9 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
 
         // save photo to db before sending if its a chatzphoto
         if (senz.getAttributes().containsKey("chatzphoto")) {
-            Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver(), false);
+            //Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver(), true);
+            User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
+            Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
             Long timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(timeStamp);
             newSecret.setID(uid);
@@ -288,7 +290,10 @@ public class SenzPhotoHandler extends BaseHandler implements ISendAckHandler, ID
                 final Secret newSecret = new Secret(senz.getAttributes().get("chatzphoto"), "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getSender()));
                 newSecret.setReceiver(senz.getReceiver());
 
-                String uid = senz.getAttributes().get("uid");
+                //TODO Remove uid from here when integrating new logic to handle ack wen photo received
+                // compose senz
+                String uid = SenzUtils.getUniqueRandomNumber();
+                //String uid = senz.getAttributes().get("uid");
                 newSecret.setID(uid);
                 Long _timeStamp = System.currentTimeMillis();
                 newSecret.setTimeStamp(_timeStamp);

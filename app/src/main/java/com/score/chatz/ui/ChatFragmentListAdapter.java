@@ -221,6 +221,11 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         } else {
             view.setBackgroundResource(R.color.white);
         }
+
+        // TODO remove this when integrate new logic to handle message delivered for photo and sound!!
+        if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE || viewHolder.messageType == MY_SOUND_TYPE || viewHolder.messageType == NOT_MY_SOUND_TYPE) {
+            viewHolder.status.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void deleteSecret(final Secret secret) {

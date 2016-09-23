@@ -216,7 +216,7 @@ public class SenzHandler extends BaseHandler {
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
             stream.setActive(false);
 
-            // handle it
+            // TODO handle it
             HashMap<String, String> attrbutes = new HashMap<>();
             attrbutes.put("chatzphoto", stream.getStream());
             attrbutes.put("uid", senz.getAttributes().get("uid"));
