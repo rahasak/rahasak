@@ -80,6 +80,18 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
     Polyline line;
 
     // senz message
+    private BroadcastReceiver noLocationEnabledReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
+    // No locations enabled message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -92,7 +104,11 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
     };
 
     public void onSenzReceived(Senz senz) {
-        if (senz.getAttributes().containsKey("lat")) {
+        if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("locDisabled")) {
+            closeProgressLoader();
+            Toast.makeText(this, "Sorry, User has Locations disabled.", Toast.LENGTH_LONG).show();
+            this.finish();
+        }else if (senz.getAttributes().containsKey("lat")) {
             // location response received
             double lat = Double.parseDouble(senz.getAttributes().get("lat"));
             double lan = Double.parseDouble(senz.getAttributes().get("lon"));
@@ -141,6 +157,7 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         setUpActionBar();
 
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(noLocationEnabledReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.NO_LOC_ENABLED));
     }
 
     private void showProgressLoader(){
@@ -181,6 +198,7 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         if (isNetworkEnabled) locationManager.removeUpdates(SenzMapActivity.this);
 
         unregisterReceiver(senzReceiver);
+        unregisterReceiver(noLocationEnabledReceiver);
     }
 
     /**

@@ -49,6 +49,9 @@ public class LocationService extends Service implements LocationListener {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d(TAG, "Connected with senz service");
             senzService = ISenzService.Stub.asInterface(service);
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                sendLocationProviderNotEnabled();
+            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -72,8 +75,9 @@ public class LocationService extends Service implements LocationListener {
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         if (!isGPSEnabled && !isNetworkEnabled) {
-            sendLocationProviderNotEnabled();
             Log.d(TAG, "No location provider enable");
+            if(senzService != null)
+                sendLocationProviderNotEnabled();
         } else {
             if (isNetworkEnabled) {
                 Log.d(TAG, "Getting location via Network");
@@ -171,7 +175,7 @@ public class LocationService extends Service implements LocationListener {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("msg", "LocDisabled");
+            senzAttributes.put("msg", "locDisabled");
 
             String id = "_ID";
             String signature = "_SIGNATURE";

@@ -39,6 +39,12 @@ public class BaseHandler {
         context.sendBroadcast(intent);
     }
 
+    protected static void broadcastNoLocationSenz(Senz senz, Context context){
+        Intent intent = IntentProvider.getNoLocationEnabledIntent();
+        intent.putExtra("SENZ", senz);
+        context.sendBroadcast(intent);
+    }
+
     protected String[] split(String src, int len) {
         String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
         for (int i = 0; i < result.length; i++)
