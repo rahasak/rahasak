@@ -94,7 +94,7 @@ public class SenzHandler extends BaseHandler {
         }
     }
 
-    private static void verifySenz(Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    private void verifySenz(Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         senz.getSender();
 
         // TODO get public key of sender
@@ -174,7 +174,7 @@ public class SenzHandler extends BaseHandler {
     private void handleStream(String stream) {
         if (senzStream != null && senzStream.isActive()) {
             if (stream.contains("#stream off")) {
-                Log.d(TAG, "Stream OFFFFFFFFFFFF ");
+                Log.d(TAG, "Stream OFF");
                 senzStream.setIsActive(false);
                 //Stream has ended. Already receieved Stream oFF.. we need to notify the handleSenz method to process the stream
                 handleSenz(senzStream.getSenzString());
@@ -217,13 +217,13 @@ public class SenzHandler extends BaseHandler {
             stream.setActive(false);
 
             // TODO handle it
-            HashMap<String, String> attrbutes = new HashMap<>();
-            attrbutes.put("chatzphoto", stream.getStream());
-            attrbutes.put("uid", senz.getAttributes().get("uid"));
+            HashMap<String, String> attributes = new HashMap<>();
+            attributes.put("chatzphoto", stream.getStream());
+            attributes.put("uid", senz.getAttributes().get("uid"));
 
-            Log.d(TAG, "chatzphoto: " + attrbutes.get("chatzphoto"));
+            Log.d(TAG, "chatzphoto: " + attributes.get("chatzphoto"));
 
-            Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attrbutes);
+            Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
             SenzPhotoHandler.getInstance().onNewChatPhoto(streamSenz, serviceConnection.getInterface(), dbSource, context);
         } else {
             // middle stream
@@ -234,6 +234,44 @@ public class SenzHandler extends BaseHandler {
 
     public SenzServiceConnection getServiceConnection() {
         return serviceConnection;
+    }
+
+    private void handleSenzShare() {
+        // share permission
+
+        // send status back
+
+        // create permission in db
+
+        // display notification
+
+        // broadcast
+    }
+
+    private void handleStatusData() {
+        // status to message
+
+        // update status in db
+
+        // broadcast
+    }
+
+    private void handleSenzData() {
+        // receive senz data
+
+        //
+    }
+
+    private void handlePhotoGet() {
+
+    }
+
+    private void handleVoiceGet() {
+
+    }
+
+    private void handleLocationGet() {
+
     }
 }
 
