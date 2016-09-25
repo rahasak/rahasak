@@ -29,29 +29,24 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private SenzStream.SENZ_STEAM_TYPE streamType;
-
-    private static final int IMAGE_SIZE = 110; // ~ 300kbs
-
     private boolean isCameraBusy;
 
     private static CameraPreview instance;
 
     //Constructor that obtains context and camera
-    public CameraPreview(Context _context, Camera camera, SenzStream.SENZ_STEAM_TYPE streamType) {
+    public CameraPreview(Context _context, Camera camera) {
         super(_context);
 
         this.mCamera = camera;
         this.mSurfaceHolder = this.getHolder();
         this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
-        this.streamType = streamType;
         instance = this;
     }
 
-    public static CameraPreview getSingleton(Context _context, Camera camera, SenzStream.SENZ_STEAM_TYPE streamType){
+    public static CameraPreview getSingleton(Context _context, Camera camera){
         if(instance == null){
-          return new CameraPreview(_context,  camera,  streamType);
+          return new CameraPreview(_context,  camera);
         }else{
             return instance;
         }
@@ -93,10 +88,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        /*if (mCamera != null) {
-            isCameraBusy = true;
-            mCamera.release();
-        }else {*/
         isCameraBusy =true;
             mCamera = getCameraInstant();
             Camera.Parameters parameters = mCamera.getParameters();
@@ -113,18 +104,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 Log.d(TAG, "Error setting camera preview: " + e.getMessage());
 
             }
-        //}
-    }
-
-
-
-    private byte[] resizeBitmapByteArray(byte[] data, int deg) {
-        Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));
-        // set max width ~ 600px
-        Bitmap rotatedBitmap = CameraUtils.getAdjustedImage(decodedBitmap, deg, 1000);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        return baos.toByteArray();
     }
 
     @Override

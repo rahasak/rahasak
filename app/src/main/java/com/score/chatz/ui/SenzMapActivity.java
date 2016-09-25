@@ -128,10 +128,8 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        showProgressLoader();
-
         setContentView(R.layout.senz_map_layout);
+        //showProgressLoader();
         myLocation = (RelativeLayout) findViewById(R.id.map_location);
         myLocation.setOnClickListener(new View.OnClickListener() {
             @Override

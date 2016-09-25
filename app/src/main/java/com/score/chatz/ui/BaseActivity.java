@@ -29,6 +29,8 @@ import com.score.chatz.utils.NetworkUtil;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 
+import java.util.List;
+
 /**
  * This the mother of all activities.. its contains things that are reusable by all activities.. things such as
  * 1.  popups,
@@ -229,6 +231,22 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
             try {
                 if (isServiceBound) {
                     senzService.send(senz);
+                } else {
+                    ActivityUtils.showToast("Failed to connected to service.", this);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void sendInOrder(List<Senz> senzList) {
+        if (!NetworkUtil.isAvailableNetwork(this)) {
+            ActivityUtils.showToast("No network connection available.", this);
+        } else {
+            try {
+                if (isServiceBound) {
+                    senzService.sendInOrder(senzList);
                 } else {
                     ActivityUtils.showToast("Failed to connected to service.", this);
                 }

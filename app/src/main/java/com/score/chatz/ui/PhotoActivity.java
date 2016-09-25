@@ -2,11 +2,14 @@ package com.score.chatz.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,54 +22,63 @@ import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.handlers.SenzPhotoHandler;
+import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.SecretsUtil;
+import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 import com.skyfishjy.library.RippleBackground;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PhotoActivity extends BaseActivity implements View.OnTouchListener {
     protected static final String TAG = PhotoActivity.class.getName();
 
+    // Camera related variables
     private android.hardware.Camera mCamera;
     private CameraPreview mCameraPreview;
     private boolean isPhotoTaken;
     private boolean isPhotoCancelled;
 
+    // Ui elements
     private View callingUserInfo;
     private View buttonControls;
     private TextView quickCountdownText;
-
-    private PhotoActivity instnce;
-    private Senz originalSenz;
-    private PowerManager.WakeLock wakeLock;
-
     private Rect startBtnRectRelativeToScreen;
     private Rect cancelBtnRectRelativeToScreen;
     private CircularImageView cancelBtn;
     private ImageView startBtn;
     private RippleBackground goRipple;
 
+    // Senz infomation
+    private Senz originalSenz;
+    private PowerManager.WakeLock wakeLock;
     private CountDownTimer cancelTimer;
 
-    private static final int TIME_TO_SERVE_REQUEST = 30000; // 30 seconds
-    private static final int TIME_TO_QUICK_PHOTO = 3; // 3 seconds
-
+    private static final int TIME_TO_SERVE_REQUEST = 30000;
+    private static final int TIME_TO_QUICK_PHOTO = 3;
 
     private float dX, dY, startX, startY;
 
+    private static final int IMAGE_SIZE = 110;
+    SenzStream.SENZ_STEAM_TYPE streamType;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_photo);
-        instnce = this;
-        mCameraPreview = CameraPreview.getSingleton(this, mCamera, (SenzStream.SENZ_STEAM_TYPE) getIntent().getExtras().get("StreamType"));
+
+        mCameraPreview = CameraPreview.getSingleton(this, mCamera);
+
+        streamType = (SenzStream.SENZ_STEAM_TYPE) getIntent().getExtras().get("StreamType");
 
         try {
             originalSenz = (Senz) getIntent().getParcelableExtra("Senz");
@@ -75,7 +87,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         }
 
         if (mCameraPreview.isCameraBusy() == true) {
-            SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+            //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
             this.finish();
         } else {
             FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
@@ -104,6 +116,16 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             getSupportActionBar().hide();
             startTimerToEndRequest();
         }
+    }
+
+    /**
+     * Wake up activity when in sleep or lock
+     */
+    private void setupActivity(){
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
     private void setupUiHandlers() {
@@ -188,14 +210,14 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                 if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside start button region
                     stopVibrations();
-                    if (isPhotoTaken == false) {
+                    if (!isPhotoTaken) {
                         cancelTimerToServe();
                         startQuickCountdownToPhoto(this);
                         isPhotoTaken = true;
                     }
                 } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside cancel button region
-                    if (isPhotoCancelled == false) {
+                    if (!isPhotoCancelled) {
                         isPhotoCancelled = true;
                         cancelTimerToServe();
                         SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
@@ -249,7 +271,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private void takePhoto() {
         quickCountdownText.setVisibility(View.INVISIBLE);
         CameraUtils.shootSound(this);
-        mCameraPreview.takePhotoManually(instnce, originalSenz);
+        takePhotoManually(PhotoActivity.this, originalSenz);
     }
 
     private void updateQuicCountTimer(final int count) {
@@ -273,25 +295,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Get the Camera instance as the activity achieves full user focus
-        if (mCamera == null) {
-            //initializeCamera(); // Local method to handle camera initialization
-            //openFrontFacingCameraGingerbread();
-        }
-
-    }
-
     private void startTimerToEndRequest() {
-        final PhotoActivity _this = this;
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, _this);
-                _this.finish();
+                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, PhotoActivity.this);
+                PhotoActivity.this.finish();
             }
 
             @Override
@@ -305,15 +314,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private void cancelTimerToServe() {
         if (cancelTimer != null)
             cancelTimer.cancel();
-    }
-
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
     public void takePhotoManually(final PhotoActivity activity, final Senz originalSenz) {
@@ -330,14 +330,11 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                     resizedImage = CameraUtils.getCompressedImage(bytes, IMAGE_SIZE);
                 }
 
-                isCameraBusy = false;
+                //isCameraBusy = false;
 
-                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
+                sendPhoto(resizedImage, originalSenz, PhotoActivity.this);
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
                 i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
-                /*String uid = SenzUtils.getUniqueRandomNumber().toString();
-                i.putExtra("IMAGE_RES_ID", uid);
-                CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(resizedImage, 0)), getContext());*/
                 i.putExtra("QUICK_PREVIEW", "true");
                 activity.startActivity(i);
                 activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -346,4 +343,132 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         });
     }
 
+    private byte[] resizeBitmapByteArray(byte[] data, int deg) {
+        Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));
+        // set max width ~ 600px
+        Bitmap rotatedBitmap = CameraUtils.getAdjustedImage(decodedBitmap, deg, 1000);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    /**
+     * Util methods
+     */
+    private void sendPhoto(final byte[] image, final Senz senz, final Context context) {
+        // compose senz
+        String uid = SenzUtils.getUniqueRandomNumber();
+
+        // stream on senz
+        // stream content
+        // stream off senz
+        Senz startStreamSenz = getStartStreamSenz(senz);
+        ArrayList<Senz> photoSenzList = getPhotoStreamSenz(senz, image, context, uid);
+        Senz stopStreamSenz = getStopStreamSenz(senz);
+
+        // populate list
+        ArrayList<Senz> senzList = new ArrayList<>();
+        senzList.add(startStreamSenz);
+        senzList.addAll(photoSenzList);
+        senzList.add(stopStreamSenz);
+
+        sendInOrder(senzList);
+    }
+
+    /**
+     * Decompose image stream in to multiple data/stream senz's
+     *
+     * @param senz    original senz
+     * @param image   image content
+     * @param context app context
+     * @param uid     unique id
+     * @return list of decomposed senz's
+     */
+    private ArrayList<Senz> getPhotoStreamSenz(Senz senz, byte[] image, Context context, String uid) {
+        String imageString = Base64.encodeToString(image, Base64.DEFAULT);
+
+        // save photo to db before sending if its a chatzphoto
+        if (senz.getAttributes().containsKey("chatzphoto")) {
+            //Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver(), true);
+            User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
+            Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
+            Long timeStamp = System.currentTimeMillis();
+            newSecret.setTimeStamp(timeStamp);
+            newSecret.setID(uid);
+            new SenzorsDbSource(context).createSecret(newSecret);
+        }
+
+        ArrayList<Senz> senzList = new ArrayList<>();
+        String[] packets = split(imageString, 1024);
+
+        for (String packet : packets) {
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            if (senz.getAttributes().containsKey("chatzphoto")) {
+                senzAttributes.put("chatzphoto", packet.trim());
+            } else if (senz.getAttributes().containsKey("profilezphoto")) {
+                senzAttributes.put("profilezphoto", packet.trim());
+            }
+
+            senzAttributes.put("uid", uid);
+
+            Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+            senzList.add(_senz);
+        }
+
+        return senzList;
+    }
+
+    /**
+     * Create start stream senz
+     *
+     * @param senz original senz
+     * @return senz
+     */
+    private Senz getStartStreamSenz(Senz senz) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("stream", "on");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+
+        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+    }
+
+    /**
+     * Create stop stream senz
+     *
+     * @param senz original senz
+     * @return senz
+     */
+    private Senz getStopStreamSenz(Senz senz) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("stream", "off");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+
+        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+    }
+
+    private String[] split(String src, int len) {
+        String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
+        for (int i = 0; i < result.length; i++)
+            result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
+        return result;
+    }
 }
