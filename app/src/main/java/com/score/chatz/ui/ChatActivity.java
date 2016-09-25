@@ -235,6 +235,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("lat", "lat");
         senzAttributes.put("lon", "lon");
+        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
         String id = "_ID";
@@ -251,7 +252,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("chatzphoto", "chatzphoto");
+        senzAttributes.put("cam", "cam");
+        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
         String id = "_ID";
@@ -268,7 +270,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("chatzmic", "chatzmic");
+        senzAttributes.put("mic", "mic");
+        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
         String id = "_ID";
@@ -283,7 +286,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("chatzmsg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
+            senzAttributes.put("msg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
             String timeStamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
             senzAttributes.put("time", timeStamp);
             senzAttributes.put("uid", secret.getID());
@@ -306,42 +309,34 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     }
 
     public void onSenzReceived(Senz senz) {
-        if (senz.getAttributes().containsKey("msg")) {
+        if (senz.getAttributes().containsKey("status")) {
             // status message
-            String msg = senz.getAttributes().get("msg");
-            if (msg != null && msg.equalsIgnoreCase("MsgSent")) {
+            String msg = senz.getAttributes().get("status");
+            if (msg != null && msg.equalsIgnoreCase("700")) {
                 onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("photoSent")) {
-                onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("soundSent")) {
-                onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("MsgSentFail")) {
-                onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("newPerm")) {
-                updatePermissions();
             }
-        } else if (senz.getAttributes().containsKey("chatzmsg")) {
+        } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
             onNewSenzReceived(senz);
-        } else if (senz.getAttributes().containsKey("chatzphoto")) {
+        } else if (senz.getAttributes().containsKey("cam")) {
             onNewSenzReceived(senz);
-        } else if (senz.getAttributes().containsKey("chatzsound")) {
+        } else if (senz.getAttributes().containsKey("mic")) {
             onNewSenzReceived(senz);
-        } /*else if (senz.getAttributes().containsKey("lat")) {
+        } else if (senz.getAttributes().containsKey("lat")) {
             onLocationReceived(senz);
-        }*/
+        }
     }
 
     private void onNewSenzReceived(Senz senz) {
         try {
             Secret secret;
-            if (senz.getAttributes().containsKey("chatzmsg")) {
-                String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
+            if (senz.getAttributes().containsKey("msg")) {
+                String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
                 secret = new Secret(msg, "TEXT", thisUser, true);
-            } else if (senz.getAttributes().containsKey("chatzsound")) {
-                secret = new Secret(senz.getAttributes().get("chatzsound"), "SOUND", thisUser, true);
+            } else if (senz.getAttributes().containsKey("mic")) {
+                secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
             } else {
-                secret = new Secret(senz.getAttributes().get("chatzphoto"), "PHOTO", thisUser, true);
+                secret = new Secret(senz.getAttributes().get("cam"), "PHOTO", thisUser, true);
             }
             secret.setReceiver(senz.getReceiver());
             secret.setTimeStamp(System.currentTimeMillis());
@@ -449,7 +444,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void navigateToLocationView(){
+    private void navigateToLocationView() {
         // TODO start map first
         // start map activity
         Intent mapIntent = new Intent(this, SenzMapActivity.class);

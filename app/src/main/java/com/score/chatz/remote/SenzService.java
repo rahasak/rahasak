@@ -13,7 +13,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
@@ -86,7 +85,7 @@ public class SenzService extends Service {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
-            SenzStatusTracker.getInstance(SenzService.this).startSenzTrack(senz);
+            SenzTracker.getInstance(SenzService.this).startSenzTrack(senz);
             writeSenz(senz);
         }
 
@@ -198,7 +197,7 @@ public class SenzService extends Service {
 
                     // handle senz
                     if (!senz.equalsIgnoreCase("TAK")) {
-                        SenzHandler.getInstance(SenzService.this).handleSenz(senz);
+                        SenHandler.getInstance().handle(senz, SenzService.this);
                     }
                 }
             }
@@ -212,7 +211,7 @@ public class SenzService extends Service {
         if (senz != null) writeSenz(senz);
     }
 
-    private void writeSenz(final Senz senz) {
+    public void writeSenz(final Senz senz) {
         new Thread(new Runnable() {
             public void run() {
                 // sign and write senz
@@ -243,7 +242,7 @@ public class SenzService extends Service {
         }).start();
     }
 
-    private void writeSenzList(final List<Senz> senzList) {
+    public void writeSenzList(final List<Senz> senzList) {
         new Thread(new Runnable() {
             @Override
             public void run() {

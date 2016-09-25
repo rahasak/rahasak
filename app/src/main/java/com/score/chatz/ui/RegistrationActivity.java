@@ -150,7 +150,8 @@ public class RegistrationActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
-            handleMessage(intent);
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            handleSenz(senz);
         }
     };
 
@@ -158,26 +159,22 @@ public class RegistrationActivity extends BaseActivity {
      * Handle broadcast message receives
      * Need to handle registration success failure here
      *
-     * @param intent intent
+     * @param senz intent
      */
-    private void handleMessage(Intent intent) {
-        String action = intent.getAction();
-        if (action.equals("com.score.chatz.DATA_SENZ")) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            if (senz.getAttributes().containsKey("msg")) {
-                // msg response received
-                ActivityUtils.cancelProgressDialog();
-                String msg = senz.getAttributes().get("msg");
-                if (msg != null && msg.equalsIgnoreCase("REG_DONE")) {
-                    ActivityUtils.showToast("Successfully registered", this);
-                    // save user
-                    // navigate home
-                    PreferenceUtils.saveUser(this, registeringUser);
-                    navigateToHome();
-                } else if (msg != null && msg.equalsIgnoreCase("REG_FAIL")) {
-                    String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
-                    displayInformationMessageDialog("Registration fail", informationMessage);
-                }
+    private void handleSenz(Senz senz) {
+        if (senz.getAttributes().containsKey("msg")) {
+            // msg response received
+            ActivityUtils.cancelProgressDialog();
+            String msg = senz.getAttributes().get("msg");
+            if (msg != null && msg.equalsIgnoreCase("REG_DONE")) {
+                ActivityUtils.showToast("Successfully registered", this);
+                // save user
+                // navigate home
+                PreferenceUtils.saveUser(this, registeringUser);
+                navigateToHome();
+            } else if (msg != null && msg.equalsIgnoreCase("REG_FAIL")) {
+                String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
+                displayInformationMessageDialog("Registration fail", informationMessage);
             }
         }
     }

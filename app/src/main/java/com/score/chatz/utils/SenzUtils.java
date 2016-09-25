@@ -13,7 +13,6 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * Created by eranga on 6/27/16.
@@ -21,7 +20,6 @@ import java.util.Random;
 public class SenzUtils {
     public static Senz getPingSenz(Context context) {
         try {
-            PrivateKey privateKey = RSAUtils.getPrivateKey(context);
             User user = PreferenceUtils.getUser(context);
 
             // create senz attributes
@@ -36,7 +34,7 @@ public class SenzUtils {
             senz.setAttributes(senzAttributes);
 
             return senz;
-        } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException e) {
+        } catch (NoUserException e) {
             e.printStackTrace();
         }
 
@@ -72,11 +70,33 @@ public class SenzUtils {
         return null;
     }
 
-    public static String getUniqueRandomNumber(){
+    public static Senz getAckSenz(User user, String uid, String statusCode) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("uid", uid);
+        senzAttributes.put("status", statusCode);
+
+        // new senz object
+        Senz senz = new Senz();
+        senz.setSenzType(SenzTypeEnum.DATA);
+        senz.setReceiver(user);
+        senz.setAttributes(senzAttributes);
+
+        return senz;
+    }
+
+    public static String getUniqueRandomNumber() {
         Long number = (long) Math.floor(Math.random() * 900000000L) + 10000000L;
         return number.toString();
-        //String uuid = java.util.UUID.randomUUID().toString();
-        //return uuid;
+    }
+
+    public static boolean isStreamOn(Senz senz) {
+        return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("on");
+    }
+
+    public static boolean isStreamOff(Senz senz) {
+        return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("off");
     }
 
 }

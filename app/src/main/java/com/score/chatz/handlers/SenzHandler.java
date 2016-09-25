@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.score.chatz.remote.SenzStatusTracker;
+import com.score.chatz.remote.SenzTracker;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.pojo.Stream;
@@ -65,7 +65,7 @@ public class SenzHandler extends BaseHandler {
                 senz.setId(SenzUtils.getUniqueRandomNumber());
                 verifySenz(senz);
                 if (senz.getSenzType() != SenzTypeEnum.STREAM)
-                    SenzStatusTracker.getInstance(context).stopSenzTrack(senz);
+                    SenzTracker.getInstance(context).stopSenzTrack(senz);
                 switch (senz.getSenzType()) {
                     case PING:
                         Log.d(TAG, "PING received");

@@ -16,10 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.chatz.R;
-import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -66,18 +67,13 @@ public class AddUserActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        this.registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ)); //Incoming data share
+        this.registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
     }
 
     @Override
-    public void onStop() {
+    public void onPause() {
         super.onStop();
         if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
     }
@@ -128,13 +124,9 @@ public class AddUserActivity extends BaseActivity {
     private void share() {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put(getResources().getString(R.string.lat), getResources().getString(R.string.lat));
-        senzAttributes.put(getResources().getString(R.string.lon), getResources().getString(R.string.lon));
-        senzAttributes.put(getResources().getString(R.string.msg), getResources().getString(R.string.msg));
-        senzAttributes.put(getResources().getString(R.string.chatzphoto), getResources().getString(R.string.chatzphoto));
-        senzAttributes.put(getResources().getString(R.string.chatzmsg), getResources().getString(R.string.chatzmsg));
-        senzAttributes.put(getResources().getString(R.string.camPerm), "false"); //Default Values, later in ui allow user to configure this on share
-        senzAttributes.put(getResources().getString(R.string.locPerm), "false"); //Dafault Values
+        senzAttributes.put("msg", "msg");
+        senzAttributes.put("status", "status");
+        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
         senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
 
         // new senz
@@ -190,20 +182,18 @@ public class AddUserActivity extends BaseActivity {
      * @param intent intent
      */
     private void handleMessage(Intent intent) {
-        String action = intent.getAction();
-        if (action.equalsIgnoreCase("com.score.chatz.DATA_SENZ")) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            if (senz.getAttributes().containsKey("msg")) {
-                // msg response received
-                ActivityUtils.cancelProgressDialog();
-                String msg = senz.getAttributes().get("msg");
-                if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
-                    onPostShare(senz);
-                } else {
-                    String user = editTextUserId.getText().toString().trim();
-                    String message = "<font color=#000000>Seems we couldn't connect you with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
-                    displayInformationMessageDialog("Fail", message);
-                }
+        Senz senz = intent.getExtras().getParcelable("SENZ");
+        assert senz != null;
+        if (senz.getAttributes().containsKey("status")) {
+            // status response received
+            ActivityUtils.cancelProgressDialog();
+            String status = senz.getAttributes().get("status");
+            if (status != null && status.equalsIgnoreCase("701")) {
+                onPostShare(senz);
+            } else {
+                String user = editTextUserId.getText().toString().trim();
+                String message = "<font color=#000000>Seems we couldn't connect you with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
+                displayInformationMessageDialog("Fail", message);
             }
         }
     }

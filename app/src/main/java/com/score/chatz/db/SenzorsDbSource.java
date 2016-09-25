@@ -6,10 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
-import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -239,20 +237,20 @@ public class SenzorsDbSource {
      */
     public void createSecret(Secret secret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-            // content values to inset
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_USER, secret.getUser().getUsername());
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER, secret.isSender() == true ? 1 : 0);
-            values.put(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID, secret.getID());
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED, 0);
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
-            values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_USER, secret.getUser().getUsername());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER, secret.isSender() == true ? 1 : 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID, secret.getID());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED, 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
 
-            // Insert the new row, if fails throw an error
-            db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
 
         insertRecordIntoLatestChat(secret);
 
@@ -261,24 +259,24 @@ public class SenzorsDbSource {
     private void insertRecordIntoLatestChat(Secret secret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-            // content values to inset
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.LatestChat.COLUMN_USER, secret.getUser().getUsername());
-            values.put(SenzorsDbContract.LatestChat.COLUMN_BLOB, secret.getBlob());
-            values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
-            values.put(SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER, secret.isSender());
-            values.put(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP, secret.getTimeStamp());
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.LatestChat.COLUMN_USER, secret.getUser().getUsername());
+        values.put(SenzorsDbContract.LatestChat.COLUMN_BLOB, secret.getBlob());
+        values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
+        values.put(SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER, secret.isSender());
+        values.put(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP, secret.getTimeStamp());
 
-            //First update the table
-            int rowCount = db.update(SenzorsDbContract.LatestChat.TABLE_NAME,
-                    values,
-                    SenzorsDbContract.LatestChat.COLUMN_USER + " =?",
-                    new String[]{secret.getUser().getUsername()});
+        //First update the table
+        int rowCount = db.update(SenzorsDbContract.LatestChat.TABLE_NAME,
+                values,
+                SenzorsDbContract.LatestChat.COLUMN_USER + " =?",
+                new String[]{secret.getUser().getUsername()});
 
-            //If not rows were affected!!then insert
-            if (rowCount == 0) {
-                db.insert(SenzorsDbContract.LatestChat.TABLE_NAME, null, values);
-            }
+        //If not rows were affected!!then insert
+        if (rowCount == 0) {
+            db.insert(SenzorsDbContract.LatestChat.TABLE_NAME, null, values);
+        }
     }
 
     /**
@@ -344,15 +342,9 @@ public class SenzorsDbSource {
 
         // content values to inset
         ContentValues values = new ContentValues();
-        if (senz.getAttributes().containsKey("permCam")) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, ((String) senz.getAttributes().get("permCam")).equalsIgnoreCase("true") ? 1 : 0);
-        }
-        if (senz.getAttributes().containsKey("permLoc")) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, ((String) senz.getAttributes().get("permLoc")).equalsIgnoreCase("true") ? 1 : 0);
-        }
-        if (senz.getAttributes().containsKey("permMic")) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, ((String) senz.getAttributes().get("permMic")).equalsIgnoreCase("true") ? 1 : 0);
-        }
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, 0);
         values.put(SenzorsDbContract.Permission.COLOMN_NAME_USER, senz.getSender().getUsername());
 
         // Insert the new row, if fails throw an error
@@ -371,22 +363,14 @@ public class SenzorsDbSource {
         // content values to inset
         ContentValues values = new ContentValues();
 
-        values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_UNIQUE_ID, senz.getId());
-
-        if (senz.getAttributes().containsKey("permCam")) {
-            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA, ((String) senz.getAttributes().get("permCam")).equalsIgnoreCase("true") ? 1 : 0);
-        }
-        if (senz.getAttributes().containsKey("permLoc")) {
-            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION, ((String) senz.getAttributes().get("permLoc")).equalsIgnoreCase("true") ? 1 : 0);
-        }
-        if (senz.getAttributes().containsKey("permMic")) {
-            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_MIC, ((String) senz.getAttributes().get("permMic")).equalsIgnoreCase("true") ? 1 : 0);
-        }
+        values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_UNIQUE_ID, senz.getAttributes().get("uid"));
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, 0);
         values.put(SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER, senz.getSender().getUsername());
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.PermissionConfiguration.TABLE_NAME, null, values);
-
     }
 
     /**
@@ -449,6 +433,7 @@ public class SenzorsDbSource {
 
     /**
      * Get secrets from give timestamp, used for lazy loading!!!
+     *
      * @param user
      * @param timestamp
      * @return
@@ -495,7 +480,8 @@ public class SenzorsDbSource {
             secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setSeenTimeStamp(_secretTimestampSeen);
-            secret.setID(_secretId);;
+            secret.setID(_secretId);
+            ;
             // fill secret list
             secretList.add(secret);
         }
@@ -508,7 +494,8 @@ public class SenzorsDbSource {
     }
 
     /**
-     *  GEt list of the lates chat messages!!!!
+     * GEt list of the lates chat messages!!!!
+     *
      * @return
      */
     public ArrayList<Secret> getLatestChatMessages() {
@@ -749,7 +736,7 @@ public class SenzorsDbSource {
 
     }
 
-    public void deleteAllSecretsThatBelongToUser(User user){
+    public void deleteAllSecretsThatBelongToUser(User user) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // delete senz of given user

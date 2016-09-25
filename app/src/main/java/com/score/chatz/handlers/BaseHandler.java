@@ -5,13 +5,10 @@ import android.content.Intent;
 import android.os.RemoteException;
 
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.services.SenzServiceConnection;
-import com.score.chatz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 
@@ -21,25 +18,25 @@ import java.util.HashMap;
 public class BaseHandler {
     private static final String TAG = BaseHandler.class.getName();
 
-    protected static void broadcastDataSenz(Senz senz, Context context){
+    protected static void broadcastDataSenz(Senz senz, Context context) {
         Intent intent = IntentProvider.getDataSenzIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }
 
-    protected static void broadcastNewDataToDisplaySenz(Senz senz, Context context){
+    protected static void broadcastNewDataToDisplaySenz(Senz senz, Context context) {
         Intent intent = IntentProvider.getNewDataToDisplayIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }
 
-    protected static void broadcastUserBusySenz(Senz senz, Context context){
+    protected static void broadcastUserBusySenz(Senz senz, Context context) {
         Intent intent = IntentProvider.getUserBusyIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }
 
-    protected static void broadcastNoLocationSenz(Senz senz, Context context){
+    protected static void broadcastNoLocationSenz(Senz senz, Context context) {
         Intent intent = IntentProvider.getNoLocationEnabledIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
@@ -52,7 +49,7 @@ public class BaseHandler {
         return result;
     }
 
-    public static void sendBusyNotification(final Senz senz, Context context){
+    public static void sendBusyNotification(final Senz senz, Context context) {
         //Get servicve connection
         final SenzServiceConnection serviceConnection = SenzHandler.getInstance(context).getServiceConnection();
 

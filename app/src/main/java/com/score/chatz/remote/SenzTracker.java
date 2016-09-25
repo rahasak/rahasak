@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.pojos.Senz;
 
 import java.util.HashMap;
@@ -17,29 +16,29 @@ import java.util.Map;
  * 2. It can store the senz wait wait for a response with the same uid. If not received before timeout, user is not online
  * Created by Lakmal on 9/12/16.
  */
-public class SenzStatusTracker {
-    private static final String TAG = SenzStatusTracker.class.getName();
+public class SenzTracker {
+    private static final String TAG = SenzTracker.class.getName();
     private static final Integer PACKET_TIMEOUT = 7; // 10 seconds
     private static final String UID = "uid";
 
     // singleton
     private static Context senzContext;
-    private static SenzStatusTracker senzStatusTracker;
+    private static SenzTracker senzTracker;
 
     // store uid -> Senz in pairs, just before sending to other user
     private static final Map<String, SenzTimer> senzDirectory = java.util.Collections.synchronizedMap(new HashMap<String, SenzTimer>());
 
-    private SenzStatusTracker() {
+    private SenzTracker() {
 
     }
 
-    public static SenzStatusTracker getInstance(Context context) {
-        if (senzStatusTracker == null) {
+    public static SenzTracker getInstance(Context context) {
+        if (senzTracker == null) {
             senzContext = context;
-            senzStatusTracker = new SenzStatusTracker();
+            senzTracker = new SenzTracker();
         }
 
-        return senzStatusTracker;
+        return senzTracker;
     }
 
     /**
@@ -48,13 +47,12 @@ public class SenzStatusTracker {
      * @param senz senz
      */
     public void startSenzTrack(Senz senz) {
-        // add UID if not exits
-        Senz senzWithUid = putUid(senz);
-
-        // start timer and put on buffer
-        SenzTimer timer = new SenzTimer(senz);
-        timer.start();
-        senzDirectory.put(senzWithUid.getAttributes().get(UID), timer);
+        if (senz.getAttributes().containsKey(UID)) {
+            // start timer and put on buffer
+            SenzTimer timer = new SenzTimer(senz);
+            timer.start();
+            senzDirectory.put(senz.getAttributes().get(UID), timer);
+        }
     }
 
     /**
@@ -67,18 +65,6 @@ public class SenzStatusTracker {
 
         // remove senz
         removeSenz(senz);
-    }
-
-    /**
-     * Return senz with a uid
-     *
-     * @param senz senz
-     * @return senz with UID
-     */
-    private Senz putUid(Senz senz) {
-        if (!senz.getAttributes().containsKey(UID))
-            senz.getAttributes().put(UID, SenzUtils.getUniqueRandomNumber());
-        return senz;
     }
 
     /**
