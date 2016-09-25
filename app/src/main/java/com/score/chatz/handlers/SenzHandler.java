@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.score.chatz.application.SenzStatusTracker;
+import com.score.chatz.remote.SenzStatusTracker;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.pojo.Stream;
@@ -49,7 +49,7 @@ public class SenzHandler extends BaseHandler {
 
             // bind to senz service
             Intent serviceIntent = new Intent();
-            serviceIntent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
+            serviceIntent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
             SenzHandler.context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
         return instance;

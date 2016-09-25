@@ -1,4 +1,4 @@
-package com.score.chatz.services;
+package com.score.chatz.remote;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.score.chatz.application.SenzStatusTracker;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.utils.PreferenceUtils;
@@ -38,9 +37,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 
-public class RemoteSenzService extends Service {
+public class SenzService extends Service {
 
-    private static final String TAG = RemoteSenzService.class.getName();
+    private static final String TAG = SenzService.class.getName();
 
     // socket host, port
     //public static final String SENZ_HOST = "10.2.2.49";
@@ -87,7 +86,7 @@ public class RemoteSenzService extends Service {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
-            SenzStatusTracker.getInstance(RemoteSenzService.this).startSenzTrack(senz);
+            SenzStatusTracker.getInstance(SenzService.this).startSenzTrack(senz);
             writeSenz(senz);
         }
 
@@ -199,7 +198,7 @@ public class RemoteSenzService extends Service {
 
                     // handle senz
                     if (!senz.equalsIgnoreCase("TAK")) {
-                        SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
+                        SenzHandler.getInstance(SenzService.this).handleSenz(senz);
                     }
                 }
             }
@@ -209,7 +208,7 @@ public class RemoteSenzService extends Service {
     }
 
     private void sendPing() {
-        Senz senz = SenzUtils.getPingSenz(RemoteSenzService.this);
+        Senz senz = SenzUtils.getPingSenz(SenzService.this);
         if (senz != null) writeSenz(senz);
     }
 
@@ -218,7 +217,7 @@ public class RemoteSenzService extends Service {
             public void run() {
                 // sign and write senz
                 try {
-                    PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
+                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
 
                     // if sender not already set find user(sender) and set it to senz first
                     if (senz.getSender() == null || senz.getSender().toString().isEmpty())
@@ -249,7 +248,7 @@ public class RemoteSenzService extends Service {
             @Override
             public void run() {
                 try {
-                    PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
+                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
 
                     //for (Senz senz : senzList) {
                     for (int i = 0; i < senzList.size(); i++) {

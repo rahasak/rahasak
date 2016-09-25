@@ -100,7 +100,7 @@ public class LocationService extends Service implements LocationListener {
         // bind with senz service
         if (!isServiceBound) {
             Intent serviceIntent = new Intent();
-            serviceIntent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
+            serviceIntent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
             bindService(serviceIntent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }

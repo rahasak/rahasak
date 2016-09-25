@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.interfaces.ISendingComHandler;
-import com.score.chatz.services.RemoteSenzService;
+import com.score.chatz.remote.SenzService;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.senz.ISenzService;
@@ -110,7 +110,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
     private void bindToSerice() {
         Intent intent = new Intent();
-        intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
+        intent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -124,7 +124,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
      */
     protected void startService() {
         // start service from here
-        Intent serviceIntent = new Intent(this, RemoteSenzService.class);
+        Intent serviceIntent = new Intent(this, SenzService.class);
         startService(serviceIntent);
 
         Log.d(TAG, "Service requested to start!!!");

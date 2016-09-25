@@ -1,9 +1,10 @@
-package com.score.chatz.application;
+package com.score.chatz.remote;
 
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.pojos.Senz;
 

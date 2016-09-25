@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.services.RemoteSenzService;
+import com.score.chatz.remote.SenzService;
 import com.score.chatz.utils.PreferenceUtils;
 
 /**
@@ -31,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startService() {
-        Intent serviceIntent = new Intent(this, RemoteSenzService.class);
+        Intent serviceIntent = new Intent(this, SenzService.class);
         startService(serviceIntent);
     }
 

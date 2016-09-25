@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.score.chatz.application.SenzStatusTracker;
 import com.score.senzc.pojos.Senz;
 
 /**

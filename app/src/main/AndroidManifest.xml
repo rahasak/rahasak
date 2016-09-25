@@ -137,11 +137,11 @@
             android:name=".services.LocationService"
             android:enabled="true" />
         <service
-            android:name=".services.RemoteSenzService"
+            android:name=".remote.SenzService"
             android:enabled="true"
             android:process=":remote">
             <intent-filter>
-                <action android:name="com.score.chatz.services.RemoteSenzService" />
+                <action android:name="com.score.chatz.services.SenzService" />
             </intent-filter>
         </service>
 
