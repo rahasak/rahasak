@@ -122,13 +122,13 @@ public class SenzorsDbSource {
         // Convert String value of boolean into an integer to be stored in sqlite (Since no support for boolean type)
         // update the inital variables with the new converted values
         if (camPerm != null) {
-            _camPerm = camPerm.equalsIgnoreCase("true") ? 1 : 0;
+            _camPerm = camPerm.equalsIgnoreCase("on") ? 1 : 0;
         }
         if (locPerm != null) {
-            _locPerm = locPerm.equalsIgnoreCase("true") ? 1 : 0;
+            _locPerm = locPerm.equalsIgnoreCase("on") ? 1 : 0;
         }
         if (micPerm != null) {
-            _micPerm = micPerm.equalsIgnoreCase("true") ? 1 : 0;
+            _micPerm = micPerm.equalsIgnoreCase("on") ? 1 : 0;
         }
 
         // content values to inset
@@ -169,13 +169,13 @@ public class SenzorsDbSource {
         // Convert String value of boolean into an integer to be stored in sqlite (Since no support for boolean type)
         // update the inital variables with the new converted values
         if (camPerm != null) {
-            _camPerm = camPerm.equalsIgnoreCase("true") ? 1 : 0;
+            _camPerm = camPerm.equalsIgnoreCase("on") ? 1 : 0;
         }
         if (locPerm != null) {
-            _locPerm = locPerm.equalsIgnoreCase("true") ? 1 : 0;
+            _locPerm = locPerm.equalsIgnoreCase("on") ? 1 : 0;
         }
         if (micPerm != null) {
-            _micPerm = micPerm.equalsIgnoreCase("true") ? 1 : 0;
+            _micPerm = micPerm.equalsIgnoreCase("on") ? 1 : 0;
         }
 
         // content values to inset

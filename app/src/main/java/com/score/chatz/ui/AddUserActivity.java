@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
@@ -124,8 +125,8 @@ public class AddUserActivity extends BaseActivity {
     private void share() {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("msg", "msg");
-        senzAttributes.put("status", "status");
+        senzAttributes.put("msg", "");
+        senzAttributes.put("status", "");
         senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
         senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
 
@@ -144,9 +145,16 @@ public class AddUserActivity extends BaseActivity {
      * Clear input fields and reset activity components
      */
     private void onPostShare(Senz senz) {
-        this.goBackToHome();
+        // save user in db
+        SenzorsDbSource dbSource = new SenzorsDbSource(this);
+        dbSource.getOrCreateUser(senz.getSender().getUsername());
+        dbSource.createPermissionsForUser(senz);
+        dbSource.createConfigurablePermissionsForUser(senz);
+
         ActivityUtils.showToast("Successfully added " + editTextUserId.getText().toString().trim(), this);
         editTextUserId.setText("");
+
+        this.goBackToHome();
     }
 
 
@@ -165,7 +173,6 @@ public class AddUserActivity extends BaseActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
         @Override

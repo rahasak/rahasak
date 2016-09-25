@@ -70,18 +70,28 @@ class SenHandler extends BasHandler {
             // show notification to current user
             String title = "@" + senz.getSender().getUsername();
             String message = "You have been invited to share secrets.";
-            showNotification(senzService.getApplicationContext(), title, message, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
+            showStatusNotification(senzService.getApplicationContext(), title, message, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
 
             // broadcast
-            broadcastDataSenz(senz, senzService.getApplicationContext());
+            broadcastShareSenz(senz, senzService.getApplicationContext());
         } else {
             // #mic #cam #lat #lon permission
+            SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+            if (senz.getAttributes().containsKey("cam")) {
+                dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("cam"), null, null);
+                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"));
+            } else if (senz.getAttributes().containsKey("mic")) {
+                dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("mic"));
+                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
+            } else if (senz.getAttributes().containsKey("lat")) {
+                dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
+                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
+            }
 
             // send status
-
-            // show notification
-
             // broadcast
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+            broadcastShareSenz(senz, senzService.getApplicationContext());
         }
     }
 
@@ -110,7 +120,7 @@ class SenHandler extends BasHandler {
 
                 // show notification
                 String title = "@" + senz.getSender().getUsername();
-                showNotification(senzService.getApplicationContext(), title, rahasa, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
+                showStatusNotification(senzService.getApplicationContext(), title, rahasa, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

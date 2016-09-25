@@ -17,8 +17,8 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.UserPermission;
 
 import java.util.ArrayList;
@@ -36,14 +36,14 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unregisterReceiver(userSharedReceiver);
+        getContext().unregisterReceiver(permissionSharedReceiver);
     }
 
-    private void setupEmptyTextFont(){
-            ((TextView)getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
+    private void setupEmptyTextFont() {
+        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
     }
 
-    private BroadcastReceiver userSharedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver permissionSharedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got new user from Senz service");
@@ -62,7 +62,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getListView().setOnItemClickListener(this);
-        getContext().registerReceiver(userSharedReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        getContext().registerReceiver(permissionSharedReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
     }
 
     @Override
@@ -105,7 +105,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     /**
      * Handle broadcast message receives
-     *
      *
      * @param intent intent
      */

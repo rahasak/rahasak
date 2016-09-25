@@ -18,6 +18,12 @@ class BasHandler {
         context.sendBroadcast(intent);
     }
 
+    void broadcastShareSenz(Senz senz, Context context) {
+        Intent intent = IntentProvider.getShareSenzIntent();
+        intent.putExtra("SENZ", senz);
+        context.sendBroadcast(intent);
+    }
+
     void broadcastNewDataToDisplaySenz(Senz senz, Context context) {
         Intent intent = IntentProvider.getNewDataToDisplayIntent();
         intent.putExtra("SENZ", senz);
@@ -51,7 +57,26 @@ class BasHandler {
         }).start();
     }
 
-    void showNotification(Context context, String title, String body, String sender, NotificationUtils.NOTIFICATION_TYPE type) {
+    void showStatusNotification(Context context, String title, String body, String sender, NotificationUtils.NOTIFICATION_TYPE type) {
         NotificationUtils.showNotification(context, title, body, sender, type);
+    }
+
+    void showPermissionNotification(Context context, User user, String permissionName, boolean isEnabled) {
+        if (permissionName.equalsIgnoreCase("loc")) {
+            if (isEnabled)
+                NotificationUtils.showNotification(context, "@" + user.getUsername(), "You been granted location permission!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
+            else
+                NotificationUtils.showNotification(context, "@" + user.getUsername(), "Your location privilege has been revoked!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
+        } else if (permissionName.equalsIgnoreCase("cam")) {
+            if (isEnabled)
+                NotificationUtils.showNotification(context, "@" + user.getUsername(), "You been granted camera permission!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
+            else
+                NotificationUtils.showNotification(context, "@" + user.getUsername(), "Your camera privilege has been revoked!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
+        } else if (permissionName.equalsIgnoreCase("mic")) {
+            if (isEnabled)
+                NotificationUtils.showNotification(context, "@" + user.getUsername(), "You been granted mic permission!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
+            else
+                NotificationUtils.showNotification(context, "@" + user.getUsername(), "Your mic privilege has been revoked!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
+        }
     }
 }

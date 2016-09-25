@@ -64,6 +64,17 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         }
     };
 
+    // share senz
+    private BroadcastReceiver senzShareReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Share senz");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzShareReceived(senz);
+        }
+    };
+
     // senz timeout
     private BroadcastReceiver senzTimeoutReceiver = new BroadcastReceiver() {
         @Override
@@ -113,6 +124,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         super.onResume();
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(senzShareReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
         registerReceiver(senzTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.PACKET_TIMEOUT));
 
         // init list again
@@ -123,6 +135,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     public void onStop() {
         super.onStop();
         unregisterReceiver(senzReceiver);
+        unregisterReceiver(senzShareReceiver);
         unregisterReceiver(senzTimeoutReceiver);
     }
 
@@ -233,8 +246,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("lat", "lat");
-        senzAttributes.put("lon", "lon");
+        senzAttributes.put("lat", "");
+        senzAttributes.put("lon", "");
         senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
@@ -252,7 +265,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("cam", "cam");
+        senzAttributes.put("cam", "");
         senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
@@ -270,7 +283,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("mic", "mic");
+        senzAttributes.put("mic", "");
         senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
@@ -315,15 +328,42 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             if (msg != null && msg.equalsIgnoreCase("700")) {
                 onSenzStatusReceived(senz);
             }
-        } else if (senz.getAttributes().containsKey("msg")) {
+        } else if (senz.getAttributes().containsKey("msg") || senz.getAttributes().containsKey("cam") || senz.getAttributes().containsKey("mic")) {
             // chat message
-            onNewSenzReceived(senz);
-        } else if (senz.getAttributes().containsKey("cam")) {
-            onNewSenzReceived(senz);
-        } else if (senz.getAttributes().containsKey("mic")) {
             onNewSenzReceived(senz);
         } else if (senz.getAttributes().containsKey("lat")) {
             onLocationReceived(senz);
+        }
+    }
+
+    private void onSenzShareReceived(Senz senz) {
+        updatePermissions();
+    }
+
+    public void onSenzTimeoutReceived(Senz senz) {
+        String uid = senz.getAttributes().get("uid");
+        new SenzorsDbSource(this).markSecretDeliveryFailed(uid);
+
+        // update failed message in list
+        for (Secret secret : secretList) {
+            if (secret.getID().equalsIgnoreCase(uid)) {
+                secret.setDeliveryFailed(true);
+                secretAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private void onSenzStatusReceived(Senz senz) {
+        // update senz in db
+        String uid = senz.getAttributes().get("uid");
+        new SenzorsDbSource(this).markSecretDelievered(uid);
+
+        for (Secret secret : secretList) {
+            if (secret.getID().equalsIgnoreCase(uid)) {
+                secret.setIsDelivered(true);
+                secretAdapter.notifyDataSetChanged();
+                playSound();
+            }
         }
     }
 
@@ -389,33 +429,6 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             } else {
                 btnMic.setImageResource(R.drawable.perm_mic_deactive);
                 btnMic.setEnabled(false);
-            }
-        }
-    }
-
-    private void onSenzStatusReceived(Senz senz) {
-        // update senz in db
-        String uid = senz.getAttributes().get("uid");
-        new SenzorsDbSource(this).markSecretDelievered(uid);
-
-        for (Secret secret : secretList) {
-            if (secret.getID().equalsIgnoreCase(uid)) {
-                secret.setIsDelivered(true);
-                secretAdapter.notifyDataSetChanged();
-                playSound();
-            }
-        }
-    }
-
-    public void onSenzTimeoutReceived(Senz senz) {
-        String uid = senz.getAttributes().get("uid");
-        new SenzorsDbSource(this).markSecretDeliveryFailed(uid);
-
-        // update failed message in list
-        for (Secret secret : secretList) {
-            if (secret.getID().equalsIgnoreCase(uid)) {
-                secret.setDeliveryFailed(true);
-                secretAdapter.notifyDataSetChanged();
             }
         }
     }

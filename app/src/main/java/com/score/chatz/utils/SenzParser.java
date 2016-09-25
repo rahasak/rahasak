@@ -67,7 +67,7 @@ public class SenzParser {
 
         // add attributes to payload
         for (String key : senz.getAttributes().keySet()) {
-            if (key.equalsIgnoreCase(senz.getAttributes().get(key))) {
+            if (key.equalsIgnoreCase(senz.getAttributes().get(key)) || senz.getAttributes().get(key).isEmpty()) {
                 // GET or SHARE query
                 // param and value equal since no value to store (SHARE #lat #lon)
                 payload = payload.concat(" ").concat("#").concat(key).concat(" ").concat(senz.getAttributes().get(key));

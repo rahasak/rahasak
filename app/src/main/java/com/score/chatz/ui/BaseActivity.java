@@ -67,6 +67,14 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         }
     };
 
+    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -78,15 +86,15 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     }
 
     @Override
-    protected void onStart() {
+    protected void onResume() {
         super.onStart();
-        registerAllReceivers();
+        this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         super.onStop();
-        unregisterAllReceivers();
+        this.unregisterReceiver(userBusyNotifier);
     }
 
     @Override
@@ -102,21 +110,10 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //startService();
-    }
-
     private void bindToSerice() {
         Intent intent = new Intent();
         intent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     /**
@@ -223,23 +220,6 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
         dialog.show();
     }
-
-    private void registerAllReceivers() {
-        //Notify when user don't want to responsed to requests
-        this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
-    }
-
-    private void unregisterAllReceivers() {
-        this.unregisterReceiver(userBusyNotifier);
-    }
-
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
 
     @Override
     public void send(Senz senz) {
