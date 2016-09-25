@@ -147,7 +147,9 @@ public class SenzHandler extends BaseHandler {
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("userBusy")) {
             // Broadcast User don't want to respond to your annoying sensor requests!!!!!
             broadcastUserBusySenz(senz, context);
-        } else if (senz.getAttributes().containsKey("chatzmsg")) {
+        } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("locDisabled")) {
+            broadcastNoLocationSenz(senz, context);
+        }  else if (senz.getAttributes().containsKey("chatzmsg")) {
             // New Chat message rec!!!!!!!
             SenzMessageHandler.getInstance().onNewMessage(senz, serviceConnection.getInterface(), dbSource, context);
         } else if (senz.getAttributes().containsKey("stream")) {

@@ -60,6 +60,16 @@ public class IntentProvider {
         return  intent;
     }
 
+    public static Intent getNoLocationEnabledIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.NO_LOC_ENABLED));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return  intent;
+    }
+
     /**
      * Return the intent filter for the intent_type.
      * @param type
@@ -112,9 +122,11 @@ public class IntentProvider {
             case PACKET_TIMEOUT:
                 intentString = "com.score.chatz.PACKET_TIMEOUT";
                 break;
-            // Depressing!! That #$%! is not online!! :)
             case NEW_DATA_TO_DISPLAY:
                 intentString = "com.score.chatz.NEW_DATA_TO_DISPLAY";
+                break;
+            case NO_LOC_ENABLED:
+                intentString = "com.score.chatz.NO_LOC_ENABLED";
                 break;
             default:
                 throw new InvalidIntentType();
@@ -133,6 +145,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        DATA_SENZ, USER_BUSY, PACKET_TIMEOUT, NEW_DATA_TO_DISPLAY
+        DATA_SENZ, USER_BUSY, PACKET_TIMEOUT, NEW_DATA_TO_DISPLAY, NO_LOC_ENABLED
     }
 }

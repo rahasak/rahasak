@@ -49,6 +49,9 @@ public class LocationService extends Service implements LocationListener {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d(TAG, "Connected with senz service");
             senzService = ISenzService.Stub.asInterface(service);
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                sendLocationProviderNotEnabled();
+            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -57,17 +60,11 @@ public class LocationService extends Service implements LocationListener {
         }
     };
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onCreate() {
         // start to listen location updates from here
@@ -79,21 +76,21 @@ public class LocationService extends Service implements LocationListener {
 
         if (!isGPSEnabled && !isNetworkEnabled) {
             Log.d(TAG, "No location provider enable");
+            if(senzService != null)
+                sendLocationProviderNotEnabled();
         } else {
-            if (isGPSEnabled) {
-                Log.d(TAG, "Getting location via GPS");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            }
             if (isNetworkEnabled) {
                 Log.d(TAG, "Getting location via Network");
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             }
+            if (isGPSEnabled) {
+                Log.d(TAG, "Getting location via GPS");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            }
+
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -111,9 +108,6 @@ public class LocationService extends Service implements LocationListener {
         return START_STICKY;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -121,7 +115,6 @@ public class LocationService extends Service implements LocationListener {
         if (isGPSEnabled) locationManager.removeUpdates(LocationService.this);
         if (isNetworkEnabled) locationManager.removeUpdates(LocationService.this);
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
@@ -165,6 +158,24 @@ public class LocationService extends Service implements LocationListener {
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             senzAttributes.put("lat", Double.toString(location.getLatitude()));
             senzAttributes.put("lon", Double.toString(location.getLongitude()));
+
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+            senzService.send(senz);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendLocationProviderNotEnabled() {
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("msg", "locDisabled");
 
             String id = "_ID";
             String signature = "_SIGNATURE";

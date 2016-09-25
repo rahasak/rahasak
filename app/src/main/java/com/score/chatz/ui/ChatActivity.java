@@ -227,6 +227,9 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void onClickLocation() {
+        // Go to locations waiting page
+        navigateToLocationView();
+
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
@@ -324,9 +327,9 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             onNewSenzReceived(senz);
         } else if (senz.getAttributes().containsKey("chatzsound")) {
             onNewSenzReceived(senz);
-        } else if (senz.getAttributes().containsKey("lat")) {
+        } /*else if (senz.getAttributes().containsKey("lat")) {
             onLocationReceived(senz);
-        }
+        }*/
     }
 
     private void onNewSenzReceived(Senz senz) {
@@ -361,13 +364,6 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
         // start location address receiver
         new LocationAddressReceiver(this, latLng, senz.getSender()).execute("PARAM");
-
-        // TODO start map first
-        // start map activity
-        Intent mapIntent = new Intent(this, SenzMapActivity.class);
-        mapIntent.putExtra("extra", latLng);
-        startActivity(mapIntent);
-        overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
 
     private void updatePermissions() {
@@ -451,5 +447,14 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
                 new SenzorsDbSource(this).deleteSecret(secret);
             }
         }
+    }
+
+    private void navigateToLocationView(){
+        // TODO start map first
+        // start map activity
+        Intent mapIntent = new Intent(this, SenzMapActivity.class);
+        //mapIntent.putExtra("extra", latLng);
+        startActivity(mapIntent);
+        overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
 }

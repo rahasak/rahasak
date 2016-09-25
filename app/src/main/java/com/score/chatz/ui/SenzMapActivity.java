@@ -1,7 +1,11 @@
 package com.score.chatz.ui;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -9,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -27,7 +32,10 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
+import com.score.chatz.services.LocationAddressReceiver;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.senzc.pojos.Senz;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -71,12 +79,57 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
     Polyline line;
 
+    // senz message
+    private BroadcastReceiver noLocationEnabledReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
+    // No locations enabled message
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
+    public void onSenzReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("locDisabled")) {
+            closeProgressLoader();
+            Toast.makeText(this, "Sorry, User has Locations disabled.", Toast.LENGTH_LONG).show();
+            this.finish();
+        }else if (senz.getAttributes().containsKey("lat")) {
+            // location response received
+            double lat = Double.parseDouble(senz.getAttributes().get("lat"));
+            double lan = Double.parseDouble(senz.getAttributes().get("lon"));
+            LatLng latLng = new LatLng(lat, lan);
+
+            // start location address receiver
+            new LocationAddressReceiver(this, latLng, senz.getSender()).execute("PARAM");
+            initLocationCoordinates(latLng);
+            closeProgressLoader();
+            setUpMapIfNeeded();
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        showProgressLoader();
 
         setContentView(R.layout.senz_map_layout);
         myLocation = (RelativeLayout) findViewById(R.id.map_location);
@@ -102,8 +155,17 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         });
 
         setUpActionBar();
-        initLocationCoordinates();
-        setUpMapIfNeeded();
+
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(noLocationEnabledReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.NO_LOC_ENABLED));
+    }
+
+    private void showProgressLoader(){
+        ActivityUtils.showProgressDialog(SenzMapActivity.this, "Please wait...");
+    }
+
+    private void closeProgressLoader(){
+        ActivityUtils.cancelProgressDialog();
     }
 
     private void requestLocation() {
@@ -134,6 +196,9 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
         if (isGPSEnabled) locationManager.removeUpdates(SenzMapActivity.this);
         if (isNetworkEnabled) locationManager.removeUpdates(SenzMapActivity.this);
+
+        unregisterReceiver(senzReceiver);
+        unregisterReceiver(noLocationEnabledReceiver);
     }
 
     /**
@@ -149,26 +214,28 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
      * Set action bar title and font
      */
     private void setUpActionBar() {
-        ActionBar actionBar = getActionBar();
-//        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-//        TextView actionBarTitle = (TextView) (this.findViewById(titleId));
-//
-//        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
-//        actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-//        actionBarTitle.setTypeface(typefaceThin);
-//
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.setTitle("#Location");
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        getSupportActionBar().setTitle("Secret Location");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
      * Initialize LatLng object from here
      */
-    private void initLocationCoordinates() {
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            this.friendLatLan = bundle.getParcelable("extra");
-        }
+    private void initLocationCoordinates(LatLng loc) {
+        this.friendLatLan = loc;
     }
 
     /**
