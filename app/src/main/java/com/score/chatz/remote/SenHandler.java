@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
@@ -15,6 +14,7 @@ import com.score.senzc.pojos.Senz;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 
 class SenHandler extends BasHandler {
     private static final String TAG = SenHandler.class.getName();
@@ -150,10 +150,16 @@ class SenHandler extends BasHandler {
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
             stream.setActive(false);
 
+            // new stream senz
+            HashMap<String, String> attributes = new HashMap<>();
+            attributes.put("cam", stream.getStream());
+            attributes.put("uid", senz.getAttributes().get("uid"));
+            Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
+
             // save in db
             // broadcast
             saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
-            broadcastStreamSenz(senz, senzService.getApplicationContext());
+            broadcastStreamSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
             stream.appendStream(senz.getAttributes().get("cam"));
@@ -164,7 +170,6 @@ class SenHandler extends BasHandler {
         try {
             Intent intent = IntentProvider.getCameraIntent(senzService.getApplicationContext());
             intent.putExtra("Senz", senz);
-            intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
             senzService.getApplicationContext().startActivity(intent);
         } catch (Exception e) {
             // fail to access camera

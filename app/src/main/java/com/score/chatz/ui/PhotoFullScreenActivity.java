@@ -37,18 +37,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
 
-    // senz message
-    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-
-            // extract senz
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzReceived(senz);
-        }
-    };
-
     // share senz
     private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
         @Override
@@ -94,15 +82,13 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
-        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
+        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(senzStreamReceiver);
-        unregisterReceiver(senzReceiver);
     }
 
     private void loadBitmap(String data, ImageView imageView) {
@@ -127,14 +113,13 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         }.start();
     }
 
-    private void onSenzReceived(Senz senz) {
-
-    }
-
     private void onSenzStreamReceived(Senz senz) {
         if (senz.getAttributes().containsKey("cam")) {
             // display stream
-            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(imageData.getBytes()));
+            loadingText.setVisibility(View.INVISIBLE);
+            imageView.setVisibility(View.VISIBLE);
+            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(senz.getAttributes().get("cam").getBytes()));
+            startCloseViewTimer();
         }
     }
 

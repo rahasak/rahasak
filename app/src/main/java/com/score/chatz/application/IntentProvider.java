@@ -40,6 +40,16 @@ public class IntentProvider {
         return intent;
     }
 
+    public static Intent getStreamSenzIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.STREAM_SENZ));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return intent;
+    }
+
     public static Intent getUserBusyIntent() {
         Intent intent = null;
         try {
@@ -129,6 +139,10 @@ public class IntentProvider {
                 // share senz
                 intentString = "com.score.chatz.SHARE_SENZ";
                 break;
+            case STREAM_SENZ:
+                // share senz
+                intentString = "com.score.chatz.STREAM_SENZ";
+                break;
             case USER_BUSY:
                 // Ohhh!! User is too busy to respond
                 intentString = "com.score.chatz.USER_BUSY";
@@ -160,6 +174,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        DATA_SENZ, SHARE_SENZ, USER_BUSY, PACKET_TIMEOUT, NEW_DATA_TO_DISPLAY, NO_LOC_ENABLED
+        DATA_SENZ, SHARE_SENZ, STREAM_SENZ, USER_BUSY, PACKET_TIMEOUT, NEW_DATA_TO_DISPLAY, NO_LOC_ENABLED
     }
 }

@@ -25,7 +25,7 @@ class BasHandler {
     }
 
     void broadcastStreamSenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getNewDataToDisplayIntent();
+        Intent intent = IntentProvider.getStreamSenzIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }

@@ -1,22 +1,11 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.util.Base64;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.score.chatz.R;
-import com.score.chatz.handlers.SenzPhotoHandler;
-import com.score.chatz.pojo.SenzStream;
-import com.score.chatz.utils.CameraUtils;
-import com.score.chatz.utils.SenzUtils;
-import com.score.senzc.pojos.Senz;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -34,8 +23,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static CameraPreview instance;
 
     //Constructor that obtains context and camera
-    public CameraPreview(Context _context, Camera camera) {
-        super(_context);
+    private CameraPreview(Context context, Camera camera) {
+        super(context);
 
         this.mCamera = camera;
         this.mSurfaceHolder = this.getHolder();
@@ -44,19 +33,19 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         instance = this;
     }
 
-    public static CameraPreview getSingleton(Context _context, Camera camera){
-        if(instance == null){
-          return new CameraPreview(_context,  camera);
-        }else{
-            return instance;
+    public static CameraPreview getSingleton(Context context, Camera camera) {
+        if (instance == null) {
+            instance = new CameraPreview(context, camera);
         }
+
+        return instance;
     }
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.05;
-        double targetRatio = (double) w/h;
+        double targetRatio = (double) w / h;
 
-        if (sizes==null) return null;
+        if (sizes == null) return null;
 
         Camera.Size optimalSize = null;
 
@@ -88,22 +77,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        isCameraBusy =true;
-            mCamera = getCameraInstant();
-            Camera.Parameters parameters = mCamera.getParameters();
-            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-            parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
-            mCamera.setParameters(parameters);
-            try {
-                mCamera.setPreviewDisplay(surfaceHolder);
-                mCamera.setDisplayOrientation(90);
+        isCameraBusy = true;
+        Camera.Parameters parameters = mCamera.getParameters();
+        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+        parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
+        mCamera.setParameters(parameters);
+        try {
+            mCamera.setPreviewDisplay(surfaceHolder);
+            mCamera.setDisplayOrientation(90);
 
-                mCamera.startPreview();
-            } catch (IOException e) {
-                // left blank for now
-                Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-
-            }
+            mCamera.startPreview();
+        } catch (IOException e) {
+            // left blank for now
+            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+        }
     }
 
     @Override
@@ -113,7 +100,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             mCamera.release();
-            isCameraBusy =false;
+            isCameraBusy = false;
         }
     }
 
@@ -141,23 +128,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    /**
-     * Helper method to access the camera returns null if
-     * it cannot get the camera or does not exist
-     *
-     * @return
-     */
-    private Camera getCameraInstant() {
-        Camera camera = null;
-        try {
-            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        } catch (Exception e) {
-            // cannot get camera or does not exist
-        }
-        return camera;
-    }
-
-    public boolean isCameraBusy(){
+    public boolean isCameraBusy() {
         return isCameraBusy;
     }
 }
