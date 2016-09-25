@@ -20,25 +20,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private boolean isCameraBusy;
 
-    private static CameraPreview instance;
-
     //Constructor that obtains context and camera
-    private CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, Camera camera) {
         super(context);
 
         this.mCamera = camera;
         this.mSurfaceHolder = this.getHolder();
         this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
-        instance = this;
-    }
-
-    public static CameraPreview getSingleton(Context context, Camera camera) {
-        if (instance == null) {
-            instance = new CameraPreview(context, camera);
-        }
-
-        return instance;
     }
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {

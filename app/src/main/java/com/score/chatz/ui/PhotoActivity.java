@@ -73,7 +73,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         setContentView(R.layout.activity_photo);
 
         initCameraInstant();
-        mCameraPreview = CameraPreview.getSingleton(this, mCamera);
+        mCameraPreview = new CameraPreview(this, mCamera);
         setupActivity();
 
         try {
