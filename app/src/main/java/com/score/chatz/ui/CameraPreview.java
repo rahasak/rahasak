@@ -116,35 +116,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //}
     }
 
-    public void takePhotoManually(final PhotoActivity activity, final Senz originalSenz) {
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
 
-                byte[] resizedImage = null;
-                bytes = resizeBitmapByteArray(bytes, 90);
-                if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
-                    //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, IMAGE_SIZE);
-                } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
-                    resizedImage = CameraUtils.getCompressedImage(bytes, IMAGE_SIZE);
-                }
-
-                isCameraBusy = false;
-
-                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
-                Intent i = new Intent(activity, PhotoFullScreenActivity.class);
-                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
-                /*String uid = SenzUtils.getUniqueRandomNumber().toString();
-                i.putExtra("IMAGE_RES_ID", uid);
-                CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(resizedImage, 0)), getContext());*/
-                i.putExtra("QUICK_PREVIEW", "true");
-                activity.startActivity(i);
-                activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                activity.finish();
-            }
-        });
-    }
 
     private byte[] resizeBitmapByteArray(byte[] data, int deg) {
         Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));

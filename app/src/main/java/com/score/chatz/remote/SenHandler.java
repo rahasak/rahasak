@@ -1,8 +1,11 @@
 package com.score.chatz.remote;
 
+import android.content.Intent;
 import android.util.Log;
 
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
@@ -42,7 +45,7 @@ class SenHandler extends BasHandler {
                 break;
             case GET:
                 Log.d(TAG, "GET received");
-                handleGet(senz);
+                handleGet(senz, senzService);
                 break;
             case DATA:
                 Log.d(TAG, "DATA received");
@@ -95,10 +98,17 @@ class SenHandler extends BasHandler {
         }
     }
 
-    private void handleGet(Senz senz) {
-        // send ack
+    private void handleGet(Senz senz, SenzService senzService) {
+        if (senz.getAttributes().containsKey("cam")) {
+            // TODO send ack 800 first
 
-        // delegate to get handler
+            // launch camera
+            handleCam(senz, senzService);
+        } else if (senz.getAttributes().containsKey("mic")) {
+
+        } else if (senz.getAttributes().containsKey("lat")) {
+
+        }
     }
 
     private void handleData(Senz senz, SenzService senzService) {
@@ -140,16 +150,25 @@ class SenHandler extends BasHandler {
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
             stream.setActive(false);
 
-            // TODO send ack
-            //senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid")));
-
             // save in db
             // broadcast
             saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
-            broadcastNewDataToDisplaySenz(senz, senzService.getApplicationContext());
+            broadcastStreamSenz(senz, senzService.getApplicationContext());
         } else {
             // middle stream
             stream.appendStream(senz.getAttributes().get("cam"));
+        }
+    }
+
+    private void handleCam(Senz senz, SenzService senzService) {
+        try {
+            Intent intent = IntentProvider.getCameraIntent(senzService.getApplicationContext());
+            intent.putExtra("Senz", senz);
+            intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
+            senzService.getApplicationContext().startActivity(intent);
+        } catch (Exception e) {
+            // fail to access camera
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "802"));
         }
     }
 

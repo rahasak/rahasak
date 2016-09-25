@@ -24,20 +24,8 @@ class BasHandler {
         context.sendBroadcast(intent);
     }
 
-    void broadcastNewDataToDisplaySenz(Senz senz, Context context) {
+    void broadcastStreamSenz(Senz senz, Context context) {
         Intent intent = IntentProvider.getNewDataToDisplayIntent();
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);
-    }
-
-    void broadcastUserBusySenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getUserBusyIntent();
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);
-    }
-
-    void broadcastNoLocationSenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getNoLocationEnabledIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }

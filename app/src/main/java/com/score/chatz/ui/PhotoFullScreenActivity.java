@@ -1,18 +1,17 @@
 package com.score.chatz.ui;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -22,58 +21,88 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.utils.CameraUtils;
 import com.score.senzc.pojos.Senz;
 
 public class PhotoFullScreenActivity extends AppCompatActivity {
 
+    private static final String TAG = PhotoFullScreenActivity.class.getName();
+
     private ImageView imageView;
-    private String image;
-
     private View loadingText;
-    private Activity activity;
 
-    private static final int CLOSE_QUICK_VIEW_TIME = 2000; // 2 seconds
+    private String imageData;
+
+    private static final int CLOSE_QUICK_VIEW_TIME = 2000;
+
+    // senz message
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
+    // share senz
+    private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Share senz");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzStreamReceived(senz);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_full_screen);
-        setupUi();
-        activity = this;
 
+        initUi();
+        initIntent();
+    }
 
+    private void initUi() {
+        imageView = (ImageView) findViewById(R.id.imageView);
+        loadingText = findViewById(R.id.loading_text);
+    }
+
+    private void initIntent() {
         Intent intent = getIntent();
-        if(intent.hasExtra("IMAGE")) {
+        if (intent.hasExtra("IMAGE")) {
             loadingText.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
-            image = intent.getStringExtra("IMAGE");
-            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(image.getBytes()));
-        }else{
+            imageData = intent.getStringExtra("IMAGE");
+            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(imageData.getBytes()));
+        } else {
             loadingText.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
         }
-        //image = CameraUtils.getPhotoCache(intent.getStringExtra("IMAGE_RES_ID"), getApplicationContext());
 
-        if(intent.hasExtra("QUICK_PREVIEW")){
-            startTimerToCloseView();
+        if (intent.hasExtra("QUICK_PREVIEW")) {
+            startCloseViewTimer();
         }
-
-
-        //imageView.setImageBitmap(image);
-    }
-
-    private void setupUi(){
-        imageView = (ImageView) findViewById(R.id.imageView);
-        loadingText = findViewById(R.id.loading_text);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerAllReceivers();
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(senzStreamReceiver);
+        unregisterReceiver(senzReceiver);
     }
 
     private void loadBitmap(String data, ImageView imageView) {
@@ -85,56 +114,29 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             task.execute(new BitmapTaskParams(data, 1000, 1000));
     }
 
-    private void startTimerToCloseView(){
-        final Activity _this = this;
+    private void startCloseViewTimer() {
         new CountDownTimer(CLOSE_QUICK_VIEW_TIME, CLOSE_QUICK_VIEW_TIME) {
             @Override
             public void onTick(long millisUntilFinished) {
-
             }
 
             @Override
             public void onFinish() {
-                _this.finish();
+                PhotoFullScreenActivity.this.finish();
             }
         }.start();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterAllReceivers();
+    private void onSenzReceived(Senz senz) {
+
     }
 
-    private void registerAllReceivers(){
-        //Notify when user don't want to responsed to requests
-        this.registerReceiver(newDataToDisplay, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.NEW_DATA_TO_DISPLAY));
-        this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
-    }
-
-    private void unregisterAllReceivers(){
-        this.unregisterReceiver(newDataToDisplay);
-        this.unregisterReceiver(userBusyNotifier);
-    }
-
-    private BroadcastReceiver newDataToDisplay = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            loadingText.setVisibility(View.INVISIBLE);
-            imageView.setVisibility(View.VISIBLE);
-            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(senz.getAttributes().get("chatzphoto").getBytes()));
-            startTimerToCloseView();
+    private void onSenzStreamReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("cam")) {
+            // display stream
+            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(imageData.getBytes()));
         }
-    };
-
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
+    }
 
     public void displayInformationMessageDialog(String title, String message) {
         final Dialog dialog = new Dialog(this);
@@ -163,7 +165,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
-                activity.finish();
+                PhotoFullScreenActivity.this.finish();
             }
         });
 
