@@ -1,16 +1,12 @@
 package com.score.chatz.ui;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.CountDownTimer;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -18,18 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.asyncTasks.RahasPlayer;
-import com.score.chatz.pojo.BitmapTaskParams;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.interfaces.IRahasPlayListener;
 import com.score.senzc.pojos.Senz;
 
-public class AudioFullScreenActivity extends AppCompatActivity {
+public class AudioFullScreenActivity extends AppCompatActivity implements IRahasPlayListener {
 
     private static final String TAG = AudioFullScreenActivity.class.getName();
 
@@ -89,7 +82,7 @@ public class AudioFullScreenActivity extends AppCompatActivity {
         initIntent();
     }
 
-    private void setupUi(){
+    private void setupUi() {
         playingText = findViewById(R.id.playingText);
         loadingText = findViewById(R.id.loading_text);
     }
@@ -106,12 +99,12 @@ public class AudioFullScreenActivity extends AppCompatActivity {
         unregisterAllReceivers();
     }
 
-    private void registerAllReceivers(){
+    private void registerAllReceivers() {
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
         registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
     }
 
-    private void unregisterAllReceivers(){
+    private void unregisterAllReceivers() {
         unregisterReceiver(senzStreamReceiver);
         unregisterReceiver(senzReceiver);
     }
@@ -129,17 +122,17 @@ public class AudioFullScreenActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
+            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
         }
     };
 
     private void initIntent() {
         Intent intent = getIntent();
-        if(intent.hasExtra("SOUND")) {
+        if (intent.hasExtra("SOUND")) {
             loadingText.setVisibility(View.INVISIBLE);
             playingText.setVisibility(View.VISIBLE);
             new RahasPlayer(Base64.decode(intent.getStringExtra("SOUND"), 0), getApplicationContext(), this).execute("Rahsa");
-        }else{
+        } else {
             loadingText.setVisibility(View.VISIBLE);
             playingText.setVisibility(View.INVISIBLE);
         }
@@ -177,5 +170,10 @@ public class AudioFullScreenActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    @Override
+    public void onFinishPlay() {
+        this.finish();
     }
 }

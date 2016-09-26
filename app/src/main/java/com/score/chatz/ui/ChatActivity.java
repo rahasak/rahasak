@@ -484,4 +484,5 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         startActivity(mapIntent);
         overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
+
 }
