@@ -65,6 +65,17 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     };
 
     // share senz
+    private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Share senz");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzStreamReceived(senz);
+        }
+    };
+
+    // share senz
     private BroadcastReceiver senzShareReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -125,6 +136,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
         registerReceiver(senzShareReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
+        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
         registerReceiver(senzTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.PACKET_TIMEOUT));
 
         // init list again
@@ -136,6 +148,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         super.onStop();
         unregisterReceiver(senzReceiver);
         unregisterReceiver(senzShareReceiver);
+        unregisterReceiver(senzStreamReceiver);
         unregisterReceiver(senzTimeoutReceiver);
     }
 
@@ -327,15 +340,19 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             String msg = senz.getAttributes().get("status");
             if (msg != null && msg.equalsIgnoreCase("700")) {
                 onSenzStatusReceived(senz);
-            }else if (msg != null && msg.equalsIgnoreCase("901")) {
+            } else if (msg != null && msg.equalsIgnoreCase("901")) {
                 displayInformationMessageDialog("Sorry", "User is busy.");
             }
-        } else if (senz.getAttributes().containsKey("msg") || senz.getAttributes().containsKey("cam") || senz.getAttributes().containsKey("mic")) {
+        } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
             onNewSenzReceived(senz);
         } else if (senz.getAttributes().containsKey("lat")) {
             onLocationReceived(senz);
         }
+    }
+
+    private void onSenzStreamReceived(Senz senz) {
+        onNewSenzReceived(senz);
     }
 
     private void onSenzShareReceived(Senz senz) {
@@ -443,7 +460,6 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
                 mp.reset();
                 mp.release();
             }
-
         });
         mediaPlayer.start();
     }

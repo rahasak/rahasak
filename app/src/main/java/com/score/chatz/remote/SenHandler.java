@@ -110,7 +110,6 @@ class SenHandler extends BasHandler {
             handleMic(senz, senzService);
         } else if (senz.getAttributes().containsKey("lat")) {
             // handle location
-
         }
     }
 
@@ -168,7 +167,7 @@ class SenHandler extends BasHandler {
                 saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
             else
                 saveSecret(stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
-            broadcastDataSenz(streamSenz, senzService.getApplicationContext());
+            broadcastStreamSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam"))
