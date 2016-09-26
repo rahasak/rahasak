@@ -73,7 +73,6 @@
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -126,11 +125,13 @@
             android:name=".ui.RecordingActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/MyMaterialTheme">
+        </activity>
         <activity android:name=".ui.AudioFullScreenActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/MyMaterialTheme">
+        </activity>
 
         <!-- Servicves -->
         <service

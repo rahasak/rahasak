@@ -9,9 +9,6 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by lakmalcaldera on 8/16/16.
- */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = CameraPreview.class.getName();
@@ -34,10 +31,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     /**
      * Get best ratio for photo, which change from device to device. OTherwise some devices the photos seems to be out of ratio!!
      *
-     * @param sizes
-     * @param w
-     * @param h
-     * @return
+     * @param sizes size
+     * @param w     width
+     * @param h     height
+     * @return camera size
      */
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.05;
@@ -49,27 +46,26 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         double minDiff = Double.MAX_VALUE;
 
-        int targetHeight = h;
-
-        // Find size
+        // find size
         for (Camera.Size size : sizes) {
             double ratio = (double) size.width / size.height;
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
+            if (Math.abs(size.height - h) < minDiff) {
                 optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
+                minDiff = Math.abs(size.height - h);
             }
         }
 
         if (optimalSize == null) {
             minDiff = Double.MAX_VALUE;
             for (Camera.Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
+                if (Math.abs(size.height - h) < minDiff) {
                     optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
+                    minDiff = Math.abs(size.height - h);
                 }
             }
         }
+
         return optimalSize;
     }
 
@@ -100,7 +96,4 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                                int width, int height) {
     }
 
-    public static boolean isCameraBusy() {
-        return isCameraBusy;
-    }
 }

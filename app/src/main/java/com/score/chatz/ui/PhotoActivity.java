@@ -12,7 +12,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
@@ -72,26 +71,20 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
 
         originalSenz = getIntent().getParcelableExtra("Senz");
 
-        if (CameraPreview.isCameraBusy()) {
-            //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
-            //this.finish();
-        } else {
-            //init camera
-            initCameraInstant();
-            mCameraPreview = new CameraPreview(this, mCamera);
-            setupCameraSurface();
+        //init camera
+        initCameraPreview();
+        setupCameraSurface();
 
-            //init activity
-            setupUi();
-            setupSwipeBtns();
-            startBtnAnimations();
-            startVibrations();
-            setupHandlesForSwipeBtnContainers();
-            setupPhotoRequestTitle();
-            setupWakeLock();
-            getSupportActionBar().hide();
-            startTimerToEndRequest();
-        }
+        // init activity
+        setupUi();
+        setupSwipeBtns();
+        startBtnAnimations();
+        startVibrations();
+        setupHandlesForSwipeBtnContainers();
+        setupPhotoRequestTitle();
+        setupWakeLock();
+        getSupportActionBar().hide();
+        startTimerToEndRequest();
     }
 
     private void setupWakeLock() {
@@ -178,8 +171,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        int x = (int) event.getRawX();
-        int y = (int) event.getRawY();
         switch (event.getAction()) {
             case (MotionEvent.ACTION_DOWN):
                 v.clearAnimation();
@@ -233,7 +224,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         hideUiControls();
 
         new CountDownTimer(TIME_TO_QUICK_PHOTO, 1000) {
-
             public void onTick(long millisUntilFinished) {
                 updateQuicCountTimer((int) millisUntilFinished / 1000);
             }
@@ -250,9 +240,10 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      *
      * @return
      */
-    private void initCameraInstant() {
+    private void initCameraPreview() {
         try {
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            mCameraPreview = new CameraPreview(this, mCamera);
         } catch (Exception e) {
             // cannot get camera or does not exist
             Log.e(TAG, "No font cam");
@@ -267,7 +258,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
 
-                sendPhoto(resizedImage, originalSenz, PhotoActivity.this);
+                sendPhotoSenz(resizedImage, originalSenz, PhotoActivity.this);
                 Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);
                 i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
                 i.putExtra("QUICK_PREVIEW", "true");
@@ -296,7 +287,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, PhotoActivity.this);
+                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, PhotoActivity.this);
                 PhotoActivity.this.finish();
             }
 
@@ -325,7 +316,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     /**
      * Util methods
      */
-    private void sendPhoto(final byte[] image, final Senz senz, final Context context) {
+    private void sendPhotoSenz(final byte[] image, final Senz senz, final Context context) {
         // compose senz
         String uid = SenzUtils.getUniqueRandomNumber();
 
@@ -343,6 +334,21 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         senzList.add(stopStreamSenz);
 
         sendInOrder(senzList);
+    }
+
+    private void sendBusySenz() {
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+        // This is unique identifier for each message
+        senzAttributes.put("msg", "userBusy");
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+
+        send(_senz);
     }
 
     /**
