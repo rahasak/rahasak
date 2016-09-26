@@ -105,8 +105,10 @@ class SenHandler extends BasHandler {
             // launch camera
             handleCam(senz, senzService);
         } else if (senz.getAttributes().containsKey("mic")) {
-
+            // launch mic
+            handleMic(senz, senzService);
         } else if (senz.getAttributes().containsKey("lat")) {
+            // handle location
 
         }
     }
@@ -152,17 +154,26 @@ class SenHandler extends BasHandler {
 
             // new stream senz
             HashMap<String, String> attributes = new HashMap<>();
-            attributes.put("cam", stream.getStream());
+            if (senz.getAttributes().containsKey("cam"))
+                attributes.put("cam", stream.getStream());
+            else
+                attributes.put("mic", stream.getStream());
             attributes.put("uid", senz.getAttributes().get("uid"));
             Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
 
             // save in db
             // broadcast
-            saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
+            if (senz.getAttributes().containsKey("cam"))
+                saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
+            else
+                saveSecret(stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
             broadcastStreamSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
-            stream.appendStream(senz.getAttributes().get("cam"));
+            if (senz.getAttributes().containsKey("cam"))
+                stream.appendStream(senz.getAttributes().get("cam"));
+            else
+                stream.appendStream(senz.getAttributes().get("mic"));
         }
     }
 
@@ -175,6 +186,12 @@ class SenHandler extends BasHandler {
             // fail to access camera
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "802"));
         }
+    }
+
+    private void handleMic(Senz senz, SenzService senzService) {
+        Intent intent = IntentProvider.getRecorderIntent(senzService.getApplicationContext());
+        intent.putExtra("Senz", senz);
+        senzService.getApplicationContext().startActivity(intent);
     }
 
 }
