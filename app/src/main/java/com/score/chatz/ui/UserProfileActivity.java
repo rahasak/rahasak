@@ -253,7 +253,12 @@ public class UserProfileActivity extends BaseActivity {
     public void sendPermission(String permName, String permValue) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put(permName, permValue);
+        if (permName.equalsIgnoreCase("loc")) {
+            senzAttributes.put("lat", permValue);
+            senzAttributes.put("lon", permValue);
+        } else {
+            senzAttributes.put(permName, permValue);
+        }
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 

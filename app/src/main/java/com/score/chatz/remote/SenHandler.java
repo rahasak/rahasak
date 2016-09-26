@@ -89,7 +89,7 @@ class SenHandler extends BasHandler {
                 showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
             } else if (senz.getAttributes().containsKey("lat")) {
                 dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
-                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
+                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "lat", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
             }
 
             // send status
