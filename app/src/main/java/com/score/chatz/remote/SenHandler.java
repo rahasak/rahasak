@@ -6,6 +6,7 @@ import android.util.Log;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Stream;
+import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
@@ -167,7 +168,7 @@ class SenHandler extends BasHandler {
                 saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
             else
                 saveSecret(stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
-            broadcastStreamSenz(streamSenz, senzService.getApplicationContext());
+            broadcastDataSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam"))
@@ -189,9 +190,11 @@ class SenHandler extends BasHandler {
     }
 
     private void handleMic(Senz senz, SenzService senzService) {
-        Intent intent = IntentProvider.getRecorderIntent(senzService.getApplicationContext());
-        intent.putExtra("Senz", senz);
-        senzService.getApplicationContext().startActivity(intent);
+        Intent openRecordingActivity = new Intent();
+        openRecordingActivity.setClass(senzService.getApplicationContext(), RecordingActivity.class);
+        openRecordingActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        openRecordingActivity.putExtra("SENDER", senz.getSender().getUsername());
+        senzService.getApplicationContext().startActivity(openRecordingActivity);
     }
 
 }

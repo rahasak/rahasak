@@ -20,11 +20,14 @@ public class AudioUtils {
                 disableSpeaker(context);
 
                 int bufferSize = AudioTrack.getMinBufferSize(RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-                AudioTrack mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+                AudioTrack mAudioTrack = new AudioTrack(AudioManager.MODE_IN_CALL, RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
 
                 mAudioTrack.play();
                 mAudioTrack.write(mp3SoundByteArray, 0, mp3SoundByteArray.length);
                 mAudioTrack.stop();
+
+                // first disable speaker
+                enableSpeaker(context);
             }
         }).start();
     }

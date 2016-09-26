@@ -1,18 +1,14 @@
 package com.score.chatz.ui;
 
-import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Base64;
-import android.view.MotionEvent;
-import android.view.View;
-import android.content.Intent;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -24,7 +20,6 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.handlers.SenzSoundHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioRecorder;
@@ -32,11 +27,15 @@ import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 import com.skyfishjy.library.RippleBackground;
 
-public class RecordingActivity extends AppCompatActivity implements View.OnTouchListener {
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class RecordingActivity extends BaseActivity implements View.OnTouchListener {
 
     private static final String TAG = RecordingActivity.class.getName();
 
@@ -49,8 +48,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private ImageView startBtn;
     private RippleBackground goRipple;
 
-    private long mStartTime = 10;
-    private Thread ticker;
+    private int mStartTime = 10;
     private boolean isRecordingCancelled;
     private static boolean isActivityActive;
 
@@ -88,7 +86,8 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
         if (isAcitivityActive()) {
             cancelTimerToServe();
-            SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
+            //SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
+            sendBusySenz();
             this.finish();
         } else {
             isActivityActive = true;
@@ -163,7 +162,8 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), RecordingActivity.this);
+                //SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), RecordingActivity.this);
+                sendBusySenz();
                 RecordingActivity.this.finish();
             }
 
@@ -238,7 +238,8 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                     if (isRecordingCancelled == false) {
                         isRecordingCancelled = true;
                         cancelTimerToServe();
-                        SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
+                        //SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
+                        sendBusySenz();
                         stopVibrations();
                         stopRecording();
                     }
@@ -257,23 +258,26 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         return true;
     }
 
-
     private void startRecording() {
         audioRecorder.startRecording(getApplicationContext());
-        ticker = new Thread(new Runnable() {
+        new CountDownTimer(mStartTime * 1000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                updateQuickCountTimer(--mStartTime);
+            }
+
+            public void onFinish() {
+                stopRecording();
+            }
+        }.start();
+    }
+
+    private void updateQuickCountTimer(final int count) {
+        this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                while (mStartTime > 0) {
-                    tick();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Log.e(TAG, "Ticker thread interrupted");
-                    }
-                }
+                mTimerTextView.setText(count + "");
             }
         });
-        ticker.start();
     }
 
     private void stopRecording() {
@@ -288,47 +292,16 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                 String uid = SenzUtils.getUniqueRandomNumber().toString();
                 secret.setID(uid);
                 dbSource.createSecret(secret);
-                sendSecret(secret, uid);
+                sendSound(secret, this, uid);
             }
         }
         this.finish();
-    }
-
-    private void sendSecret(Secret secret, String uid) {
-        SenzSoundHandler.getInstance().sendSound(secret, this, uid);
     }
 
     private Secret getSoundSecret(User sender, User receiver, String sound) {
         Secret secret = new Secret(sound, "SOUND", SecretsUtil.getTheUser(sender, receiver, getApplicationContext()), false);
         secret.setReceiver(sender);
         return secret;
-    }
-
-
-    private void tick() {
-        try {
-            if (mStartTime > 0) {
-                mStartTime--;
-                this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mTimerTextView.setText(mStartTime + "");
-                    }
-                });
-                if (mStartTime == 0) {
-                    stopRecording();
-                }
-            } else {
-                stopRecording();
-            }
-        } catch (Exception ex) {
-            Log.e(TAG, "Tick method exceptop - " + ex);
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -341,6 +314,93 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         return isActivityActive;
     }
 
+    private void sendBusySenz() {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("status", "901");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        Senz _senz = new Senz(id, signature, senzType, receiver, sender, senzAttributes);
+        send(_senz);
+    }
+
+    private void sendSound(final Secret secret, final Context context, final String uid) {
+        // compose senzes
+        Senz startSenz = getStartSoundSharingSenze(secret, context);
+        ArrayList<Senz> photoSenzList = getSoundStreamingSenz(secret, context, uid);
+        Senz stopSenz = getStopSoundSharingSenz(secret, context);
+
+        ArrayList<Senz> senzList = new ArrayList<Senz>();
+        senzList.add(startSenz);
+        senzList.addAll(photoSenzList);
+        senzList.add(stopSenz);
+
+        sendInOrder(senzList);
+    }
+
+    private ArrayList<Senz> getSoundStreamingSenz(Secret secret, Context context, String uid) {
+        String soundString = secret.getBlob();
+
+        ArrayList<Senz> senzList = new ArrayList<>();
+        String[] sound = split(soundString, 1024);
+        for (int i = 0; i < sound.length; i++) {
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("mic", sound[i].trim());
+            senzAttributes.put("uid", uid);
+
+            Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getUser(), senzAttributes);
+            senzList.add(_senz);
+        }
+        return senzList;
+    }
+
+    private Senz getStartSoundSharingSenze(Secret secret, Context context) {
+        //senz is the original senz
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("mic", "on");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+        Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getReceiver(), senzAttributes);
+        return _senz;
+    }
+
+    private Senz getStopSoundSharingSenz(Secret secret, Context context) {
+        // create senz attributes
+        //senz is the original senz
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("mic", "off");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+        Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getReceiver(), senzAttributes);
+        return _senz;
+    }
+
+    private String[] split(String src, int len) {
+        String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
+        for (int i = 0; i < result.length; i++)
+            result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
+        return result;
+    }
 }
 
 

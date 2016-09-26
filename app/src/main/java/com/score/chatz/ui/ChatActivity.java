@@ -327,6 +327,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             String msg = senz.getAttributes().get("status");
             if (msg != null && msg.equalsIgnoreCase("700")) {
                 onSenzStatusReceived(senz);
+            }else if (msg != null && msg.equalsIgnoreCase("901")) {
+                displayInformationMessageDialog("Sorry", "User is busy.");
             }
         } else if (senz.getAttributes().containsKey("msg") || senz.getAttributes().containsKey("cam") || senz.getAttributes().containsKey("mic")) {
             // chat message
