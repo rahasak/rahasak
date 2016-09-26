@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:background="@color/black">
+    android:background="@color/android_grey">
 
     <TextView
         android:id="@+id/playingText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Playing secret..."
-        android:textColor="@color/white"
+        android:textColor="@color/android_green"
         android:textSize="25sp"
         android:layout_centerInParent="true"/>
 
@@ -39,8 +39,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Waiting image..."
-                android:textColor="@color/white"
+                android:text="Waiting for sound..."
+                android:textColor="@color/android_green"
                 android:textSize="25sp"
                 android:layout_centerInParent="true" />
 

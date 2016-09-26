@@ -213,7 +213,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void navigateMicWait() {
-        // TODO
+        Intent intent = new Intent(this, AudioFullScreenActivity.class);
+        startActivity(intent);
     }
 
     private void onClickSend() {

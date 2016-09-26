@@ -174,9 +174,6 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                 public void onClick(View v) {
                     Intent intent = new Intent(context, PhotoFullScreenActivity.class);
                     intent.putExtra("IMAGE", secret.getBlob());
-                    /*String uid = SenzUtils.getUniqueRandomNumber().toString();
-                    intent.putExtra("IMAGE_RES_ID", uid);
-                    CameraUtils.savePhotoCache(uid, CameraUtils.getBitmapFromBytes(Base64.encode(secret.getBlob().getBytes(), 0)), getContext());*/
                     context.startActivity(intent);
                 }
             });
@@ -200,7 +197,10 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     //AudioUtils.play(Base64.decode(secret.getBlob(), 0), getContext());
 
                     // play via async task
-                    new RahasPlayer(Base64.decode(secret.getBlob(), 0), getContext()).execute("Rahsa");
+                    //new RahasPlayer(Base64.decode(secret.getBlob(), 0), getContext()).execute("Rahsa");
+                    Intent intent = new Intent(context, AudioFullScreenActivity.class);
+                    intent.putExtra("SOUND", secret.getBlob());
+                    context.startActivity(intent);
                 }
             });
         }

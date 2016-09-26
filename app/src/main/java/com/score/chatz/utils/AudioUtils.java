@@ -12,7 +12,7 @@ public class AudioUtils {
 
     public static final int RECORDER_SAMPLE_RATE = 8000;
 
-    public static void play(final byte[] mp3SoundByteArray, final Context context) {
+    public static void F(final byte[] mp3SoundByteArray, final Context context) {
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -12,6 +12,8 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -22,35 +24,73 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.asyncTasks.RahasPlayer;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.utils.CameraUtils;
 import com.score.senzc.pojos.Senz;
 
 public class AudioFullScreenActivity extends AppCompatActivity {
-    private TextView playingText;
 
+    private static final String TAG = AudioFullScreenActivity.class.getName();
+
+    private View playingText;
     private View loadingText;
-    private Activity activity;
+
+    // senz message
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
+    // share senz
+    private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Share senz");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzStreamReceived(senz);
+        }
+    };
+
+    private void onSenzStreamReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("mic")) {
+            // display stream
+            loadingText.setVisibility(View.INVISIBLE);
+            playingText.setVisibility(View.VISIBLE);
+            new RahasPlayer(Base64.decode(senz.getAttributes().get("mic"), 0), getApplicationContext(), this).execute("Rahsa");
+        }
+    }
+
+    private void onSenzReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("status")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
+                // user busy
+                displayInformationMessageDialog("info", "user busy");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {
+                // camera error
+                displayInformationMessageDialog("error", "cam error");
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo_full_screen);
-        setupUi();
-        activity = this;
+        setContentView(R.layout.activity_audio_full_screen);
 
-        Intent intent = getIntent();
-        if(intent.hasExtra("IMAGE")) {
-            loadingText.setVisibility(View.INVISIBLE);
-            playingText.setVisibility(View.VISIBLE);
-        }else{
-            loadingText.setVisibility(View.VISIBLE);
-            playingText.setVisibility(View.INVISIBLE);
-        }
+        setupUi();
+        initIntent();
     }
 
     private void setupUi(){
-        playingText = (TextView) findViewById(R.id.playingText);
+        playingText = findViewById(R.id.playingText);
         loadingText = findViewById(R.id.loading_text);
     }
 
@@ -67,14 +107,13 @@ public class AudioFullScreenActivity extends AppCompatActivity {
     }
 
     private void registerAllReceivers(){
-        //Notify when user don't want to responsed to requests
-        this.registerReceiver(newDataToDisplay, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.NEW_DATA_TO_DISPLAY));
-        this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
     }
 
     private void unregisterAllReceivers(){
-        this.unregisterReceiver(newDataToDisplay);
-        this.unregisterReceiver(userBusyNotifier);
+        unregisterReceiver(senzStreamReceiver);
+        unregisterReceiver(senzReceiver);
     }
 
     private BroadcastReceiver newDataToDisplay = new BroadcastReceiver() {
@@ -93,6 +132,18 @@ public class AudioFullScreenActivity extends AppCompatActivity {
             displayInformationMessageDialog( getResources().getString(R.string.sorry),  senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
         }
     };
+
+    private void initIntent() {
+        Intent intent = getIntent();
+        if(intent.hasExtra("SOUND")) {
+            loadingText.setVisibility(View.INVISIBLE);
+            playingText.setVisibility(View.VISIBLE);
+            new RahasPlayer(Base64.decode(intent.getStringExtra("SOUND"), 0), getApplicationContext(), this).execute("Rahsa");
+        }else{
+            loadingText.setVisibility(View.VISIBLE);
+            playingText.setVisibility(View.INVISIBLE);
+        }
+    }
 
     public void displayInformationMessageDialog(String title, String message) {
         final Dialog dialog = new Dialog(this);
@@ -121,7 +172,7 @@ public class AudioFullScreenActivity extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
-                activity.finish();
+                AudioFullScreenActivity.this.finish();
             }
         });
 

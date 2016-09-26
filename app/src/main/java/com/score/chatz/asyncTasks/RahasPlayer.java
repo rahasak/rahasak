@@ -1,5 +1,6 @@
 package com.score.chatz.asyncTasks;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -15,6 +16,13 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
 
     private byte[] rahasa;
     private Context context;
+    private Activity activity;
+
+    public RahasPlayer(byte[] rahasa, Context context, Activity activity) {
+        this.rahasa = rahasa;
+        this.context = context;
+        this.activity = activity;
+    }
 
     public RahasPlayer(byte[] rahasa, Context context) {
         this.rahasa = rahasa;
@@ -41,6 +49,9 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+        if(activity != null){
+            activity.finish();
+        }
     }
 }
 
