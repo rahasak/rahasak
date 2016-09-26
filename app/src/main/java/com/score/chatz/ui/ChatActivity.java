@@ -480,7 +480,6 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         // TODO start map first
         // start map activity
         Intent mapIntent = new Intent(this, SenzMapActivity.class);
-        //mapIntent.putExtra("extra", latLng);
         startActivity(mapIntent);
         overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }

@@ -6,6 +6,7 @@ import android.util.Log;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Stream;
+import com.score.chatz.services.LocationService;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
@@ -110,6 +111,7 @@ class SenHandler extends BasHandler {
             handleMic(senz, senzService);
         } else if (senz.getAttributes().containsKey("lat")) {
             // handle location
+            handleLocation(senz, senzService);
         }
     }
 
@@ -194,6 +196,12 @@ class SenHandler extends BasHandler {
         openRecordingActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         openRecordingActivity.putExtra("SENDER", senz.getSender().getUsername());
         senzService.getApplicationContext().startActivity(openRecordingActivity);
+    }
+
+    private void handleLocation(Senz senz, SenzService senzService) {
+        Intent intent = new Intent(senzService.getApplicationContext(), LocationService.class);
+        intent.putExtra("SENZ", senz);
+        senzService.getApplicationContext().startService(intent);
     }
 
 }

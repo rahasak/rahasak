@@ -1,6 +1,5 @@
 package com.score.chatz.ui;
 
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -79,18 +78,6 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
     Polyline line;
 
-    // senz message
-    private BroadcastReceiver noLocationEnabledReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-
-            // extract senz
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzReceived(senz);
-        }
-    };
-
     // No locations enabled message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
@@ -104,11 +91,11 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
     };
 
     public void onSenzReceived(Senz senz) {
-        if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("locDisabled")) {
+        if (senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("locDisabled")) {
             closeProgressLoader();
             Toast.makeText(this, "Sorry, User has Locations disabled.", Toast.LENGTH_LONG).show();
             this.finish();
-        }else if (senz.getAttributes().containsKey("lat")) {
+        } else if (senz.getAttributes().containsKey("lat")) {
             // location response received
             double lat = Double.parseDouble(senz.getAttributes().get("lat"));
             double lan = Double.parseDouble(senz.getAttributes().get("lon"));
@@ -155,14 +142,13 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         setUpActionBar();
 
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
-        registerReceiver(noLocationEnabledReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.NO_LOC_ENABLED));
     }
 
-    private void showProgressLoader(){
+    private void showProgressLoader() {
         ActivityUtils.showProgressDialog(SenzMapActivity.this, "Please wait...");
     }
 
-    private void closeProgressLoader(){
+    private void closeProgressLoader() {
         ActivityUtils.cancelProgressDialog();
     }
 
@@ -196,7 +182,6 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
         if (isNetworkEnabled) locationManager.removeUpdates(SenzMapActivity.this);
 
         unregisterReceiver(senzReceiver);
-        unregisterReceiver(noLocationEnabledReceiver);
     }
 
     /**

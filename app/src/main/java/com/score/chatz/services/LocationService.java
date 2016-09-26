@@ -16,7 +16,6 @@ import android.util.Log;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 
@@ -32,7 +31,7 @@ public class LocationService extends Service implements LocationListener {
 
     private LocationManager locationManager;
 
-    private User receiver;
+    private Senz thisSenz;
 
     // keep providers
     private boolean isGPSEnabled;
@@ -76,7 +75,7 @@ public class LocationService extends Service implements LocationListener {
 
         if (!isGPSEnabled && !isNetworkEnabled) {
             Log.d(TAG, "No location provider enable");
-            if(senzService != null)
+            if (senzService != null)
                 sendLocationProviderNotEnabled();
         } else {
             if (isNetworkEnabled) {
@@ -87,7 +86,6 @@ public class LocationService extends Service implements LocationListener {
                 Log.d(TAG, "Getting location via GPS");
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             }
-
         }
     }
 
@@ -95,7 +93,7 @@ public class LocationService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        this.receiver = intent.getExtras().getParcelable("USER");
+        this.thisSenz = intent.getExtras().getParcelable("SENZ");
 
         // bind with senz service
         if (!isServiceBound) {
@@ -162,7 +160,7 @@ public class LocationService extends Service implements LocationListener {
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
-            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, thisSenz.getSender(), senzAttributes);
 
             senzService.send(senz);
         } catch (RemoteException e) {
@@ -175,12 +173,12 @@ public class LocationService extends Service implements LocationListener {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("msg", "locDisabled");
+            senzAttributes.put("status", "locDisabled");
 
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
-            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, thisSenz.getSender(), senzAttributes);
 
             senzService.send(senz);
         } catch (RemoteException e) {
