@@ -337,18 +337,18 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     }
 
     private void sendBusySenz() {
+        // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("uid", originalSenz.getAttributes().get("uid"));
+        senzAttributes.put("status", "801");
 
-        // This is unique identifier for each message
-        senzAttributes.put("msg", "userBusy");
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
-
-        send(_senz);
+        Senz senz = new Senz(id, signature, senzType, originalSenz.getReceiver(), originalSenz.getSender(), senzAttributes);
+        send(senz);
     }
 
     /**
