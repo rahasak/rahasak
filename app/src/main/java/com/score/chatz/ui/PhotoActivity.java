@@ -200,7 +200,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                     if (!isPhotoCancelled) {
                         isPhotoCancelled = true;
                         cancelTimerToServe();
-                        //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+                        sendBusySenz();
                         stopVibrations();
                         this.finish();
                     }
@@ -287,16 +287,29 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, PhotoActivity.this);
+                sendBusySenz();
                 PhotoActivity.this.finish();
             }
 
             @Override
             public void onTick(long millisUntilFinished) {
                 Log.i(TAG, "Time in count down -" + millisUntilFinished);
-
             }
         }.start();
+    }
+
+    private void sendBusySenz() {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("status", "801");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        Senz _senz = new Senz(id, signature, senzType, originalSenz.getReceiver(), originalSenz.getSender(), senzAttributes);
+        send(_senz);
     }
 
     private void cancelTimerToServe() {
@@ -334,21 +347,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         senzList.add(stopStreamSenz);
 
         sendInOrder(senzList);
-    }
-
-    private void sendBusySenz() {
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("uid", originalSenz.getAttributes().get("uid"));
-        senzAttributes.put("status", "801");
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz senz = new Senz(id, signature, senzType, originalSenz.getReceiver(), originalSenz.getSender(), senzAttributes);
-        send(senz);
     }
 
     /**

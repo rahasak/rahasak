@@ -37,6 +37,18 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
 
+    // senz message
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            onSenzReceived(senz);
+        }
+    };
+
     // share senz
     private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
         @Override
@@ -82,6 +94,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
         registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
     }
 
@@ -89,6 +102,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(senzStreamReceiver);
+        unregisterReceiver(senzReceiver);
     }
 
     private void loadBitmap(String data, ImageView imageView) {
@@ -111,6 +125,18 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
                 PhotoFullScreenActivity.this.finish();
             }
         }.start();
+    }
+
+    private void onSenzReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("status")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
+                // user busy
+                displayInformationMessageDialog("info", "user busy");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {
+                // camera error
+                displayInformationMessageDialog("error", "cam error");
+            }
+        }
     }
 
     private void onSenzStreamReceived(Senz senz) {
