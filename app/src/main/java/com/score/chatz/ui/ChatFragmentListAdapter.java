@@ -194,8 +194,6 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //AudioUtils.play(Base64.decode(secret.getBlob(), 0), getContext());
-
                     // play via async task
                     //new RahasPlayer(Base64.decode(secret.getBlob(), 0), getContext()).execute("Rahsa");
                     Intent intent = new Intent(context, AudioFullScreenActivity.class);

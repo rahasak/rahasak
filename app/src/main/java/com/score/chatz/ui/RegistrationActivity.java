@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
-import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
@@ -42,8 +41,6 @@ public class RegistrationActivity extends BaseActivity {
 
         setupUI();
         setupRegisterBtn();
-
-        SenzHandler.getInstance(getApplicationContext());
 
         //Register all receivers
         registerReceivers();

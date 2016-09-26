@@ -50,7 +50,7 @@ class BasHandler {
     }
 
     void showPermissionNotification(Context context, User user, String permissionName, boolean isEnabled) {
-        if (permissionName.equalsIgnoreCase("loc")) {
+        if (permissionName.equalsIgnoreCase("lat")) {
             if (isEnabled)
                 NotificationUtils.showNotification(context, "@" + user.getUsername(), "You been granted location permission!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
             else

@@ -89,7 +89,7 @@ class SenHandler extends BasHandler {
                 showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
             } else if (senz.getAttributes().containsKey("lat")) {
                 dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
-                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
+                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "lat", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
             }
 
             // send status
@@ -110,7 +110,6 @@ class SenHandler extends BasHandler {
             handleMic(senz, senzService);
         } else if (senz.getAttributes().containsKey("lat")) {
             // handle location
-
         }
     }
 
@@ -168,7 +167,7 @@ class SenHandler extends BasHandler {
                 saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
             else
                 saveSecret(stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
-            broadcastDataSenz(streamSenz, senzService.getApplicationContext());
+            broadcastStreamSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam"))

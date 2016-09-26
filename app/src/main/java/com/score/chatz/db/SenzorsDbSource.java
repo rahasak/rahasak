@@ -114,7 +114,7 @@ public class SenzorsDbSource {
     public void updatePermissions(User user, String camPerm, String locPerm, String micPerm) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        // intial permissions
+        // initial permissions
         int _camPerm = 0;
         int _locPerm = 0;
         int _micPerm = 0;

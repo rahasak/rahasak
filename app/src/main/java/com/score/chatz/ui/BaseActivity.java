@@ -1,7 +1,6 @@
 package com.score.chatz.ui;
 
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,9 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.interfaces.ISendingComHandler;
-import com.score.chatz.remote.SenzService;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.senz.ISenzService;
@@ -69,34 +66,25 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         }
     };
 
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //Unbind from service
+
+        // unbind from service
         if (isServiceBound) unbindService(senzServiceConnection);
     }
 
     @Override
     protected void onResume() {
         super.onStart();
-        this.registerReceiver(userBusyNotifier, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.USER_BUSY));
     }
 
     @Override
     protected void onPause() {
         super.onStop();
-        this.unregisterReceiver(userBusyNotifier);
     }
 
     @Override
@@ -108,25 +96,14 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
         //startService();
         if (!isServiceBound) {
-            bindToSerice();
+            bindToService();
         }
     }
 
-    private void bindToSerice() {
+    private void bindToService() {
         Intent intent = new Intent();
         intent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    /**
-     * Start long running background service
-     */
-    protected void startService() {
-        // start service from here
-        Intent serviceIntent = new Intent(this, SenzService.class);
-        startService(serviceIntent);
-
-        Log.d(TAG, "Service requested to start!!!");
     }
 
     private void setupFonts() {
