@@ -40,7 +40,15 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private static final String TAG = RecordingActivity.class.getName();
 
+    private View moving_layout;
+    private Button doneBtn;
     private TextView mTimerTextView;
+    private Rect startBtnRectRelativeToScreen;
+    private Rect cancelBtnRectRelativeToScreen;
+    private CircularImageView cancelBtn;
+    private ImageView startBtn;
+    private RippleBackground goRipple;
+
     private long mStartTime = 10;
     private Thread ticker;
     private boolean isRecordingCancelled;
@@ -54,6 +62,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private User receiver;
 
     private boolean isRecordingDone;
+    private boolean hasRecordingStarted;
 
     SenzorsDbSource dbSource;
 
@@ -61,32 +70,12 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private PowerManager.WakeLock wakeLock;
 
-    private View moving_layout;
-    private boolean hasRecordingStarted;
-    private Button doneBtn;
-
-
-    private Rect startBtnRectRelativeToScreen;
-    private Rect cancelBtnRectRelativeToScreen;
-    private CircularImageView cancelBtn;
-    private ImageView startBtn;
-    private RippleBackground goRipple;
     private float dX, dY, startX, startY;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_recording);
-
-
-        this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
-        this.mTimerTextView.setText(mStartTime + "");
-
-        this.moving_layout = (View) findViewById(R.id.moving_layout);
 
         Intent intent = getIntent();
         try {
@@ -104,30 +93,37 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         } else {
             isActivityActive = true;
 
-
             dbSource = new SenzorsDbSource(this);
-
             audioRecorder = new AudioRecorder();
-
             isRecordingDone = false;
 
-            Log.i(TAG, "SENDER FROM RECORDING ACTIVITY - " + sender.getUsername());
-            Log.i(TAG, "RECEIVERE FROM RECORDING ACTIVITY - " + receiver.getUsername());
-
-
+            setupUi();
             setupDontBtn();
             setupSwipeBtns();
             startBtnAnimations();
             startVibrations();
             setupHandlesForSwipeBtnContainers();
             setupPhotoRequestTitle();
-
-            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-            wakeLock.acquire();
+            setupWakeLock();
             startTimerToEndRequest();
         }
+    }
 
+    private void setupUi(){
+        this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
+        this.mTimerTextView.setText(mStartTime + "");
+        this.moving_layout = (View) findViewById(R.id.moving_layout);
+    }
+
+    private void setupWakeLock() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+        wakeLock.acquire();
     }
 
     private void setupDontBtn() {
@@ -164,13 +160,11 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     }
 
     private void startTimerToEndRequest() {
-        final RecordingActivity _this = this;
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                //initializeCamera();
-                SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), _this);
-                _this.finish();
+                SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), RecordingActivity.this);
+                RecordingActivity.this.finish();
             }
 
             @Override
@@ -305,8 +299,6 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     }
 
     private Secret getSoundSecret(User sender, User receiver, String sound) {
-        //Swapping receiever and sender here cause we need to send the secret out
-        //Secret secret = new Secret(null, null, null, receiver, sender);
         Secret secret = new Secret(sound, "SOUND", SecretsUtil.getTheUser(sender, receiver, getApplicationContext()), false);
         secret.setReceiver(sender);
         return secret;
