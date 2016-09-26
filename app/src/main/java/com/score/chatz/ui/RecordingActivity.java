@@ -39,6 +39,7 @@ import com.skyfishjy.library.RippleBackground;
 public class RecordingActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private static final String TAG = RecordingActivity.class.getName();
+
     private TextView mTimerTextView;
     private long mStartTime = 10;
     private Thread ticker;
@@ -62,8 +63,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private View moving_layout;
     private boolean hasRecordingStarted;
-
-    Button doneBtn;
+    private Button doneBtn;
 
 
     private Rect startBtnRectRelativeToScreen;
@@ -97,7 +97,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         String senderString = intent.getStringExtra("SENDER");
         sender = new User("", senderString);
 
-        if (isAcitivityActive() == true) {
+        if (isAcitivityActive()) {
             cancelTimerToServe();
             SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), this);
             this.finish();

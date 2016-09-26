@@ -22,7 +22,6 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.SecretsUtil;
@@ -56,13 +55,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private ImageView startBtn;
     private RippleBackground goRipple;
 
-    // senz information
     private Senz originalSenz;
     private PowerManager.WakeLock wakeLock;
     private CountDownTimer cancelTimer;
 
     private static final int TIME_TO_SERVE_REQUEST = 30000;
-    private static final int TIME_TO_QUICK_PHOTO = 3;
+    private static final int TIME_TO_QUICK_PHOTO = 3000;
     private static final int IMAGE_SIZE = 110;
 
     private float dX, dY, startX, startY;
@@ -72,59 +70,47 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
 
-        initCameraInstant();
-        mCameraPreview = new CameraPreview(this, mCamera);
-        setupActivity();
+        originalSenz = getIntent().getParcelableExtra("Senz");
 
-        try {
-            originalSenz = getIntent().getParcelableExtra("Senz");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        if (mCameraPreview.isCameraBusy()) {
+        if (CameraPreview.isCameraBusy()) {
             //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
-            this.finish();
+            //this.finish();
         } else {
-            FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
-            try {
-                preview.addView(mCameraPreview);
-            } catch (IllegalStateException ex) {
-                ex.printStackTrace();
-                ViewGroup parent = (ViewGroup) mCameraPreview.getParent();
-                if (parent != null) {
-                    parent.removeView(mCameraPreview);
-                }
-                preview.addView(mCameraPreview);
-            }
+            //init camera
+            initCameraInstant();
+            mCameraPreview = new CameraPreview(this, mCamera);
+            setupCameraSurface();
 
-            setupUiHandlers();
+            //init activity
+            setupUi();
             setupSwipeBtns();
             startBtnAnimations();
             startVibrations();
             setupHandlesForSwipeBtnContainers();
             setupPhotoRequestTitle();
-
-            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-            wakeLock.acquire();
-
+            setupWakeLock();
             getSupportActionBar().hide();
             startTimerToEndRequest();
         }
     }
 
-    /**
-     * Wake up activity when in sleep or lock
-     */
-    private void setupActivity() {
+    private void setupWakeLock() {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+        wakeLock.acquire();
     }
 
-    private void setupUiHandlers() {
+    private void setupCameraSurface() {
+        FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
+        preview.addView(mCameraPreview);
+    }
+
+    private void setupUi() {
         quickCountdownText = (TextView) findViewById(R.id.quick_count_down);
         quickCountdownText.setVisibility(View.INVISIBLE);
         callingUserInfo = findViewById(R.id.sender_info);
@@ -153,11 +139,17 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     protected void onDestroy() {
         super.onDestroy();
         //Release screen lock, so the phone can go back to sleep
+        stopVibrations();
+        releaseCamera();
         if (wakeLock != null)
             wakeLock.release();
-        if (mCamera != null)
+    }
+
+    private void releaseCamera() {
+        if (mCamera != null) {
+            Log.d(TAG, "Stopping preview in SurfaceDestroyed().");
             mCamera.release();
-        stopVibrations();
+        }
     }
 
     private void setupSwipeBtns() {
@@ -217,7 +209,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                     if (!isPhotoCancelled) {
                         isPhotoCancelled = true;
                         cancelTimerToServe();
-                        SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
+                        //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, this);
                         stopVibrations();
                         this.finish();
                     }
@@ -240,7 +232,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         quickCountdownText.setVisibility(View.VISIBLE);
         hideUiControls();
 
-        new CountDownTimer(1000 * 3, 1000) {
+        new CountDownTimer(TIME_TO_QUICK_PHOTO, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 updateQuicCountTimer((int) millisUntilFinished / 1000);
@@ -250,31 +242,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                 takePhoto();
             }
         }.start();
-
-//        new Thread(new Runnable() {
-//            int mStartTime = TIME_TO_QUICK_PHOTO;
-//
-//            @Override
-//            public void run() {
-//                while (mStartTime != 0) {
-//                    updateQuicCountTimer(mStartTime);
-//                    mStartTime--;
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException ex) {
-//                        Log.e(TAG, "Ticker thread interrupted");
-//                    }
-//                }
-//                if (mStartTime == 0) {
-//                    context.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            takePhoto();
-//                        }
-//                    });
-//                }
-//            }
-//        }).start();
     }
 
     /**
@@ -292,11 +259,23 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         }
     }
 
-
     private void takePhoto() {
         quickCountdownText.setVisibility(View.INVISIBLE);
         CameraUtils.shootSound(this);
-        takePhotoManually(PhotoActivity.this, originalSenz);
+        mCamera.takePicture(null, null, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+                byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
+
+                sendPhoto(resizedImage, originalSenz, PhotoActivity.this);
+                Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);
+                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
+                i.putExtra("QUICK_PREVIEW", "true");
+                startActivity(i);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                finish();
+            }
+        });
     }
 
     private void updateQuicCountTimer(final int count) {
@@ -308,23 +287,16 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         });
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
-
-        if (mCamera != null) {
-            mCamera.setPreviewCallback(null);
-            mCameraPreview.getHolder().removeCallback(mCameraPreview);
-            mCamera.release();
-        }
     }
 
     private void startTimerToEndRequest() {
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, PhotoActivity.this);
+                //SenzPhotoHandler.getInstance().sendBusyNotification(originalSenz, PhotoActivity.this);
                 PhotoActivity.this.finish();
             }
 
@@ -339,23 +311,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private void cancelTimerToServe() {
         if (cancelTimer != null)
             cancelTimer.cancel();
-    }
-
-    public void takePhotoManually(final PhotoActivity activity, final Senz originalSenz) {
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
-
-                sendPhoto(resizedImage, originalSenz, PhotoActivity.this);
-                Intent i = new Intent(activity, PhotoFullScreenActivity.class);
-                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
-                i.putExtra("QUICK_PREVIEW", "true");
-                activity.startActivity(i);
-                activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                activity.finish();
-            }
-        });
     }
 
     private byte[] resizeBitmapByteArray(byte[] data, int deg) {

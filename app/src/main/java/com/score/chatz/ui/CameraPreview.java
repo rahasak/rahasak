@@ -18,7 +18,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private boolean isCameraBusy;
+    private static boolean isCameraBusy;
 
     //Constructor that obtains context and camera
     public CameraPreview(Context context, Camera camera) {
@@ -26,10 +26,19 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         this.mCamera = camera;
         this.mSurfaceHolder = this.getHolder();
-        this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
-        this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
+        this.mSurfaceHolder.addCallback(this);
+        this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        isCameraBusy = true;
     }
 
+    /**
+     * Get best ratio for photo, which change from device to device. OTherwise some devices the photos seems to be out of ratio!!
+     *
+     * @param sizes
+     * @param w
+     * @param h
+     * @return
+     */
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.05;
         double targetRatio = (double) w / h;
@@ -66,7 +75,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        isCameraBusy = true;
         Camera.Parameters parameters = mCamera.getParameters();
         List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
         parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
@@ -84,40 +92,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        if (mCamera != null) {
-            Log.d(TAG, "Stopping preview in SurfaceDestroyed().");
-            mCamera.setPreviewCallback(null);
-            mCamera.stopPreview();
-            mCamera.release();
-            isCameraBusy = false;
-        }
+        isCameraBusy = false;
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format,
                                int width, int height) {
-        if (mSurfaceHolder.getSurface() == null) {
-            //preview surface does not exist
-            return;
-        }
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e) {
-            //ignore: tried to stop a non-existent preview
-        }
-
-        // start preview with new settings
-        try {
-            mCamera.setPreviewDisplay(mSurfaceHolder);
-            mCamera.setDisplayOrientation(90);
-            mCamera.startPreview();
-        } catch (Exception e) {
-            // intentionally left blank for a test
-            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-        }
     }
 
-    public boolean isCameraBusy() {
+    public static boolean isCameraBusy() {
         return isCameraBusy;
     }
 }

@@ -6,6 +6,8 @@ import android.util.Log;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Stream;
+import com.score.chatz.ui.CameraPreview;
+import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
@@ -167,11 +169,11 @@ class SenHandler extends BasHandler {
     }
 
     private void handleCam(Senz senz, SenzService senzService) {
-        try {
+        if(!CameraPreview.isCameraBusy()) {
             Intent intent = IntentProvider.getCameraIntent(senzService.getApplicationContext());
             intent.putExtra("Senz", senz);
             senzService.getApplicationContext().startActivity(intent);
-        } catch (Exception e) {
+        } else {
             // fail to access camera
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "802"));
         }
