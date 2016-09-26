@@ -157,11 +157,6 @@
                 <action android:name="senz.action.RESTART" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.SenzReceiver">
-            <intent-filter>
-                <action android:name="com.score.senz.NEW_SENZ" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
