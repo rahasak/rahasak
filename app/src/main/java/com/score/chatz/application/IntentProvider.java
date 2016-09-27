@@ -50,40 +50,10 @@ public class IntentProvider {
         return intent;
     }
 
-    public static Intent getUserBusyIntent() {
-        Intent intent = null;
-        try {
-            intent = getIntent(getIntentType(INTENT_TYPE.USER_BUSY));
-        } catch (InvalidIntentType ex) {
-            Log.e(TAG, "No such intent, " + ex);
-        }
-        return intent;
-    }
-
     public static Intent getpacketTimeoutIntent() {
         Intent intent = null;
         try {
             intent = getIntent(getIntentType(INTENT_TYPE.PACKET_TIMEOUT));
-        } catch (InvalidIntentType ex) {
-            Log.e(TAG, "No such intent, " + ex);
-        }
-        return intent;
-    }
-
-    public static Intent getNewDataToDisplayIntent() {
-        Intent intent = null;
-        try {
-            intent = getIntent(getIntentType(INTENT_TYPE.NEW_DATA_TO_DISPLAY));
-        } catch (InvalidIntentType ex) {
-            Log.e(TAG, "No such intent, " + ex);
-        }
-        return intent;
-    }
-
-    public static Intent getNoLocationEnabledIntent() {
-        Intent intent = null;
-        try {
-            intent = getIntent(getIntentType(INTENT_TYPE.NO_LOC_ENABLED));
         } catch (InvalidIntentType ex) {
             Log.e(TAG, "No such intent, " + ex);
         }
