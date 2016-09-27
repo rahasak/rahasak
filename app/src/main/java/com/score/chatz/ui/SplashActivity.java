@@ -43,11 +43,9 @@ public class SplashActivity extends AppCompatActivity {
         // start service
         try {
             PreferenceUtils.getUser(this);
+
             // have user, so move to home
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            finish();
-            startActivity(intent);
+            navigateToHome();
         } catch (NoUserException e) {
             e.printStackTrace();
             navigateToSplash();
@@ -87,8 +85,9 @@ public class SplashActivity extends AppCompatActivity {
      * This method will be call after successful login
      */
     public void navigateToHome() {
-        Intent intent = new Intent(SplashActivity.this, HomeActivity.class);
-        SplashActivity.this.startActivity(intent);
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
         SplashActivity.this.finish();
 
     }

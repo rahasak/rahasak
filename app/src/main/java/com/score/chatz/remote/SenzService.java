@@ -187,11 +187,12 @@ public class SenzService extends Service {
                 if (!line.isEmpty()) {
                     String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
 
-                    Log.d(TAG, "Senz received " + senz);
-
                     // handle senz
                     if (!senz.equalsIgnoreCase("TAK")) {
+                        Log.d(TAG, "Senz received " + senz);
                         SenHandler.getInstance().handle(senz, SenzService.this);
+                    } else {
+                        Log.d(TAG, "TAK Senz received");
                     }
                 }
             }
@@ -282,10 +283,12 @@ public class SenzService extends Service {
         @Override
         protected Object doInBackground(Object[] params) {
             if (!isOnline) {
+                Log.d(TAG, "Not online, so init comm");
                 initSoc();
                 sendPing();
                 initReader();
             } else {
+                Log.d(TAG, "Online, so send ping");
                 sendPing();
             }
 
