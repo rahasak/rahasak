@@ -38,9 +38,6 @@ class SenHandler extends BasHandler {
         if (senz.getSenzType() != SenzTypeEnum.STREAM)
             SenzTracker.getInstance(senzService).stopSenzTrack(senz);
         switch (senz.getSenzType()) {
-            case PING:
-                Log.d(TAG, "PING received");
-                break;
             case SHARE:
                 Log.d(TAG, "SHARE received");
                 handleShare(senz, senzService);
