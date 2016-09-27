@@ -32,7 +32,7 @@ public class SenzTracker {
 
     }
 
-    public static SenzTracker getInstance(Context context) {
+    static SenzTracker getInstance(Context context) {
         if (senzTracker == null) {
             senzContext = context;
             senzTracker = new SenzTracker();
@@ -46,7 +46,7 @@ public class SenzTracker {
      *
      * @param senz senz
      */
-    public void startSenzTrack(Senz senz) {
+    void startSenzTrack(Senz senz) {
         if (senz.getAttributes().containsKey(UID)) {
             // start timer and put on buffer
             SenzTimer timer = new SenzTimer(senz);
@@ -60,7 +60,7 @@ public class SenzTracker {
      *
      * @param senz senz
      */
-    public void stopSenzTrack(Senz senz) {
+    void stopSenzTrack(Senz senz) {
         Log.d(TAG, "Response comes for senz with UDI " + senz.getAttributes().get(UID));
 
         // remove senz
@@ -87,6 +87,7 @@ public class SenzTracker {
 
         SenzTimer(Senz senz) {
             this.senz = senz;
+            this.broadcast = true;
         }
 
         public void run() {
@@ -104,7 +105,7 @@ public class SenzTracker {
             onTimeout(senz);
         }
 
-        public void setBroadcast(boolean broadcast) {
+        void setBroadcast(boolean broadcast) {
             this.broadcast = broadcast;
         }
 
