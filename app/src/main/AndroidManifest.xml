@@ -146,15 +146,10 @@
         </service>
 
         <!-- Receievers -->
-        <receiver android:name=".receivers.BootCompleteReceiver">
+        <receiver android:name=".receivers.SenzRestartReceiver">
             <intent-filter>
-                <action android:name="senz.action.RESTART" />
+                <action android:name="senz.action.SENZ_RESTART" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receivers.DeathWatchReceiver">
-            <intent-filter>
-                <action android:name="senz.action.RESTART" />
             </intent-filter>
         </receiver>
     </application>

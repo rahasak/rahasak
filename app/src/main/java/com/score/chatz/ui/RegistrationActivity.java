@@ -159,17 +159,17 @@ public class RegistrationActivity extends BaseActivity {
      * @param senz intent
      */
     private void handleSenz(Senz senz) {
-        if (senz.getAttributes().containsKey("msg")) {
+        if (senz.getAttributes().containsKey("status")) {
             // msg response received
             ActivityUtils.cancelProgressDialog();
-            String msg = senz.getAttributes().get("msg");
-            if (msg != null && msg.equalsIgnoreCase("REG_DONE")) {
+            String msg = senz.getAttributes().get("status");
+            if (msg != null && msg.equalsIgnoreCase("600")) {
                 ActivityUtils.showToast("Successfully registered", this);
                 // save user
                 // navigate home
                 PreferenceUtils.saveUser(this, registeringUser);
                 navigateToHome();
-            } else if (msg != null && msg.equalsIgnoreCase("REG_FAIL")) {
+            } else if (msg != null && msg.equalsIgnoreCase("602")) {
                 String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
                 displayInformationMessageDialog("Registration fail", informationMessage);
             }

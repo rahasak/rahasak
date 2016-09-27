@@ -202,9 +202,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
     @Override
     public void send(Senz senz) {
-        if (!NetworkUtil.isAvailableNetwork(this)) {
-            ActivityUtils.showToast("No network connection available.", this);
-        } else {
+        if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
                     senzService.send(senz);
@@ -214,13 +212,13 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        } else {
+            ActivityUtils.showToast("No network connection available.", this);
         }
     }
 
     public void sendInOrder(List<Senz> senzList) {
-        if (!NetworkUtil.isAvailableNetwork(this)) {
-            ActivityUtils.showToast("No network connection available.", this);
-        } else {
+        if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
                     senzService.sendInOrder(senzList);
@@ -230,6 +228,8 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        } else {
+            ActivityUtils.showToast("No network connection available.", this);
         }
     }
 }
