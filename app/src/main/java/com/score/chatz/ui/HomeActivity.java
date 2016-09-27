@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ public class HomeActivity extends BaseActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FloatingActionButton fab;
+    private TextView tabOneTextView;
+    private TextView tabTwoTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,27 +85,25 @@ public class HomeActivity extends BaseActivity {
     private void setupViewPager() {
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
 
             @Override
             public void onPageScrolled(int pos, float arg1, int arg2) {
-                if (pos == 0) {
-                    fab.setVisibility(View.INVISIBLE);
-                } else {
-                    fab.setVisibility(View.VISIBLE);
-                }
             }
 
             @Override
             public void onPageSelected(int pos) {
                 if (pos == 0) {
                     fab.setVisibility(View.INVISIBLE);
+                    tabTwoTextView.setTextColor(getResources().getColor(R.color.clouds));
+                    tabOneTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
                 } else {
                     fab.setVisibility(View.VISIBLE);
+                    tabTwoTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tabOneTextView.setTextColor(getResources().getColor(R.color.clouds));
                 }
             }
         });
@@ -126,6 +127,10 @@ public class HomeActivity extends BaseActivity {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setCustomView(R.layout.home_rahas_tab);
         tabLayout.getTabAt(1).setCustomView(R.layout.home_friends_tab);
+        tabOneTextView = (TextView) findViewById(R.id.rahas_text_view);
+        tabTwoTextView = (TextView) findViewById(R.id.friends_text_view);
+        tabTwoTextView.setTextColor(getResources().getColor(R.color.clouds));
+        tabOneTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -153,23 +158,15 @@ public class HomeActivity extends BaseActivity {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
+
         @Override
         public int getCount() {
             return mFragmentList.size();
         }
+
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

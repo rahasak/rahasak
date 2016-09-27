@@ -1,102 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<android.support.v7.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/toolbar_height"
-    android:background="@color/android_grey"
-    app:popupTheme="@style/MyMaterialTheme"
-    app:contentInsetEnd="0dp"
-    app:contentInsetStart="0dp"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="@color/white"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        app:popupTheme="@style/MyMaterialTheme" />
+
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabMaxWidth="0dp"
-        app:tabMode="fixed"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/android_green"
-        app:tabIndicatorHeight="3dp"
         android:layout_below="@+id/toolbar"
-        android:background="@color/android_grey" />
+        android:background="@color/white"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/colorPrimary"
+        app:tabIndicatorHeight="3dp"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed" />
 
-        <android.support.v4.view.ViewPager
+    <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-            android:layout_below="@+id/tabs" />
+        android:layout_below="@+id/tabs" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/android_green"
-        android:tint="@color/white"
-        app:rippleColor="@color/white"
-        app:fabSize="normal"
         android:src="@android:drawable/ic_input_add"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true" />
+        android:tint="@color/white"
+        app:backgroundTint="@color/android_green"
+        app:fabSize="normal"
+        app:rippleColor="@color/white" />
 
 </RelativeLayout>
-
-    <!--<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/app_bar"
-            android:theme="@style/MyMaterialTheme"
-            android:background="@color/android_grey">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@color/android_grey"
-                app:popupTheme="@style/MyMaterialTheme"
-                app:contentInsetEnd="0dp"
-                app:contentInsetStart="0dp"/>
-
-
-            <android.support.design.widget.TabLayout
-                    android:id="@+id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:tabMaxWidth="0dp"
-                    app:tabMode="fixed"
-                    app:tabGravity="fill"
-                    app:tabIndicatorColor="@color/android_green"
-                    app:tabIndicatorHeight="3dp"/>
-
-        </android.support.design.widget.AppBarLayout>
-
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            app:backgroundTint="@color/android_green"
-            android:tint="@color/white"
-            app:rippleColor="@color/white"
-            app:fabSize="normal"
-            android:src="@android:drawable/ic_input_add" />
-    </android.support.design.widget.CoordinatorLayout>-->
-

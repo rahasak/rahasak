@@ -13,19 +13,17 @@
         android:paddingBottom="0dp">
 
         <TextView
+            android:id="@+id/friends_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/home_page_tab_two"
-            android:layout_toRightOf="@+id/icon"
             android:allowUndo="false"
             android:layout_centerInParent="true"
             android:layout_marginLeft="10dp"
             android:paddingTop="12dp"
             android:textSize="15sp"
             android:layout_alignParentBottom="false"
-            android:layout_alignBottom="@+id/icon"
-            android:layout_alignBaseline="@+id/icon"
-            android:textColor="@color/white"
+            android:textColor="@color/colorPrimary"
             android:textStyle="normal"
             android:fontFamily="Helvetica" />
     </RelativeLayout>

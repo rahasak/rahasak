@@ -154,68 +154,6 @@
 
             </FrameLayout>
 
-
-            <!--<FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:layout_weight="0"
-                android:background="#ecf0f1">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:layout_marginBottom="6dp">
-                    <FrameLayout
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:background="#ecf0f1">
-                        <ImageButton
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/perm_locations_active"
-                            android:background="@color/transparent"
-                            android:adjustViewBounds="true"
-                            android:scaleType="centerInside"
-                            android:id="@+id/getLocBtn"
-                            android:alpha="1" />
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content">
-                        <ImageButton
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/perm_camera_deactive"
-                            android:background="@color/transparent"
-                            android:adjustViewBounds="true"
-                            android:scaleType="centerInside"
-                            android:id="@+id/getCamBtn"
-                            android:layout_gravity="top" />
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content">
-                        <ImageButton
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/perm_mic_deactive"
-                            android:background="@color/transparent"
-                            android:adjustViewBounds="true"
-                            android:scaleType="centerInside"
-                            android:id="@+id/getMicBtn"
-                            android:layout_gravity="top" />
-                    </FrameLayout>
-
-
-                </LinearLayout>
-
-            </FrameLayout>-->
-
-
         </LinearLayout>
 
     </FrameLayout>

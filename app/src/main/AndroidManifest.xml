@@ -46,7 +46,7 @@
     <!-- android:name=".application.SenzApplication" -->
     <application
         android:name=".application.SenzApplication"
-        android:icon="@drawable/rlogo_launcher"
+        android:icon="@drawable/rahaslogo"
         android:label="@string/app_name">
 
         <!-- production key -->
