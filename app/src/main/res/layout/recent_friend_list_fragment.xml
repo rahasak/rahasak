@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.FriendListFragment"
     android:orientation="vertical"
-    android:background="@color/clouds">
+    android:background="@color/white">
 
 
     <ListView
