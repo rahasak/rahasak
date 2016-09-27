@@ -25,7 +25,7 @@ class SenHandler extends BasHandler {
 
     private Stream stream;
 
-    public static SenHandler getInstance() {
+    static SenHandler getInstance() {
         if (instance == null) {
             instance = new SenHandler();
         }

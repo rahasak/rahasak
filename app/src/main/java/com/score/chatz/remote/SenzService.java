@@ -97,17 +97,6 @@ public class SenzService extends Service {
 
         @Override
         public void sendFromUri(String uri, Senz senz, String uid) throws RemoteException {
-            /*if(senz.getAttributes().containsKey("chatzphoto") || senz.getAttributes().containsKey("profilezphoto")) {
-                Bitmap image = CameraUtils.getPhotoCache(uri, getApplicationContext());
-                byte[] imageBytes = CameraUtils.getBytesFromImage(image);
-                ArrayList<Senz> photoSenzList = RemoteServiceUtils.getPhotoStreamingSenz(senz, imageBytes, getApplicationContext(), uid);
-                Senz stopSenz = RemoteServiceUtils.getStopPhotoSharingSenz(senz);
-                ArrayList<Senz> senzList = new ArrayList<Senz>();
-                senzList.addAll(photoSenzList);
-                senzList.add(stopSenz);
-                Log.d(TAG, "----------- full size" + senzList.size());
-                writeSenzList(senzList);
-            }*/
         }
     };
 
@@ -217,21 +206,60 @@ public class SenzService extends Service {
     }
 
     public void writeSenz(final Senz senz) {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            new Thread(new Runnable() {
-                public void run() {
-                    // sign and write senz
-                    try {
-                        PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+        new Thread(new Runnable() {
+            public void run() {
+                // sign and write senz
+                try {
+                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
 
+                    // if sender not already set find user(sender) and set it to senz first
+                    if (senz.getSender() == null || senz.getSender().toString().isEmpty())
+                        senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+
+                    // get digital signature of the senz
+                    String senzPayload = SenzParser.getSenzPayload(senz);
+                    String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                    String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+                    Log.d(TAG, "Senz to be send: " + message);
+
+                    //  sends the message to the server
+                    if (isOnline) {
+                        writer.println(message);
+                        writer.flush();
+                    } else {
+                        Log.e(TAG, "Socket disconnected");
+                    }
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void writeSenzList(final List<Senz> senzList) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+
+                    //for (Senz senz : senzList) {
+                    for (int i = 0; i < senzList.size(); i++) {
+                        Senz senz = senzList.get(i);
                         // if sender not already set find user(sender) and set it to senz first
                         if (senz.getSender() == null || senz.getSender().toString().isEmpty())
                             senz.setSender(PreferenceUtils.getUser(getBaseContext()));
 
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);
-                        String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        String senzSignature;
+                        if (senz.getAttributes().containsKey("stream")) {
+                            senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        } else {
+                            senzSignature = "SIGNATURE";
+                        }
                         String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
@@ -241,59 +269,12 @@ public class SenzService extends Service {
                         } else {
                             Log.e(TAG, "Socket disconnected");
                         }
-                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
-                        e.printStackTrace();
                     }
+                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
+                    e.printStackTrace();
                 }
-            }).start();
-        } else {
-            Log.e(TAG, "No network to send senz");
-        }
-    }
-
-    public void writeSenzList(final List<Senz> senzList) {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
-
-                        //for (Senz senz : senzList) {
-                        for (int i = 0; i < senzList.size(); i++) {
-                            Senz senz = senzList.get(i);
-                            // if sender not already set find user(sender) and set it to senz first
-                            if (senz.getSender() == null || senz.getSender().toString().isEmpty())
-                                senz.setSender(PreferenceUtils.getUser(getBaseContext()));
-
-                            // get digital signature of the senz
-                            String senzPayload = SenzParser.getSenzPayload(senz);
-                            String senzSignature;
-                            if (senz.getAttributes().containsKey("stream")) {
-                                senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                            } else {
-                                senzSignature = "SIGNATURE";
-                            }
-                            String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-                            Log.d(TAG, "Senz to be send: " + message);
-
-                            //  sends the message to the server
-                            if (isOnline) {
-                                writer.println(message);
-                                writer.flush();
-                            } else {
-                                Log.e(TAG, "Socket disconnected");
-                            }
-                        }
-                    } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        } else {
-            Log.e(TAG, "No network to send senz list");
-        }
+            }
+        }).start();
     }
 
     class SenzComm extends AsyncTask {
