@@ -110,18 +110,21 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     protected void onStart() {
         super.onStart();
 
-        if (!isServiceBound) {
-            bindToService();
-        }
+        Log.d(TAG, "Bind to senz service");
+        bindToService();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        isActivityActive = false;
 
         // unbind from service
-        if (isServiceBound) unbindService(senzServiceConnection);
+        if (isServiceBound) {
+            Log.d(TAG, "Unbind to senz service");
+            unbindService(senzServiceConnection);
+
+            isServiceBound = false;
+        }
     }
 
     private void setupUi() {

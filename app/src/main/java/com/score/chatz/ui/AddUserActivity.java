@@ -65,9 +65,8 @@ public class AddUserActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
 
-        if (!isServiceBound) {
-            bindToService();
-        }
+        Log.d(TAG, "Bind to senz service");
+        bindToService();
     }
 
     @Override
@@ -75,7 +74,12 @@ public class AddUserActivity extends BaseActivity {
         super.onStop();
 
         // unbind from service
-        if (isServiceBound) unbindService(senzServiceConnection);
+        if (isServiceBound) {
+            Log.d(TAG, "Unbind to senz service");
+            unbindService(senzServiceConnection);
+
+            isServiceBound = false;
+        }
     }
 
     private void setupUiElements() {

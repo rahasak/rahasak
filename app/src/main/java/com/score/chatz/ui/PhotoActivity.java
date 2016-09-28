@@ -91,9 +91,8 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     protected void onStart() {
         super.onStart();
 
-        if (!isServiceBound) {
-            bindToService();
-        }
+        Log.d(TAG, "Bind to senz service");
+        bindToService();
     }
 
     @Override
@@ -101,7 +100,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         super.onStop();
 
         // unbind from service
-        if (isServiceBound) unbindService(senzServiceConnection);
+        if (isServiceBound) {
+            Log.d(TAG, "Unbind to senz service");
+            unbindService(senzServiceConnection);
+
+            isServiceBound = false;
+        }
     }
 
     private void setupWakeLock() {

@@ -55,8 +55,8 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d(TAG, "Connected with senz service");
-            isServiceBound = true;
             senzService = ISenzService.Stub.asInterface(service);
+            isServiceBound = true;
         }
 
         public void onServiceDisconnected(ComponentName className) {
