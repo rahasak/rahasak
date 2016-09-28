@@ -118,6 +118,23 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!isServiceBound) {
+            bindToService();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         // bind to senz service

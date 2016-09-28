@@ -132,7 +132,7 @@
             android:enabled="true"
             android:process=":remote">
             <intent-filter>
-                <action android:name="com.score.chatz.services.SenzService" />
+                <action android:name="com.score.chatz.remote.SenzService" />
             </intent-filter>
         </service>
 

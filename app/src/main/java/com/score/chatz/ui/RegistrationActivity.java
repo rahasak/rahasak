@@ -43,7 +43,6 @@ public class RegistrationActivity extends BaseActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,29 +51,37 @@ public class RegistrationActivity extends BaseActivity {
         setupUI();
         setupRegisterBtn();
 
-        //Register all receivers
-        registerReceivers();
-
         //Generate RSA keys
         doPreRegistration();
     }
 
-    /**
-     * Register all intent receivers
-     */
-    private void registerReceivers() {
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
-    }
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-    private void unRegisterReceivers() {
-        if (senzReceiver != null) unregisterReceiver(senzReceiver);
+        if (!isServiceBound) {
+            bindToService();
+        }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //remove all registers
-        unRegisterReceivers();
+    protected void onStop() {
+        super.onStop();
+
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
     private void setupUI() {
@@ -135,7 +142,6 @@ public class RegistrationActivity extends BaseActivity {
      * Send register senz to senz service via service binder
      */
     private void doRegistration() {
-
         // first create create senz
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());

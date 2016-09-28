@@ -50,7 +50,6 @@ public class AddUserActivity extends BaseActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +59,23 @@ public class AddUserActivity extends BaseActivity {
         setupActionBar();
         setupAddUsersBtn();
         setupFonts();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!isServiceBound) {
+            bindToService();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
     }
 
     private void setupUiElements() {

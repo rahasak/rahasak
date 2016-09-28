@@ -87,6 +87,23 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         startTimerToEndRequest();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!isServiceBound) {
+            bindToService();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
+    }
+
     private void setupWakeLock() {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);

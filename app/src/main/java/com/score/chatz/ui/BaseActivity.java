@@ -74,20 +74,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         setupFonts();
     }
 
-    @Override
-    protected void onStart() {
-        if (!isServiceBound) {
-            bindToService();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        // unbind from service
-        if (isServiceBound) unbindService(senzServiceConnection);
-    }
-
-    private void bindToService() {
+    protected void bindToService() {
         Intent intent = new Intent();
         intent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);

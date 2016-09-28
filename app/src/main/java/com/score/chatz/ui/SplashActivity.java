@@ -74,13 +74,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected void onResume() {
-        super.onResume();
-    }
-
-    /**
      * Switch to home activity
      * This method will be call after successful login
      */
@@ -90,15 +83,5 @@ public class SplashActivity extends AppCompatActivity {
         startActivity(intent);
         SplashActivity.this.finish();
 
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

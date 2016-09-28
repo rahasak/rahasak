@@ -1,26 +1,23 @@
 package com.score.chatz.ui;
 
 import android.content.Intent;
-import android.graphics.Typeface;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
-
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextClock;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +25,7 @@ import java.util.List;
 /**
  * First Activity after Splash screen!!!
  */
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getName();
 
@@ -51,7 +48,6 @@ public class HomeActivity extends BaseActivity {
         setupViewPager();
         setupTabLayouts();
         initFloatingButton();
-        //startService();
 
         // Adding current user's name to the top right corner of the action bar!!!
         try {

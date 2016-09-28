@@ -97,6 +97,23 @@ public class UserProfileActivity extends BaseActivity {
         setupClickableImage();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!isServiceBound) {
+            bindToService();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
+    }
+
     private void initUi() {
         username = (TextView) findViewById(R.id.user_name);
         userImage = (ImageView) findViewById(R.id.clickable_image);

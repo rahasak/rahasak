@@ -106,6 +106,24 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!isServiceBound) {
+            bindToService();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActivityActive = false;
+
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
+    }
+
     private void setupUi() {
         this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
         this.mTimerTextView.setText(mStartTime + "");
@@ -297,12 +315,6 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         Secret secret = new Secret(sound, "SOUND", SecretsUtil.getTheUser(sender, receiver, getApplicationContext()), false);
         secret.setReceiver(sender);
         return secret;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        isActivityActive = false;
     }
 
     public static boolean isAcitivityActive() {
