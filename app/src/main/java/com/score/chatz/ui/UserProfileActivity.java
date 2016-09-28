@@ -255,9 +255,11 @@ public class UserProfileActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(this, ChatActivity.class);
+                /*Intent intent = new Intent(this, ChatActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.putExtra("SENDER", thisUser.getUsername());
-                startActivity(intent);
+                startActivity(intent);*/
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

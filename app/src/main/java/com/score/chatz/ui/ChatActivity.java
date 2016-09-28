@@ -266,6 +266,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void navigateToProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("SENDER", thisUser.getUsername());
         startActivity(intent);
     }
