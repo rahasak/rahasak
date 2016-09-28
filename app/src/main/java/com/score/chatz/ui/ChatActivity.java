@@ -1,12 +1,17 @@
 package com.score.chatz.ui;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,16 +20,18 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.utils.LimitedList;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
-import com.score.chatz.services.LocationAddressReceiver;
+import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.LimitedList;
+import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.SenzUtils;
+import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -34,7 +41,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-public class ChatActivity extends BaseActivity implements View.OnClickListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = ChatActivity.class.getName();
 
@@ -47,11 +54,30 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
     // secret list
     private ListView listView;
-    //private ChatFragmentListAdapter secretAdapter;
     private ChatListAdapter secretAdapter;
 
     private User thisUser;
     private LimitedList<Secret> secretList;
+
+    // service interface
+    protected ISenzService senzService = null;
+    protected boolean isServiceBound = false;
+
+    // service connection
+    protected ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(TAG, "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
+            isServiceBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d(TAG, "Disconnected from senz service");
+            senzService = null;
+            isServiceBound = false;
+        }
+    };
+
 
     // senz received
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -162,8 +188,13 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         super.onDestroy();
 
         // keep only last message
-        //deleteAllSecretsExceptTheLast();
         new SenzorsDbSource(this).deleteAllSecretsExceptLast();
+    }
+
+    protected void bindToService() {
+        Intent intent = new Intent();
+        intent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
+        bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -214,7 +245,6 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             secretList.add(secret);
         }
 
-        //secretAdapter = new ChatFragmentListAdapter(this, secretList);
         secretAdapter = new ChatListAdapter(this, secretList);
         listView.setAdapter(secretAdapter);
     }
@@ -353,13 +383,14 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             if (msg != null && msg.equalsIgnoreCase("700")) {
                 onSenzStatusReceived(senz);
             } else if (msg != null && msg.equalsIgnoreCase("901")) {
-                displayInformationMessageDialog("Sorry", "User is busy.");
+                //displayInformationMessageDialog("Sorry", "User is busy.");
+                Toast.makeText(this, "User busy", Toast.LENGTH_LONG).show();
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
             onNewSenzReceived(senz);
         } else if (senz.getAttributes().containsKey("lat")) {
-            onLocationReceived(senz);
+            //onLocationReceived(senz);
         }
     }
 
@@ -422,16 +453,6 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void onLocationReceived(Senz senz) {
-        // location response received
-        double lat = Double.parseDouble(senz.getAttributes().get("lat"));
-        double lan = Double.parseDouble(senz.getAttributes().get("lon"));
-        LatLng latLng = new LatLng(lat, lan);
-
-        // start location address receiver
-        new LocationAddressReceiver(this, latLng, senz.getSender()).execute("PARAM");
-    }
-
     private void updatePermissions() {
         UserPermission userPerm = new SenzorsDbSource(this).getUserPermission(thisUser);
         if (userPerm != null) {
@@ -476,23 +497,28 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         mediaPlayer.start();
     }
 
-    private void deleteAllSecretsExceptTheLast() {
-        // keep last secret
-        if (secretList.size() > 1) {
-            // remove last secret
-            secretList.remove(secretList.get(secretList.size() - 1));
-            for (Secret secret : secretList) {
-                new SenzorsDbSource(this).deleteSecret(secret);
-            }
-        }
-    }
-
     private void navigateToLocationView() {
         // TODO start map first
         // start map activity
         Intent mapIntent = new Intent(this, SenzMapActivity.class);
         startActivity(mapIntent);
         overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+    }
+
+    public void send(Senz senz) {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            try {
+                if (isServiceBound) {
+                    senzService.send(senz);
+                } else {
+                    ActivityUtils.showToast("Failed to connected to service.", this);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ActivityUtils.showToast("No network connection available.", this);
+        }
     }
 
 }
