@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
-import com.score.chatz.asyncTasks.RahasPlayer;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.BitmapTaskParams;
@@ -32,21 +30,22 @@ import java.util.List;
  */
 public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     private static final String TAG = ChatFragmentListAdapter.class.getName();
+
     Context context;
-    List<Secret> userSecretList;
-    static final int MY_MESSAGE_TYPE = 0;
-    static final int NOT_MY_MESSAGE_TYPE = 1;
-    static final int MY_PHOTO_TYPE = 2;
-    static final int NOT_MY_PHOTO_TYPE = 3;
-    static final int NOT_MY_SOUND_TYPE = 4;
-    static final int MY_SOUND_TYPE = 5;
-    static User currentUser;
+    private List<Secret> userSecretList;
+    private static final int MY_MESSAGE_TYPE = 0;
+    private static final int NOT_MY_MESSAGE_TYPE = 1;
+    private static final int MY_PHOTO_TYPE = 2;
+    private static final int NOT_MY_PHOTO_TYPE = 3;
+    private static final int NOT_MY_SOUND_TYPE = 4;
+    private static final int MY_SOUND_TYPE = 5;
+    private static User currentUser;
     private LayoutInflater mInflater;
 
     public ChatFragmentListAdapter(Context _context, List<Secret> secretList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
         context = _context;
-        userSecretList = secretList;
+        this.userSecretList = secretList;
         try {
             currentUser = PreferenceUtils.getUser(getContext());
         } catch (NoUserException e) {
@@ -63,7 +62,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         //isSender means the secret belongs to your friend
-        if (((Secret) getItem(position)).isSender() && ((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
+        if ((getItem(position)).isSender() && (getItem(position)).getType().equalsIgnoreCase("SOUND")) {
             return NOT_MY_SOUND_TYPE;
         } else if (!((Secret) getItem(position)).isSender() && ((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
             return MY_SOUND_TYPE;
@@ -92,9 +91,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         // A ViewHolder keeps references to children views to avoid unnecessary calls
         // to findViewById() on each row.
         final ViewHolder holder;
-        final Secret secret = (Secret) getItem(i);
+        final Secret secret = getItem(i);
         int type = getItemViewType(i);
-        //Log.i("SECRETS" ,"Secret : Text - " + secret.getText() + ", Sender - " + secret.getSender().getUsername() + ", Receiver - " + secret.getReceiver().getUsername());
+
         if (view == null || (view != null && ((ViewHolder) view.getTag()).messageType != type)) {
             //inflate sensor list row layout
             //create view holder to store reference to child views
@@ -117,28 +116,28 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     break;
                 case MY_PHOTO_TYPE:
                     view = mInflater.inflate(R.layout.my_photo_layout, viewGroup, false);
-                    holder.image = (ImageView) view.findViewById(R.id.play);
+                    //holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = MY_PHOTO_TYPE;
                     break;
                 case NOT_MY_PHOTO_TYPE:
                     view = mInflater.inflate(R.layout.not_my_photo_layout, viewGroup, false);
-                    holder.image = (ImageView) view.findViewById(R.id.not_my_image);
+                    //holder.image = (ImageView) view.findViewById(R.id.not_my_image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = NOT_MY_PHOTO_TYPE;
                     break;
                 case MY_SOUND_TYPE:
                     view = mInflater.inflate(R.layout.my_sound_layout, viewGroup, false);
-                    holder.image = (ImageView) view.findViewById(R.id.play);
+                    //holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = MY_SOUND_TYPE;
                     break;
                 case NOT_MY_SOUND_TYPE:
                     view = mInflater.inflate(R.layout.not_my_sound_layout, viewGroup, false);
-                    holder.image = (ImageView) view.findViewById(R.id.play);
+                    //holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.status = (TextView) view.findViewById(R.id.deleviered_message);
                     holder.messageType = NOT_MY_SOUND_TYPE;
@@ -232,7 +231,6 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
     private void loadBitmap(String data, ImageView imageView) {
         BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        //task.execute(new BitmapTaskParams(data, 100, 100));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 400, 400)));
         else

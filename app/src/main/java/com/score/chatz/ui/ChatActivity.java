@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.utils.LimitedList;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.services.LocationAddressReceiver;
@@ -32,7 +33,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 
 public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
@@ -47,10 +47,11 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
     // secret list
     private ListView listView;
-    private ChatFragmentListAdapter secretAdapter;
+    //private ChatFragmentListAdapter secretAdapter;
+    private ChatListAdapter secretAdapter;
 
     private User thisUser;
-    private List<Secret> secretList;
+    private LimitedList<Secret> secretList;
 
     // senz received
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -207,8 +208,13 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initSecretList() {
-        secretList = new SenzorsDbSource(this).getSecretz(thisUser);
-        secretAdapter = new ChatFragmentListAdapter(this, secretList);
+        secretList = new LimitedList<>(5);
+        for (Secret secret : new SenzorsDbSource(this).getSecretz(thisUser)) {
+            secretList.add(secret);
+        }
+
+        //secretAdapter = new ChatFragmentListAdapter(this, secretList);
+        secretAdapter = new ChatListAdapter(this, secretList);
         listView.setAdapter(secretAdapter);
     }
 

@@ -55,7 +55,7 @@
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/play"
+                android:id="@+id/sound"
                 android:gravity="left"
                 android:scaleType="fitCenter"
                 android:background="@drawable/image_border"

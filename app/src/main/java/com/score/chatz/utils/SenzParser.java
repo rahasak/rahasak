@@ -102,6 +102,22 @@ public class SenzParser {
                 "^era " +
                 "v50I88VzgvBvubCjGitTMO9";
 
-        parse(senzMessage3);
+        //parse(senzMessage3);
+
+        LimitedList<String> list = new LimitedList<>(3);
+        list.add("era");
+        System.out.println(list);
+
+        list.add("nan");
+        System.out.println(list);
+
+        list.add("edsd");
+        System.out.println(list);
+
+        list.add("kesdf");
+        System.out.println(list);
+
+        list.add("ioio");
+        System.out.println(list);
     }
 }
