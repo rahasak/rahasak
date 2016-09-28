@@ -527,13 +527,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 if (isServiceBound) {
                     senzService.send(senz);
                 } else {
-                    ActivityUtils.showToast("Failed to connected to service.", this);
+                    ActivityUtils.showCustomToast("Failed to connected to service.", this);
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         } else {
-            ActivityUtils.showToast("No network connection available.", this);
+            ActivityUtils.showCustomToast("No network connection available.", this);
         }
     }
 

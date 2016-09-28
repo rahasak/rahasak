@@ -1,16 +1,20 @@
 package com.score.chatz.utils;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.score.chatz.R;
 
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.senzc.pojos.User;
@@ -123,6 +127,19 @@ public class ActivityUtils {
      */
     public static void showToast(String message, Context context){
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
+
+    public static void showCustomToast(String message, Context context){
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layout = inflater.inflate(R.layout.custom_toast, null);
+        TextView text = (TextView) layout.findViewById(R.id.text);
+        text.setText(message);
+
+        Toast toast = new Toast(context);
+        toast.setGravity(Gravity.BOTTOM, 0, 0);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();
     }
 
 }

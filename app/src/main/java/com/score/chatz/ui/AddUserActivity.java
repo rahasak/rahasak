@@ -207,7 +207,7 @@ public class AddUserActivity extends BaseActivity {
         dbSource.createPermissionsForUser(senz);
         dbSource.createConfigurablePermissionsForUser(senz);
 
-        ActivityUtils.showToast("Successfully added " + editTextUserId.getText().toString().trim(), this);
+        ActivityUtils.showCustomToast("Successfully added " + editTextUserId.getText().toString().trim(), this);
         editTextUserId.setText("");
 
         this.goBackToHome();

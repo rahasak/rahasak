@@ -124,7 +124,7 @@ public class RegistrationActivity extends BaseActivity {
                 }
             });
         } catch (InvalidInputFieldsException e) {
-            ActivityUtils.showToast("Invalid username", this);
+            ActivityUtils.showCustomToast("Invalid username", this);
             e.printStackTrace();
         }
     }
@@ -177,7 +177,7 @@ public class RegistrationActivity extends BaseActivity {
             ActivityUtils.cancelProgressDialog();
             String msg = senz.getAttributes().get("status");
             if (msg != null && msg.equalsIgnoreCase("600")) {
-                ActivityUtils.showToast("Successfully registered", this);
+                ActivityUtils.showCustomToast("Successfully registered", this);
                 // save user
                 // navigate home
                 PreferenceUtils.saveUser(this, registeringUser);
