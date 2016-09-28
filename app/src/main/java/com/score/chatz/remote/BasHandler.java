@@ -12,20 +12,8 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 class BasHandler {
-    void broadcastDataSenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getDataSenzIntent();
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);
-    }
-
-    void broadcastShareSenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getShareSenzIntent();
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);
-    }
-
-    void broadcastStreamSenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getStreamSenzIntent();
+    void broadcastSenz(Senz senz, Context context) {
+        Intent intent = IntentProvider.getSenzIntent();
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }

@@ -141,7 +141,7 @@ public class SenzMapActivity extends AppCompatActivity implements LocationListen
 
         setUpActionBar();
 
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     private void showProgressLoader() {

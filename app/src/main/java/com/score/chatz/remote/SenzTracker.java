@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class SenzTracker {
     private static final String TAG = SenzTracker.class.getName();
-    private static final Integer PACKET_TIMEOUT = 7; // 10 seconds
+    private static final Integer TIMEOUT_INTERVAL = 7; // 10 seconds
     private static final String UID = "uid";
 
     // singleton
@@ -95,7 +95,7 @@ public class SenzTracker {
 
             // start wait
             try {
-                Thread.sleep(PACKET_TIMEOUT * 1000);
+                Thread.sleep(TIMEOUT_INTERVAL * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -115,7 +115,7 @@ public class SenzTracker {
                 removeSenz(senz);
 
                 // broadcast packet
-                Intent intent = IntentProvider.getpacketTimeoutIntent();
+                Intent intent = IntentProvider.getTimeoutIntent();
                 intent.putExtra("SENZ", senz);
                 senzContext.sendBroadcast(intent);
             }

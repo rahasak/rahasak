@@ -75,7 +75,7 @@ class SenHandler extends BasHandler {
             showStatusNotification(senzService.getApplicationContext(), title, message, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
 
             // broadcast
-            broadcastShareSenz(senz, senzService.getApplicationContext());
+            broadcastSenz(senz, senzService.getApplicationContext());
         } else {
             // #mic #cam #lat #lon permission
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
@@ -93,7 +93,7 @@ class SenHandler extends BasHandler {
             // send status
             // broadcast
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
-            broadcastShareSenz(senz, senzService.getApplicationContext());
+            broadcastSenz(senz, senzService.getApplicationContext());
         }
     }
 
@@ -117,7 +117,7 @@ class SenHandler extends BasHandler {
         if (senz.getAttributes().containsKey("status")) {
             // status
             // broadcast
-            broadcastDataSenz(senz, senzService.getApplicationContext());
+            broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg")) {
             // rahasa
             // send ack
@@ -127,7 +127,7 @@ class SenHandler extends BasHandler {
                 // save and broadcast
                 String rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
                 saveSecret(rahasa, "TEXT", senz.getSender(), senzService.getApplicationContext());
-                broadcastDataSenz(senz, senzService.getApplicationContext());
+                broadcastSenz(senz, senzService.getApplicationContext());
 
                 // show notification
                 String title = "@" + senz.getSender().getUsername();
@@ -137,7 +137,7 @@ class SenHandler extends BasHandler {
             }
         } else if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
             // location, broadcast
-            broadcastDataSenz(senz, senzService.getApplicationContext());
+            broadcastSenz(senz, senzService.getApplicationContext());
         }
     }
 
@@ -166,7 +166,7 @@ class SenHandler extends BasHandler {
                 saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
             else
                 saveSecret(stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
-            broadcastStreamSenz(streamSenz, senzService.getApplicationContext());
+            broadcastSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam"))

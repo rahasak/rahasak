@@ -34,6 +34,16 @@ public class RegistrationActivity extends BaseActivity {
     private User registeringUser;
     private TextView welcomeTextView;
 
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            handleSenz(senz);
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,11 +63,11 @@ public class RegistrationActivity extends BaseActivity {
      * Register all intent receivers
      */
     private void registerReceivers() {
-        registerReceiver(senzMessageReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     private void unRegisterReceivers() {
-        if (senzMessageReceiver != null) unregisterReceiver(senzMessageReceiver);
+        if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
     @Override
@@ -142,15 +152,6 @@ public class RegistrationActivity extends BaseActivity {
         // Sending senz to service
         send(senz);
     }
-
-    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            handleSenz(senz);
-        }
-    };
 
     /**
      * Handle broadcast message receives

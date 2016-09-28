@@ -33,23 +33,23 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     private ArrayList<UserPermission> userPermissionList;
     private FriendListAdapter adapter;
 
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got new user from Senz service");
+            handleSenz(intent);
+        }
+    };
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unregisterReceiver(permissionSharedReceiver);
+        getContext().unregisterReceiver(senzReceiver);
     }
 
     private void setupEmptyTextFont() {
         ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
     }
-
-    private BroadcastReceiver permissionSharedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got new user from Senz service");
-            handleSharedUser(intent);
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,7 +62,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getListView().setOnItemClickListener(this);
-        getContext().registerReceiver(permissionSharedReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
+        getContext().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
@@ -108,7 +108,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
      *
      * @param intent intent
      */
-    private void handleSharedUser(Intent intent) {
+    private void handleSenz(Intent intent) {
         displayUserList();
     }
 

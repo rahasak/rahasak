@@ -37,18 +37,16 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
 
             // extract senz
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzReceived(senz);
-        }
-    };
-
-    // share senz
-    private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Share senz");
-
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzStreamReceived(senz);
+            switch (senz.getSenzType()) {
+                case DATA:
+                    onSenzReceived(senz);
+                    break;
+                case STREAM:
+                    onSenzStreamReceived(senz);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -90,41 +88,14 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     @Override
     protected void onResume() {
         super.onResume();
-        registerAllReceivers();
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterAllReceivers();
-    }
-
-    private void registerAllReceivers() {
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
-        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
-    }
-
-    private void unregisterAllReceivers() {
-        unregisterReceiver(senzStreamReceiver);
         unregisterReceiver(senzReceiver);
     }
-
-    private BroadcastReceiver newDataToDisplay = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            loadingText.setVisibility(View.INVISIBLE);
-            playingText.setVisibility(View.VISIBLE);
-        }
-    };
-
-    private BroadcastReceiver userBusyNotifier = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            displayInformationMessageDialog(getResources().getString(R.string.sorry), senz.getSender().getUsername() + " " + getResources().getString(R.string.is_busy_now));
-        }
-    };
 
     private void initIntent() {
         Intent intent = getIntent();

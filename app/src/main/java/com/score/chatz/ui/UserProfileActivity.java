@@ -73,12 +73,12 @@ public class UserProfileActivity extends BaseActivity {
         }
     }
 
-    private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            handleDataSenz(senz);
+            handleSenz(senz);
         }
     };
 
@@ -174,13 +174,13 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ)); //Incoming data share
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
     public void onPause() {
         super.onStop();
-        if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
+        if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
 
@@ -276,7 +276,7 @@ public class UserProfileActivity extends BaseActivity {
         send(senz);
     }
 
-    private void handleDataSenz(Senz senz) {
+    private void handleSenz(Senz senz) {
         ActivityUtils.cancelProgressDialog();
         if (senz.getAttributes().containsKey("status")) {
             // status response received

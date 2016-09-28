@@ -66,38 +66,25 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         }
     };
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // unbind from service
-        if (isServiceBound) unbindService(senzServiceConnection);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onStop();
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Setup Fonts!!!
         setupFonts();
+    }
 
-        //startService();
+    @Override
+    protected void onStart() {
         if (!isServiceBound) {
             bindToService();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        // unbind from service
+        if (isServiceBound) unbindService(senzServiceConnection);
     }
 
     private void bindToService() {

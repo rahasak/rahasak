@@ -1,6 +1,5 @@
 package com.score.chatz.ui;
 
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,37 +52,24 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     private User thisUser;
     private List<Secret> secretList;
 
-    // senz message
+    // senz received
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-
-            // extract senz
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzReceived(senz);
-        }
-    };
-
-    // share senz
-    private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Share senz");
-
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzStreamReceived(senz);
-        }
-    };
-
-    // share senz
-    private BroadcastReceiver senzShareReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Share senz");
-
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzShareReceived(senz);
+            switch (senz.getSenzType()) {
+                case DATA:
+                    onDataReceived(senz);
+                    break;
+                case SHARE:
+                    onSenzShareReceived(senz);
+                    break;
+                case STREAM:
+                    onSenzStreamReceived(senz);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -137,21 +121,17 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
         // bind to senz service
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
-        registerReceiver(senzShareReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SHARE_SENZ));
-        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
-        registerReceiver(senzTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.PACKET_TIMEOUT));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        registerReceiver(senzTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.TIMEOUT));
 
         // init list again
         initSecretList();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         unregisterReceiver(senzReceiver);
-        unregisterReceiver(senzShareReceiver);
-        unregisterReceiver(senzStreamReceiver);
         unregisterReceiver(senzTimeoutReceiver);
     }
 
@@ -338,7 +318,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         dbSource.createSecret(secret);
     }
 
-    public void onSenzReceived(Senz senz) {
+    public void onDataReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
             // status message
             String msg = senz.getAttributes().get("status");

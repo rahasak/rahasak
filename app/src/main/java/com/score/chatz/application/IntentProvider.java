@@ -20,40 +20,20 @@ import com.score.chatz.ui.RecordingActivity;
 public class IntentProvider {
     private static final String TAG = IntentProvider.class.getName();
 
-    public static Intent getDataSenzIntent() {
+    public static Intent getSenzIntent() {
         Intent intent = null;
         try {
-            intent = getIntent(getIntentType(INTENT_TYPE.DATA_SENZ));
+            intent = getIntent(getIntentType(INTENT_TYPE.SENZ));
         } catch (InvalidIntentType ex) {
             Log.e(TAG, "No such intent, " + ex);
         }
         return intent;
     }
 
-    public static Intent getShareSenzIntent() {
+    public static Intent getTimeoutIntent() {
         Intent intent = null;
         try {
-            intent = getIntent(getIntentType(INTENT_TYPE.SHARE_SENZ));
-        } catch (InvalidIntentType ex) {
-            Log.e(TAG, "No such intent, " + ex);
-        }
-        return intent;
-    }
-
-    public static Intent getStreamSenzIntent() {
-        Intent intent = null;
-        try {
-            intent = getIntent(getIntentType(INTENT_TYPE.STREAM_SENZ));
-        } catch (InvalidIntentType ex) {
-            Log.e(TAG, "No such intent, " + ex);
-        }
-        return intent;
-    }
-
-    public static Intent getpacketTimeoutIntent() {
-        Intent intent = null;
-        try {
-            intent = getIntent(getIntentType(INTENT_TYPE.PACKET_TIMEOUT));
+            intent = getIntent(getIntentType(INTENT_TYPE.TIMEOUT));
         } catch (InvalidIntentType ex) {
             Log.e(TAG, "No such intent, " + ex);
         }
@@ -101,31 +81,12 @@ public class IntentProvider {
     private static String getIntentType(INTENT_TYPE intentType) throws InvalidIntentType {
         String intentString = null;
         switch (intentType) {
-            case DATA_SENZ:
-                // Yummy!! Data packets from service
-                intentString = "com.score.chatz.DATA_SENZ";
+            case SENZ:
+                intentString = "com.score.chatz.SENZ";
                 break;
-            case SHARE_SENZ:
-                // share senz
-                intentString = "com.score.chatz.SHARE_SENZ";
-                break;
-            case STREAM_SENZ:
-                // share senz
-                intentString = "com.score.chatz.STREAM_SENZ";
-                break;
-            case USER_BUSY:
-                // Ohhh!! User is too busy to respond
-                intentString = "com.score.chatz.USER_BUSY";
-                break;
-            case PACKET_TIMEOUT:
+            case TIMEOUT:
                 // Depressing!! That #$%! is not online!! :)
-                intentString = "com.score.chatz.PACKET_TIMEOUT";
-                break;
-            case NEW_DATA_TO_DISPLAY:
-                intentString = "com.score.chatz.NEW_DATA_TO_DISPLAY";
-                break;
-            case NO_LOC_ENABLED:
-                intentString = "com.score.chatz.NO_LOC_ENABLED";
+                intentString = "com.score.chatz.TIMEOUT";
                 break;
             default:
                 throw new InvalidIntentType();
@@ -144,6 +105,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        DATA_SENZ, SHARE_SENZ, STREAM_SENZ, USER_BUSY, PACKET_TIMEOUT, NEW_DATA_TO_DISPLAY, NO_LOC_ENABLED
+        SENZ, TIMEOUT
     }
 }

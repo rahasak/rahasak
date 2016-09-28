@@ -40,6 +40,17 @@ public class AddUserActivity extends BaseActivity {
     private Button addFriendBtn;
     private EditText editTextUserId;
 
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            handleSenz(senz);
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +60,6 @@ public class AddUserActivity extends BaseActivity {
         setupActionBar();
         setupAddUsersBtn();
         setupFonts();
-        //startService();
     }
 
     private void setupUiElements() {
@@ -70,13 +80,13 @@ public class AddUserActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        this.registerReceiver(senzDataReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
+        this.registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
     public void onPause() {
-        super.onStop();
-        if (senzDataReceiver != null) unregisterReceiver(senzDataReceiver);
+        super.onPause();
+        unregisterReceiver(senzReceiver);
     }
 
     private void setupAddUsersBtn() {
@@ -174,23 +184,13 @@ public class AddUserActivity extends BaseActivity {
         }
     }
 
-    private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
-            handleMessage(intent);
-        }
-    };
-
     /**
      * Handle broadcast message receives
      * Need to handle registration success failure here
      *
-     * @param intent intent
+     * @param senz intent
      */
-    private void handleMessage(Intent intent) {
-        Senz senz = intent.getExtras().getParcelable("SENZ");
-        assert senz != null;
+    private void handleSenz(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
             // status response received
             ActivityUtils.cancelProgressDialog();

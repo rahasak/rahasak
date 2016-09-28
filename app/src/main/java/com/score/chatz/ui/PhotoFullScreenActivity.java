@@ -45,18 +45,16 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
             // extract senz
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzReceived(senz);
-        }
-    };
-
-    // share senz
-    private BroadcastReceiver senzStreamReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Share senz");
-
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzStreamReceived(senz);
+            switch (senz.getSenzType()) {
+                case DATA:
+                    onSenzReceived(senz);
+                    break;
+                case STREAM:
+                    onSenzStreamReceived(senz);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -94,14 +92,12 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.DATA_SENZ));
-        registerReceiver(senzStreamReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.STREAM_SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(senzStreamReceiver);
         unregisterReceiver(senzReceiver);
     }
 
