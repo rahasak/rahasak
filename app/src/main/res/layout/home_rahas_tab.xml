@@ -13,7 +13,8 @@
         android:layout_gravity="center_horizontal"
         android:gravity="bottom"
         android:paddingBottom="0dp">
-        <TextView
+
+        <!--<TextView
             android:id="@+id/rahas_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,7 +27,22 @@
             android:layout_alignParentBottom="false"
             android:textColor="@color/colorPrimary"
             android:textStyle="normal"
-            android:fontFamily="Helvetica" />
+            android:fontFamily="Helvetica" />-->
+
+        <ImageView
+            android:id="@+id/tabOneActive"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/love_speech"/>
+        <ImageView
+            android:id="@+id/tabOneDeActive"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/love_speech_deactive"/>
+
+
     </RelativeLayout>
 
 

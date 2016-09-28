@@ -69,8 +69,9 @@ public class SplashActivity extends AppCompatActivity {
         // no user, so move to registration
         Intent intent = new Intent(this, RegistrationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        finish();
         startActivity(intent);
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
+        finish();
     }
 
     /**

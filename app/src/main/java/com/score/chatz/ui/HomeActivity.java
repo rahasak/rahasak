@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -34,8 +35,13 @@ public class HomeActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FloatingActionButton fab;
-    private TextView tabOneTextView;
-    private TextView tabTwoTextView;
+
+    private ImageView tabOneActive;
+    private ImageView tabOneDeActive;
+    private ImageView tabTwoActive;
+    private ImageView tabTwoDeActive;
+    //private TextView tabOneTextView;
+    //private TextView tabTwoTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +100,10 @@ public class HomeActivity extends AppCompatActivity {
             public void onPageSelected(int pos) {
                 if (pos == 0) {
                     fab.setVisibility(View.INVISIBLE);
-                    tabTwoTextView.setTextColor(getResources().getColor(R.color.clouds));
-                    tabOneTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    activateTabOne();
                 } else {
                     fab.setVisibility(View.VISIBLE);
-                    tabTwoTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
-                    tabOneTextView.setTextColor(getResources().getColor(R.color.clouds));
+                    activateTabTwo();
                 }
             }
         });
@@ -123,10 +127,25 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setCustomView(R.layout.home_rahas_tab);
         tabLayout.getTabAt(1).setCustomView(R.layout.home_friends_tab);
-        tabOneTextView = (TextView) findViewById(R.id.rahas_text_view);
-        tabTwoTextView = (TextView) findViewById(R.id.friends_text_view);
-        tabTwoTextView.setTextColor(getResources().getColor(R.color.clouds));
-        tabOneTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+        tabOneActive = (ImageView) findViewById(R.id.tabOneActive);
+        tabOneDeActive = (ImageView) findViewById(R.id.tabOneDeActive);
+        tabTwoActive = (ImageView) findViewById(R.id.tabTwoActive);
+        tabTwoDeActive = (ImageView) findViewById(R.id.tabTwoDeActive);
+        activateTabOne();
+    }
+
+    private void activateTabOne(){
+        tabOneActive.setVisibility(View.VISIBLE);
+        tabOneDeActive.setVisibility(View.INVISIBLE);
+        tabTwoActive.setVisibility(View.INVISIBLE);
+        tabTwoDeActive.setVisibility(View.VISIBLE);
+    }
+
+    private void activateTabTwo(){
+        tabOneActive.setVisibility(View.INVISIBLE);
+        tabOneDeActive.setVisibility(View.VISIBLE);
+        tabTwoActive.setVisibility(View.VISIBLE);
+        tabTwoDeActive.setVisibility(View.INVISIBLE);
     }
 
     private void setupViewPager(ViewPager viewPager) {

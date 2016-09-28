@@ -3,6 +3,7 @@ package com.score.chatz.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -90,6 +91,7 @@ public class RegistrationActivity extends BaseActivity {
 
     private void setupUI() {
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
+        editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         welcomeTextView = (TextView) findViewById(R.id.welcome_text);
         welcomeTextView.setTypeface(typeface);
     }

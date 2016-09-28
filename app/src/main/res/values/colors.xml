@@ -26,10 +26,10 @@
     <color name="tab_highlight">#FFF</color>
     <color name="black">#000</color>
 
-    <color name="colorPrimary">#000</color>
+    <color name="colorPrimary">#f47644</color>
     <color name="colorPrimaryDark">#125688</color>
     <color name="colorAccent">#c8e8ff</color>
-    <color name="clouds">#e2e1e1</color>
+    <color name="clouds">#ABABAB</color>
     <color name="android_grey">#636363</color>
     <color name="android_green">#a9d063</color>
     <color name="translucent_black">#80000000</color>

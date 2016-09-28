@@ -8,57 +8,71 @@
     android:isScrollContainer="true"
     android:fillViewport="true"
     android:background="@color/white">
-<RelativeLayout
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@color/white">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/registering_user_id"
-        android:hint="@string/register_user_id"
-        android:textColor="@color/android_grey"
-        android:textColorHint="@color/android_green"
-        android:textSize="30sp"
-        android:singleLine="true"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/welcome_text"
-        android:layout_alignLeft="@+id/welcome_text"
-        android:layout_below="@+id/welcome_text"
-        android:layout_marginTop="60dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:text="@string/register_button_text"
-        android:id="@+id/register_btn"
-        android:textColor="@color/black"
-        android:background="@color/android_green"
-        android:layout_below="@+id/registering_user_id"
-        android:layout_alignLeft="@+id/welcome_text"
-        android:layout_marginTop="34dp"
-        android:layout_alignRight="@+id/welcome_text"
-        android:layout_alignParentBottom="false"
-        android:layout_marginBottom="200dp" />
-
-    <TextView
+    <RelativeLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="50dp">
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/rahaslogo"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:text="@string/register_welcome_text"
         android:id="@+id/welcome_text"
         android:textSize="28sp"
         android:textColor="@color/android_grey"
-        android:layout_alignParentTop="false"
-        android:layout_marginTop="61dp"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:textStyle="bold"
+        android:layout_toRightOf="@+id/logo"
+        android:layout_alignBottom="@+id/logo" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You must first register under a unique name, before you can start sharing secrets with friends."
+        android:layout_marginTop="30dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentEnd="false"
-        android:gravity="center_horizontal"
-        android:textStyle="bold" />
+        android:layout_marginRight="20dp"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/registering_user_id"
+        android:hint="@string/register_user_id"
+        android:textColor="@color/android_grey"
+        android:textColorHint="@color/clouds"
+        android:textSize="25sp"
+        android:paddingBottom="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
 
-</RelativeLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="@string/register_button_text"
+        android:id="@+id/register_btn"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="200dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
+
+</LinearLayout>
 </ScrollView>

@@ -15,22 +15,21 @@
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="45dp"
-            android:background="@drawable/dialog_header_shape">
+            android:layout_height="45dp">
 
             <TextView
                 android:id="@+id/information_message_dialog_layout_message_header_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Information"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20dp"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp">
             </TextView>
 
-            <Button
-                android:layout_width="60dp"
+            <!--<Button
+                android:layout_width="80dp"
                 android:gravity="center"
                 android:textColor="#FFFFFF"
                 android:layout_height="32dp"
@@ -39,9 +38,9 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:id="@+id/information_message_dialog_layout_cancel_button"
-                android:background="@drawable/button_selector"
+                android:background="@color/colorPrimary"
                 android:text="Cancel">
-            </Button>
+            </Button>-->
 
         </RelativeLayout>
 
@@ -49,7 +48,6 @@
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="20dp"
             android:padding="5dp">
 
             <TextView
@@ -77,12 +75,25 @@
             <Button
                 android:layout_width="0dp"
                 android:textColor="#FFFFFF"
-                android:layout_height="35dp"
+                android:layout_height="45dp"
                 android:layout_weight="1"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
+                android:layout_marginRight="0dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/colorPrimary"
+                android:id="@+id/information_message_dialog_layout_cancel_button"
+                android:text="CANCEL">
+            </Button>
+
+            <Button
+                android:layout_width="0dp"
+                android:textColor="#FFFFFF"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
                 android:id="@+id/information_message_dialog_layout_ok_button"
-                android:background="@drawable/button_selector"
+                android:background="@color/colorPrimary"
                 android:text="Ok">
             </Button>
 

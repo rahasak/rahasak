@@ -6,11 +6,21 @@ android:background="@color/white">
 
     <ImageView
         android:layout_width="80dp"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:src="@drawable/rahaslogo"
         android:layout_gravity="center"
         android:layout_alignParentBottom="false"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:id="@+id/logo" />
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RAHASAK"
+        android:layout_below="@+id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"/>
 </RelativeLayout>
 
 

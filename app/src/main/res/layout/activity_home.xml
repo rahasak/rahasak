@@ -42,7 +42,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_input_add"
         android:tint="@color/white"
-        app:backgroundTint="@color/android_green"
+        app:backgroundTint="@color/colorPrimary"
         app:fabSize="normal"
         app:rippleColor="@color/white" />
 
