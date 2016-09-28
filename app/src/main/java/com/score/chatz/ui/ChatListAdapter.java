@@ -127,7 +127,7 @@ class ChatListAdapter extends BaseAdapter {
         else holder.sender.setText("@" + "Me");
 
         // set status
-        if (!secret.isSender()) {
+        if (!secret.isSender() && secret.getType().equalsIgnoreCase("TEXT")) {
             if (secret.isDelivered()) holder.status.setText("Delivered ");
             else if (secret.isDeliveryFailed()) holder.status.setText("Delivery fail ");
             else holder.status.setText("Sending...");

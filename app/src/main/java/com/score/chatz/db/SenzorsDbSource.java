@@ -736,6 +736,13 @@ public class SenzorsDbSource {
 
     }
 
+    public void deleteAllSecretsExceptLast() {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        db.delete(SenzorsDbContract.Secret.TABLE_NAME,
+                "uid NOT IN (SELECT uid FROM " + SenzorsDbContract.Secret.TABLE_NAME + " ORDER BY _id DESC LIMIT 1)",
+                null);
+    }
+
     public void deleteAllSecretsThatBelongToUser(User user) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 

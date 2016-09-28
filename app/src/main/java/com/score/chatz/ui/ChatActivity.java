@@ -162,7 +162,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         super.onDestroy();
 
         // keep only last message
-        deleteAllSecretsExceptTheLast();
+        //deleteAllSecretsExceptTheLast();
+        new SenzorsDbSource(this).deleteAllSecretsExceptLast();
     }
 
     @Override
