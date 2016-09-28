@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.chatz.R;
@@ -51,6 +54,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton btnLocation;
     private ImageButton btnPhoto;
     private ImageButton btnMic;
+    private Toolbar toolbar;
 
     // secret list
     private ListView listView;
@@ -118,30 +122,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         initUi();
         initUser();
-        initActionBar();
+        setupToolbar();
+        setupActionBar();
         initSecretList();
         updatePermissions();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToHome();
-                return true;
-            case R.id.action_open_profile:
-                navigateToProfile();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.chat_action_bar, menu);
-        return super.onCreateOptionsMenu(menu);
+        setupBackBtn();
+        setupProfileAccessBtn();
     }
 
     @Override
@@ -232,11 +218,40 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         thisUser = new User("", username);
     }
 
-    private void initActionBar() {
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        getSupportActionBar().setTitle("@" + thisUser.getUsername());
-        getSupportActionBar().setHomeButtonEnabled(true);
+    private void setupToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setCollapsible(false);
+        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
+        setSupportActionBar(toolbar);
+    }
+
+    private void setupActionBar() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.chat_activity_header, null));
+        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        ((TextView)findViewById(R.id.user_name)).setText("@" + thisUser.getUsername());
+    }
+
+    private void setupProfileAccessBtn(){
+        ImageView backBtn = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_settings_btn);
+        backBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                navigateToProfile();
+            }
+        });
+    }
+
+    private void setupBackBtn(){
+        ImageView backBtn = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
+        backBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void initSecretList() {

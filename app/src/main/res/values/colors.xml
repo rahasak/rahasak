@@ -27,6 +27,7 @@
     <color name="black">#000</color>
 
     <color name="colorPrimary">#f47644</color>
+    <color name="colorPrimaryLight">#FCD6C7</color>
     <color name="colorPrimaryDark">#125688</color>
     <color name="colorAccent">#c8e8ff</color>
     <color name="clouds">#ABABAB</color>

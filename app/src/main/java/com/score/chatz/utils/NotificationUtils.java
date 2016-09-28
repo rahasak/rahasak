@@ -83,7 +83,7 @@ public class NotificationUtils {
     public static void showNotification(Context context, String title, String message, String sender, NOTIFICATION_TYPE type) {
         // display notification
         if(isBackgroundRunning(context) || !isAppInteractable(context) || isScreenLocked(context)) {
-            Notification notification = NotificationUtils.getNotification(context, R.drawable.rlogo_launcher, title, message, sender, type);
+            Notification notification = NotificationUtils.getNotification(context, R.drawable.rahaslogo, title, message, sender, type);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);

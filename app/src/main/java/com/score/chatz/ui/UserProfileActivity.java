@@ -248,6 +248,7 @@ public class UserProfileActivity extends BaseActivity {
         getSupportActionBar().setTitle("@" + thisUser.getUsername());
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().hide();
     }
 
     @Override

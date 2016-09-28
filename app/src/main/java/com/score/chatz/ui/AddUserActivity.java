@@ -4,14 +4,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +44,7 @@ public class AddUserActivity extends BaseActivity {
     private TextView invite_text_part_4;
     private Button addFriendBtn;
     private EditText editTextUserId;
+    private Toolbar toolbar;
 
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
@@ -55,10 +61,12 @@ public class AddUserActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user);
 
+        setupToolbar();
         setupUiElements();
         setupActionBar();
         setupAddUsersBtn();
         setupFonts();
+        setupBackBtn();
     }
 
     @Override
@@ -88,13 +96,31 @@ public class AddUserActivity extends BaseActivity {
         invite_text_part_3 = (TextView) findViewById(R.id.textView3);
         invite_text_part_4 = (TextView) findViewById(R.id.textView4);
         editTextUserId = (EditText) findViewById(R.id.friend_id);
+        editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+    }
+
+    private void setupToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setCollapsible(false);
+        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
+        setSupportActionBar(toolbar);
     }
 
     private void setupActionBar() {
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        getSupportActionBar().setTitle("Invite");
-        getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.add_user_header, null));
+        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+    }
+
+    private void setupBackBtn(){
+        ImageView backBtn = (ImageView) findViewById(R.id.back_btn);
+        backBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     @Override
@@ -127,7 +153,7 @@ public class AddUserActivity extends BaseActivity {
         User registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font color=#000000>Are you sure you want to share secrets with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font size=10 color=#ABABAB>Are you sure you want to share secrets with </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -219,7 +245,7 @@ public class AddUserActivity extends BaseActivity {
                 onPostShare(senz);
             } else {
                 String user = editTextUserId.getText().toString().trim();
-                String message = "<font color=#000000>Seems we couldn't connect you with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
+                String message = "<font size=10 color=#ABABAB>Seems we couldn't connect you with </font> <font color=#f47644>" + "<b>" + user + "</b>" + "</font>";
                 displayInformationMessageDialog("Fail", message);
             }
         }

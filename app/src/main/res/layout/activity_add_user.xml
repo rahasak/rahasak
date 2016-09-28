@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:id="@+id/scrollview"
     android:layout_height="fill_parent"
@@ -13,13 +14,22 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        app:popupTheme="@style/MyMaterialTheme" />
+
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/friend_id"
-        android:hint="@string/invite_user_id"
+        android:hint="@string/register_user_id"
         android:textColor="@color/android_grey"
-        android:textColorHint="@color/android_green"
+        android:textColorHint="@color/clouds"
         android:textSize="25sp"
         android:singleLine="true"
         android:layout_centerVertical="true"
@@ -28,15 +38,15 @@
         android:layout_alignRight="@+id/textView"
         android:layout_alignEnd="@+id/textView"
         android:layout_below="@+id/textView4"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="10dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="70dp"
         android:text="@string/invite_button_text"
         android:id="@+id/add_friend_btn"
-        android:textColor="@color/android_grey"
-        android:background="@color/android_green"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
         android:layout_below="@+id/friend_id"
         android:layout_alignLeft="@+id/friend_id"
         android:layout_alignStart="@+id/friend_id"
@@ -51,7 +61,7 @@
         android:text="@string/invite_text_part_1"
         android:id="@+id/textView"
         android:textSize="28sp"
-        android:textColor="@color/android_grey"
+        android:textColor="@color/colorPrimary"
         android:layout_alignParentTop="true"
         android:layout_marginTop="61dp"
         android:layout_marginLeft="20dp"
@@ -62,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/invite_text_part_2"
-        android:textColor="@color/android_grey"
+        android:textColor="@color/colorPrimary"
         android:textSize="28sp"
         android:id="@+id/textView2"
         android:layout_below="@+id/textView"
@@ -74,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/invite_text_part_3"
-        android:textColor="@color/android_grey"
+        android:textColor="@color/colorPrimary"
         android:textSize="28sp"
         android:id="@+id/textView3"
         android:layout_alignBottom="@+id/textView2"
@@ -87,7 +97,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/invite_text_part_4"
-        android:textColor="@color/android_grey"
+        android:textColor="@color/colorPrimary"
         android:textSize="28sp"
         android:id="@+id/textView4"
         android:layout_below="@+id/textView2"

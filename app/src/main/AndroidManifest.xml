@@ -84,8 +84,8 @@
         <activity
             android:name=".ui.ChatActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat"
-            android:windowSoftInputMode="adjustResize" />
+            android:theme="@style/MyMaterialTheme"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.HomeActivity"
             android:launchMode="singleTask"
@@ -94,8 +94,8 @@
         <activity
             android:name=".ui.AddUserActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
-            android:windowSoftInputMode="adjustResize" />
+            android:theme="@style/MyMaterialTheme"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.RegistrationActivity"
             android:theme="@style/MyMaterialTheme"

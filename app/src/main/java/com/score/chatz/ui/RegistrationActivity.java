@@ -115,7 +115,7 @@ public class RegistrationActivity extends BaseActivity {
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font color=#000000>Are you sure you want to register with Rahask using </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font size=10 color=#ABABAB>Are you sure you want to register with Rahask using </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -183,7 +183,7 @@ public class RegistrationActivity extends BaseActivity {
                 PreferenceUtils.saveUser(this, registeringUser);
                 navigateToHome();
             } else if (msg != null && msg.equalsIgnoreCase("602")) {
-                String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
+                String informationMessage = "<font size=10 color=#ABABAB>Seems username </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
                 displayInformationMessageDialog("Registration fail", informationMessage);
             }
         }
