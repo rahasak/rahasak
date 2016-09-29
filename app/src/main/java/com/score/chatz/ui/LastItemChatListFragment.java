@@ -1,7 +1,5 @@
 package com.score.chatz.ui;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -15,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
@@ -35,14 +32,6 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     private LastItemChatListAdapter adapter;
     private User currentUser;
     SenzorsDbSource dbSource;
-
-    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got new user from Senz service");
-            handleSharedUser(intent);
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,7 +59,6 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getContext().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
         getListView().setOnItemClickListener(this);
     }
 
@@ -87,7 +75,6 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unregisterReceiver(senzReceiver);
     }
 
     /**
