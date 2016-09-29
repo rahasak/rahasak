@@ -5,18 +5,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -174,7 +169,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
 
         // keep only last message
-        new SenzorsDbSource(this).deleteAllSecretsExceptLast();
+        new SenzorsDbSource(this).deleteAllSecretsExceptLast(thisUser.getUsername());
     }
 
     protected void bindToService() {
@@ -231,12 +226,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-        ((TextView)findViewById(R.id.user_name)).setText("@" + thisUser.getUsername());
+        ((TextView) findViewById(R.id.user_name)).setText("@" + thisUser.getUsername());
     }
 
-    private void setupProfileAccessBtn(){
+    private void setupProfileAccessBtn() {
         ImageView backBtn = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_settings_btn);
-        backBtn.setOnClickListener(new View.OnClickListener(){
+        backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 navigateToProfile();
@@ -244,9 +239,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void setupBackBtn(){
+    private void setupBackBtn() {
         ImageView backBtn = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
-        backBtn.setOnClickListener(new View.OnClickListener(){
+        backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
