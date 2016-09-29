@@ -87,11 +87,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case DATA:
                     onDataReceived(senz);
                     break;
-                case SHARE:
-                    onSenzShareReceived(senz);
-                    break;
                 case STREAM:
                     onSenzStreamReceived(senz);
+                    break;
+                case SHARE:
+                    onSenzShareReceived(senz);
                     break;
                 default:
                     break;
