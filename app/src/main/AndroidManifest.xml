@@ -105,7 +105,7 @@
         <activity
             android:name=".ui.UserProfileActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/MyMaterialTheme" />
         <activity
             android:name=".ui.PhotoFullScreenActivity"
             android:screenOrientation="portrait"

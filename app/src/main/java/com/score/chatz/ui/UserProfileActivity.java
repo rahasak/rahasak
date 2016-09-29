@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -95,6 +97,8 @@ public class UserProfileActivity extends BaseActivity {
         initPermissions();
         setupGetProfileImageBtn();
         setupClickableImage();
+        setupCoordinator();
+        setupBackBtn();
     }
 
     @Override
@@ -136,7 +140,7 @@ public class UserProfileActivity extends BaseActivity {
         configurablePermission = dbSource.getUserConfigPermission(thisUser);
         thisUserGivenPermission = dbSource.getUserAndPermission(thisUser);
 
-        username.setText(configurablePermission.getUser().getUsername());
+        //username.setText(configurablePermission.getUser().getUsername());
 
         if (configurablePermission.getUser().getUserImage() != null) {
             loadBitmap(dbSource.getImageFromDB(thisUser.getUsername()), userImage);
@@ -206,14 +210,14 @@ public class UserProfileActivity extends BaseActivity {
 
 
     private void setupGetProfileImageBtn() {
-        tapImageText = (TextView) findViewById(R.id.tap_image_text);
+        /*tapImageText = (TextView) findViewById(R.id.tap_image_text);
         ImageView imgBtn = (ImageView) findViewById(R.id.clickable_image);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getPhoto(configurablePermission.getUser());
             }
-        });
+        });*/
     }
 
     /*
@@ -236,34 +240,41 @@ public class UserProfileActivity extends BaseActivity {
 
     private void setupClickableImage() {
         //Update permissions
-        if (thisUserGivenPermission.getCamPerm()) {
+        /*if (thisUserGivenPermission.getCamPerm()) {
             tapImageText.setVisibility(View.VISIBLE);
         } else {
             tapImageText.setVisibility(View.INVISIBLE);
-        }
+        }*/
     }
 
     private void setupActionBar() {
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
         getSupportActionBar().setTitle("@" + thisUser.getUsername());
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
         //getSupportActionBar().hide();
+
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                /*Intent intent = new Intent(this, ChatActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.putExtra("SENDER", thisUser.getUsername());
-                startActivity(intent);*/
+    private void setupCoordinator(){
+        CollapsingToolbarLayout collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle("@" + thisUser.getUsername());
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        View header = getLayoutInflater().inflate(R.layout.profile_header, null);
+        toolbar.setContentInsetsAbsolute(0,0);
+        toolbar.addView(header);
+    }
+
+    private void setupBackBtn(){
+        ((ImageView)findViewById(R.id.back_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+            }
+        });
     }
 
     private void loadBitmap(String data, ImageView imageView) {
