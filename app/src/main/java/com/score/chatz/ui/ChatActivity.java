@@ -49,6 +49,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton btnPhoto;
     private ImageButton btnMic;
     private Toolbar toolbar;
+    private ImageView btnBack;
+    private ImageView btnUserSetting;
 
     // secret list
     private ListView listView;
@@ -119,8 +121,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setupActionBar();
         initSecretList();
         updatePermissions();
-        setupBackBtn();
-        setupProfileAccessBtn();
     }
 
     @Override
@@ -185,6 +185,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             onClickPhoto();
         } else if (v == btnMic) {
             onClickMic();
+        } else if (v == btnBack) {
+            finish();
+        } else if (v == btnUserSetting) {
+            navigateToProfile();
         }
     }
 
@@ -224,26 +228,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
         ((TextView) findViewById(R.id.user_name)).setText("@" + thisUser.getUsername());
-    }
 
-    private void setupProfileAccessBtn() {
-        ImageView backBtn = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_settings_btn);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateToProfile();
-            }
-        });
-    }
-
-    private void setupBackBtn() {
-        ImageView backBtn = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
+        btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_settings_btn);
+        btnBack.setOnClickListener(this);
+        btnUserSetting.setOnClickListener(this);
     }
 
     private void initSecretList() {
@@ -484,7 +473,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void navigateToLocationView() {
-        // TODO start map first
         // start map activity
         Intent mapIntent = new Intent(this, SenzMapActivity.class);
         startActivity(mapIntent);
