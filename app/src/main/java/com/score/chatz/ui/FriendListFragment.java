@@ -1,15 +1,12 @@
 package com.score.chatz.ui;
 
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.UserPermission;
 
@@ -33,18 +29,9 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     private ArrayList<UserPermission> userPermissionList;
     private FriendListAdapter adapter;
 
-    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got new user from Senz service");
-            handleSenz(intent);
-        }
-    };
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unregisterReceiver(senzReceiver);
     }
 
     private void setupEmptyTextFont() {
@@ -62,7 +49,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getListView().setOnItemClickListener(this);
-        getContext().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
@@ -100,17 +86,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         } else {
             adapter = new FriendListAdapter(getContext(), userPermissionList);
             getListView().setAdapter(adapter);
-            //sensorListView.setEmptyView(emptyView);
         }
-    }
-
-    /**
-     * Handle broadcast message receives
-     *
-     * @param intent intent
-     */
-    private void handleSenz(Intent intent) {
-        displayUserList();
     }
 
 }
