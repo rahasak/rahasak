@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -76,7 +75,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             isServiceBound = false;
         }
     };
-
 
     // senz received
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -265,12 +263,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    private void navigateToHome() {
-        this.finish();
-        Intent intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
-    }
-
     private void navigateToPhotoWait() {
         Intent intent = new Intent(this, PhotoFullScreenActivity.class);
         startActivity(intent);
@@ -393,14 +385,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (msg != null && msg.equalsIgnoreCase("700")) {
                 onSenzStatusReceived(senz);
             } else if (msg != null && msg.equalsIgnoreCase("901")) {
-                //displayInformationMessageDialog("Sorry", "User is busy.");
                 Toast.makeText(this, "User busy", Toast.LENGTH_LONG).show();
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
             onNewSenzReceived(senz);
         } else if (senz.getAttributes().containsKey("lat")) {
-            //onLocationReceived(senz);
+            // location received
         }
     }
 
@@ -434,7 +425,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (secret.getID().equalsIgnoreCase(uid)) {
                 secret.setIsDelivered(true);
                 secretAdapter.notifyDataSetChanged();
-                playSound();
             }
         }
     }
@@ -456,8 +446,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             secretList.add(secret);
             secretAdapter.notifyDataSetChanged();
-
-            playSound();
         } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
         }
@@ -493,18 +481,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 btnMic.setEnabled(false);
             }
         }
-    }
-
-    private void playSound() {
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.message);
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mp.reset();
-                mp.release();
-            }
-        });
-        mediaPlayer.start();
     }
 
     private void navigateToLocationView() {
