@@ -3,6 +3,8 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -277,7 +279,8 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
+                //byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
+                byte[] resizedImage = getResizedBitmapLessThan500KB(bytes, 300);
 
                 sendPhotoSenz(resizedImage, originalSenz, PhotoActivity.this);
                 Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);
@@ -297,11 +300,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                 quickCountdownText.setText(count + "");
             }
         });
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     private void startTimerToEndRequest() {
@@ -464,4 +462,36 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
         return result;
     }
+
+    public static byte[] getResizedBitmapLessThan500KB(byte[] data, int maxSize) {
+        Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 0) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        Bitmap reduced_bitmap = Bitmap.createScaledBitmap(image, width, height, true);
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(-90);
+
+        Bitmap rBitMap = Bitmap.createBitmap(reduced_bitmap, 0, 0, reduced_bitmap.getWidth(), reduced_bitmap.getHeight(), matrix, true);
+
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        rBitMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        System.out.println(byteArray.length / 1024 + "size------");
+
+        return byteArray;
+    }
+
 }
