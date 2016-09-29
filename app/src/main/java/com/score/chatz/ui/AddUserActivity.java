@@ -209,7 +209,6 @@ public class AddUserActivity extends BaseActivity {
         this.goBackToHome();
     }
 
-
     private void goBackToHome() {
         Log.d(TAG, "go home clicked");
         this.finish();

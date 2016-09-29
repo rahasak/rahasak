@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.score.chatz"
-    android:versionCode="3"
-    android:versionName="1.3">
+    package="com.score.chatz">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -83,9 +81,10 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.ChatActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.HomeActivity"
             android:launchMode="singleTask"
@@ -99,7 +98,7 @@
         <activity
             android:name=".ui.RegistrationActivity"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.PhotoActivity"
             android:screenOrientation="portrait"
@@ -115,13 +114,11 @@
         <activity
             android:name=".ui.RecordingActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme">
-        </activity>
+            android:theme="@style/MyMaterialTheme" />
         <activity
             android:name=".ui.AudioFullScreenActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme">
-        </activity>
+            android:theme="@style/MyMaterialTheme" />
 
         <!-- Servicves -->
         <service

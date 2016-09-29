@@ -173,8 +173,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void bindToService() {
-        Intent intent = new Intent();
-        intent.setClassName("com.score.chatz", "com.score.chatz.remote.SenzService");
+        Intent intent = new Intent("com.score.chatz.remote.SenzService");
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
