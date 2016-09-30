@@ -25,6 +25,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
@@ -289,7 +290,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 //byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
                 //byte[] resizedImage = getResizedBitmapLessThan500KB(bytes, 300);
-                byte[] resizedImage = new ImgT().compressImage(bytes);
+                byte[] resizedImage = new ImageUtils().compressImage(bytes);
 
                 sendPhotoSenz(resizedImage, originalSenz, PhotoActivity.this);
                 Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);

@@ -1,4 +1,4 @@
-package com.score.chatz.ui;
+package com.score.chatz.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
  * Created by eranga on 10/1/16.
  */
 
-public class ImgT {
+public class ImageUtils {
 
     public byte[] compressImage(byte[] data) {
 
