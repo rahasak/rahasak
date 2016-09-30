@@ -279,8 +279,8 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                //byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
-                byte[] resizedImage = getResizedBitmapLessThan500KB(bytes, 300);
+                byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
+                //byte[] resizedImage = getResizedBitmapLessThan500KB(bytes, 300);
 
                 sendPhotoSenz(resizedImage, originalSenz, PhotoActivity.this);
                 Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);

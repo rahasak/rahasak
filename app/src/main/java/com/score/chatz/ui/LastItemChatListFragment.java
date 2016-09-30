@@ -1,5 +1,7 @@
 package com.score.chatz.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -13,11 +15,11 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.utils.PreferenceUtils;
-import com.score.senzc.pojos.User;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
 
 import java.util.ArrayList;
 
@@ -30,19 +32,23 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
 
     private ArrayList<Secret> allSecretsList;
     private LastItemChatListAdapter adapter;
-    private User currentUser;
-    SenzorsDbSource dbSource;
+    private SenzorsDbSource dbSource;
+
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got new user from Senz service");
+
+            Senz senz = intent.getExtras().getParcelable("SENZ");
+            if (senz.getSenzType() == SenzTypeEnum.SHARE) {
+                displayUserList();
+            }
+        }
+    };
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        try {
-            currentUser = PreferenceUtils.getUser(this.getContext());
-        } catch (NoUserException ex) {
-            Log.e(TAG, "No user Found.");
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         dbSource = new SenzorsDbSource(getContext());
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.last_item_chat_list_fragment, container, false);
     }
 
@@ -62,19 +68,19 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         getListView().setOnItemClickListener(this);
     }
 
-    private void handleSharedUser(Intent intent) {
-        displayUserList();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         displayUserList();
+
+        getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
+
+        getActivity().unregisterReceiver(senzReceiver);
     }
 
     /**
@@ -82,7 +88,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
      * Basically setup list adapter if have items to display otherwise display empty view
      */
     private void displayUserList() {
-        allSecretsList = (ArrayList<Secret>) dbSource.getLatestChatMessages();
+        allSecretsList = dbSource.getLatestChatMessages();
         adapter = new LastItemChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
