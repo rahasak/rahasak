@@ -236,7 +236,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initSecretList() {
-        secretList = new LimitedList<>(5);
+        secretList = new LimitedList<>(7);
         for (Secret secret : new SenzorsDbSource(this).getSecretz(thisUser)) {
             secretList.add(secret);
         }
