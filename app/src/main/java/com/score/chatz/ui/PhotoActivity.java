@@ -116,9 +116,16 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-        wakeLock.acquire();
+//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+//        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+//        wakeLock.acquire();
+    }
+
+    private void clearFlags() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void setupCameraSurface() {
@@ -155,10 +162,11 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     protected void onDestroy() {
         super.onDestroy();
         //Release screen lock, so the phone can go back to sleep
+        clearFlags();
         stopVibrations();
         releaseCamera();
-        if (wakeLock != null)
-            wakeLock.release();
+//        if (wakeLock != null)
+//            wakeLock.release();
     }
 
     private void releaseCamera() {

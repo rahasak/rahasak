@@ -127,6 +127,16 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //Release screen lock, so the phone can go back to sleep
+//        if (wakeLock != null)
+//            wakeLock.release();
+        stopVibrations();
+        clearFlags();
+    }
+
     private void setupUi() {
         this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
         this.mTimerTextView.setText(mStartTime + "");
@@ -139,9 +149,16 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-        wakeLock.acquire();
+//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+//        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+//        wakeLock.acquire();
+    }
+
+    private void clearFlags() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void setupDontBtn() {
@@ -168,20 +185,10 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //Release screen lock, so the phone can go back to sleep
-        if (wakeLock != null)
-            wakeLock.release();
-        stopVibrations();
-    }
-
     private void startTimerToEndRequest() {
         cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
             @Override
             public void onFinish() {
-                //SenzSoundHandler.getInstance().sendBusyNotification(new Senz(null, null, null, sender, receiver, null), RecordingActivity.this);
                 sendBusySenz();
                 RecordingActivity.this.finish();
             }
