@@ -12,16 +12,14 @@ import java.io.ByteArrayOutputStream;
 /**
  * Created by eranga on 10/1/16.
  */
-
 public class ImageUtils {
 
     public byte[] compressImage(byte[] data) {
-
         Bitmap scaledBitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
 
-//      by setting this field as true, the actual bitmap pixels are not loaded in the memory. Just the bounds are loaded. If
-//      you try the use the bitmap here, you will get null.
+        // by setting this field as true, the actual bitmap pixels are not loaded in the memory. Just the bounds are loaded. If
+        // you try the use the bitmap here, you will get null.
         options.inJustDecodeBounds = true;
 
         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length, options);
@@ -29,14 +27,13 @@ public class ImageUtils {
         int actualHeight = options.outHeight;
         int actualWidth = options.outWidth;
 
-//      max Height and width values of the compressed image is taken as 816x612
-
+        // max Height and width values of the compressed image is taken as 816x612
         float maxHeight = 816.0f;
         float maxWidth = 612.0f;
         float imgRatio = actualWidth / actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
-//      width and height values are set maintaining the aspect ratio of the image
+        // width and height values are set maintaining the aspect ratio of the image
 
         if (actualHeight > maxHeight || actualWidth > maxWidth) {
             if (imgRatio < maxRatio) {
@@ -54,26 +51,23 @@ public class ImageUtils {
             }
         }
 
-//      setting inSampleSize value allows to load a scaled down version of the original image
-
+        // setting inSampleSize value allows to load a scaled down version of the original image
         options.inSampleSize = calculateInSampleSize(options, actualWidth, actualHeight);
 
-//      inJustDecodeBounds set to false to load the actual bitmap
+        // inJustDecodeBounds set to false to load the actual bitmap
         options.inJustDecodeBounds = false;
 
-//      this options allow android to claim the bitmap memory if it runs low on memory
+        // this options allow android to claim the bitmap memory if it runs low on memory
         options.inPurgeable = true;
         options.inInputShareable = true;
         options.inTempStorage = new byte[16 * 1024];
 
         try {
-//          load the bitmap from its path
-
             bmp = BitmapFactory.decodeByteArray(data, 0, data.length, options);
         } catch (OutOfMemoryError exception) {
             exception.printStackTrace();
-
         }
+
         try {
             scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight, Bitmap.Config.ARGB_8888);
         } catch (OutOfMemoryError exception) {
@@ -92,59 +86,20 @@ public class ImageUtils {
         canvas.setMatrix(scaleMatrix);
         canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
 
-//      check the rotation of the image and display it properly
-//        ExifInterface exif;
-//        try {
-//            exif = new ExifInterface(filePath);
-//
-//            int orientation = exif.getAttributeInt(
-//                    ExifInterface.TAG_ORIENTATION, 0);
-//            Log.d("EXIF", "Exif: " + orientation);
-//            Matrix matrix = new Matrix();
-//            if (orientation == 6) {
-//                matrix.postRotate(90);
-//                Log.d("EXIF", "Exif: " + orientation);
-//            } else if (orientation == 3) {
-//                matrix.postRotate(180);
-//                Log.d("EXIF", "Exif: " + orientation);
-//            } else if (orientation == 8) {
-//                matrix.postRotate(270);
-//                Log.d("EXIF", "Exif: " + orientation);
-//            }
-//            scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0,
-//                    scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix,
-//                    true);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
         // rotate
         Matrix matrix = new Matrix();
         matrix.postRotate(-90);
-//        switch (getOrientation(data)) {
-//            case 90:
-//                matrix.postRotate(90);
-//                break;
-//            case 180:
-//                matrix.postRotate(180);
-//                break;
-//            case 270:
-//                matrix.postRotate(270);
-//                break;
-//            default:
-//                break;
-//        }
 
         scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+
         System.out.println(out.toByteArray().length / 1024 + "hhhhhh");
 
         return out.toByteArray();
     }
 
-    public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
@@ -163,9 +118,8 @@ public class ImageUtils {
         return inSampleSize;
     }
 
-
     // Returns the degrees in clockwise. Values are 0, 90, 180, or 270.
-    public int getOrientation(byte[] jpeg) {
+    private int getOrientation(byte[] jpeg) {
         if (jpeg == null) {
             return 0;
         }
