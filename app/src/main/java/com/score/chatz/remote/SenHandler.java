@@ -5,10 +5,10 @@ import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.ui.RecordingActivity;
+import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -33,7 +33,7 @@ class SenHandler extends BasHandler {
         return instance;
     }
 
-    public void handle(String senzMsg, SenzService senzService) {
+    void handle(String senzMsg, SenzService senzService) {
         Senz senz = SenzParser.parse(senzMsg);
         if (senz.getSenzType() != SenzTypeEnum.STREAM)
             SenzTracker.getInstance(senzService).stopSenzTrack(senz);
@@ -70,9 +70,9 @@ class SenHandler extends BasHandler {
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
 
             // show notification to current user
-            String title = "@" + senz.getSender().getUsername();
             String message = "You have been invited to share secrets.";
-            showStatusNotification(senzService.getApplicationContext(), title, message, senz.getSender().getUsername(), NotificationType.MESSAGE);
+            SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                    NotificationUtils.getMessageNotification(senz.getSender().getUserImage(), message));
 
             // broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
@@ -81,13 +81,16 @@ class SenHandler extends BasHandler {
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
             if (senz.getAttributes().containsKey("cam")) {
                 dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("cam"), null, null);
-                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"));
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUserImage(), "cam", senz.getAttributes().get("cam")));
             } else if (senz.getAttributes().containsKey("mic")) {
                 dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("mic"));
-                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUserImage(), "mic", senz.getAttributes().get("mic")));
             } else if (senz.getAttributes().containsKey("lat")) {
                 dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
-                showPermissionNotification(senzService.getApplicationContext(), senz.getSender(), "lat", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUserImage(), "lat", senz.getAttributes().get("lat")));
             }
 
             // send status
@@ -130,8 +133,8 @@ class SenHandler extends BasHandler {
                 broadcastSenz(senz, senzService.getApplicationContext());
 
                 // show notification
-                String title = "@" + senz.getSender().getUsername();
-                showStatusNotification(senzService.getApplicationContext(), title, rahasa, senz.getSender().getUsername(), NotificationType.MESSAGE);
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getMessageNotification(senz.getSender().getUserImage(), rahasa));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

@@ -6,6 +6,10 @@ import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
 
+import com.score.chatz.R;
+import com.score.chatz.enums.NotificationType;
+import com.score.chatz.pojo.SenzNotification;
+
 import java.util.List;
 
 /**
@@ -76,6 +80,31 @@ public class NotificationUtils {
             //it is not locked
             return false;
         }
+    }
+
+    public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
+        if (permissionName.equalsIgnoreCase("lat")) {
+            if (isEnabled.equalsIgnoreCase("on"))
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted location permission", user, NotificationType.PERMISSION);
+            else
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your location permission has been revoked", user, NotificationType.PERMISSION);
+        } else if (permissionName.equalsIgnoreCase("cam")) {
+            if (isEnabled.equalsIgnoreCase("on"))
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted camera permission", user, NotificationType.PERMISSION);
+            else
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your camera permission has been revoked", user, NotificationType.PERMISSION);
+        } else if (permissionName.equalsIgnoreCase("mic")) {
+            if (isEnabled.equalsIgnoreCase("on"))
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted mic permission", user, NotificationType.PERMISSION);
+            else
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your mic permission has been revoked", user, NotificationType.PERMISSION);
+        }
+
+        return null;
+    }
+
+    public static SenzNotification getMessageNotification(String user, String message) {
+        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.MESSAGE);
     }
 
 }
