@@ -273,7 +273,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
             secret.setReceiver(thisUser);
             secret.setTimeStamp(System.currentTimeMillis());
-            secret.setID(SenzUtils.getUniqueRandomNumber());
+            secret.setId(SenzUtils.getUniqueRandomNumber());
 
             // send secret
             // save secret
@@ -349,7 +349,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             senzAttributes.put("msg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
             String timeStamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
             senzAttributes.put("time", timeStamp);
-            senzAttributes.put("uid", secret.getID());
+            senzAttributes.put("uid", secret.getId());
 
             // new senz
             String id = "_ID";
@@ -399,7 +399,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // update failed message in list
         for (Secret secret : secretList) {
-            if (secret.getID().equalsIgnoreCase(uid)) {
+            if (secret.getId().equalsIgnoreCase(uid)) {
                 secret.setDeliveryFailed(true);
                 secretAdapter.notifyDataSetChanged();
             }
@@ -412,8 +412,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         new SenzorsDbSource(this).markSecretDelievered(uid);
 
         for (Secret secret : secretList) {
-            if (secret.getID().equalsIgnoreCase(uid)) {
-                secret.setIsDelivered(true);
+            if (secret.getId().equalsIgnoreCase(uid)) {
+                secret.setDelivered(true);
                 secretAdapter.notifyDataSetChanged();
             }
         }
@@ -432,7 +432,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
             secret.setReceiver(senz.getReceiver());
             secret.setTimeStamp(System.currentTimeMillis());
-            secret.setID(senz.getAttributes().get("uid"));
+            secret.setId(senz.getAttributes().get("uid"));
 
             secretList.add(secret);
             secretAdapter.notifyDataSetChanged();

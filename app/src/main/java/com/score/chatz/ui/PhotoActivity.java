@@ -365,7 +365,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
             Long timeStamp = System.currentTimeMillis();
             newSecret.setTimeStamp(timeStamp);
-            newSecret.setID(uid);
+            newSecret.setId(uid);
             new SenzorsDbSource(context).createSecret(newSecret);
         }
 

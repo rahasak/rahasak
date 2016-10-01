@@ -304,7 +304,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
                 Long _timeStamp = System.currentTimeMillis();
                 secret.setTimeStamp(_timeStamp);
                 String uid = SenzUtils.getUniqueRandomNumber();
-                secret.setID(uid);
+                secret.setId(uid);
                 dbSource.createSecret(secret);
                 sendSound(secret, this, uid);
             }

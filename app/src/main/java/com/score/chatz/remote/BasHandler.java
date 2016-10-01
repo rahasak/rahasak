@@ -20,7 +20,7 @@ class BasHandler {
     void saveSecret(String blob, String type, User user, final Context context) {
         // create secret
         final Secret secret = new Secret(blob, type, user, true);
-        secret.setID(SenzUtils.getUniqueRandomNumber());
+        secret.setId(SenzUtils.getUniqueRandomNumber());
         secret.setTimeStamp(System.currentTimeMillis());
 
         // save secret async

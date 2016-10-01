@@ -10,7 +10,7 @@ public class Secret {
     private User user;
     private User receiver;
     private String type;
-    private boolean isDelete;
+    private boolean isViewed;
     private boolean isDelivered;
     private Long timeStamp;
     private Long seenTimeStamp;
@@ -25,12 +25,12 @@ public class Secret {
         this.isSender = isSender;
     }
 
-    public boolean isSender(){
-        return isSender;
-    }
-
     public String getBlob() {
         return blob;
+    }
+
+    public void setBlob(String blob) {
+        this.blob = blob;
     }
 
     public User getUser() {
@@ -38,67 +38,79 @@ public class Secret {
     }
 
     public void setUser(User user) {
-         this.user = user;
-    }
-
-    public String getType(){
-        return type;
-    }
-
-    public void setReceiver(User rec){
-        receiver = rec;
+        this.user = user;
     }
 
     public User getReceiver() {
         return receiver;
     }
 
-    public void setDelete(boolean val){
-        isDelete = val;
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
     }
 
-    public void setDeliveryFailed(boolean val){
-        isDeliveryFailed = val;
+    public String getType() {
+        return type;
     }
 
-    public void setIsDelivered(boolean val){
-        isDelivered = val;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setTimeStamp(Long ts){
-        timeStamp = ts;
+    public boolean isViewed() {
+        return isViewed;
     }
 
-    public void setSeenTimeStamp(Long sts){
-        seenTimeStamp = sts;
+    public void setViewed(boolean viewed) {
+        isViewed = viewed;
     }
 
-    public boolean isDelivered(){
+    public boolean isDelivered() {
         return isDelivered;
     }
 
-    public boolean isDeliveryFailed(){
-        return isDeliveryFailed;
+    public void setDelivered(boolean delivered) {
+        isDelivered = delivered;
     }
 
-    public Long getTimeStamp(){
+    public Long getTimeStamp() {
         return timeStamp;
     }
 
-    public Long getSeenTimeStamp(){
+    public void setTimeStamp(Long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public Long getSeenTimeStamp() {
         return seenTimeStamp;
     }
 
-    public void setID(String val){
-        id = val;
+    public void setSeenTimeStamp(Long seenTimeStamp) {
+        this.seenTimeStamp = seenTimeStamp;
     }
 
-    public String getID(){
+    public String getId() {
         return id;
     }
 
-    public void removeData(){
-        this.blob = null;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isDeliveryFailed() {
+        return isDeliveryFailed;
+    }
+
+    public void setDeliveryFailed(boolean deliveryFailed) {
+        isDeliveryFailed = deliveryFailed;
+    }
+
+    public boolean isSender() {
+        return isSender;
+    }
+
+    public void setSender(boolean sender) {
+        isSender = sender;
     }
 
     @Override

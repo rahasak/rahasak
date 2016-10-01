@@ -32,7 +32,7 @@ public class SenzorsDbSource {
      */
     public SenzorsDbSource(Context context) {
         Log.d(TAG, "Init: db source");
-        this.context = context;
+        SenzorsDbSource.context = context;
     }
 
     /**
@@ -186,11 +186,11 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_USER, secret.getUser().getUsername());
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER, secret.isSender() == true ? 1 : 0);
-        values.put(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID, secret.getID());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER, secret.isSender() ? 1 : 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID, secret.getId());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED, 0);
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
 
         // Insert the new row, if fails throw an error
@@ -326,7 +326,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
+        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, delivered, delivery_fail, timestamp, timestamp_seen " +
                 "FROM secret WHERE user = ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
 
@@ -336,7 +336,7 @@ public class SenzorsDbSource {
         String _secretBlobType;
         String _secretUser;
         int _secretIsSender;
-        int _secretDelete;
+        int _secretViewed;
         int _secretIsDelivered;
         int _secretDeliveryFailed;
         Long _secretTimestamp;
@@ -352,18 +352,18 @@ public class SenzorsDbSource {
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
-            _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
+            _secretViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretTimestampSeen = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN));
 
             // create secret
-            Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1 ? true : false);
-            secret.setDelete(_secretDelete == 1 ? true : false);
-            secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
-            secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
+            Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1);
+            secret.setViewed(_secretViewed == 1);
+            secret.setDelivered(_secretIsDelivered == 1);
+            secret.setDeliveryFailed(_secretDeliveryFailed == 1);
             secret.setTimeStamp(_secretTimestamp);
             secret.setSeenTimeStamp(_secretTimestampSeen);
-            secret.setID(_secretId);
+            secret.setId(_secretId);
             // fill secret list
             secretList.add(secret);
         }
@@ -386,7 +386,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, deleted, delivered, delivery_fail, timestamp, timestamp_seen " +
+        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, delivered, delivery_fail, timestamp, timestamp_seen " +
                 "FROM secret WHERE user = ? AND timestamp > ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{user.getUsername(), timestamp.toString()});
 
@@ -396,7 +396,7 @@ public class SenzorsDbSource {
         String _secretBlobType;
         String _secretUser;
         int _secretIsSender;
-        int _secretDelete;
+        int _secretViewed;
         int _secretIsDelivered;
         int _secretDeliveryFailed;
         Long _secretTimestamp;
@@ -412,20 +412,19 @@ public class SenzorsDbSource {
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretDeliveryFailed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERY_FAILED));
-            _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
+            _secretViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretTimestampSeen = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP_SEEN));
 
 
             // create secret
-            Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1 ? true : false);
-            secret.setDelete(_secretDelete == 1 ? true : false);
-            secret.setIsDelivered(_secretIsDelivered == 1 ? true : false);
-            secret.setDeliveryFailed(_secretDeliveryFailed == 1 ? true : false);
+            Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1);
+            secret.setViewed(_secretViewed == 1);
+            secret.setDelivered(_secretIsDelivered == 1);
+            secret.setDeliveryFailed(_secretDeliveryFailed == 1);
             secret.setTimeStamp(_secretTimestamp);
             secret.setSeenTimeStamp(_secretTimestampSeen);
-            secret.setID(_secretId);
-            ;
+            secret.setId(_secretId);
             // fill secret list
             secretList.add(secret);
         }
@@ -443,7 +442,7 @@ public class SenzorsDbSource {
      * @return
      */
     public ArrayList<Secret> getLatestChatMessages() {
-        ArrayList<Secret> secretList = new ArrayList();
+        ArrayList secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
@@ -472,7 +471,7 @@ public class SenzorsDbSource {
             User user = new User("", _secretUser);
 
             user.setUserImage(getImageFromDB(_secretUser));
-            Secret secret = new Secret(_secretBlob, _secretBlobType, user, _secretIsSender == 1 ? true : false);
+            Secret secret = new Secret(_secretBlob, _secretBlobType, user, _secretIsSender == 1);
             secret.setTimeStamp(_secretTimestamp);
             // fill secret list
             secretList.add(secret);
@@ -514,9 +513,9 @@ public class SenzorsDbSource {
         if (cursor.moveToFirst()) {
 
             // get permission attributes
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
 
             // create senz
             _userimage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
@@ -558,9 +557,9 @@ public class SenzorsDbSource {
         if (cursor.moveToFirst()) {
 
             // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
 
             // create senz
             userPerm = new UserPermission(user, _camera, _location, _mic);
@@ -598,9 +597,9 @@ public class SenzorsDbSource {
         if (cursor.moveToFirst()) {
 
             // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
 
             // create senz
             userPerm = new UserPermission(user, _camera, _location, _mic);
@@ -641,9 +640,9 @@ public class SenzorsDbSource {
         while (cursor.moveToNext()) {
 
             // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
 
             // get user attributes
             _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
@@ -676,7 +675,7 @@ public class SenzorsDbSource {
         // delete senz of given user
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
                 SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + "=?",
-                new String[]{secret.getID()});
+                new String[]{secret.getId()});
 
     }
 
@@ -714,7 +713,7 @@ public class SenzorsDbSource {
             db.update(SenzorsDbContract.Secret.TABLE_NAME,
                     values,
                     SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + "=?",
-                    new String[]{secret.getID()});
+                    new String[]{secret.getId()});
 
             db.setTransactionSuccessful();
         } finally {
