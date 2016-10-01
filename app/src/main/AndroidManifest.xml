@@ -81,13 +81,11 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.ChatActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.HomeActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
