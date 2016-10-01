@@ -2,11 +2,10 @@ package com.score.chatz.asyncTasks;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.util.Base64;
 import android.widget.ImageView;
 
 import com.score.chatz.pojo.BitmapTaskParams;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.ImageUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -18,24 +17,19 @@ public class BitmapWorkerTask extends AsyncTask<BitmapTaskParams, Void, Bitmap> 
 
     public BitmapWorkerTask(ImageView imageView) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
-        imageViewReference = new WeakReference<ImageView>(imageView);
+        imageViewReference = new WeakReference<>(imageView);
     }
 
     // Decode image in background.
     @Override
     protected Bitmap doInBackground(BitmapTaskParams... params) {
-        return CameraUtils.decodeBitmapFromByteArray(rotateImage(params[0].getData(), -90), params[0].getWidth(), params[0].getHeight());
+        String encodedBitmap = params[0].getData();
+        return new ImageUtils().decodeBitmap(encodedBitmap);
     }
 
-    private byte[] rotateImage(String base64EncodedString, int degrees){
-
-        return Base64.decode(base64EncodedString, 0);
-    }
-
-    // Once complete, see if ImageView is still around and set bitmap.
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        if (imageViewReference != null && bitmap != null) {
+        if (bitmap != null) {
             final ImageView imageView = imageViewReference.get();
             if (imageView != null) {
                 imageView.setImageBitmap(bitmap);

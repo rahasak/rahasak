@@ -1,14 +1,10 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.PowerManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -23,7 +19,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
@@ -33,7 +29,6 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 import com.skyfishjy.library.RippleBackground;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,12 +52,10 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private RippleBackground goRipple;
 
     private Senz originalSenz;
-    private PowerManager.WakeLock wakeLock;
     private CountDownTimer cancelTimer;
 
     private static final int TIME_TO_SERVE_REQUEST = 30000;
     private static final int TIME_TO_QUICK_PHOTO = 3000;
-    private static final int IMAGE_SIZE = 110;
 
     private float dX, dY, startX, startY;
 
@@ -115,10 +108,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
-//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-//        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-//        wakeLock.acquire();
     }
 
     private void clearFlags() {
@@ -161,12 +150,10 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //Release screen lock, so the phone can go back to sleep
+
         clearFlags();
         stopVibrations();
         releaseCamera();
-//        if (wakeLock != null)
-//            wakeLock.release();
     }
 
     private void releaseCamera() {
@@ -283,22 +270,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
 
     private void takePhoto() {
         quickCountdownText.setVisibility(View.INVISIBLE);
-        CameraUtils.shootSound(this);
+        AudioUtils.shootSound(this);
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                //byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
-                //byte[] resizedImage = getResizedBitmapLessThan500KB(bytes, 300);
-
                 byte[] resizedImage = new ImageUtils().compressImage(bytes);
                 sendPhotoSenz(resizedImage, originalSenz, PhotoActivity.this);
-
-//                Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);
-//                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
-//                i.putExtra("QUICK_PREVIEW", "true");
-//                startActivity(i);
-
-                //overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
         });
@@ -347,15 +324,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             cancelTimer.cancel();
     }
 
-    private byte[] resizeBitmapByteArray(byte[] data, int deg) {
-        Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));
-        // set max width ~ 600px
-        Bitmap rotatedBitmap = CameraUtils.getAdjustedImage(decodedBitmap, deg, 1000);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        return baos.toByteArray();
-    }
-
     /**
      * Util methods
      */
@@ -389,11 +357,10 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      * @return list of decomposed senz's
      */
     private ArrayList<Senz> getPhotoStreamSenz(Senz senz, byte[] image, Context context, String uid) {
-        String imageString = Base64.encodeToString(image, Base64.DEFAULT);
+        String imageString = new ImageUtils().encodeBitmap(image);
 
         // save photo to db before sending if its a cam
         if (senz.getAttributes().containsKey("cam")) {
-            //Secret newSecret = new Secret(imageString, "IMAGE", senz.getReceiver(), true);
             User user = SecretsUtil.getTheUser(senz.getSender(), senz.getReceiver(), context);
             Secret newSecret = new Secret(imageString, "IMAGE", user, SecretsUtil.isThisTheUsersSecret(user, senz.getReceiver()));
             Long timeStamp = System.currentTimeMillis();
@@ -474,34 +441,4 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         return result;
     }
 
-    public static byte[] getResizedBitmapLessThan500KB(byte[] data, int maxSize) {
-        Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length);
-
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 0) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-        Bitmap reduced_bitmap = Bitmap.createScaledBitmap(image, width, height, true);
-
-        Matrix matrix = new Matrix();
-        matrix.postRotate(-90);
-
-        Bitmap rBitMap = Bitmap.createBitmap(reduced_bitmap, 0, 0, reduced_bitmap.getWidth(), reduced_bitmap.getHeight(), matrix, true);
-
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        rBitMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-
-        System.out.println(byteArray.length / 1024 + "size------");
-
-        return byteArray;
-    }
 }

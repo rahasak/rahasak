@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.PowerManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -47,25 +46,23 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     private ImageView startBtn;
     private RippleBackground goRipple;
 
-    private int mStartTime = 10;
     private boolean isRecordingCancelled;
     private static boolean isActivityActive;
 
+    private boolean isRecordingDone;
+    private boolean hasRecordingStarted;
+
     private static final int TIME_TO_SERVE_REQUEST = 30000;
 
+    private int mStartTime = 10;
     private CountDownTimer cancelTimer;
 
     private User sender;
     private User receiver;
 
-    private boolean isRecordingDone;
-    private boolean hasRecordingStarted;
-
     SenzorsDbSource dbSource;
 
     AudioRecorder audioRecorder;
-
-    private PowerManager.WakeLock wakeLock;
 
     private float dX, dY, startX, startY;
 
@@ -130,9 +127,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //Release screen lock, so the phone can go back to sleep
-//        if (wakeLock != null)
-//            wakeLock.release();
+
         stopVibrations();
         clearFlags();
     }
@@ -148,10 +143,6 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
-//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-//        wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-//        wakeLock.acquire();
     }
 
     private void clearFlags() {

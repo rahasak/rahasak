@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -94,9 +95,10 @@ public class ImageUtils {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
 
-        System.out.println(out.toByteArray().length / 1024 + "hhhhhh");
+        byte[] scaledData = out.toByteArray();
+        Log.d("TAG", scaledData.length / 1024 + "hoooooo");
 
-        return out.toByteArray();
+        return scaledData;
     }
 
     private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -231,4 +233,14 @@ public class ImageUtils {
         }
         return value;
     }
+
+    public String encodeBitmap(byte[] bitmapData) {
+        return Base64.encodeToString(bitmapData, Base64.DEFAULT);
+    }
+
+    public Bitmap decodeBitmap(String encodedImage) {
+        byte data[] = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
+    }
+
 }

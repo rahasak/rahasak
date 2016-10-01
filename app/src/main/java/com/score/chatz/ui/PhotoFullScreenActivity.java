@@ -23,7 +23,7 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.pojo.BitmapTaskParams;
-import com.score.chatz.utils.CameraUtils;
+import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
 public class PhotoFullScreenActivity extends AppCompatActivity {
@@ -78,7 +78,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             loadingText.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
             imageData = intent.getStringExtra("IMAGE");
-            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(imageData.getBytes()));
+            imageView.setImageBitmap(new ImageUtils().decodeBitmap(imageData));
         } else {
             loadingText.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
@@ -140,7 +140,8 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             // display stream
             loadingText.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
-            imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(senz.getAttributes().get("cam").getBytes()));
+            //imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(senz.getAttributes().get("cam").getBytes()));
+            imageView.setImageBitmap(new ImageUtils().decodeBitmap(senz.getAttributes().get("cam")));
             startCloseViewTimer();
         }
     }
