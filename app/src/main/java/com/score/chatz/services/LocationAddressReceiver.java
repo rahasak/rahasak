@@ -62,7 +62,7 @@ public class LocationAddressReceiver extends AsyncTask<String, String, String> {
         super.onPostExecute(address);
 
         // update sender's last know location in database
-        new SenzorsDbSource(context).updateSenz(sender, address);
+        //new SenzorsDbSource(context).updateSenz(sender, address);
     }
 
 }

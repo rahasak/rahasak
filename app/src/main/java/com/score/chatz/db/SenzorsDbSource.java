@@ -11,9 +11,6 @@ import com.score.chatz.pojo.UserPermission;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,26 +82,6 @@ public class SenzorsDbSource {
     }
 
     /**
-     * Update Location information of user
-     *
-     * @param user
-     * @param value
-     */
-    public void updateSenz(User user, String value) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Location.COLUMN_NAME_VALUE, value);
-
-        // update
-        db.update(SenzorsDbContract.Location.TABLE_NAME,
-                values,
-                SenzorsDbContract.Location.COLUMN_NAME_USER + " = ?",
-                new String[]{String.valueOf(user.getId())});
-    }
-
-    /**
      * Update permissions given to current user by others/Friends
      *
      * @param user    Other user or friend
@@ -146,7 +123,7 @@ public class SenzorsDbSource {
         // update
         db.update(SenzorsDbContract.Permission.TABLE_NAME,
                 values,
-                SenzorsDbContract.Permission.COLOMN_NAME_USER + " = ?",
+                SenzorsDbContract.Permission.COLUMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
     }
 
@@ -195,39 +172,6 @@ public class SenzorsDbSource {
                 values,
                 SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
-    }
-
-    /**
-     * Add senz to the database
-     *
-     * @param senz senz object
-     */
-    public void createSenz(Senz senz) {
-        Log.d(TAG, "AddSensor: adding senz from - " + senz.getSender());
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // content values to inset
-        ContentValues values = new ContentValues();
-        if (senz.getAttributes().containsKey("lat")) {
-            values.put(SenzorsDbContract.Location.COLUMN_NAME_NAME, "Location");
-        } else if (senz.getAttributes().containsKey("gpio13") || senz.getAttributes().containsKey("gpio15")) {
-            // store json string in db
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("GPIO13", "OFF");
-                jsonObject.put("GPIO15", "OFF");
-
-                values.put(SenzorsDbContract.Location.COLUMN_NAME_NAME, "GPIO");
-                values.put(SenzorsDbContract.Location.COLUMN_NAME_VALUE, jsonObject.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        values.put(SenzorsDbContract.Location.COLUMN_NAME_USER, senz.getSender().getId());
-
-        // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.Location.TABLE_NAME, SenzorsDbContract.Location.COLUMN_NAME_NAME, values);
     }
 
     /**
@@ -345,7 +289,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, 0);
-        values.put(SenzorsDbContract.Permission.COLOMN_NAME_USER, senz.getSender().getUsername());
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_USER, senz.getSender().getUsername());
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, null, values);
@@ -503,7 +447,7 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
-                "GROUP BY user";
+                "GROUP BY user ORDER BY timestamp";
 
         Cursor cursor = db.rawQuery(query, null);
 

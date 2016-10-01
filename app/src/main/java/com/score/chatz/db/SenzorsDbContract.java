@@ -9,14 +9,7 @@ import android.provider.BaseColumns;
  */
 public class SenzorsDbContract {
 
-    public SenzorsDbContract() {}
-
-    /* Inner class that defines sensor table contents */
-    public static abstract class Location implements BaseColumns {
-        public static final String TABLE_NAME = "location";
-        public static final String COLUMN_NAME_NAME = "name";
-        public static final String COLUMN_NAME_VALUE = "value";
-        public static final String COLUMN_NAME_USER = "user";
+    public SenzorsDbContract() {
     }
 
     /* Inner class that defines secret table */
@@ -42,7 +35,6 @@ public class SenzorsDbContract {
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_NAME_IS_SENDER = "is_sender";
         public static final String COLUMN_TIMESTAMP = "timestamp";
-
     }
 
     /* Inner class that defines permission control for the user
@@ -52,7 +44,7 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_LOCATION = "location";
         public static final String COLUMN_NAME_CAMERA = "camera";
         public static final String COLUMN_NAME_MIC = "mic";
-        public static final String COLOMN_NAME_USER = "user";
+        public static final String COLUMN_NAME_USER = "user";
     }
 
     /* Inner class that defines permission control for the user
@@ -71,10 +63,5 @@ public class SenzorsDbContract {
         public static final String TABLE_NAME = "user";
         public static final String COLUMN_NAME_USERNAME = "username";
         public static final String COLOMN_NAME_IMAGE = "image";
-    }
-
-    //  Types of blob stored in secret table
-    enum BLOB_TYPES{
-        IMAGE, SOUND, TEXT
     }
 }
