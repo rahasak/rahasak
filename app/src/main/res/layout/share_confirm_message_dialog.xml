@@ -3,15 +3,24 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/dialog_shape"
     android:layout_gravity="center">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:background="@drawable/dialog_shape">
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:foregroundGravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -99,5 +108,7 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    </RelativeLayout>
 
 </ScrollView>
