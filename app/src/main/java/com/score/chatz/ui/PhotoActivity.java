@@ -1,7 +1,6 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -290,14 +289,16 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 //byte[] resizedImage = CameraUtils.getCompressedImage(resizeBitmapByteArray(bytes, 90), IMAGE_SIZE);
                 //byte[] resizedImage = getResizedBitmapLessThan500KB(bytes, 300);
-                byte[] resizedImage = new ImageUtils().compressImage(bytes);
 
+                byte[] resizedImage = new ImageUtils().compressImage(bytes);
                 sendPhotoSenz(resizedImage, originalSenz, PhotoActivity.this);
-                Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);
-                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
-                i.putExtra("QUICK_PREVIEW", "true");
-                startActivity(i);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+//                Intent i = new Intent(PhotoActivity.this, PhotoFullScreenActivity.class);
+//                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
+//                i.putExtra("QUICK_PREVIEW", "true");
+//                startActivity(i);
+
+                //overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
         });
