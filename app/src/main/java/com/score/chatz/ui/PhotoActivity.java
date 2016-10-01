@@ -81,6 +81,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         setupWakeLock();
         getSupportActionBar().hide();
         startTimerToEndRequest();
+        setupUserImage();
     }
 
     @Override
@@ -136,8 +137,15 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     }
 
     private void setupPhotoRequestTitle() {
-        ((TextView) findViewById(R.id.photo_request)).setText(getResources().getString(R.string.photo_request) + " @" + originalSenz.getSender().getUsername());
-        ((TextView) findViewById(R.id.photo_request)).setTypeface(typeface, Typeface.NORMAL);
+        ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
+        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + originalSenz.getSender().getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
+    }
+
+    private void setupUserImage(){
+        String userImage = new SenzorsDbSource(this).getImageFromDB(originalSenz.getSender().getUsername());
+        if(userImage != null)
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
     @Override

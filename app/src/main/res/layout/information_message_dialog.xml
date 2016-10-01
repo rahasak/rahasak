@@ -97,7 +97,7 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:id="@+id/information_message_dialog_layout_ok_button"
-                android:background="@color/white"
+                android:background="@color/transparent"
                 android:text="Ok">
             </Button>
 
