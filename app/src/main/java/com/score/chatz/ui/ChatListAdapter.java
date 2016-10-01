@@ -2,6 +2,7 @@ package com.score.chatz.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,12 @@ class ChatListAdapter extends BaseAdapter {
 
     private Context context;
     private List<Secret> secretList;
+    Typeface typeface;
 
     ChatListAdapter(Context context, List<Secret> secretList) {
         this.context = context;
         this.secretList = secretList;
+        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
     @Override
@@ -107,8 +110,11 @@ class ChatListAdapter extends BaseAdapter {
 
     private void setupView(View view, ViewHolder holder, Secret secret) {
         holder.sender = (TextView) view.findViewById(R.id.sender);
+        holder.sender.setTypeface(typeface, Typeface.NORMAL);
         holder.status = (TextView) view.findViewById(R.id.deleviered_message);
+        holder.status.setTypeface(typeface, Typeface.NORMAL);
         holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
+        holder.sentTime.setTypeface(typeface, Typeface.NORMAL);
 
         if (secret.getType().equalsIgnoreCase("TEXT")) {
             // text
@@ -119,6 +125,8 @@ class ChatListAdapter extends BaseAdapter {
         } else {
             holder.image = (ImageView) view.findViewById(R.id.sound);
         }
+
+        holder.message.setTypeface(typeface, Typeface.BOLD);
     }
 
     private void setupHolder(ViewHolder holder, final Secret secret) {

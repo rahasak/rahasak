@@ -35,10 +35,6 @@
                 android:layout_height="wrap_content"
                 android:text="To add a friend, press on the '+' icon."
                 android:layout_centerInParent="true"
-                android:textColor="@color/colorPrimary"
-                android:textAlignment="gravity"
-                android:textStyle="italic"
-                android:gravity="center"
                 android:textSize="25sp" />
             <FrameLayout
                 android:layout_width="0dp"

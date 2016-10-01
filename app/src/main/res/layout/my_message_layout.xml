@@ -2,83 +2,61 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:text="Hi This is a message"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:layout_gravity="right"
+        android:background="@color/colorPrimary"
+        android:padding="15dp"
+        android:layout_margin="5dp" />
+
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingLeft="5dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Lakmal Caldera"
-            android:id="@+id/sender"
-            android:textColor="@color/black"
-            android:textSize="13dp" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="11:00 AM"
-            android:id="@+id/sent_time"
-            android:textColor="@color/android_grey"
-            android:textStyle="italic"
-            android:textSize="9sp"
-            android:layout_alignLeft="@+id/sender"
-            android:layout_below="@+id/sender" />
-
-        </RelativeLayout>
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <FrameLayout
-                android:layout_width="3dp"
-                android:layout_height="match_parent"
-                android:background="@color/android_green"
-                android:layout_margin="5dp">
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:gravity="right"
+            >
 
-            </FrameLayout>
             <TextView
+                android:id="@+id/sent_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hi This is a message"
-                android:textColor="@color/black"
-                android:id="@+id/message"
-                android:textSize="15dp"
-                android:gravity="left"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginBottom="15dp" />
+                android:layout_alignLeft="@+id/sender"
+                android:layout_below="@+id/sender"
+                android:text="11:00 AM"
+                android:textColor="@color/android_grey"
+                android:textSize="12sp"
+                android:layout_alignRight="@id/deleviered_message"/>
+
+            <ImageView
+                android:id="@+id/deleviered_message"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="2dp"
+                android:src="@drawable/tick_enabled"
+                />
+
         </LinearLayout>
-    </FrameLayout>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="20dp">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Delivered"
-            android:textColor="@color/black"
-            android:id="@+id/deleviered_message"
-            android:textSize="10dp"
-            android:gravity="left"
-            android:layout_marginLeft="5dp"
-            android:textStyle="italic" />
+
     </FrameLayout>
 
 </LinearLayout>

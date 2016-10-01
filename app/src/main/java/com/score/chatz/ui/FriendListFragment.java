@@ -47,7 +47,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     };
 
     private void setupEmptyTextFont() {
-        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
+        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
     }
 
     @Override

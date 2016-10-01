@@ -52,7 +52,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     }
 
     private void setupEmptyTextFont() {
-        ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
+        ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
     }
 
     @Override

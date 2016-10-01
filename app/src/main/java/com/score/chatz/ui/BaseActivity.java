@@ -81,9 +81,9 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
     }
 
     private void setupFonts() {
-        typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
-        typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-Light.otf");
-        typefaceUltraThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-UltraLight.otf");
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
+        typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
+        typefaceUltraThin = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
     }
 
     /**
@@ -108,13 +108,12 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         messageTextView.setText(Html.fromHtml(message));
 
         // set custom font
-        messageHeaderTextView.setTypeface(typeface);
+        messageHeaderTextView.setTypeface(typeface, Typeface.BOLD);
         messageTextView.setTypeface(typeface);
 
         //set ok button
         Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(typeface);
-        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setTypeface(typeface, Typeface.BOLD);
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
@@ -147,13 +146,12 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         messageTextView.setText(Html.fromHtml(message));
 
         // set custom font
-        messageHeaderTextView.setTypeface(typeface);
+        messageHeaderTextView.setTypeface(typeface, Typeface.BOLD);
         messageTextView.setTypeface(typeface);
 
         //set ok button
         Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(typeface);
-        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setTypeface(typeface, Typeface.BOLD);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +162,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
         // cancel button
         Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
-        cancelButton.setTypeface(typeface);
+        cancelButton.setTypeface(typeface, Typeface.BOLD);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();

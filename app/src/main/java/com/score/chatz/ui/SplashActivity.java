@@ -1,9 +1,11 @@
 package com.score.chatz.ui;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
@@ -15,7 +17,7 @@ import com.score.chatz.utils.PreferenceUtils;
  *
  * @author eranga herath(erangaeb@gmail.com)
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
     private final int SPLASH_DISPLAY_LENGTH = 3000;
     private static final String TAG = SplashActivity.class.getName();
 
@@ -28,6 +30,11 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.splash_layout);
         startService();
         initNavigation();
+        setupSplashText();
+    }
+
+    private void setupSplashText(){
+        ((TextView)findViewById(R.id.splash_name)).setTypeface(typefaceThin, Typeface.BOLD);
     }
 
     private void startService() {

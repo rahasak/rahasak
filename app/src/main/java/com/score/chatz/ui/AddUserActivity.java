@@ -7,6 +7,8 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -60,6 +62,7 @@ public class AddUserActivity extends BaseActivity {
         setupAddUsersBtn();
         setupFonts();
         setupBackBtn();
+        setupEditTextView();
     }
 
     @Override
@@ -86,7 +89,35 @@ public class AddUserActivity extends BaseActivity {
     private void setupUiElements() {
         invite_text = (TextView) findViewById(R.id.textView);
         editTextUserId = (EditText) findViewById(R.id.friend_id);
+        editTextUserId.setTypeface(typeface, Typeface.NORMAL);
         editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+    }
+
+    private void setupEditTextView() {
+        TextWatcher fieldValidatorTextWatcher = new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                lowerCaseText();
+            }
+
+            private void lowerCaseText(){
+                if(!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
+                    String usernameText = editTextUserId.getText().toString();
+                    usernameText = usernameText.toLowerCase();
+                    editTextUserId.setText(usernameText);
+                    editTextUserId.setSelection(editTextUserId.getText().length());
+                }
+            }
+        };
+        editTextUserId.addTextChangedListener(fieldValidatorTextWatcher);
     }
 
     private void setupToolbar() {
@@ -143,7 +174,7 @@ public class AddUserActivity extends BaseActivity {
         User registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font size=10 color=#ABABAB>Are you sure you want to share secrets with </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font size=10>Are you sure you want to share secrets with </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -231,7 +262,7 @@ public class AddUserActivity extends BaseActivity {
                 onPostShare(senz);
             } else {
                 String user = editTextUserId.getText().toString().trim();
-                String message = "<font size=10 color=#ABABAB>Seems we couldn't connect you with </font> <font color=#f47644>" + "<b>" + user + "</b>" + "</font>";
+                String message = "<font size=10>Seems we couldn't connect you with </font> <font color=#f47644>" + "<b>" + user + "</b>" + "</font>";
                 displayInformationMessageDialog("Fail", message);
             }
         }

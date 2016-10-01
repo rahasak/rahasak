@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:id="@+id/scrollview"
-    android:layout_height="fill_parent"
-    android:layout_width="fill_parent"
-    android:isScrollContainer="true"
-    android:fillViewport="true"
-    android:background="@color/white">
-<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -23,44 +14,70 @@
         app:contentInsetStart="0dp"
         app:popupTheme="@style/MyMaterialTheme" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:id="@+id/friend_id"
-        android:hint="@string/register_user_id"
-        android:textColor="@color/android_grey"
-        android:textColorHint="@color/clouds"
-        android:textSize="25sp"
-        android:maxLines="1"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_centerInParent="false" />
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:fillViewport="true"
+        android:orientation="vertical">
 
-    <Button
-        android:layout_width="match_parent"
-        android:text="@string/invite_button_text"
-        android:id="@+id/add_friend_btn"
-        android:textColor="@color/white"
-        android:background="@drawable/rounded_corner_button"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_below="@+id/friend_id"
-        android:layout_height="55dp"
-        android:layout_marginTop="20dp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/invite_text_part_1"
-        android:id="@+id/textView"
-        android:textSize="28sp"
-        android:textColor="@color/colorPrimary"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:textStyle="bold"
-        android:layout_above="@+id/friend_id"
-        android:layout_marginBottom="80dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-</RelativeLayout>
-</ScrollView>
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/friend_id"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/invite_text_part_1"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="50dp" />
+
+            <EditText
+                android:id="@+id/friend_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="false"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/border_bottom"
+                android:hint="@string/register_user_id"
+                android:inputType="textNoSuggestions"
+                android:maxLines="1"
+                android:textColor="@color/android_grey"
+                android:textColorHint="@color/clouds"
+                android:textSize="25sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+            <Button
+                android:id="@+id/add_friend_btn"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_below="@+id/friend_id"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_corner_button"
+                android:text="@string/invite_button_text"
+                android:textColor="@color/white" />
+
+            </FrameLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

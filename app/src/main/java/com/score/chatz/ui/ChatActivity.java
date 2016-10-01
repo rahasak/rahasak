@@ -5,6 +5,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -44,7 +46,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     // UI components
     private EditText txtSecret;
-    private ImageButton btnSend;
+    private TextView btnSend;
     private ImageButton btnLocation;
     private ImageButton btnPhoto;
     private ImageButton btnMic;
@@ -196,7 +198,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void initUi() {
         // init
         txtSecret = (EditText) findViewById(R.id.text_message);
-        btnSend = (ImageButton) findViewById(R.id.sendBtn);
+        txtSecret.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf"), Typeface.NORMAL);
+        txtSecret.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+
+        btnSend = (TextView) findViewById(R.id.sendBtn);
+        btnSend.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf"), Typeface.BOLD);
+
         btnLocation = (ImageButton) findViewById(R.id.getLocBtn);
         btnPhoto = (ImageButton) findViewById(R.id.getCamBtn);
         btnMic = (ImageButton) findViewById(R.id.getMicBtn);

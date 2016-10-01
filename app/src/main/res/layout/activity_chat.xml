@@ -15,7 +15,10 @@
         android:tag="chatFragment"
         android:orientation="vertical"
         android:fitsSystemWindows="true"
-        tools:context="com.score.chatz.ui.ChatFragment">
+        tools:context="com.score.chatz.ui.ChatFragment"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -53,9 +56,9 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="85dp"
                 android:layout_weight="0"
-                android:background="#ecf0f1">
+                android:background="#ecf0f1"
+                android:layout_height="105dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -69,32 +72,28 @@
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
                         <EditText
                             android:id="@+id/text_message"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
                             android:layout_marginRight="5dp"
-                            android:backgroundTint="#c5c5c5"
                             android:hint="@string/enter_secret_here_hint"
                             android:paddingLeft="7dp"
                             android:paddingRight="7dp"
-                            android:paddingTop="7dp"
+                            android:background="@drawable/border_bottom"
+                            android:inputType="textNoSuggestions"
                             android:textColor="@color/android_grey"
-                            android:textColorHint="@android:color/darker_gray" />
+                            android:textColorHint="@color/clouds"
+                            android:layout_height="50dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="34dp"
-                            android:layout_marginBottom="10dp"
+                            android:layout_height="match_parent"
                             android:orientation="horizontal"
-                            android:paddingBottom="5dp"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="5dp"
-                            android:paddingTop="5dp">
+                            android:padding="10dp">
 
                             <FrameLayout
                                 android:layout_width="0dp"
@@ -134,15 +133,17 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1">
 
+
                                 <ImageButton
                                     android:id="@+id/getMicBtn"
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
                                     android:layout_gravity="top"
-                                    android:adjustViewBounds="true"
                                     android:background="@color/transparent"
                                     android:scaleType="centerInside"
-                                    android:src="@drawable/perm_mic_deactive" />
+                                    android:src="@drawable/perm_mic_deactive"
+                                    android:layout_height="match_parent" />
+
+
                             </FrameLayout>
 
 
@@ -150,19 +151,21 @@
 
                     </LinearLayout>
 
-
-                    <ImageButton
+                    <TextView
+                        android:textAlignment="center"
                         android:id="@+id/sendBtn"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
                         android:layout_centerHorizontal="true"
-                        android:layout_gravity="center_vertical"
+                        android:layout_gravity="top|center_vertical"
                         android:adjustViewBounds="true"
-                        android:background="@drawable/chat_message_btn"
-                        android:baselineAlignBottom="false"
-                        android:padding="9dp"
+                        android:background="@drawable/left_border"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/send_black" />
+                        android:gravity="center"
+                        android:textColor="@color/colorPrimary"
+                        android:text="SEND"
+                        android:layout_width="60dp"
+                        android:layout_height="35dp"
+                        android:baselineAlignBottom="true"
+                        android:layout_marginTop="10dp" />
 
                 </LinearLayout>
 
