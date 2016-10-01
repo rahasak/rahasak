@@ -3,18 +3,22 @@ package com.score.chatz.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -128,6 +132,11 @@ public class UserProfileActivity extends BaseActivity {
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
         micSwitch = (Switch) findViewById(R.id.perm_mic_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
+
+        ((TextView) findViewById(R.id.perms_text)).setTypeface(typeface);
+        ((TextView) findViewById(R.id.perm_loc_text)).setTypeface(typeface);
+        ((TextView) findViewById(R.id.perm_cam_text)).setTypeface(typeface);
+        ((TextView) findViewById(R.id.perm_mic_text)).setTypeface(typeface);
     }
 
     private void initThisUser() {
@@ -256,20 +265,27 @@ public class UserProfileActivity extends BaseActivity {
 
     }
 
-    private void setupCoordinator(){
+    private void setupCoordinator() {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("@" + thisUser.getUsername());
         collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
+
+        collapsingToolbar.setExpandedTitleTypeface(typeface);
+        collapsingToolbar.setCollapsedTitleTypeface(typeface);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         View header = getLayoutInflater().inflate(R.layout.profile_header, null);
-        toolbar.setContentInsetsAbsolute(0,0);
+        toolbar.setContentInsetsAbsolute(0, 0);
         toolbar.addView(header);
+
+        /*Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_user);
+        expandToolbar(bm);*/
     }
 
-    private void setupBackBtn(){
-        ((ImageView)findViewById(R.id.back_btn)).setOnClickListener(new View.OnClickListener() {
+    private void setupBackBtn() {
+        ((ImageView) findViewById(R.id.back_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

@@ -3,6 +3,7 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Base64;
@@ -21,6 +22,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioRecorder;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
@@ -100,6 +102,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
             setupPhotoRequestTitle();
             setupWakeLock();
             startTimerToEndRequest();
+            setupUserImage();
         }
     }
 
@@ -164,7 +167,15 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     }
 
     private void setupPhotoRequestTitle() {
-        ((TextView) findViewById(R.id.photo_request)).setText(getResources().getString(R.string.sound_request) + " @" + sender.getUsername());
+        ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
+        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + sender.getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
+    }
+
+    private void setupUserImage(){
+        String userImage = new SenzorsDbSource(this).getImageFromDB(sender.getUsername());
+        if(userImage != null)
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
     @Override

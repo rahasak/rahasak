@@ -1,85 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollview"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@color/white"
-    android:fillViewport="true"
-    android:isScrollContainer="true"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        android:visibility="gone"
+        app:popupTheme="@style/MyMaterialTheme" />
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white"
+        android:fillViewport="true"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white">
-
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:layout_centerInParent="false"
-                    android:layout_above="@+id/welcome_message">
-
-                    <ImageView
-                        android:id="@+id/logo"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/rahaslogo" />
-
-                    <TextView
-                        android:id="@+id/welcome_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignBottom="@+id/logo"
-                        android:layout_marginLeft="10dp"
-                        android:layout_toRightOf="@+id/logo"
-                        android:gravity="center_vertical"
-                        android:text="@string/register_welcome_text"
-                        android:textColor="@color/android_grey"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/welcome_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginRight="50dp"
-                    android:layout_marginTop="50dp"
-                    android:text="You must first register under a unique name, before you can start sharing secrets with friends."
-                    android:layout_above="@+id/registering_user_id" />
-
-                <EditText
-                    android:id="@+id/registering_user_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginRight="50dp"
-                    android:layout_marginTop="15dp"
-                    android:hint="@string/register_user_id"
-                    android:paddingBottom="10dp"
-                    android:textColor="@color/android_grey"
-                    android:textColorHint="@color/clouds"
-                    android:textSize="25sp"
-                    android:layout_centerVertical="true" />
-
-                <Button
-                    android:id="@+id/register_btn"
-                    android:layout_width="match_parent"
-                    android:layout_marginBottom="0dp"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginRight="50dp"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/rounded_corner_button"
-                    android:text="@string/register_button_text"
-                    android:textColor="@color/white"
-                    android:layout_below="@+id/registering_user_id"
-                    android:layout_height="55dp" />
+                android:layout_above="@+id/welcome_message"
+                android:layout_centerInParent="false"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
             </RelativeLayout>
-</ScrollView>
+
+            <TextView
+                android:id="@+id/welcome_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/registering_user_id"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="50dp"
+                android:text="You must first register under a unique name, before you can start sharing secrets with friends."
+                android:textSize="28sp" />
+
+            <EditText
+                android:id="@+id/registering_user_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="15dp"
+                android:hint="@string/register_user_id"
+                android:paddingBottom="10dp"
+                android:textColor="@color/android_grey"
+                android:textColorHint="@color/clouds"
+                android:inputType="textNoSuggestions"
+                android:background="@drawable/border_bottom"
+                android:textSize="25sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+            <Button
+                android:id="@+id/register_btn"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_below="@+id/registering_user_id"
+                android:layout_marginBottom="100dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_corner_button"
+                android:text="@string/register_button_text"
+                android:textColor="@color/white" />
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

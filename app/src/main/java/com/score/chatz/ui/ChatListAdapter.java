@@ -2,6 +2,7 @@ package com.score.chatz.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,12 @@ class ChatListAdapter extends BaseAdapter {
 
     private Context context;
     private List<Secret> secretList;
+    Typeface typeface;
 
     ChatListAdapter(Context context, List<Secret> secretList) {
         this.context = context;
         this.secretList = secretList;
+        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
     @Override
@@ -76,9 +79,10 @@ class ChatListAdapter extends BaseAdapter {
      * Keep reference to children view to avoid unnecessary calls
      */
     private static class ViewHolder {
-        TextView sender;
         TextView status;
         TextView sentTime;
+        ImageView messageDeliveredIcon;
+        ImageView messageDeliveryPendingIcon;
         ImageView image;
         TextView message;
     }
@@ -106,13 +110,18 @@ class ChatListAdapter extends BaseAdapter {
     }
 
     private void setupView(View view, ViewHolder holder, Secret secret) {
-        holder.sender = (TextView) view.findViewById(R.id.sender);
-        holder.status = (TextView) view.findViewById(R.id.deleviered_message);
+        //holder.status = (TextView) view.findViewById(R.id.deleviered_message);
+        //holder.status.setTypeface(typeface, Typeface.NORMAL);
         holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
+        holder.sentTime.setTypeface(typeface, Typeface.NORMAL);
+        holder.messageDeliveredIcon = (ImageView) view.findViewById(R.id.deleviered_message);
+        holder.messageDeliveryPendingIcon = (ImageView) view.findViewById(R.id.not_deleviered_message);
 
         if (secret.getType().equalsIgnoreCase("TEXT")) {
             // text
             holder.message = (TextView) view.findViewById(R.id.message);
+            holder.message.setTypeface(typeface, Typeface.BOLD);
+            holder.messageDeliveredIcon.setVisibility(View.GONE);
         } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
             // photo
             holder.image = (ImageView) view.findViewById(R.id.image);
@@ -122,17 +131,26 @@ class ChatListAdapter extends BaseAdapter {
     }
 
     private void setupHolder(ViewHolder holder, final Secret secret) {
-        // set sender
-        if (secret.isSender()) holder.sender.setText("@" + secret.getUser().getUsername());
-        else holder.sender.setText("@" + "Me");
 
         // set status
         if (!secret.isSender() && secret.getType().equalsIgnoreCase("TEXT")) {
-            if (secret.isDelivered()) holder.status.setText("Delivered ");
-            else if (secret.isDeliveryFailed()) holder.status.setText("Delivery fail ");
-            else holder.status.setText("Sending...");
+            if (secret.isDelivered()) {
+                //holder.status.setText("Delivered ");
+                holder.messageDeliveredIcon.setVisibility(View.VISIBLE);
+                holder.messageDeliveryPendingIcon.setVisibility(View.GONE);
+            } else if (secret.isDeliveryFailed()) {
+                //holder.status.setText("Delivery fail ");
+                holder.messageDeliveredIcon.setVisibility(View.GONE);
+                holder.messageDeliveryPendingIcon.setVisibility(View.VISIBLE);
+            }/* else {
+                holder.status.setText("Sending...");
+            }*/
         } else {
-            holder.status.setVisibility(View.INVISIBLE);
+           // holder.status.setVisibility(View.INVISIBLE);
+            if(holder.messageDeliveredIcon != null)
+            holder.messageDeliveredIcon.setVisibility(View.GONE);
+            if(holder.messageDeliveryPendingIcon != null)
+            holder.messageDeliveryPendingIcon.setVisibility(View.GONE);
         }
 
         // set sent time

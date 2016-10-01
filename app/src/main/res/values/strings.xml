@@ -9,7 +9,7 @@
     <string name="action_bar_permissions">Permissions</string>
     <string name="action_bar_profile">Profile</string>
     <string name="invite_user_id">User ID</string>
-    <string name="invite_button_text">Let\'s start sharing secrets!</string>
+    <string name="invite_button_text">Start Sharing!</string>
     <string name="invite_text_part_1">Is there someone who would like to share a secret with you?</string>
     <string name="invite_text_part_2">like to share a</string>
     <string name="invite_text_part_3">secret</string>
@@ -19,7 +19,7 @@
     <string name="perm_camera">Camera </string>
     <string name="user_perm_card">user_perm_card</string>
     <string name="default_user_image">default_user_image</string>
-    <string name="enter_secret_here_hint">Enter your secret here..</string>
+    <string name="enter_secret_here_hint">Enter your secret here...</string>
     <string name="register_welcome_text">Welcome</string>
     <string name="register_button_text">Register</string>
     <string name="register_user_id">Username</string>
@@ -30,7 +30,7 @@
     <string name="no_internet">No Network Connection</string>
     <string name="sorry">Sorry!!</string>
     <string name="is_busy_now">is busy right now.</string>
-    <string name="photo_request">Photo requested by:</string>
-    <string name="sound_request">Say a secret to:</string>
+    <string name="photo_request">Incomming selfie request from :</string>
+    <string name="sound_request">Incoming mic request from :</string>
     <string name="rahasak">Rahasak</string>
 </resources>

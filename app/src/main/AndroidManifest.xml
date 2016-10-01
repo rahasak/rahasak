@@ -92,11 +92,12 @@
             android:name=".ui.AddUserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.RegistrationActivity"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="stateHidden" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.PhotoActivity"
             android:screenOrientation="portrait"

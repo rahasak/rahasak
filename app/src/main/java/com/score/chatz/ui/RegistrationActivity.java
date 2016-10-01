@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,7 +38,7 @@ public class RegistrationActivity extends BaseActivity {
     private Button registerBtn;
     private EditText editTextUserId;
     private User registeringUser;
-    private TextView welcomeTextView;
+    private Toolbar toolbar;
 
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
@@ -50,8 +54,11 @@ public class RegistrationActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
+        setupToolbar();
         setupUI();
         setupRegisterBtn();
+        setupEditTextView();
+        setupActionBar();
 
         //Generate RSA keys
         doPreRegistration();
@@ -90,17 +97,57 @@ public class RegistrationActivity extends BaseActivity {
         if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
+    private void setupEditTextView() {
+        TextWatcher fieldValidatorTextWatcher = new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                lowerCaseText();
+            }
+
+            private void lowerCaseText(){
+                if(!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
+                    String usernameText = editTextUserId.getText().toString();
+                    usernameText = usernameText.toLowerCase();
+                    editTextUserId.setText(usernameText);
+                    editTextUserId.setSelection(editTextUserId.getText().length());
+                }
+            }
+        };
+        editTextUserId.addTextChangedListener(fieldValidatorTextWatcher);
+    }
+
+    private void setupActionBar() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.registration_header, null));
+        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+    }
+
+    private void setupToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setCollapsible(false);
+        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
+        setSupportActionBar(toolbar);
+    }
+
     private void setupUI() {
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
+        editTextUserId.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-        editTextUserId.setTypeface(typeface, Typeface.NORMAL);
-        welcomeTextView = (TextView) findViewById(R.id.welcome_text);
-        welcomeTextView.setTypeface(typeface);
-        ((TextView)findViewById(R.id.welcome_message)).setTypeface(typeface, Typeface.NORMAL);
+        ((TextView) findViewById(R.id.welcome_message)).setTypeface(typefaceThin, Typeface.NORMAL);
     }
 
     private void setupRegisterBtn() {
         registerBtn = (Button) findViewById(R.id.register_btn);
+        registerBtn.setTypeface(typefaceThin, Typeface.BOLD);
         registerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 onClickRegister();
@@ -118,7 +165,7 @@ public class RegistrationActivity extends BaseActivity {
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font size=10 color=#ABABAB>Are you sure you want to register with Rahask using </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font size=10>Are you sure you want to register with Rahask using </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -186,7 +233,7 @@ public class RegistrationActivity extends BaseActivity {
                 PreferenceUtils.saveUser(this, registeringUser);
                 navigateToHome();
             } else if (msg != null && msg.equalsIgnoreCase("602")) {
-                String informationMessage = "<font size=10 color=#ABABAB>Seems username </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try a different username</font>";
+                String informationMessage = "<font size=10>Seems username </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font> already obtained by some other user, try a different username</font>";
                 displayInformationMessageDialog("Registration fail", informationMessage);
             }
         }

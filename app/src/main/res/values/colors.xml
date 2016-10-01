@@ -36,4 +36,6 @@
     <color name="translucent_black">#80000000</color>
     <color name="translucent_red">#F2FF6666</color>
 
+    <color name="my_chat_message">@color/colorPrimary</color>
+    <color name="not_my_chat_message">#C0C0C0</color>
 </resources>

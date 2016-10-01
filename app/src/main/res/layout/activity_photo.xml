@@ -100,25 +100,75 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
         android:orientation="horizontal"
-        android:gravity="center"
+        android:background="@color/translucent_black"
+        android:layout_centerVertical="false"
+        android:layout_height="100dp">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"></FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="20"
+        android:orientation="horizontal"
         android:id="@+id/sender_info"
-        android:background="@color/translucent_black">
+        android:layout_centerVertical="false"
+        android:layout_height="100dp">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/rahaslogo"
-            android:layout_marginRight="10dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:id="@+id/photo_request"
-            android:text="Photo Request by : Eranga"
-            android:textColor="@color/white" />
+            android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/photo_request_user_name"
+            android:text="Eranga"
+            android:textColor="@color/white"
+            android:textSize="50dp"/>
+
+            <TextView
+                android:id="@+id/photo_request_header"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="Selfie request"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:layout_marginLeft="15dp"/>
+
+        </LinearLayout>
+
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:id="@+id/user_profile_image"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="top|center"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"
+            android:src="@drawable/default_user"
+            app:siBorderAlpha="0.0"
+            app:siBorderWidth="0dp"
+            app:siSquare="true"
+            android:layout_margin="15dp"/>
+
+
     </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"></FrameLayout>
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/quick_count_down"
@@ -126,7 +176,7 @@
         android:layout_height="wrap_content"
         android:text="3"
         android:textSize="120sp"
-        android:textColor="@color/android_green"
+        android:textColor="@color/colorPrimary"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="50dp" />

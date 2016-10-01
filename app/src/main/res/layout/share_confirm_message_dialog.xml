@@ -1,114 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center">
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:background="@drawable/dialog_shape">
+    android:layout_gravity="center"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_height="wrap_content"
-        android:layout_width="300dp"
-        android:foregroundGravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center_horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="45dp">
-
-            <TextView
-                android:id="@+id/information_message_dialog_layout_message_header_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Information"
-                android:textColor="@color/colorPrimary"
-                android:textSize="20dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp">
-            </TextView>
-
-            <!--<Button
-                android:layout_width="80dp"
-                android:gravity="center"
-                android:textColor="#FFFFFF"
-                android:layout_height="32dp"
-                android:layout_weight="1"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:id="@+id/information_message_dialog_layout_cancel_button"
-                android:background="@color/colorPrimary"
-                android:text="Cancel">
-            </Button>-->
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:padding="5dp">
-
-            <TextView
-                android:text="message"
-                android:id="@+id/information_message_dialog_layout_message_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="17dp"
-
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:textColor="#000000">
-            </TextView>
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
+        <FrameLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_weight="1"></FrameLayout>
 
-            <Button
-                android:layout_width="0dp"
-                android:textColor="#FFFFFF"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:layout_marginRight="0dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="@color/colorPrimary"
-                android:id="@+id/information_message_dialog_layout_cancel_button"
-                android:text="CANCEL">
-            </Button>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="5"
+            android:background="@drawable/dialog_shape"
+            android:gravity="center"
+            android:layout_height="wrap_content">
 
-            <Button
-                android:layout_width="0dp"
-                android:textColor="#FFFFFF"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                android:id="@+id/information_message_dialog_layout_ok_button"
-                android:background="@color/colorPrimary"
-                android:text="Ok">
-            </Button>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:foregroundGravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="45dp">
+
+                    <TextView
+                        android:id="@+id/information_message_dialog_layout_message_header_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="Information"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="20dp"></TextView>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:id="@+id/information_message_dialog_layout_message_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
+                        android:text="message"
+                        android:textColor="#000000"
+                        android:textSize="17dp"></TextView>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/information_message_dialog_layout_cancel_button"
+                        android:layout_width="0dp"
+                        android:layout_height="45dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="0dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/transparent"
+                        android:text="CANCEL"
+                        android:textColor="@color/colorPrimary"></Button>
+
+                    <Button
+                        android:id="@+id/information_message_dialog_layout_ok_button"
+                        android:layout_width="0dp"
+                        android:layout_height="45dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/transparent"
+                        android:text="Ok"
+                        android:textColor="@color/colorPrimary"></Button>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"></FrameLayout>
+
 
     </LinearLayout>
 
-    </RelativeLayout>
 
 </ScrollView>

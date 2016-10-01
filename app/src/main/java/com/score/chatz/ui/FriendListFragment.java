@@ -47,7 +47,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     };
 
     private void setupEmptyTextFont() {
-        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/HelveticaNeue-UltraLight.otf"));
+        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
     }
 
     @Override
@@ -72,7 +72,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("SENDER", userPermissionList.get(position).getUser().getUsername());
         startActivity(intent);
     }
