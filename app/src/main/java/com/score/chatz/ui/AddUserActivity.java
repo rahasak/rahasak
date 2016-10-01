@@ -34,10 +34,7 @@ public class AddUserActivity extends BaseActivity {
     private static final String TAG = AddUserActivity.class.getName();
 
     // Ui elements
-    private TextView invite_text_part_1;
-    private TextView invite_text_part_2;
-    private TextView invite_text_part_3;
-    private TextView invite_text_part_4;
+    private TextView invite_text;
     private Button addFriendBtn;
     private EditText editTextUserId;
     private Toolbar toolbar;
@@ -87,10 +84,7 @@ public class AddUserActivity extends BaseActivity {
     }
 
     private void setupUiElements() {
-        invite_text_part_1 = (TextView) findViewById(R.id.textView);
-        invite_text_part_2 = (TextView) findViewById(R.id.textView2);
-        invite_text_part_3 = (TextView) findViewById(R.id.textView3);
-        invite_text_part_4 = (TextView) findViewById(R.id.textView4);
+        invite_text = (TextView) findViewById(R.id.textView);
         editTextUserId = (EditText) findViewById(R.id.friend_id);
         editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
     }
@@ -164,10 +158,7 @@ public class AddUserActivity extends BaseActivity {
     }
 
     private void setupFonts() {
-        invite_text_part_1.setTypeface(typefaceUltraThin, Typeface.NORMAL);
-        invite_text_part_2.setTypeface(typefaceUltraThin, Typeface.NORMAL);
-        invite_text_part_3.setTypeface(typefaceUltraThin, Typeface.NORMAL);
-        invite_text_part_4.setTypeface(typefaceUltraThin, Typeface.NORMAL);
+        invite_text.setTypeface(typefaceUltraThin, Typeface.NORMAL);
     }
 
     /**

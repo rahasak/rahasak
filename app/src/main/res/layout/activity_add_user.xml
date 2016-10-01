@@ -24,36 +24,30 @@
         app:popupTheme="@style/MyMaterialTheme" />
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
         android:id="@+id/friend_id"
         android:hint="@string/register_user_id"
         android:textColor="@color/android_grey"
         android:textColorHint="@color/clouds"
         android:textSize="25sp"
-        android:singleLine="true"
+        android:maxLines="1"
         android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView"
-        android:layout_below="@+id/textView4"
-        android:layout_marginTop="10dp" />
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_centerInParent="false" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
+        android:layout_width="match_parent"
         android:text="@string/invite_button_text"
         android:id="@+id/add_friend_btn"
         android:textColor="@color/white"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/rounded_corner_button"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
         android:layout_below="@+id/friend_id"
-        android:layout_alignLeft="@+id/friend_id"
-        android:layout_alignStart="@+id/friend_id"
-        android:layout_marginTop="34dp"
-        android:layout_alignRight="@+id/friend_id"
-        android:layout_alignEnd="@+id/friend_id"
-        android:layout_marginBottom="100dp" />
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -62,48 +56,11 @@
         android:id="@+id/textView"
         android:textSize="28sp"
         android:textColor="@color/colorPrimary"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="61dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/invite_text_part_2"
-        android:textColor="@color/colorPrimary"
-        android:textSize="28sp"
-        android:id="@+id/textView2"
-        android:layout_below="@+id/textView"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/invite_text_part_3"
-        android:textColor="@color/colorPrimary"
-        android:textSize="28sp"
-        android:id="@+id/textView3"
-        android:layout_alignBottom="@+id/textView2"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2"
-        android:layout_marginLeft="10dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/invite_text_part_4"
-        android:textColor="@color/colorPrimary"
-        android:textSize="28sp"
-        android:id="@+id/textView4"
-        android:layout_below="@+id/textView2"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignStart="@+id/textView2"
-        android:textStyle="bold" />
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:textStyle="bold"
+        android:layout_above="@+id/friend_id"
+        android:layout_marginBottom="80dp" />
 
 </RelativeLayout>
 </ScrollView>

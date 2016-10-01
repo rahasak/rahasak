@@ -10,7 +10,7 @@
     <string name="action_bar_profile">Profile</string>
     <string name="invite_user_id">User ID</string>
     <string name="invite_button_text">Let\'s start sharing secrets!</string>
-    <string name="invite_text_part_1">Is there someone who would</string>
+    <string name="invite_text_part_1">Is there someone who would like to share a secret with you?</string>
     <string name="invite_text_part_2">like to share a</string>
     <string name="invite_text_part_3">secret</string>
     <string name="invite_text_part_4">with you?</string>
