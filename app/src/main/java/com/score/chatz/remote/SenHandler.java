@@ -5,10 +5,10 @@ import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.ui.RecordingActivity;
-import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -72,7 +72,7 @@ class SenHandler extends BasHandler {
             // show notification to current user
             String title = "@" + senz.getSender().getUsername();
             String message = "You have been invited to share secrets.";
-            showStatusNotification(senzService.getApplicationContext(), title, message, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
+            showStatusNotification(senzService.getApplicationContext(), title, message, senz.getSender().getUsername(), NotificationType.MESSAGE);
 
             // broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
@@ -131,7 +131,7 @@ class SenHandler extends BasHandler {
 
                 // show notification
                 String title = "@" + senz.getSender().getUsername();
-                showStatusNotification(senzService.getApplicationContext(), title, rahasa, senz.getSender().getUsername(), NotificationUtils.NOTIFICATION_TYPE.MESSAGE);
+                showStatusNotification(senzService.getApplicationContext(), title, rahasa, senz.getSender().getUsername(), NotificationType.MESSAGE);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
