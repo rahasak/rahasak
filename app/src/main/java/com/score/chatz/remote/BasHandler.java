@@ -43,6 +43,7 @@ class BasHandler {
     void showPermissionNotification(Context context, User user, String permissionName, boolean isEnabled) {
 //        if (permissionName.equalsIgnoreCase("lat")) {
 //            if (isEnabled)
+//                SenzNotification senzNotification = new SenzNotification(R.drawable.rahaslogo, "@" + user.getUsername(), "you been granted location permission", user.getUsername(), NotificationType.PERMISSION);
 //                NotificationUtils.showNotification(context, "@" + user.getUsername(), "You been granted location permission!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
 //            else
 //                NotificationUtils.showNotification(context, "@" + user.getUsername(), "Your location privilege has been revoked!", user.getUsername(), NotificationUtils.NOTIFICATION_TYPE.PERMISSION);
