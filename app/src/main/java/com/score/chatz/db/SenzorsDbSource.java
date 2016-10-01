@@ -447,7 +447,7 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
-                "GROUP BY user ORDER BY timestamp";
+                "GROUP BY user ORDER BY timestamp DESC";
 
         Cursor cursor = db.rawQuery(query, null);
 
