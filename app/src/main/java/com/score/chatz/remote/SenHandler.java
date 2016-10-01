@@ -136,7 +136,7 @@ class SenHandler {
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getMessageNotification(senz.getSender().getUsername(), rahasa));
+                        NotificationUtils.getNewSecretNotification(senz.getSender().getUsername(), rahasa));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

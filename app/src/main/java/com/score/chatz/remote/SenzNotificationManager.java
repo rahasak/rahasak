@@ -42,7 +42,7 @@ class SenzNotificationManager {
 
         // set up pending intent
         Intent intent;
-        if (senzNotification.getNotificationType() == NotificationType.MESSAGE) {
+        if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
             intent = new Intent(context, ChatActivity.class);
             intent.putExtra("SENDER", senzNotification.getSender());
         } else {
@@ -60,7 +60,7 @@ class SenzNotificationManager {
                 .setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntent);
 
-        if (senzNotification.getNotificationType() != NotificationType.MESSAGE) {
+        if (senzNotification.getNotificationType() != NotificationType.NEW_SECRET) {
             builder.setVibrate(new long[]{1000, 1000});
         }
 
@@ -76,12 +76,12 @@ class SenzNotificationManager {
      * @param senzNotification
      */
     void showNotification(SenzNotification senzNotification) {
-        if (senzNotification.getNotificationType() == NotificationType.PERMISSION || senzNotification.getNotificationType() == NotificationType.NEW_USER) {
+        if (senzNotification.getNotificationType() == NotificationType.NEW_PERMISSION || senzNotification.getNotificationType() == NotificationType.NEW_USER) {
             Notification notification = getNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
-        } else if (senzNotification.getNotificationType() == NotificationType.MESSAGE) {
+        } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
             if (NotificationUtils.isBackgroundRunning(context) || !NotificationUtils.isAppInteractable(context) || NotificationUtils.isScreenLocked(context)) {
                 Notification notification = getNotification(senzNotification);
                 notification.flags |= Notification.FLAG_AUTO_CANCEL;

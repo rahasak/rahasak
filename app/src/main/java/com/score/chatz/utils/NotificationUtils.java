@@ -82,34 +82,34 @@ public class NotificationUtils {
         }
     }
 
+    public static SenzNotification getNewUserNotification(String user) {
+        String message = "You have been invited to share secrets.";
+        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.NEW_USER);
+    }
+
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         if (permissionName.equalsIgnoreCase("lat")) {
             if (isEnabled.equalsIgnoreCase("on"))
-                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted location permission", user, NotificationType.PERMISSION);
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted location permission", user, NotificationType.NEW_PERMISSION);
             else
-                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your location permission has been revoked", user, NotificationType.PERMISSION);
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your location permission has been revoked", user, NotificationType.NEW_PERMISSION);
         } else if (permissionName.equalsIgnoreCase("cam")) {
             if (isEnabled.equalsIgnoreCase("on"))
-                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted camera permission", user, NotificationType.PERMISSION);
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted camera permission", user, NotificationType.NEW_PERMISSION);
             else
-                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your camera permission has been revoked", user, NotificationType.PERMISSION);
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your camera permission has been revoked", user, NotificationType.NEW_PERMISSION);
         } else if (permissionName.equalsIgnoreCase("mic")) {
             if (isEnabled.equalsIgnoreCase("on"))
-                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted mic permission", user, NotificationType.PERMISSION);
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You been granted mic permission", user, NotificationType.NEW_PERMISSION);
             else
-                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your mic permission has been revoked", user, NotificationType.PERMISSION);
+                return new SenzNotification(R.drawable.rahaslogo, "@" + user, "Your mic permission has been revoked", user, NotificationType.NEW_PERMISSION);
         }
 
         return null;
     }
 
-    public static SenzNotification getMessageNotification(String user, String message) {
-        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.MESSAGE);
-    }
-
-    public static SenzNotification getNewUserNotification(String user) {
-        String message = "You have been invited to share secrets.";
-        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.NEW_USER);
+    public static SenzNotification getNewSecretNotification(String user, String message) {
+        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.NEW_SECRET);
     }
 
 }
