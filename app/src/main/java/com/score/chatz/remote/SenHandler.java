@@ -73,9 +73,8 @@ class SenHandler {
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
 
             // show notification to current user
-            String message = "You have been invited to share secrets.";
             SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                    NotificationUtils.getMessageNotification(senz.getSender().getUsername(), message));
+                    NotificationUtils.getNewUserNotification(senz.getSender().getUsername()));
 
             // broadcast
             broadcastSenz(senz, senzService.getApplicationContext());

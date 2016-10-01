@@ -107,4 +107,9 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.MESSAGE);
     }
 
+    public static SenzNotification getNewUserNotification(String user) {
+        String message = "You have been invited to share secrets.";
+        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.NEW_USER);
+    }
+
 }

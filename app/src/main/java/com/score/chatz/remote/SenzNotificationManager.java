@@ -76,12 +76,18 @@ class SenzNotificationManager {
      * @param senzNotification
      */
     void showNotification(SenzNotification senzNotification) {
-        // display notification
-        if (NotificationUtils.isBackgroundRunning(context) || !NotificationUtils.isAppInteractable(context) || NotificationUtils.isScreenLocked(context)) {
+        if (senzNotification.getNotificationType() == NotificationType.PERMISSION || senzNotification.getNotificationType() == NotificationType.NEW_USER) {
             Notification notification = getNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+        } else if (senzNotification.getNotificationType() == NotificationType.MESSAGE) {
+            if (NotificationUtils.isBackgroundRunning(context) || !NotificationUtils.isAppInteractable(context) || NotificationUtils.isScreenLocked(context)) {
+                Notification notification = getNotification(senzNotification);
+                notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+            }
         }
     }
 
