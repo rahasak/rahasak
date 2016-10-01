@@ -1,10 +1,12 @@
 package com.score.chatz.remote;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.ui.RecordingActivity;
@@ -13,12 +15,13 @@ import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 
-class SenHandler extends BasHandler {
+class SenHandler {
     private static final String TAG = SenHandler.class.getName();
 
     private static SenHandler instance;
@@ -72,7 +75,7 @@ class SenHandler extends BasHandler {
             // show notification to current user
             String message = "You have been invited to share secrets.";
             SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                    NotificationUtils.getMessageNotification(senz.getSender().getUserImage(), message));
+                    NotificationUtils.getMessageNotification(senz.getSender().getUsername(), message));
 
             // broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
@@ -82,15 +85,15 @@ class SenHandler extends BasHandler {
             if (senz.getAttributes().containsKey("cam")) {
                 dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("cam"), null, null);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUserImage(), "cam", senz.getAttributes().get("cam")));
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "cam", senz.getAttributes().get("cam")));
             } else if (senz.getAttributes().containsKey("mic")) {
                 dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("mic"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUserImage(), "mic", senz.getAttributes().get("mic")));
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "mic", senz.getAttributes().get("mic")));
             } else if (senz.getAttributes().containsKey("lat")) {
                 dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUserImage(), "lat", senz.getAttributes().get("lat")));
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "lat", senz.getAttributes().get("lat")));
             }
 
             // send status
@@ -134,7 +137,7 @@ class SenHandler extends BasHandler {
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getMessageNotification(senz.getSender().getUserImage(), rahasa));
+                        NotificationUtils.getMessageNotification(senz.getSender().getUsername(), rahasa));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -202,6 +205,28 @@ class SenHandler extends BasHandler {
         Intent intent = new Intent(senzService.getApplicationContext(), LocationService.class);
         intent.putExtra("SENZ", senz);
         senzService.getApplicationContext().startService(intent);
+    }
+
+
+    private void broadcastSenz(Senz senz, Context context) {
+        Intent intent = IntentProvider.getSenzIntent();
+        intent.putExtra("SENZ", senz);
+        context.sendBroadcast(intent);
+    }
+
+    private void saveSecret(String blob, String type, User user, final Context context) {
+        // create secret
+        final Secret secret = new Secret(blob, type, user, true);
+        secret.setID(SenzUtils.getUniqueRandomNumber());
+        secret.setTimeStamp(System.currentTimeMillis());
+
+        // save secret async
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new SenzorsDbSource(context).createSecret(secret);
+            }
+        }).start();
     }
 
 }
