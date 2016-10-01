@@ -30,8 +30,13 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
         AudioUtils.disableSpeaker(context);
 
         int bufferSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        AudioTrack rahasaTrack = new AudioTrack(AudioManager.STREAM_MUSIC, AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                bufferSize, AudioTrack.MODE_STREAM);
+        AudioTrack rahasaTrack = new AudioTrack(
+                AudioManager.STREAM_MUSIC,
+                AudioUtils.RECORDER_SAMPLE_RATE,
+                AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                bufferSize,
+                AudioTrack.MODE_STREAM);
 
         // play rahasa
         rahasaTrack.play();

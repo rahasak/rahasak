@@ -54,7 +54,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private static final int TIME_TO_SERVE_REQUEST = 30000;
 
-    private int mStartTime = 10;
+    private int mStartTime = 7;
     private CountDownTimer cancelTimer;
 
     private User sender;

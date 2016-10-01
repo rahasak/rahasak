@@ -13,8 +13,6 @@ import java.io.IOException;
  */
 public class AudioRecorder {
     private static final String TAG = AudioRecorder.class.getName();
-    private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
-    private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final int BufferElements2Rec = 1024;
     private static final int BytesPerElement = 2;
 
@@ -24,9 +22,12 @@ public class AudioRecorder {
     private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
     public void startRecording() {
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                AudioUtils.RECORDER_SAMPLE_RATE, RECORDER_CHANNELS,
-                RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
+        recorder = new AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                AudioUtils.RECORDER_SAMPLE_RATE,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                BufferElements2Rec * BytesPerElement);
         recorder.startRecording();
         isRecording = true;
 
@@ -70,6 +71,8 @@ public class AudioRecorder {
     }
 
     public ByteArrayOutputStream getRecording() {
+        Log.d(TAG, buffer.size() / 1024 + "lennnnn");
+        Log.d(TAG, buffer.toByteArray().length / 1024 + "lennnnn");
         return buffer;
     }
 
