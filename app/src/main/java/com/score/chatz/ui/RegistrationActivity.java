@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -92,8 +93,10 @@ public class RegistrationActivity extends BaseActivity {
     private void setupUI() {
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
         editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        editTextUserId.setTypeface(typeface, Typeface.NORMAL);
         welcomeTextView = (TextView) findViewById(R.id.welcome_text);
         welcomeTextView.setTypeface(typeface);
+        ((TextView)findViewById(R.id.welcome_message)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupRegisterBtn() {
