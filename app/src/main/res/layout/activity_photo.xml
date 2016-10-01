@@ -100,24 +100,21 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center"
         android:id="@+id/sender_info"
-        android:background="@color/translucent_black">
+        android:background="@color/translucent_black"
+        android:layout_centerVertical="false"
+        android:layout_height="80dp">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/rahaslogo"
-            android:layout_marginRight="10dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/photo_request"
-            android:text="Photo Request by : Eranga"
-            android:textColor="@color/white" />
+            android:text="Incomming selfie requesr from Eranga"
+            android:textColor="@color/white"
+            android:textSize="20dp"/>
     </LinearLayout>
 
     <TextView
@@ -126,7 +123,7 @@
         android:layout_height="wrap_content"
         android:text="3"
         android:textSize="120sp"
-        android:textColor="@color/android_green"
+        android:textColor="@color/colorPrimary"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="50dp" />

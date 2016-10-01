@@ -24,7 +24,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/white"
+            android:background="@drawable/light_bottom_border"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             app:popupTheme="@style/MyMaterialTheme" />
@@ -40,7 +40,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:padding="5dp">
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp">
 
                 <ListView
                     android:id="@+id/messages_list_view"
@@ -57,24 +58,23 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_weight="0"
-                android:background="#ecf0f1"
-                android:layout_height="105dp">
+                android:background="@drawable/light_top_border"
+                android:layout_height="85dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#ecf0f1"
+                    android:background="@color/white"
                     android:orientation="horizontal"
-                    android:paddingBottom="5dp"
                     android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:paddingTop="5dp">
+                    android:paddingRight="0dp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:layout_gravity="bottom">
 
                         <EditText
                             android:id="@+id/text_message"
@@ -87,26 +87,30 @@
                             android:inputType="textNoSuggestions"
                             android:textColor="@color/android_grey"
                             android:textColorHint="@color/clouds"
-                            android:layout_height="50dp" />
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
                             android:orientation="horizontal"
-                            android:padding="10dp">
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:padding="8dp"
+                            android:layout_gravity="bottom"
+                            android:gravity="bottom">
 
                             <FrameLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="#ecf0f1">
+                                android:layout_weight="1">
+
 
                                 <ImageButton
                                     android:id="@+id/getLocBtn"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_gravity="top"
                                     android:adjustViewBounds="true"
-                                    android:alpha="1"
                                     android:background="@color/transparent"
                                     android:scaleType="centerInside"
                                     android:src="@drawable/perm_locations_active" />
@@ -115,7 +119,8 @@
                             <FrameLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1">
+                                android:layout_weight="1"
+                                android:background="@drawable/left_border">
 
                                 <ImageButton
                                     android:id="@+id/getCamBtn"
@@ -131,7 +136,8 @@
                             <FrameLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1">
+                                android:layout_weight="1"
+                                android:background="@drawable/left_border">
 
 
                                 <ImageButton
@@ -151,21 +157,26 @@
 
                     </LinearLayout>
 
+                    <FrameLayout
+                        android:background="@drawable/left_border"
+                        android:layout_width="2dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_height="20dp">
+                    </FrameLayout>
+
                     <TextView
+                        android:layout_height="45dp"
                         android:textAlignment="center"
                         android:id="@+id/sendBtn"
                         android:layout_centerHorizontal="true"
                         android:layout_gravity="top|center_vertical"
                         android:adjustViewBounds="true"
-                        android:background="@drawable/left_border"
                         android:scaleType="fitCenter"
                         android:gravity="center"
                         android:textColor="@color/colorPrimary"
                         android:text="SEND"
-                        android:layout_width="60dp"
-                        android:layout_height="35dp"
                         android:baselineAlignBottom="true"
-                        android:layout_marginTop="10dp" />
+                        android:layout_width="50dp" />
 
                 </LinearLayout>
 

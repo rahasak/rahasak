@@ -35,6 +35,8 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private String imageData;
 
+    private Typeface typeface;
+
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
 
     // senz message
@@ -65,6 +67,11 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
         initUi();
         initIntent();
+        setUpFonts();
+    }
+
+    private void setUpFonts(){
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
     }
 
     private void initUi() {
@@ -152,7 +159,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         //set layout for dialog
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.information_message_dialog);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(true);
 
@@ -163,13 +170,12 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         messageTextView.setText(Html.fromHtml(message));
 
         // set custom font
-        messageHeaderTextView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf"));
-        messageTextView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf"));
+        messageHeaderTextView.setTypeface(typeface, Typeface.BOLD);
+        messageTextView.setTypeface(typeface);
 
         //set ok button
         Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf"));
-        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setTypeface(typeface, Typeface.BOLD);
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();

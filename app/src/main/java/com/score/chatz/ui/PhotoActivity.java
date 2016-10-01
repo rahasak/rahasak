@@ -2,6 +2,7 @@ package com.score.chatz.ui;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -136,6 +137,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request)).setText(getResources().getString(R.string.photo_request) + " @" + originalSenz.getSender().getUsername());
+        ((TextView) findViewById(R.id.photo_request)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     @Override

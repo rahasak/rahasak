@@ -2,89 +2,6 @@
 <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/white"
-    android:gravity="right"
-    android:orientation="horizontal">
-
-    <FrameLayout
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:background="@color/android_grey"></FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp">
-
-        <LinearLayout
-            android:id="@+id/message_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="5dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/not_my_image"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:adjustViewBounds="true"
-                    android:background="@drawable/image_border"
-                    android:cropToPadding="false"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/default_user" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/sender"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Lakmal Caldera"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold|italic" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/sent_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignLeft="@+id/sender"
-                        android:layout_alignParentBottom="false"
-                        android:layout_alignParentEnd="false"
-                        android:layout_below="@+id/sender"
-                        android:text="11:00 AM"
-                        android:textColor="@color/android_grey"
-                        android:textSize="9sp"
-                        android:textStyle="italic" />
-                </FrameLayout>
-            </LinearLayout>
-
-        </LinearLayout>
-    </FrameLayout>
-</LinearLayout>-->
-
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@color/white">
 
@@ -107,7 +24,6 @@
                 android:textSize="13dp"
                 android:layout_alignParentEnd="false"
                 android:layout_alignParentRight="false"
-                android:layout_alignParentStart="false"
                 android:gravity="right" />
             <TextView
                 android:layout_width="wrap_content"
@@ -179,4 +95,100 @@
             android:gravity="right" />
     </FrameLayout>
 
+</LinearLayout>-->
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:background="@color/white"
+android:orientation="vertical"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp">
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:orientation="horizontal"
+    android:layout_weight="1"
+    android:gravity="bottom"
+    android:layout_marginTop="20dp">
+
+
+    <FrameLayout
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_gravity="left"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:adjustViewBounds="true"
+            android:background="@drawable/image_border"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_user"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10dp"
+            android:layout_width="200dp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="wrap_content"></FrameLayout>
+
 </LinearLayout>
+
+
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:id="@+id/sent_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignLeft="@+id/sender"
+            android:layout_below="@+id/sender"
+            android:text="11:00 AM"
+            android:textColor="@color/android_grey"
+            android:textSize="12sp"
+            android:gravity="center_vertical" />
+
+        <ImageView
+            android:id="@+id/deleviered_message"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:padding="3dp"
+            android:src="@drawable/tick_enabled"
+            android:layout_margin="2dp" />
+
+        <ImageView
+            android:id="@+id/not_deleviered_message"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:padding="3dp"
+            android:src="@drawable/tick_disabled"
+            android:layout_margin="2dp" />
+
+    </LinearLayout>
+
+</FrameLayout>
+
+</LinearLayout>
+
+

@@ -27,6 +27,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.SenzUtils;
@@ -123,6 +124,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setupActionBar();
         initSecretList();
         updatePermissions();
+        setupUserImage();
     }
 
     @Override
@@ -215,6 +217,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         btnMic.setOnClickListener(this);
 
         listView = (ListView) findViewById(R.id.messages_list_view);
+        listView.setDivider(null);
+        listView.setDividerHeight(0);
     }
 
     private void initUser() {
@@ -238,9 +242,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         ((TextView) findViewById(R.id.user_name)).setText("@" + thisUser.getUsername());
 
         btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
-        btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_settings_btn);
+        btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_profile_image);
         btnBack.setOnClickListener(this);
         btnUserSetting.setOnClickListener(this);
+    }
+
+    private void setupUserImage(){
+        String userImage = new SenzorsDbSource(this).getImageFromDB(this.thisUser.getUsername());
+        if(userImage != null)
+        btnUserSetting.setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
     private void initSecretList() {

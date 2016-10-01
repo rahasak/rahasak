@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -40,8 +41,6 @@ public class HomeActivity extends AppCompatActivity {
     private ImageView tabOneDeActive;
     private ImageView tabTwoActive;
     private ImageView tabTwoDeActive;
-    //private TextView tabOneTextView;
-    //private TextView tabTwoTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +75,6 @@ public class HomeActivity extends AppCompatActivity {
         toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
         setSupportActionBar(toolbar);
     }
-
     private void setupActionBar() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.home_action_bar, null));

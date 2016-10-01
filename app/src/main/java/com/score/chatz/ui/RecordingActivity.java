@@ -3,6 +3,7 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Base64;
@@ -165,6 +166,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request)).setText(getResources().getString(R.string.sound_request) + " @" + sender.getUsername());
+        ((TextView) findViewById(R.id.photo_request)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     @Override
