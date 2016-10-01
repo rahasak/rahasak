@@ -76,6 +76,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
 
     protected void bindToService() {
         Intent intent = new Intent("com.score.chatz.remote.SenzService");
+        intent.setPackage(this.getPackageName());
         bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
