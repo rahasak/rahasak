@@ -6,165 +6,161 @@
     android:background="@color/android_grey">
 
     <TextView
+        android:id="@+id/timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="100sp"
+        android:layout_alignParentTop="false"
+        android:layout_centerInParent="true"
         android:text="0"
         android:textColor="@color/colorPrimary"
-        android:typeface="monospace"
+        android:textSize="100sp"
         android:textStyle="bold"
-        android:id="@+id/timer"
-        android:layout_alignParentTop="false"
-        android:layout_centerInParent="true" />
+        android:typeface="monospace" />
 
     <TextView
+        android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Share a secret under ten seconds."
-        android:id="@+id/textView9"
-        android:textColor="@color/colorPrimary"
-        android:gravity="center_horizontal"
-        android:layout_centerHorizontal="true"
         android:layout_above="@+id/timer"
-        android:layout_marginBottom="50dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:gravity="center_horizontal"
+        android:text="Share a secret under 7 seconds."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/colorPrimary" />
 
 
     <RelativeLayout
+        android:id="@+id/moving_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/moving_layout"
         android:background="@color/transparent">
 
 
-
         <com.github.siyamed.shapeimageview.CircularImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/fail"
             android:id="@+id/cancel"
-            app:siBorderWidth="0dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            app:siSquare="true"
-            app:siBorderAlpha = "0.0"
-            android:layout_centerInParent="true"
-            android:background="@drawable/vibrating_image"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="30dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignBaseline="@+id/go_ripple"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
             android:layout_marginBottom="60dp"
-            android:layout_alignBaseline="@+id/go_ripple" />
-
-
+            android:layout_marginLeft="30dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/vibrating_image"
+            android:cropToPadding="true"
+            android:src="@drawable/fail"
+            app:siBorderAlpha="0.0"
+            app:siBorderWidth="0dp"
+            app:siSquare="true" />
 
 
         <com.github.siyamed.shapeimageview.CircularImageView
+            android:id="@+id/start"
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
-            android:src="@drawable/success"
-            android:id="@+id/start"
-            app:siBorderWidth="0dp"
             android:layout_gravity="center"
+            android:layout_marginBottom="60dp"
+            android:layout_marginRight="30dp"
             android:adjustViewBounds="true"
+            android:background="@drawable/vibrating_image"
             android:cropToPadding="true"
-            app:siSquare="true"
-            app:siBorderAlpha = "0.0"
             android:foregroundGravity="center"
             android:scaleType="fitXY"
-            android:background="@drawable/vibrating_image"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="30dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="60dp" />
+            android:src="@drawable/success"
+            app:siBorderAlpha="0.0"
+            app:siBorderWidth="0dp"
+            app:siSquare="true" />
 
-        <com.skyfishjy.library.RippleBackground
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/go_ripple"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:id="@+id/go_ripple"
-            app:rb_color="#F5F5F5"
-            app:rb_radius="32dp"
-            app:rb_rippleAmount="2"
-            app:rb_duration="1000"
-            app:rb_scale="3"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="false"
             android:layout_alignParentLeft="false"
             android:layout_alignParentRight="false"
-            android:background="@color/transparent"
             android:layout_centerHorizontal="true"
+            android:background="@color/transparent"
             android:foregroundGravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:layout_alignParentBottom="true">
+            app:rb_color="#F5F5F5"
+            app:rb_duration="1000"
+            app:rb_radius="32dp"
+            app:rb_rippleAmount="2"
+            app:rb_scale="3">
+
             <com.github.siyamed.shapeimageview.CircularImageView
+                android:id="@+id/selector"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_centerInParent="true"
-                android:src="@drawable/microphone_picker"
-                android:id="@+id/selector"
-                app:siBorderWidth="0dp"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
-                android:cropToPadding="true"
-                app:siSquare="true"
-                app:siBorderAlpha = "0.0"
-                android:foregroundGravity="center"
                 android:background="@drawable/vibrating_image"
-                android:scaleType="centerInside" />
+                android:cropToPadding="true"
+                android:foregroundGravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/microphone_picker"
+                app:siBorderAlpha="0.0"
+                app:siBorderWidth="0dp"
+                app:siSquare="true" />
         </com.skyfishjy.library.RippleBackground>
-
-
 
 
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:background="@color/translucent_black"
+        android:layout_height="100dp"
         android:layout_centerVertical="false"
-        android:layout_height="100dp">
+        android:background="@color/translucent_black"
+        android:orientation="horizontal">
 
         <FrameLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"></FrameLayout>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"></FrameLayout>
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="20"
-            android:orientation="horizontal"
             android:id="@+id/sender_info"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
             android:layout_centerVertical="false"
-            android:layout_height="100dp">
+            android:layout_weight="20"
+            android:orientation="horizontal">
 
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
+                    android:id="@+id/photo_request_user_name"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:id="@+id/photo_request_user_name"
                     android:text="Eranga"
                     android:textColor="@color/white"
-                    android:textSize="50dp"/>
+                    android:textSize="50dp" />
 
                 <TextView
                     android:id="@+id/photo_request_header"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:text="Mic request"
                     android:textColor="@color/white"
-                    android:textSize="20dp"
-                    android:layout_marginLeft="15dp"/>
+                    android:textSize="20dp" />
 
             </LinearLayout>
 
@@ -174,21 +170,21 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_gravity="top|center"
+                android:layout_margin="15dp"
                 android:adjustViewBounds="true"
                 android:cropToPadding="true"
                 android:src="@drawable/default_user"
                 app:siBorderAlpha="0.0"
                 app:siBorderWidth="0dp"
-                app:siSquare="true"
-                android:layout_margin="15dp"/>
+                app:siSquare="true" />
 
 
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"></FrameLayout>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"></FrameLayout>
 
     </LinearLayout>
 
@@ -196,13 +192,13 @@
         android:id="@+id/done_btn"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:background="@color/colorPrimary"
         android:text="Done!"
-        android:textColor="@color/android_grey"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="80dp" />
+        android:textColor="@color/android_grey" />
 
 
 </RelativeLayout>

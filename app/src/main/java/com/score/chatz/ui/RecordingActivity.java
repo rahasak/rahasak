@@ -49,8 +49,6 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     private RippleBackground goRipple;
 
     private boolean isRecordingCancelled;
-    private static boolean isActivityActive;
-
     private boolean isRecordingDone;
     private boolean hasRecordingStarted;
 
@@ -82,28 +80,20 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         String senderString = intent.getStringExtra("SENDER");
         sender = new User("", senderString);
 
-        if (isAcitivityActive()) {
-            cancelTimerToServe();
-            sendBusySenz();
-            this.finish();
-        } else {
-            isActivityActive = true;
+        dbSource = new SenzorsDbSource(this);
+        audioRecorder = new AudioRecorder();
+        isRecordingDone = false;
 
-            dbSource = new SenzorsDbSource(this);
-            audioRecorder = new AudioRecorder();
-            isRecordingDone = false;
-
-            setupUi();
-            setupDontBtn();
-            setupSwipeBtns();
-            startBtnAnimations();
-            startVibrations();
-            setupHandlesForSwipeBtnContainers();
-            setupPhotoRequestTitle();
-            setupWakeLock();
-            startTimerToEndRequest();
-            setupUserImage();
-        }
+        setupUi();
+        setupDontBtn();
+        setupSwipeBtns();
+        startBtnAnimations();
+        startVibrations();
+        setupHandlesForSwipeBtnContainers();
+        setupPhotoRequestTitle();
+        setupWakeLock();
+        startTimerToEndRequest();
+        setupUserImage();
     }
 
     @Override
@@ -172,9 +162,9 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
-    private void setupUserImage(){
+    private void setupUserImage() {
         String userImage = new SenzorsDbSource(this).getImageFromDB(sender.getUsername());
-        if(userImage != null)
+        if (userImage != null)
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
@@ -327,10 +317,6 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         Secret secret = new Secret(sound, "SOUND", SecretsUtil.getTheUser(sender, receiver, getApplicationContext()), false);
         secret.setReceiver(sender);
         return secret;
-    }
-
-    public static boolean isAcitivityActive() {
-        return isActivityActive;
     }
 
     private void sendBusySenz() {
