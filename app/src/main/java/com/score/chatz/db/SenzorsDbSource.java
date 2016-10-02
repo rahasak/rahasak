@@ -702,16 +702,10 @@ public class SenzorsDbSource {
         //String sqlDelete = "delete from secret where uid in (select uid from secret where _id not in (select _id from secret where user = '" + username + "' order by _id DESC limit 1) and user = '" + username + "')";
 
         // TODO refactor/optimize this
-        String sqlDelete =
-                "delete from secret where " +
-                        "uid in " +
-                        "(select uid from secret where " +
-                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
-                        "user = '" + username + "' and " +
-                        "viewed = 1)";
-        //db.delete(SenzorsDbContract.Secret.TABLE_NAME, sqlDelete, null);
-        //db.rawQuery(sqlDelete, new String[]{});
-        db.execSQL(sqlDelete);
+        String sqlDelete = "uid in (select uid from secret where _id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and user = '" + username + "')";
+        db.delete(SenzorsDbContract.Secret.TABLE_NAME,
+                sqlDelete,
+                null);
     }
 
     public void deleteAllSecretsThatBelongToUser(User user) {

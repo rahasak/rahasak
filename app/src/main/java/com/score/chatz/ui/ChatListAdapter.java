@@ -62,10 +62,10 @@ class ChatListAdapter extends BaseAdapter {
         final Secret secret = (Secret) getItem(position);
 
         // mark secret viewed
-        if (!secret.isViewed()) {
-            secret.setViewed(true);
-            dbSource.markSecretViewed(secret.getId());
-        }
+//        if (!secret.isViewed()) {
+//            secret.setViewed(true);
+//            dbSource.markSecretViewed(secret.getId());
+//        }
 
         //if (view == null) {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
