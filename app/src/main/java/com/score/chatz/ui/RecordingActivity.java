@@ -1,11 +1,16 @@
 package com.score.chatz.ui;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -20,11 +25,15 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.ImageUtils;
+import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.SecretsUtil;
+import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
+import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -32,8 +41,9 @@ import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class RecordingActivity extends BaseActivity implements View.OnTouchListener {
+public class RecordingActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private static final String TAG = RecordingActivity.class.getName();
 
@@ -46,17 +56,61 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     private ImageView startBtn;
     private RippleBackground goRipple;
 
-    private CountDownTimer cancelTimer;
-    private CountDownTimer recordTimer;
-    private AudioRecorder audioRecorder;
-
     private Senz thisSenz;
     private SenzorsDbSource dbSource;
+    private AudioRecorder audioRecorder;
 
     private static final int TIME_TO_SERVE_REQUEST = 30000;
     private static final int START_TIME = 7;
 
     private float dX, dY, startX, startY;
+
+    protected Typeface typeface;
+
+    // service interface
+    protected ISenzService senzService = null;
+    protected boolean isServiceBound = false;
+
+    // service connection
+    protected ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(TAG, "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
+            isServiceBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d(TAG, "Disconnected from senz service");
+            senzService = null;
+            isServiceBound = false;
+        }
+    };
+
+
+    private CountDownTimer requestTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
+        @Override
+        public void onFinish() {
+            sendBusySenz();
+            RecordingActivity.this.finish();
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.i(TAG, "Time in count down -" + millisUntilFinished);
+
+        }
+    };
+
+    private CountDownTimer recordTimer = new CountDownTimer(START_TIME * 1000, 1000) {
+        public void onTick(long millisUntilFinished) {
+            updateQuickCountTimer((int) millisUntilFinished / 1000);
+        }
+
+        public void onFinish() {
+            stopRecording();
+        }
+    };
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,7 +163,14 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         clearFlags();
     }
 
+    protected void bindToService() {
+        Intent intent = new Intent("com.score.chatz.remote.SenzService");
+        intent.setPackage(this.getPackageName());
+        bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     private void setupUi() {
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
         this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
         this.mTimerTextView.setText(START_TIME + "");
         this.moving_layout = findViewById(R.id.moving_layout);
@@ -163,24 +224,12 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     }
 
     private void startTimerToEndRequest() {
-        cancelTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
-            @Override
-            public void onFinish() {
-                sendBusySenz();
-                RecordingActivity.this.finish();
-            }
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                Log.i(TAG, "Time in count down -" + millisUntilFinished);
-
-            }
-        }.start();
+        requestTimer.start();
     }
 
     private void cancelTimerToServe() {
-        if (cancelTimer != null)
-            cancelTimer.cancel();
+        if (requestTimer != null)
+            requestTimer.cancel();
     }
 
     private void setupSwipeBtns() {
@@ -253,15 +302,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private void startRecording() {
         audioRecorder.startRecording();
-        recordTimer = new CountDownTimer(START_TIME * 1000, 1000) {
-            public void onTick(long millisUntilFinished) {
-                updateQuickCountTimer((int) millisUntilFinished / 1000);
-            }
-
-            public void onFinish() {
-                stopRecording();
-            }
-        }.start();
+        recordTimer.start();
     }
 
     private void updateQuickCountTimer(final int count) {
@@ -274,6 +315,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     }
 
     private void stopRecording() {
+        Log.d(TAG, "Stop recording ---");
         // stops the recording activity
         audioRecorder.stopRecording();
         if (audioRecorder.getRecording() != null) {
@@ -382,6 +424,42 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
             result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
         return result;
     }
+
+    public void send(Senz senz) {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            try {
+                if (isServiceBound) {
+                    senzService.send(senz);
+                } else {
+                    Log.d(TAG, "send senz " + SenzParser.getSenzPayload(senz));
+                    ActivityUtils.showCustomToast("Failed to connected to service.", this);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ActivityUtils.showCustomToast("No network connection available.", this);
+        }
+    }
+
+    public void sendInOrder(List<Senz> senzList) {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            try {
+                if (isServiceBound) {
+                    senzService.sendInOrder(senzList);
+                } else {
+                    Log.d(TAG, "send senzlist " + senzList.size());
+                    ActivityUtils.showCustomToast("Failed to connected to service.", this);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ActivityUtils.showCustomToast("No network connection available.", this);
+        }
+    }
+
+
 }
 
 
