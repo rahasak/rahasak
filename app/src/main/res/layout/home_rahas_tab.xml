@@ -35,6 +35,7 @@
             android:layout_height="40dp"
             android:padding="8dp"
             android:src="@drawable/love_speech"/>
+
         <ImageView
             android:id="@+id/tabOneDeActive"
             android:layout_width="40dp"

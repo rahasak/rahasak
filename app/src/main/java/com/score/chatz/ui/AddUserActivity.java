@@ -174,7 +174,7 @@ public class AddUserActivity extends BaseActivity {
         User registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font size=10>Are you sure you want to share secrets with </font> <font color=#f47644>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font size=10>Are you sure you want to share secrets with </font> <font color=#F88F8C>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -262,7 +262,7 @@ public class AddUserActivity extends BaseActivity {
                 onPostShare(senz);
             } else {
                 String user = editTextUserId.getText().toString().trim();
-                String message = "<font size=10>Seems we couldn't connect you with </font> <font color=#f47644>" + "<b>" + user + "</b>" + "</font>";
+                String message = "<font size=10>Seems we couldn't connect you with </font> <font color=#F88F8C>" + "<b>" + user + "</b>" + "</font>";
                 displayInformationMessageDialog("Fail", message);
             }
         }
