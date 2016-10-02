@@ -60,7 +60,7 @@
                         android:layout_marginBottom="10dp"
                         android:text="Lakmal"
                         android:textColor="@color/black"
-                        android:textSize="14sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/sent_time"
@@ -73,7 +73,7 @@
                         android:layout_marginRight="5dp"
                         android:text="11:00 AM"
                         android:textColor="@color/android_grey"
-                        android:textSize="9sp"
+                        android:textSize="12sp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="false" />
 
@@ -88,7 +88,7 @@
                         android:ellipsize="end"
                         android:singleLine="true"
                         android:text="Secret"
-                        android:textSize="13sp" />
+                        android:textSize="18sp" />
 
 
                 </RelativeLayout>
@@ -97,7 +97,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@drawable/bottom_border"></FrameLayout>
-
             </LinearLayout>
         </FrameLayout>
 

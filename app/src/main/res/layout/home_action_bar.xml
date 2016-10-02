@@ -6,33 +6,34 @@
 
 
     <ImageView
-        android:layout_height="wrap_content"
         android:layout_width="35dp"
-        android:src="@drawable/rahaslogo"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="15dp"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="5dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/rahaslogo" />
 
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginTop="7dp"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="15dp"
-        android:layout_alignParentRight="true">
+        android:layout_marginTop="7dp">
 
         <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lakmal"
-        android:id="@+id/user_name"
-        android:textColor="@color/colorPrimary"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textSize="20dp" />
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="Lakmal"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </RelativeLayout>
 
 

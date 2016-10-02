@@ -66,6 +66,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
 
+    private Typeface typeface;
+
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -198,13 +200,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initUi() {
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
+
         // init
         txtSecret = (EditText) findViewById(R.id.text_message);
-        txtSecret.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf"), Typeface.NORMAL);
+        txtSecret.setTypeface(typeface, Typeface.NORMAL);
         txtSecret.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
 
         btnSend = (TextView) findViewById(R.id.sendBtn);
-        btnSend.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf"), Typeface.BOLD);
+        btnSend.setTypeface(typeface, Typeface.BOLD);
 
         btnLocation = (ImageButton) findViewById(R.id.getLocBtn);
         btnPhoto = (ImageButton) findViewById(R.id.getCamBtn);
@@ -239,7 +243,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-        ((TextView) findViewById(R.id.user_name)).setText("@" + thisUser.getUsername());
+        TextView header = ((TextView) findViewById(R.id.user_name));
+        header.setTypeface(typeface, Typeface.BOLD);
+        header.setText("@" + thisUser.getUsername());
 
         btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
         btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_profile_image);

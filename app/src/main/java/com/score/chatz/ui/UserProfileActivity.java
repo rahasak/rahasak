@@ -224,7 +224,7 @@ public class UserProfileActivity extends BaseActivity {
      * Get photo of user
      */
     private void getProfilePhoto() {
-        ActivityUtils.showProgressDialog(this, "Please wait");
+        ActivityUtils.showProgressDialog(this, "Calling selfie...");
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -309,7 +309,7 @@ public class UserProfileActivity extends BaseActivity {
 
         currentSenz = senz;
 
-        ActivityUtils.showProgressDialog(this, "Selfie calling...");
+        ActivityUtils.showProgressDialog(this, "Please wait...");
         send(senz);
     }
 

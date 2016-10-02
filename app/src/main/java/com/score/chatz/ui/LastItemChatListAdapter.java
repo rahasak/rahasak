@@ -12,10 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.pojo.Secret;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.pojos.User;
@@ -36,7 +36,6 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
     static final int IMAGE_MESSAGE = 1;
     static final int SOUND_MESSAGE = 2;
     static User currentUser;
-    private LayoutInflater mInflater;
     private Typeface typeface;
 
     public LastItemChatListAdapter(Context _context, ArrayList<Secret> secretList) {
@@ -48,7 +47,6 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
         } catch (NoUserException e) {
             e.printStackTrace();
         }
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
@@ -60,8 +58,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
 
     @Override
     public int getItemViewType(int position) {
-        Secret secret = (Secret) getItem(position);
-        //if(((Secret)getItem(position)).getImage() != null){
+        Secret secret = getItem(position);
         if (((Secret) getItem(position)).getType().equalsIgnoreCase("IMAGE")) {
             return IMAGE_MESSAGE;
         } else if (((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
@@ -70,7 +67,6 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
             return TEXT_MESSAGE;
         }
     }
-
 
     /**
      * Create list row viewv
@@ -82,80 +78,52 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
      */
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        // A ViewHolder keeps references to children views to avoid unnecessary calls
-        // to findViewById() on each row.
         final ViewHolder holder;
-        final Secret secret = (Secret) getItem(i);
-        int type = getItemViewType(i);
-        //Log.i("SECRETS" ,"Secret : Text - " + secret.getText() + ", Sender - " + secret.getSender().getUsername() + ", Receiver - " + secret.getReceiver().getUsername());
-        if (view == null || (view != null && ((ViewHolder) view.getTag()).messageType != type)) {
-            //inflate sensor list row layout
-            //create view holder to store reference to child views
+        final Secret secret = getItem(i);
+
+        if (view == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = layoutInflater.inflate(R.layout.rahas_row_layout, viewGroup, false);
+
             holder = new ViewHolder();
-            switch (type) {
-                case IMAGE_MESSAGE:
-                    view = mInflater.inflate(R.layout.rahas_image_row_layout, viewGroup, false);
-                    holder.image = (ImageView) view.findViewById(R.id.image);
-                    holder.sender = (TextView) view.findViewById(R.id.sender);
-                    holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-                    holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
-                    holder.messageType = IMAGE_MESSAGE;
-                    break;
-                case TEXT_MESSAGE:
-                    view = mInflater.inflate(R.layout.rahas_row_layout, viewGroup, false);
-                    holder.message = (TextView) view.findViewById(R.id.message);
-                    holder.sender = (TextView) view.findViewById(R.id.sender);
-                    holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-                    holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
-                    holder.messageType = TEXT_MESSAGE;
-                    break;
-                case SOUND_MESSAGE:
-                    view = mInflater.inflate(R.layout.rahas_sound_row_layout, viewGroup, false);
-                    holder.sender = (TextView) view.findViewById(R.id.sender);
-                    holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-                    holder.messageType = SOUND_MESSAGE;
-                    break;
-            }
+            holder.message = (TextView) view.findViewById(R.id.message);
+            holder.sender = (TextView) view.findViewById(R.id.sender);
+            holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
+            holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
+
+            holder.sender.setTypeface(typeface, Typeface.NORMAL);
+            holder.message.setTypeface(typeface, Typeface.NORMAL);
+            holder.sentTime.setTypeface(typeface, Typeface.NORMAL);
+
             view.setTag(holder);
         } else {
-            //get view holder back_icon
             holder = (ViewHolder) view.getTag();
         }
-        holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-        setUpRow(i, secret, view, holder);
+
+        setUpRow(secret, holder);
         return view;
     }
 
-    private void setUpRow(int i, Secret secret, View view, ViewHolder viewHolder) {
-        // enable share and change color of view
-        if (viewHolder.messageType == TEXT_MESSAGE) {
-            viewHolder.message.setText(secret.getBlob());
-            viewHolder.message.setTypeface(typeface, Typeface.NORMAL);
-        } else if (viewHolder.messageType == SOUND_MESSAGE) {
-            //Nothing to do here!!
+    private void setUpRow(Secret secret, ViewHolder viewHolder) {
+        viewHolder.sender.setText("@" + secret.getUser().getUsername());
+
+        if (secret.getType().equalsIgnoreCase("IMAGE")) {
+            viewHolder.message.setText("Selfie secret");
+        } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
+            viewHolder.message.setText("Audio secret");
         } else {
-            if (secret.getBlob() != null) {
-                loadBitmap(secret.getBlob(), viewHolder.image);
-            }
+            viewHolder.message.setText(secret.getBlob());
         }
 
         if (secret.getTimeStamp() != null) {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
-            viewHolder.sentTime.setTypeface(typeface, Typeface.NORMAL);
         }
 
-
-        User selectedUser = secret.getUser();
-
-        viewHolder.sender.setText("@" + selectedUser.getUsername());
-        viewHolder.sender.setTypeface(typeface, Typeface.NORMAL);
-        //Extracting user image
-        if (selectedUser.getUserImage() != null) {
-            loadBitmap(selectedUser.getUserImage(), viewHolder.userImage);
+        if (secret.getUser().getUserImage() != null) {
+            loadBitmap(secret.getUser().getUserImage(), viewHolder.userImage);
         }
-
     }
 
     private void loadBitmap(String data, ImageView imageView) {
@@ -169,13 +137,10 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
     /**
      * Keep reference to children view to avoid unnecessary calls
      */
-    static class ViewHolder {
+    private static class ViewHolder {
         TextView message;
         TextView sender;
         TextView sentTime;
-        Integer messageType;
-        ImageView image;
         com.github.siyamed.shapeimageview.RoundedImageView userImage;
-
     }
 }

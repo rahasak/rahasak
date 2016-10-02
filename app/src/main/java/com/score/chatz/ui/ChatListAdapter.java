@@ -62,7 +62,7 @@ class ChatListAdapter extends BaseAdapter {
         final Secret secret = (Secret) getItem(position);
 
         // mark secret viewed
-        if (secret.isViewed()) {
+        if (!secret.isViewed()) {
             secret.setViewed(true);
             dbSource.markSecretViewed(secret.getId());
         }
