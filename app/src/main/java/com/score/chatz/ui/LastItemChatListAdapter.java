@@ -7,18 +7,15 @@ import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.TimeUtils;
-import com.score.senzc.pojos.User;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -27,45 +24,33 @@ import java.util.Date;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
+public class LastItemChatListAdapter extends BaseAdapter {
 
     private static final String TAG = ChatFragmentListAdapter.class.getName();
-    Context context;
-    ArrayList<Secret> userSecretList;
-    static final int TEXT_MESSAGE = 0;
-    static final int IMAGE_MESSAGE = 1;
-    static final int SOUND_MESSAGE = 2;
-    static User currentUser;
+    private Context context;
+    private ArrayList<Secret> userSecretList;
     private Typeface typeface;
 
     public LastItemChatListAdapter(Context _context, ArrayList<Secret> secretList) {
-        super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
-        context = _context;
-        userSecretList = secretList;
-        try {
-            currentUser = PreferenceUtils.getUser(getContext());
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
+        this.context = _context;
+        this.userSecretList = secretList;
 
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
     @Override
-    public int getViewTypeCount() {
-        return 3;
+    public int getCount() {
+        return userSecretList.size();
     }
 
     @Override
-    public int getItemViewType(int position) {
-        Secret secret = getItem(position);
-        if (((Secret) getItem(position)).getType().equalsIgnoreCase("IMAGE")) {
-            return IMAGE_MESSAGE;
-        } else if (((Secret) getItem(position)).getType().equalsIgnoreCase("SOUND")) {
-            return SOUND_MESSAGE;
-        } else {
-            return TEXT_MESSAGE;
-        }
+    public Object getItem(int position) {
+        return userSecretList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     /**
@@ -79,7 +64,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         final ViewHolder holder;
-        final Secret secret = getItem(i);
+        final Secret secret = (Secret) getItem(i);
 
         if (view == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
