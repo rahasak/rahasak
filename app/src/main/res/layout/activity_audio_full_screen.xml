@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:background="@color/android_grey">
+    android:background="@color/black">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <TextView
-        android:id="@+id/playingText"
+        android:id="@+id/mic_playingText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Playing secret..."
-        android:textColor="@color/android_green"
+        android:textColor="@color/colorPrimary"
         android:textSize="25sp"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true" />
 
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/loading_text">
@@ -46,6 +50,90 @@
 
         </LinearLayout>
 
+    </RelativeLayout>-->
+
     </RelativeLayout>
+
+
+    <LinearLayout
+        android:id="@+id/mic_loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+
+                <com.github.siyamed.shapeimageview.RoundedImageView
+                    android:id="@+id/user_profile_image"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
+                    android:src="@drawable/rahaslogo"
+                    app:siBorderAlpha="0.0"
+                    app:siBorderWidth="0dp"
+                    app:siRadius="8dp"
+                    android:padding="10dp"
+                    app:siSquare="true" />
+
+                <LinearLayout
+                    android:id="@+id/loading_info_box"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:visibility="gone"
+                        android:indeterminate="true">
+                    </ProgressBar>
+
+                    <TextView
+                        android:id="@+id/mic_calling_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Secret calling..."
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="25sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/mic_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:gravity="center"
+                    android:text="Eranga"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="35sp" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

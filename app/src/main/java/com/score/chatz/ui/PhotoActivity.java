@@ -128,6 +128,8 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         quickCountdownText.setVisibility(View.INVISIBLE);
         callingUserInfo = findViewById(R.id.sender_info);
         buttonControls = findViewById(R.id.moving_layout);
+
+        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void hideUiControls() {
@@ -138,7 +140,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
         ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + originalSenz.getSender().getUsername());
-        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupUserImage() {

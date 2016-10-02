@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
@@ -30,11 +31,11 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private static final String TAG = PhotoFullScreenActivity.class.getName();
 
+    private View loadingView;
+    private TextView selfieCallingText;
+    private TextView usernameText;
     private ImageView imageView;
-    private View loadingText;
-
     private String imageData;
-
     private Typeface typeface;
 
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
@@ -65,9 +66,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_full_screen);
 
+        setUpFonts();
         initUi();
         initIntent();
-        setUpFonts();
     }
 
     private void setUpFonts(){
@@ -76,24 +77,38 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private void initUi() {
         imageView = (ImageView) findViewById(R.id.imageView);
-        loadingText = findViewById(R.id.loading_text);
+        loadingView = findViewById(R.id.selfie_loading_view);
+        selfieCallingText = (TextView) findViewById(R.id.selfie_calling_text);
+        usernameText = (TextView) findViewById(R.id.selfie_username);
+
+        selfieCallingText.setTypeface(typeface, Typeface.NORMAL);
+        usernameText.setTypeface(typeface, Typeface.BOLD);
     }
 
     private void initIntent() {
         Intent intent = getIntent();
         if (intent.hasExtra("IMAGE")) {
-            loadingText.setVisibility(View.INVISIBLE);
+            loadingView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
             imageData = intent.getStringExtra("IMAGE");
             imageView.setImageBitmap(new ImageUtils().decodeBitmap(imageData));
         } else {
-            loadingText.setVisibility(View.VISIBLE);
+            loadingView.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
+            setupUserImage(intent.getStringExtra("SENDER"));
         }
 
         if (intent.hasExtra("QUICK_PREVIEW")) {
             startCloseViewTimer();
         }
+    }
+
+    private void setupUserImage(String sender) {
+        String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
+        if (userImage != null)
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+
+        usernameText.setText("@" + sender);
     }
 
     @Override
@@ -145,7 +160,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private void onSenzStreamReceived(Senz senz) {
         if (senz.getAttributes().containsKey("cam")) {
             // display stream
-            loadingText.setVisibility(View.INVISIBLE);
+            loadingView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
             //imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(senz.getAttributes().get("cam").getBytes()));
             imageView.setImageBitmap(new ImageUtils().decodeBitmap(senz.getAttributes().get("cam")));

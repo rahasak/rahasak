@@ -14,20 +14,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.RahasPlayer;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.interfaces.IRahasPlayListener;
+import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
 public class AudioFullScreenActivity extends AppCompatActivity implements IRahasPlayListener {
 
     private static final String TAG = AudioFullScreenActivity.class.getName();
 
-    private View playingText;
-    private View loadingText;
+    private View loadingView;
+
+    private TextView playingText;
+    private TextView usernameText;
+    private TextView micCallingText;
 
     private Typeface typeface;
 
@@ -55,7 +61,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     private void onSenzStreamReceived(Senz senz) {
         if (senz.getAttributes().containsKey("mic")) {
             // display stream
-            loadingText.setVisibility(View.INVISIBLE);
+            loadingView.setVisibility(View.INVISIBLE);
             playingText.setVisibility(View.VISIBLE);
             new RahasPlayer(Base64.decode(senz.getAttributes().get("mic"), 0), getApplicationContext(), this).execute("Rahsa");
         }
@@ -78,9 +84,9 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_full_screen);
 
+        setUpFonts();
         setupUi();
         initIntent();
-        setUpFonts();
     }
 
     private void setUpFonts() {
@@ -88,8 +94,15 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     }
 
     private void setupUi() {
-        playingText = findViewById(R.id.playingText);
-        loadingText = findViewById(R.id.loading_text);
+        loadingView = findViewById(R.id.mic_loading_view);
+
+        playingText = (TextView) findViewById(R.id.mic_playingText);
+        usernameText = (TextView) findViewById(R.id.mic_username);
+        micCallingText = (TextView) findViewById(R.id.mic_calling_text);
+
+        usernameText.setTypeface(typeface, Typeface.BOLD);
+        micCallingText.setTypeface(typeface, Typeface.NORMAL);
+        playingText.setTypeface(typeface, Typeface.NORMAL);
     }
 
     @Override
@@ -107,13 +120,22 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     private void initIntent() {
         Intent intent = getIntent();
         if (intent.hasExtra("SOUND")) {
-            loadingText.setVisibility(View.INVISIBLE);
+            loadingView.setVisibility(View.INVISIBLE);
             playingText.setVisibility(View.VISIBLE);
             new RahasPlayer(Base64.decode(intent.getStringExtra("SOUND"), 0), getApplicationContext(), this).execute("Rahsa");
         } else {
-            loadingText.setVisibility(View.VISIBLE);
+            loadingView.setVisibility(View.VISIBLE);
             playingText.setVisibility(View.INVISIBLE);
+            setupUserImage(intent.getStringExtra("SENDER"));
         }
+    }
+
+    private void setupUserImage(String sender) {
+        String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
+        if (userImage != null)
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+
+        usernameText.setText("@" + sender);
     }
 
     public void displayInformationMessageDialog(String title, String message) {

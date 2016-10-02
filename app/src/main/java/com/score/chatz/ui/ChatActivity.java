@@ -278,11 +278,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void navigateToPhotoWait() {
         Intent intent = new Intent(this, PhotoFullScreenActivity.class);
+        intent.putExtra("SENDER", thisUser.getUsername());
         startActivity(intent);
     }
 
     private void navigateMicWait() {
         Intent intent = new Intent(this, AudioFullScreenActivity.class);
+        intent.putExtra("SENDER", thisUser.getUsername());
         startActivity(intent);
     }
 

@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:background="@color/black">
+    android:background="@color/black"
+    android:gravity="center">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:src="@drawable/default_user"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/default_user" />
 
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/loading_text">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:id="@+id/loading_info_box">
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -39,12 +40,87 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Selfie calling..."
-            android:textColor="@color/white"
+            android:textColor="@color/colorPrimary"
             android:textSize="25sp"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"
+            android:id="@+id/selfie_calling_text"/>
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </RelativeLayout>-->
+
+    <LinearLayout
+        android:id="@+id/selfie_loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+
+                <com.github.siyamed.shapeimageview.CircularImageView
+                    android:id="@+id/user_profile_image"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
+                    android:src="@drawable/rahaslogo"
+                    app:siBorderAlpha="0.0"
+                    android:padding="10dp"
+                    app:siSquare="true" />
+
+                <LinearLayout
+                    android:id="@+id/loading_info_box"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:indeterminate="true"></ProgressBar>
+
+                    <TextView
+                        android:id="@+id/selfie_calling_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Selfie calling..."
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="25sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/selfie_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Eranga"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="35sp" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

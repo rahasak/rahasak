@@ -101,7 +101,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="horizontal"
-        android:background="@color/translucent_black"
+        android:background="@color/transparent"
         android:layout_centerVertical="false"
         android:layout_height="100dp">
 
@@ -130,7 +130,7 @@
             android:layout_weight="1"
             android:id="@+id/photo_request_user_name"
             android:text="Eranga"
-            android:textColor="@color/white"
+            android:textColor="@color/colorPrimary"
             android:textSize="50dp"/>
 
             <TextView
@@ -139,7 +139,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:text="Selfie request"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20dp"
                 android:layout_marginLeft="15dp"/>
 
