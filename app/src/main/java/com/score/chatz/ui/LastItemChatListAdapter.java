@@ -94,9 +94,9 @@ public class LastItemChatListAdapter extends BaseAdapter {
 
         if (secret.getType().equalsIgnoreCase("IMAGE")) {
             viewHolder.message.setText("Selfie secret");
-        } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
+        } else if (secret.getType().equalsIgnoreCase("SOUND")) {
             viewHolder.message.setText("Audio secret");
-        } else {
+        } else if (secret.getType().equalsIgnoreCase("TEXT")) {
             viewHolder.message.setText(secret.getBlob());
         }
 

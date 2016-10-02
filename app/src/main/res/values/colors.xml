@@ -25,6 +25,7 @@
     <color name="transparent">#00000000</color>
     <color name="tab_highlight">#FFF</color>
     <color name="black">#000</color>
+    <color name="gray_back">#e5e5e5</color>
 
     <color name="colorPrimary">#F88F8C</color>
     <color name="colorPrimaryLight">#FCD6C7</color>
