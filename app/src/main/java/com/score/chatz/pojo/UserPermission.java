@@ -11,6 +11,7 @@ public class UserPermission {
     private boolean locationPermission;
     private boolean micPermission;
 
+
     public UserPermission(User user, boolean cameraPermission, boolean locationPermission,  boolean micPermission) {
         this.user = user;
         this.cameraPermission = cameraPermission;

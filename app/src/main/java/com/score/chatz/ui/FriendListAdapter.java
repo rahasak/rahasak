@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 
+import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.score.chatz.R;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.pojo.BitmapTaskParams;
@@ -56,7 +57,7 @@ import java.util.ArrayList;
 
                 //create view holder to store reference to child views
                 holder = new ViewHolder();
-                holder.userImageView = (CircularImageView) view.findViewById(R.id.user_image);
+                holder.userImageView = (RoundedImageView) view.findViewById(R.id.user_image);
                 holder.usernameView = (TextView) view.findViewById(R.id.user_name);
                 holder.userLocationPermView = (ImageView) view.findViewById(R.id.perm_locations);
                 holder.userCameraPermView = (ImageView) view.findViewById(R.id.perm_camera);
@@ -116,7 +117,7 @@ import java.util.ArrayList;
          * Keep reference to children view to avoid unnecessary calls
          */
         static class ViewHolder {
-            CircularImageView userImageView;
+            RoundedImageView userImageView;
             TextView usernameView;
             ImageView userCameraPermView;
             ImageView userLocationPermView;

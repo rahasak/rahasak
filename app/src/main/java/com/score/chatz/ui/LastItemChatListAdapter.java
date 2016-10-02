@@ -94,7 +94,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
                     holder.image = (ImageView) view.findViewById(R.id.image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-                    holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
+                    holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
                     holder.messageType = IMAGE_MESSAGE;
                     break;
                 case TEXT_MESSAGE:
@@ -102,7 +102,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
                     holder.message = (TextView) view.findViewById(R.id.message);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-                    holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
+                    holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
                     holder.messageType = TEXT_MESSAGE;
                     break;
                 case SOUND_MESSAGE:
@@ -133,7 +133,6 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
                 loadBitmap(secret.getBlob(), viewHolder.image);
             }
         }
-
 
         if (secret.getTimeStamp() != null) {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
@@ -169,7 +168,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
         TextView sentTime;
         Integer messageType;
         ImageView image;
-        com.github.siyamed.shapeimageview.CircularImageView userImage;
+        com.github.siyamed.shapeimageview.RoundedImageView userImage;
 
     }
 }

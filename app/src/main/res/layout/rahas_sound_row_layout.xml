@@ -16,15 +16,16 @@
             android:layout_height="match_parent"
             android:padding="10dp">
 
-            <com.github.siyamed.shapeimageview.CircularImageView
+            <com.github.siyamed.shapeimageview.RoundedImageView
                 android:id="@+id/user_image"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="54dp"
+                android:layout_height ="54dp"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:cropToPadding="true"
                 android:src="@drawable/default_user"
                 app:siBorderAlpha="0.0"
+                app:siRadius="8dp"
                 app:siBorderWidth="0dp"
                 app:siSquare="true" />
 

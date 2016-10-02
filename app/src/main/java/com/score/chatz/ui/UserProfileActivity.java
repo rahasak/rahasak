@@ -35,11 +35,10 @@ import java.util.HashMap;
 public class UserProfileActivity extends BaseActivity {
     private static final String TAG = UserProfileActivity.class.getName();
 
-    private TextView username;
     private Switch cameraSwitch;
     private Switch locationSwitch;
     private Switch micSwitch;
-    private ImageView userImage;
+    private ImageView userImageView;
 
     private User thisUser;
     private UserPermission configurablePermission;
@@ -126,8 +125,7 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     private void initUi() {
-        username = (TextView) findViewById(R.id.user_name);
-        userImage = (ImageView) findViewById(R.id.clickable_image);
+        userImageView = (ImageView) findViewById(R.id.clickable_image);
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
         micSwitch = (Switch) findViewById(R.id.perm_mic_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
@@ -145,11 +143,10 @@ public class UserProfileActivity extends BaseActivity {
 
     private void initPermissions() {
         configurablePermission = dbSource.getUserConfigPermission(thisUser);
-        //username.setText(configurablePermission.getUser().getUsername());
 
-        if (configurablePermission.getUser().getUserImage() != null) {
-            loadBitmap(dbSource.getImageFromDB(thisUser.getUsername()), userImage);
-        }
+        String userImage = new SenzorsDbSource(this).getImageFromDB(this.thisUser.getUsername());
+        if (userImage != null)
+            userImageView.setImageBitmap(new ImageUtils().decodeBitmap(userImage));
 
         cameraSwitch.setChecked(configurablePermission.getCamPerm());
         micSwitch.setChecked(configurablePermission.getMicPerm());
@@ -338,7 +335,7 @@ public class UserProfileActivity extends BaseActivity {
             dbSource.insertImageToDB(thisUser.getUsername(), encodedImage);
 
             // display image
-            userImage.setImageBitmap(new ImageUtils().decodeBitmap(encodedImage));
+            userImageView.setImageBitmap(new ImageUtils().decodeBitmap(encodedImage));
         }
     }
 
