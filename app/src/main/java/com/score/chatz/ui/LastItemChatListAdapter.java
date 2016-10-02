@@ -1,6 +1,7 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -36,6 +37,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
     static final int SOUND_MESSAGE = 2;
     static User currentUser;
     private LayoutInflater mInflater;
+    private Typeface typeface;
 
     public LastItemChatListAdapter(Context _context, ArrayList<Secret> secretList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, secretList);
@@ -47,6 +49,8 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
             e.printStackTrace();
         }
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
     @Override
@@ -126,6 +130,7 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
         // enable share and change color of view
         if (viewHolder.messageType == TEXT_MESSAGE) {
             viewHolder.message.setText(secret.getBlob());
+            viewHolder.message.setTypeface(typeface, Typeface.NORMAL);
         } else if (viewHolder.messageType == SOUND_MESSAGE) {
             //Nothing to do here!!
         } else {
@@ -138,12 +143,14 @@ public class LastItemChatListAdapter extends ArrayAdapter<Secret> {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
+            viewHolder.sentTime.setTypeface(typeface, Typeface.NORMAL);
         }
 
 
         User selectedUser = secret.getUser();
 
         viewHolder.sender.setText("@" + selectedUser.getUsername());
+        viewHolder.sender.setTypeface(typeface, Typeface.NORMAL);
         //Extracting user image
         if (selectedUser.getUserImage() != null) {
             loadBitmap(selectedUser.getUserImage(), viewHolder.userImage);

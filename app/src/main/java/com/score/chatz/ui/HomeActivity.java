@@ -1,6 +1,7 @@
 package com.score.chatz.ui;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -59,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
             User user = PreferenceUtils.getUser(this);
             Log.i(TAG, "Registered User on Home page - " + user.getUsername());
             ((TextView) getSupportActionBar().getCustomView().findViewById(R.id.user_name)).setText("@" + user.getUsername());
+            ((TextView) getSupportActionBar().getCustomView().findViewById(R.id.user_name)).setTypeface( Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf"));
         } catch (NoUserException ex) {
             Log.d(TAG, "No Registered User");
         }

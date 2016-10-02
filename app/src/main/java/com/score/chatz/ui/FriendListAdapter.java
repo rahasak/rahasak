@@ -1,6 +1,7 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.content.res.ResourcesCompat;
@@ -24,12 +25,15 @@ import java.util.ArrayList;
  */
 class FriendListAdapter extends ArrayAdapter<UserPermission> {
     Context context;
+    private Typeface typeface;
+
     ArrayList<UserPermission> userPermissionList;
 
     public FriendListAdapter(Context _context, ArrayList<UserPermission> userPermsList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, userPermsList);
         context = _context;
         userPermissionList = userPermsList;
+        typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
 
@@ -76,6 +80,7 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
     private void setUpRow(int i, UserPermission userPerm, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         viewHolder.usernameView.setText("@" + userPerm.getUser().getUsername());
+        viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
 
         if (userPerm.getCamPerm() == true) {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
