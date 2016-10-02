@@ -104,16 +104,15 @@
 
             <ImageView
                 android:layout_height="wrap_content"
+                android:layout_width="150dp"
                 android:id="@+id/image"
                 android:src="@drawable/default_user"
                 android:scaleType="fitCenter"
                 android:background="@drawable/image_border"
                 android:adjustViewBounds="true"
                 android:layout_marginRight="10dp"
-                android:layout_width="200dp"
                 android:gravity="right"
-                android:layout_gravity="right"
-                android:minWidth="200dp"/>
+                android:layout_gravity="right" />
 
     </LinearLayout>
 

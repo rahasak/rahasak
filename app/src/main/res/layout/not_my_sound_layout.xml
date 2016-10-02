@@ -126,9 +126,9 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/play_recording"
                 android:padding="10dp"
-                android:layout_alignParentRight="true"
                 android:layout_gravity="left"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginLeft="10dp"
+                android:layout_alignParentRight="true" />
 
 
 
