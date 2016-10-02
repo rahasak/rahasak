@@ -19,11 +19,9 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.ImageUtils;
-import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
@@ -48,21 +46,15 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
     private ImageView startBtn;
     private RippleBackground goRipple;
 
-    private boolean isRecordingCancelled;
-    private boolean isRecordingDone;
-    private boolean hasRecordingStarted;
+    private CountDownTimer cancelTimer;
+    private CountDownTimer recordTimer;
+    private AudioRecorder audioRecorder;
+
+    private Senz thisSenz;
+    private SenzorsDbSource dbSource;
 
     private static final int TIME_TO_SERVE_REQUEST = 30000;
-
-    private int mStartTime = 7;
-    private CountDownTimer cancelTimer;
-
-    private User sender;
-    private User receiver;
-
-    SenzorsDbSource dbSource;
-
-    AudioRecorder audioRecorder;
+    private static final int START_TIME = 7;
 
     private float dX, dY, startX, startY;
 
@@ -72,17 +64,9 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         setContentView(R.layout.activity_recording);
 
         Intent intent = getIntent();
-        try {
-            receiver = PreferenceUtils.getUser(getApplicationContext());
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
-        String senderString = intent.getStringExtra("SENDER");
-        sender = new User("", senderString);
-
+        thisSenz = intent.getParcelableExtra("Senz");
         dbSource = new SenzorsDbSource(this);
         audioRecorder = new AudioRecorder();
-        isRecordingDone = false;
 
         setupUi();
         setupDontBtn();
@@ -127,7 +111,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private void setupUi() {
         this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
-        this.mTimerTextView.setText(mStartTime + "");
+        this.mTimerTextView.setText(START_TIME + "");
         this.moving_layout = findViewById(R.id.moving_layout);
     }
 
@@ -151,6 +135,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         doneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                recordTimer.cancel();
                 stopRecording();
             }
         });
@@ -158,12 +143,12 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
-        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + sender.getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + thisSenz.getSender().getUsername());
         ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupUserImage() {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(sender.getUsername());
+        String userImage = new SenzorsDbSource(this).getImageFromDB(thisSenz.getSender().getUsername());
         if (userImage != null)
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
@@ -232,7 +217,6 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
                 dY = v.getY() - event.getRawY();
 
                 break;
-
             case (MotionEvent.ACTION_MOVE):
                 v.animate()
                         .x(event.getRawX() + dX)
@@ -241,23 +225,17 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
                         .start();
                 if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside start button region
-                    if (hasRecordingStarted == false) {
-                        hasRecordingStarted = true;
-                        stopVibrations();
-                        cancelTimerToServe();
-                        startRecording();
-                        moving_layout.setVisibility(View.INVISIBLE);
-                        doneBtn.setVisibility(View.VISIBLE);
-                    }
+                    stopVibrations();
+                    cancelTimerToServe();
+                    startRecording();
+                    moving_layout.setVisibility(View.INVISIBLE);
+                    doneBtn.setVisibility(View.VISIBLE);
                 } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside cancel button region
-                    if (!isRecordingCancelled) {
-                        isRecordingCancelled = true;
-                        cancelTimerToServe();
-                        sendBusySenz();
-                        stopVibrations();
-                        //stopRecording();
-                    }
+                    stopVibrations();
+                    cancelTimerToServe();
+                    sendBusySenz();
+                    this.finish();
                 }
                 break;
             case (MotionEvent.ACTION_UP):
@@ -275,9 +253,9 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private void startRecording() {
         audioRecorder.startRecording();
-        new CountDownTimer(mStartTime * 1000, 1000) {
+        recordTimer = new CountDownTimer(START_TIME * 1000, 1000) {
             public void onTick(long millisUntilFinished) {
-                updateQuickCountTimer(--mStartTime);
+                updateQuickCountTimer((int) millisUntilFinished / 1000);
             }
 
             public void onFinish() {
@@ -297,20 +275,18 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
 
     private void stopRecording() {
         // stops the recording activity
-        if (!isRecordingDone) {
-            isRecordingDone = true;
-            audioRecorder.stopRecording();
-            if (audioRecorder.getRecording() != null) {
-                Secret secret = getSoundSecret(sender, receiver, Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
-                Long _timeStamp = System.currentTimeMillis();
-                secret.setTimeStamp(_timeStamp);
-                String uid = SenzUtils.getUniqueRandomNumber();
-                secret.setId(uid);
-                dbSource.createSecret(secret);
-                sendSound(secret, this, uid);
-            }
+        audioRecorder.stopRecording();
+        if (audioRecorder.getRecording() != null) {
+            Secret secret = getSoundSecret(thisSenz.getSender(), thisSenz.getReceiver(), Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
+            Long _timeStamp = System.currentTimeMillis();
+            secret.setTimeStamp(_timeStamp);
+            String uid = SenzUtils.getUniqueRandomNumber();
+            secret.setId(uid);
+            dbSource.createSecret(secret);
+            sendSound(secret, this, uid);
+
+            this.finish();
         }
-        this.finish();
     }
 
     private Secret getSoundSecret(User sender, User receiver, String sound) {
@@ -329,7 +305,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, receiver, sender, senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, thisSenz.getReceiver(), thisSenz.getSender(), senzAttributes);
         send(_senz);
     }
 

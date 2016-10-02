@@ -63,12 +63,12 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
 
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
-            if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("901")) {
                 // user busy
                 displayInformationMessageDialog("info", "user busy");
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("902")) {
                 // camera error
-                displayInformationMessageDialog("error", "cam error");
+                displayInformationMessageDialog("error", "mic error");
             }
         }
     }
@@ -83,7 +83,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         setUpFonts();
     }
 
-    private void setUpFonts(){
+    private void setUpFonts() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
     }
 

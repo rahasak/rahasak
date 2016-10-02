@@ -23,6 +23,7 @@ import com.score.chatz.R;
 import com.score.chatz.interfaces.ISendingComHandler;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.SenzParser;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 
@@ -179,6 +180,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
                 if (isServiceBound) {
                     senzService.send(senz);
                 } else {
+                    Log.d(TAG, "send senz " + SenzParser.getSenzPayload(senz));
                     ActivityUtils.showCustomToast("Failed to connected to service.", this);
                 }
             } catch (RemoteException e) {
@@ -195,6 +197,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
                 if (isServiceBound) {
                     senzService.sendInOrder(senzList);
                 } else {
+                    Log.d(TAG, "send senzlist " + senzList.size());
                     ActivityUtils.showCustomToast("Failed to connected to service.", this);
                 }
             } catch (RemoteException e) {

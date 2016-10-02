@@ -31,7 +31,6 @@ class ChatListAdapter extends BaseAdapter {
 
     private Typeface typeface;
 
-
     ChatListAdapter(Context context, List<Secret> secretList) {
         this.context = context;
         this.secretList = secretList;

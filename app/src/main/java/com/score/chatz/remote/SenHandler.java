@@ -193,11 +193,11 @@ class SenHandler {
     }
 
     private void handleMic(Senz senz, SenzService senzService) {
-        Intent openRecordingActivity = new Intent();
-        openRecordingActivity.setClass(senzService.getApplicationContext(), RecordingActivity.class);
-        openRecordingActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        openRecordingActivity.putExtra("SENDER", senz.getSender().getUsername());
-        senzService.getApplicationContext().startActivity(openRecordingActivity);
+        Intent intent = new Intent();
+        intent.setClass(senzService.getApplicationContext(), RecordingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("Senz", senz);
+        senzService.getApplicationContext().startActivity(intent);
     }
 
     private void handleLocation(Senz senz, SenzService senzService) {
