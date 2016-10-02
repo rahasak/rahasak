@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.TimeUtils;
@@ -26,11 +27,16 @@ class ChatListAdapter extends BaseAdapter {
 
     private Context context;
     private List<Secret> secretList;
-    Typeface typeface;
+    private SenzorsDbSource dbSource;
+
+    private Typeface typeface;
+
 
     ChatListAdapter(Context context, List<Secret> secretList) {
         this.context = context;
         this.secretList = secretList;
+        this.dbSource = new SenzorsDbSource(context);
+
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
@@ -55,6 +61,12 @@ class ChatListAdapter extends BaseAdapter {
         // to findViewById() on each row
         final ViewHolder holder;
         final Secret secret = (Secret) getItem(position);
+
+        // mark secret viewed
+        if (secret.isViewed()) {
+            secret.setViewed(true);
+            dbSource.markSecretViewed(secret.getId());
+        }
 
         //if (view == null) {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -146,11 +158,11 @@ class ChatListAdapter extends BaseAdapter {
                 holder.status.setText("Sending...");
             }*/
         } else {
-           // holder.status.setVisibility(View.INVISIBLE);
-            if(holder.messageDeliveredIcon != null)
-            holder.messageDeliveredIcon.setVisibility(View.GONE);
-            if(holder.messageDeliveryPendingIcon != null)
-            holder.messageDeliveryPendingIcon.setVisibility(View.GONE);
+            // holder.status.setVisibility(View.INVISIBLE);
+            if (holder.messageDeliveredIcon != null)
+                holder.messageDeliveredIcon.setVisibility(View.GONE);
+            if (holder.messageDeliveryPendingIcon != null)
+                holder.messageDeliveryPendingIcon.setVisibility(View.GONE);
         }
 
         // set sent time

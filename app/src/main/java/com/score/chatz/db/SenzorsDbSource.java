@@ -230,23 +230,16 @@ public class SenzorsDbSource {
      */
     public void markSecretViewed(String uid) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        try {
-            db.beginTransaction();
 
-            // content values to inset
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 1);
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 1);
 
-            // update
-            db.update(SenzorsDbContract.Secret.TABLE_NAME,
-                    values,
-                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
-                    new String[]{uid});
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        // update
+        db.update(SenzorsDbContract.Secret.TABLE_NAME,
+                values,
+                SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
+                new String[]{uid});
     }
 
     /**
@@ -709,14 +702,14 @@ public class SenzorsDbSource {
         //String sqlDelete = "delete from secret where uid in (select uid from secret where _id not in (select _id from secret where user = '" + username + "' order by _id DESC limit 1) and user = '" + username + "')";
 
         // TODO refactor/optimize this
-        String sqlDelete = "" +
-                "uid in " +
-                "   (select uid from secret where " +
-                "       _id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
-                "       user = '" + username + "')";
-        db.delete(SenzorsDbContract.Secret.TABLE_NAME,
-                sqlDelete,
-                null);
+        String sqlDelete =
+                "delete from secret where " +
+                        "uid in " +
+                        "(select uid from secret where " +
+                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
+                        "user = '" + username + "')";
+        //db.delete(SenzorsDbContract.Secret.TABLE_NAME, sqlDelete, null);
+        db.rawQuery(sqlDelete, new String[]{});
     }
 
     public void deleteAllSecretsThatBelongToUser(User user) {

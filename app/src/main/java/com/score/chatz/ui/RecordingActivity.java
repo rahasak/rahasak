@@ -256,7 +256,7 @@ public class RecordingActivity extends BaseActivity implements View.OnTouchListe
                         cancelTimerToServe();
                         sendBusySenz();
                         stopVibrations();
-                        stopRecording();
+                        //stopRecording();
                     }
                 }
                 break;
