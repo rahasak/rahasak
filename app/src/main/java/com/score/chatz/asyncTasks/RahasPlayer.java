@@ -26,17 +26,17 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        // first disable speaker
-        AudioUtils.disableSpeaker(context);
-
         int bufferSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
         AudioTrack rahasaTrack = new AudioTrack(
-                AudioManager.STREAM_MUSIC,
+                AudioManager.STREAM_VOICE_CALL,
                 AudioUtils.RECORDER_SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 bufferSize,
                 AudioTrack.MODE_STREAM);
+
+        // play via earpiece
+        enableEarpiece();
 
         // play rahasa
         rahasaTrack.play();
@@ -50,6 +50,12 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         listener.onFinishPlay();
+    }
+
+    private void enableEarpiece() {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.STREAM_VOICE_CALL);
+        audioManager.setSpeakerphoneOn(false);
     }
 }
 

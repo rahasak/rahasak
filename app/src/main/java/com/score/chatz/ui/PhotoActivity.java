@@ -6,7 +6,6 @@ import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -142,9 +141,9 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
-    private void setupUserImage(){
+    private void setupUserImage() {
         String userImage = new SenzorsDbSource(this).getImageFromDB(originalSenz.getSender().getUsername());
-        if(userImage != null)
+        if (userImage != null)
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
