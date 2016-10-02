@@ -26,7 +26,7 @@
     <color name="tab_highlight">#FFF</color>
     <color name="black">#000</color>
 
-    <color name="colorPrimary">#f47644</color>
+    <color name="colorPrimary">#F88F8C</color>
     <color name="colorPrimaryLight">#FCD6C7</color>
     <color name="colorPrimaryDark">#125688</color>
     <color name="colorAccent">#c8e8ff</color>
@@ -37,5 +37,5 @@
     <color name="translucent_red">#F2FF6666</color>
 
     <color name="my_chat_message">@color/colorPrimary</color>
-    <color name="not_my_chat_message">#C0C0C0</color>
+    <color name="not_my_chat_message">#75CADC</color>
 </resources>

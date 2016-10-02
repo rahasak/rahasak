@@ -268,21 +268,13 @@ public class UserProfileActivity extends BaseActivity {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("@" + thisUser.getUsername());
-        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
-        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
-
-
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         View header = getLayoutInflater().inflate(R.layout.profile_header, null);
         toolbar.setContentInsetsAbsolute(0, 0);
         toolbar.addView(header);
-
-        ((NestedScrollView)findViewById(R.id.nested_scroll)).setScrollY(100);
-
-
-        /*Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_user);
-        expandToolbar(bm);*/
     }
 
     private void setupBackBtn() {
