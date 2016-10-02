@@ -247,10 +247,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         btnUserSetting.setOnClickListener(this);
     }
 
-    private void setupUserImage(){
+    private void setupUserImage() {
         String userImage = new SenzorsDbSource(this).getImageFromDB(this.thisUser.getUsername());
-        if(userImage != null)
-        btnUserSetting.setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+        if (userImage != null)
+            btnUserSetting.setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
     private void initSecretList() {

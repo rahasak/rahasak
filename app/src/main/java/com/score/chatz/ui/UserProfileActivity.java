@@ -3,22 +3,15 @@ package com.score.chatz.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +23,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -45,16 +39,12 @@ public class UserProfileActivity extends BaseActivity {
     private Switch cameraSwitch;
     private Switch locationSwitch;
     private Switch micSwitch;
-    private TextView tapImageText;
     private ImageView userImage;
 
     private User thisUser;
     private UserPermission configurablePermission;
-    private UserPermission thisUserGivenPermission;
 
     private Senz currentSenz;
-    private String currentPermission;
-    private String currentPermissionValue;
 
     SenzorsDbSource dbSource;
 
@@ -84,7 +74,16 @@ public class UserProfileActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            handleSenz(senz);
+            switch (senz.getSenzType()) {
+                case DATA:
+                    handleDataSenz(senz);
+                    break;
+                case STREAM:
+                    handleStreamSenz(senz);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -146,8 +145,6 @@ public class UserProfileActivity extends BaseActivity {
 
     private void initPermissions() {
         configurablePermission = dbSource.getUserConfigPermission(thisUser);
-        thisUserGivenPermission = dbSource.getUserAndPermission(thisUser);
-
         //username.setText(configurablePermission.getUser().getUsername());
 
         if (configurablePermission.getUser().getUserImage() != null) {
@@ -216,32 +213,33 @@ public class UserProfileActivity extends BaseActivity {
         if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
-
     private void setupGetProfileImageBtn() {
-        /*tapImageText = (TextView) findViewById(R.id.tap_image_text);
-        ImageView imgBtn = (ImageView) findViewById(R.id.clickable_image);
+        ImageView imgBtn = (ImageView) findViewById(R.id.profile_camera_icon);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getPhoto(configurablePermission.getUser());
+                getProfilePhoto();
             }
-        });*/
+        });
     }
 
     /*
      * Get photo of user
      */
-    private void getPhoto(User receiver) {
+    private void getProfilePhoto() {
+        ActivityUtils.showProgressDialog(this, "Please wait");
+
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("profilezphoto", "profilezphoto");
+        senzAttributes.put("cam", "");
+        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.GET;
-        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
 
         send(senz);
     }
@@ -313,14 +311,12 @@ public class UserProfileActivity extends BaseActivity {
         Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
 
         currentSenz = senz;
-        currentPermission = permName;
-        currentPermissionValue = permValue;
 
-        ActivityUtils.showProgressDialog(this, "Please wait...");
+        ActivityUtils.showProgressDialog(this, "Selfie calling...");
         send(senz);
     }
 
-    private void handleSenz(Senz senz) {
+    private void handleDataSenz(Senz senz) {
         ActivityUtils.cancelProgressDialog();
         if (senz.getAttributes().containsKey("status")) {
             // status response received
@@ -330,6 +326,19 @@ public class UserProfileActivity extends BaseActivity {
                     updatePermission(currentSenz);
                 }
             }
+        }
+    }
+
+    private void handleStreamSenz(Senz senz) {
+        if (senz.getAttributes().containsKey("cam")) {
+            ActivityUtils.cancelProgressDialog();
+
+            // save profile picture in db
+            String encodedImage = senz.getAttributes().get("cam");
+            dbSource.insertImageToDB(thisUser.getUsername(), encodedImage);
+
+            // display image
+            userImage.setImageBitmap(new ImageUtils().decodeBitmap(encodedImage));
         }
     }
 
