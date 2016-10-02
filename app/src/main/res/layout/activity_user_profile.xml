@@ -186,28 +186,31 @@
     android:layout_height="match_parent"
     android:background="@color/pressed_sensor">
 
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:fitsSystemWindows="true"
-        android:theme="@style/MyMaterialTheme"
-        android:background="@color/pressed_sensor">
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@color/pressed_sensor"
+        app:expanded="false">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="@color/translucent_black"
-            app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:expandedTitleMarginStart="48dp"
+            app:expandedTitleMarginEnd="64dp"
+            app:contentScrim="@color/translucent_black">
 
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center"
                 android:fitsSystemWindows="true"
-                android:scaleType="center"
                 android:src="@drawable/default_user"
                 app:layout_collapseMode="parallax"
                 android:id="@+id/clickable_image"/>
@@ -226,12 +229,20 @@
             </LinearLayout>
 
 
-            <android.support.v7.widget.Toolbar
+            <!--<android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/transparent"
                 android:title="Collapsing Toolbar"
+                app:layout_collapseMode="pin" />-->
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/transparent"
+                android:title="CollapsingToolbar"
                 app:layout_collapseMode="pin" />
 
 
@@ -243,13 +254,12 @@
             android:id="@+id/nested_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:background="@color/white">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:background="@drawable/image_border">
+                android:layout_height="match_parent">
 
         <!--<TextView
             android:id="@+id/tap_image_text"
@@ -260,28 +270,34 @@
             android:textColor="@color/android_grey"
             android:textSize="12sp" />-->
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"></FrameLayout>
+
         <LinearLayout
-            android:layout_width="280dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="20"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"
             android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/perms_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Permissions:"/>
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                android:layout_marginBottom="15dp"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:background="@drawable/light_bottom_border">
 
                 <ImageView
                     android:id="@+id/perm_locations"
@@ -303,7 +319,7 @@
                     android:layout_weight="3"
                     android:text="@string/perm_location"
                     android:textColor="@color/android_grey"
-                    android:textSize="13dp" />
+                    android:textSize="20dp" />
 
                 <Switch
                     android:id="@+id/perm_location_switch"
@@ -319,8 +335,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                android:layout_marginBottom="15dp"
+                android:paddingBottom="20dp"
+                android:background="@drawable/light_bottom_border">
 
                 <ImageView
                     android:id="@+id/perm_camera"
@@ -342,7 +361,7 @@
                     android:layout_weight="3"
                     android:text="@string/perm_camera"
                     android:textColor="@color/android_grey"
-                    android:textSize="13dp" />
+                    android:textSize="20dp" />
 
                 <Switch
                     android:id="@+id/perm_camera_switch"
@@ -356,8 +375,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                android:layout_marginBottom="15dp"
+                android:paddingBottom="20dp"
+                android:background="@drawable/light_bottom_border">
 
                 <ImageView
                     android:id="@+id/perm_mic"
@@ -379,7 +401,7 @@
                     android:layout_weight="3"
                     android:text="@string/perm_mic"
                     android:textColor="@color/android_grey"
-                    android:textSize="13dp" />
+                    android:textSize="20dp" />
 
                 <Switch
                     android:id="@+id/perm_mic_switch"
@@ -390,6 +412,13 @@
                     android:layout_weight="26" />
             </LinearLayout>
         </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"></FrameLayout>
+
+                </LinearLayout>
 
             </FrameLayout>
 

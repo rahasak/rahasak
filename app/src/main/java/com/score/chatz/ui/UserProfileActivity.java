@@ -133,7 +133,6 @@ public class UserProfileActivity extends BaseActivity {
         micSwitch = (Switch) findViewById(R.id.perm_mic_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
-        ((TextView) findViewById(R.id.perms_text)).setTypeface(typeface);
         ((TextView) findViewById(R.id.perm_loc_text)).setTypeface(typeface);
         ((TextView) findViewById(R.id.perm_cam_text)).setTypeface(typeface);
         ((TextView) findViewById(R.id.perm_mic_text)).setTypeface(typeface);
@@ -257,10 +256,10 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     private void setupActionBar() {
-        /*getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        getSupportActionBar().setTitle("@" + thisUser.getUsername());
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        //getSupportActionBar().setTitle("@" + thisUser.getUsername());
+        //getSupportActionBar().setHomeButtonEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().hide();
 
     }
@@ -269,16 +268,18 @@ public class UserProfileActivity extends BaseActivity {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("@" + thisUser.getUsername());
-        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
-        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
 
-        collapsingToolbar.setExpandedTitleTypeface(typeface);
-        collapsingToolbar.setCollapsedTitleTypeface(typeface);
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         View header = getLayoutInflater().inflate(R.layout.profile_header, null);
         toolbar.setContentInsetsAbsolute(0, 0);
         toolbar.addView(header);
+
+        ((NestedScrollView)findViewById(R.id.nested_scroll)).setScrollY(100);
+
 
         /*Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_user);
         expandToolbar(bm);*/
