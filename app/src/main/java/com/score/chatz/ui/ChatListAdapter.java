@@ -7,7 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -56,153 +59,205 @@ class ChatListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        // A ViewHolder keeps references to children views to avoid unnecessary calls
-        // to findViewById() on each row
         final ViewHolder holder;
         final Secret secret = (Secret) getItem(position);
 
-        // mark secret viewed
-//        if (!secret.isViewed()) {
-//            secret.setViewed(true);
-//            dbSource.markSecretViewed(secret.getId());
-//        }
+        if (view == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = layoutInflater.inflate(R.layout.chat_view_row_layout, parent, false);
 
-        //if (view == null) {
-        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = getInflateLayout(layoutInflater, parent, secret);
+            holder = new ViewHolder();
 
-        holder = new ViewHolder();
-        setupView(view, holder, secret);
-        view.setTag(holder);
+            holder.imageLayout = (RelativeLayout) view.findViewById(R.id.chat_image);
+            holder.soundLayout = (RelativeLayout) view.findViewById(R.id.chat_sound);
+            holder.messageLayout = (LinearLayout) view.findViewById(R.id.chat_message);
+            holder.myStatusLayout = (FrameLayout) view.findViewById(R.id.my_status);
+            holder.friendStatusLayout = (FrameLayout) view.findViewById(R.id.friend_status);
 
-        //} else {
-        //    // get view holder back
-        //    holder = (ViewHolder) view.getTag();
-        //}
+            holder.myImageView = (ImageView) view.findViewById(R.id.my_image);
+            holder.friendImageView = (ImageView) view.findViewById(R.id.friend_image);
 
-        // bind view holder content
-        setupHolder(holder, secret);
+            holder.mySoundView = (ImageView) view.findViewById(R.id.my_sound);
+            holder.friendSoundView = (ImageView) view.findViewById(R.id.friend_sound);
 
+            holder.myMessageView = (TextView) view.findViewById(R.id.my_message);
+            holder.friendMessageView = (TextView) view.findViewById(R.id.friend_message);
+
+            holder.mySentTimeView = (TextView) view.findViewById(R.id.my_sent_time);
+            holder.friendSentTimeView = (TextView) view.findViewById(R.id.friend_sent_time);
+
+            holder.mySentIconView = (ImageView) view.findViewById(R.id.my_delivered_message);
+            holder.friendSentIconView = (ImageView) view.findViewById(R.id.friend_delivered_message);
+
+            holder.myPendingIconView = (ImageView) view.findViewById(R.id.my_not_delivered_message);
+            holder.friendPendingIconView = (ImageView) view.findViewById(R.id.friend_not_delivered_message);
+
+            // set fonts
+            holder.myMessageView.setTypeface(typeface, Typeface.BOLD);
+            holder.friendMessageView.setTypeface(typeface, Typeface.BOLD);
+            holder.mySentTimeView.setTypeface(typeface);
+            holder.friendSentTimeView.setTypeface(typeface);
+
+            view.setTag(holder);
+        } else {
+            holder = (ViewHolder) view.getTag();
+        }
+
+        setupRow(secret, holder);
         return view;
+    }
+
+    private void setupRow(final Secret secret, ViewHolder holder) {
+        if (secret.getType().equalsIgnoreCase("TEXT")) {
+            holder.imageLayout.setVisibility(View.GONE);
+            holder.soundLayout.setVisibility(View.GONE);
+            holder.messageLayout.setVisibility(View.VISIBLE);
+            if (secret.isSender()) {
+                // TODO
+                holder.friendStatusLayout.setVisibility(View.VISIBLE);
+                holder.myStatusLayout.setVisibility(View.GONE);
+
+                holder.myMessageView.setVisibility(View.GONE);
+                holder.friendMessageView.setVisibility(View.VISIBLE);
+                holder.friendMessageView.setText(secret.getBlob());
+            } else {
+                // TODO
+                holder.friendStatusLayout.setVisibility(View.GONE);
+                holder.myStatusLayout.setVisibility(View.VISIBLE);
+
+                holder.friendMessageView.setVisibility(View.GONE);
+                holder.myMessageView.setVisibility(View.VISIBLE);
+                holder.myMessageView.setText(secret.getBlob());
+            }
+        } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
+            holder.soundLayout.setVisibility(View.GONE);
+            holder.messageLayout.setVisibility(View.GONE);
+            holder.imageLayout.setVisibility(View.VISIBLE);
+
+            // TODO
+            holder.friendStatusLayout.setVisibility(View.GONE);
+            holder.myStatusLayout.setVisibility(View.GONE);
+            if (secret.isSender()) {
+                holder.myImageView.setVisibility(View.GONE);
+                holder.friendImageView.setVisibility(View.VISIBLE);
+                new BitmapWorkerTask(holder.friendImageView).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
+            } else {
+                holder.myImageView.setVisibility(View.VISIBLE);
+                holder.friendImageView.setVisibility(View.GONE);
+                new BitmapWorkerTask(holder.myImageView).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
+            }
+        } else if (secret.getType().equalsIgnoreCase("SOUND")) {
+            // TODO
+            holder.friendStatusLayout.setVisibility(View.GONE);
+            holder.myStatusLayout.setVisibility(View.GONE);
+
+            holder.messageLayout.setVisibility(View.GONE);
+            holder.imageLayout.setVisibility(View.GONE);
+            holder.soundLayout.setVisibility(View.VISIBLE);
+            if (secret.isSender()) {
+                holder.mySoundView.setVisibility(View.GONE);
+                holder.friendSoundView.setVisibility(View.VISIBLE);
+            } else {
+                holder.mySoundView.setVisibility(View.VISIBLE);
+                holder.friendSoundView.setVisibility(View.GONE);
+            }
+        }
+
+        // set status and time
+        if (secret.isSender()) {
+            holder.myStatusLayout.setVisibility(View.GONE);
+            holder.friendStatusLayout.setVisibility(View.VISIBLE);
+            holder.friendSentIconView.setVisibility(View.GONE);
+            holder.friendPendingIconView.setVisibility(View.GONE);
+
+            if (secret.getTimeStamp() != null) {
+                java.sql.Timestamp timestamp = new java.sql.Timestamp(secret.getTimeStamp());
+                Date date = new Date(timestamp.getTime());
+                holder.friendSentTimeView.setText(TimeUtils.getTimeInWords(date));
+            }
+        } else {
+            holder.myStatusLayout.setVisibility(View.VISIBLE);
+            holder.friendStatusLayout.setVisibility(View.GONE);
+            if (secret.isDelivered()) {
+                holder.mySentIconView.setVisibility(View.VISIBLE);
+                holder.myPendingIconView.setVisibility(View.GONE);
+            } else {
+                holder.mySentIconView.setVisibility(View.GONE);
+                holder.myPendingIconView.setVisibility(View.VISIBLE);
+            }
+
+            if (secret.getTimeStamp() != null) {
+                java.sql.Timestamp timestamp = new java.sql.Timestamp(secret.getTimeStamp());
+                Date date = new Date(timestamp.getTime());
+                holder.mySentTimeView.setText(TimeUtils.getTimeInWords(date));
+            }
+        }
+
+        // set click listeners
+        holder.friendImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, PhotoFullScreenActivity.class);
+                intent.putExtra("IMAGE", secret.getBlob());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.myImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, PhotoFullScreenActivity.class);
+                intent.putExtra("IMAGE", secret.getBlob());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.friendSoundView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AudioFullScreenActivity.class);
+                intent.putExtra("SOUND", secret.getBlob());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.mySoundView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AudioFullScreenActivity.class);
+                intent.putExtra("SOUND", secret.getBlob());
+                context.startActivity(intent);
+            }
+        });
     }
 
     /**
      * Keep reference to children view to avoid unnecessary calls
      */
     private static class ViewHolder {
-        TextView status;
-        TextView sentTime;
-        ImageView messageDeliveredIcon;
-        ImageView messageDeliveryPendingIcon;
-        ImageView image;
-        TextView message;
-    }
+        RelativeLayout imageLayout;
+        RelativeLayout soundLayout;
+        LinearLayout messageLayout;
+        FrameLayout myStatusLayout;
+        FrameLayout friendStatusLayout;
 
-    private View getInflateLayout(LayoutInflater layoutInflater, ViewGroup parent, Secret secret) {
-        if (secret.isSender()) {
-            // send from user
-            if (secret.getType().equalsIgnoreCase("TEXT")) {
-                return layoutInflater.inflate(R.layout.my_message_layout, parent, false);
-            } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
-                return layoutInflater.inflate(R.layout.my_photo_layout, parent, false);
-            } else {
-                return layoutInflater.inflate(R.layout.my_sound_layout, parent, false);
-            }
-        } else {
-            // my secret
-            if (secret.getType().equalsIgnoreCase("TEXT")) {
-                return layoutInflater.inflate(R.layout.not_my_message_layout, parent, false);
-            } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
-                return layoutInflater.inflate(R.layout.not_my_photo_layout, parent, false);
-            } else {
-                return layoutInflater.inflate(R.layout.not_my_sound_layout, parent, false);
-            }
-        }
-    }
+        ImageView myImageView;
+        ImageView friendImageView;
 
-    private void setupView(View view, ViewHolder holder, Secret secret) {
-        //holder.status = (TextView) view.findViewById(R.id.deleviered_message);
-        //holder.status.setTypeface(typeface, Typeface.NORMAL);
-        holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-        holder.sentTime.setTypeface(typeface, Typeface.NORMAL);
-        holder.messageDeliveredIcon = (ImageView) view.findViewById(R.id.deleviered_message);
-        holder.messageDeliveryPendingIcon = (ImageView) view.findViewById(R.id.not_deleviered_message);
+        ImageView mySoundView;
+        ImageView friendSoundView;
 
-        if (secret.getType().equalsIgnoreCase("TEXT")) {
-            // text
-            holder.message = (TextView) view.findViewById(R.id.message);
-            holder.message.setTypeface(typeface, Typeface.BOLD);
-            holder.messageDeliveredIcon.setVisibility(View.GONE);
-        } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
-            // photo
-            holder.image = (ImageView) view.findViewById(R.id.image);
-        } else {
-            holder.image = (ImageView) view.findViewById(R.id.sound);
-        }
-    }
+        TextView myMessageView;
+        TextView friendMessageView;
 
-    private void setupHolder(ViewHolder holder, final Secret secret) {
+        TextView mySentTimeView;
+        TextView friendSentTimeView;
 
-        // set status
-        if (!secret.isSender() && secret.getType().equalsIgnoreCase("TEXT")) {
-            if (secret.isDelivered()) {
-                //holder.status.setText("Delivered ");
-                holder.messageDeliveredIcon.setVisibility(View.VISIBLE);
-                holder.messageDeliveryPendingIcon.setVisibility(View.GONE);
-            } else if (secret.isDeliveryFailed()) {
-                //holder.status.setText("Delivery fail ");
-                holder.messageDeliveredIcon.setVisibility(View.GONE);
-                holder.messageDeliveryPendingIcon.setVisibility(View.VISIBLE);
-            }/* else {
-                holder.status.setText("Sending...");
-            }*/
-        } else {
-            // holder.status.setVisibility(View.INVISIBLE);
-            if (holder.messageDeliveredIcon != null)
-                holder.messageDeliveredIcon.setVisibility(View.GONE);
-            if (holder.messageDeliveryPendingIcon != null)
-                holder.messageDeliveryPendingIcon.setVisibility(View.GONE);
-        }
+        ImageView mySentIconView;
+        ImageView friendSentIconView;
 
-        // set sent time
-        if (secret.getTimeStamp() != null) {
-            java.sql.Timestamp timestamp = new java.sql.Timestamp(secret.getTimeStamp());
-            Date date = new Date(timestamp.getTime());
-            holder.sentTime.setText(TimeUtils.getTimeInWords(date));
-        }
-
-        // set message, image, sound
-        if (secret.getType().equalsIgnoreCase("TEXT")) {
-            holder.message.setText(secret.getBlob());
-        } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
-            if (secret.getBlob() != null) {
-                new BitmapWorkerTask(holder.image).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
-
-                // set click listener
-                holder.image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, PhotoFullScreenActivity.class);
-                        intent.putExtra("IMAGE", secret.getBlob());
-                        context.startActivity(intent);
-                    }
-                });
-            }
-        } else {
-            if (secret.getBlob() != null) {
-                holder.image.setImageResource(R.drawable.play_recording);
-
-                // set click listener
-                holder.image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, AudioFullScreenActivity.class);
-                        intent.putExtra("SOUND", secret.getBlob());
-                        context.startActivity(intent);
-                    }
-                });
-            }
-        }
+        ImageView myPendingIconView;
+        ImageView friendPendingIconView;
     }
 
 }
