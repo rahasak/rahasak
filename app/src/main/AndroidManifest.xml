@@ -50,7 +50,7 @@
         <!-- production key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCqn55xNTOJXT6DMHBiupuYOcYXhdbp_wU" />
+            android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />
 
         <!-- debug key -->
         <!-- <meta-data -->
