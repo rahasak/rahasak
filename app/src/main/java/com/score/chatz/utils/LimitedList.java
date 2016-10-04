@@ -7,10 +7,16 @@ import java.util.ArrayList;
  */
 public class LimitedList<K> extends ArrayList<K> {
 
+    private static final int DEFAULT_MAX_SIZE = 7;
+
     private int maxSize;
 
     public LimitedList(int size) {
-        this.maxSize = size;
+        if (size < DEFAULT_MAX_SIZE) {
+            this.maxSize = DEFAULT_MAX_SIZE;
+        } else {
+            this.maxSize = size;
+        }
     }
 
     public boolean add(K k) {

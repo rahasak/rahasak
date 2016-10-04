@@ -39,6 +39,7 @@ import com.score.senzc.pojos.User;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
@@ -260,8 +261,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initSecretList() {
-        secretList = new LimitedList<>(7);
-        for (Secret secret : new SenzorsDbSource(this).getSecretz(thisUser)) {
+        ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecretz(thisUser);
+        secretList = new LimitedList<>(tmpList.size());
+        for (Secret secret : tmpList) {
             secretList.add(secret);
         }
 
@@ -505,7 +507,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
 
-    public void send(Senz senz) {
+    private void send(Senz senz) {
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
