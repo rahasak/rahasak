@@ -75,8 +75,8 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-
-                <com.github.siyamed.shapeimageview.RoundedImageView
+                
+                <com.github.siyamed.shapeimageview.CircularImageView
                     android:id="@+id/user_profile_image"
                     android:layout_width="130dp"
                     android:layout_height="130dp"
@@ -86,8 +86,6 @@
                     android:cropToPadding="true"
                     android:src="@drawable/rahaslogo"
                     app:siBorderAlpha="0.0"
-                    app:siBorderWidth="0dp"
-                    app:siRadius="8dp"
                     android:padding="10dp"
                     app:siSquare="true" />
 
