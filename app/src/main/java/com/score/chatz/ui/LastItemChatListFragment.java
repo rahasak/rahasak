@@ -1,5 +1,6 @@
 package com.score.chatz.ui;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +9,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -74,7 +78,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     public void onResume() {
         super.onResume();
         displayUserList();
-        setupActionBar(false);
+        setupActionBar(false, 0);
 
         //getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
@@ -103,7 +107,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         if (secret.isViewed()) {
             secret.setViewed(false);
             adapter.notifyDataSetChanged();
-            setupActionBar(false);
+            setupActionBar(false, 0);
         } else {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
             intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
@@ -116,23 +120,84 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         Secret secret = allSecretsList.get(position);
         secret.setViewed(true);
         adapter.notifyDataSetChanged();
-        setupActionBar(true);
+        setupActionBar(true, position);
 
         return true;
     }
 
-    private void setupActionBar(boolean enableDelete) {
+    private void setupActionBar(boolean enableDelete, final int index) {
         ImageView delete = (ImageView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.delete);
         TextView name = (TextView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.user_name);
 
         if (enableDelete) {
             delete.setVisibility(View.VISIBLE);
             name.setVisibility(View.GONE);
+
+            // handle delete
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    displayConfirmationMessageDialog("Are you sure your want to delete the secret", index);
+                }
+            });
         } else {
             delete.setVisibility(View.GONE);
             name.setVisibility(View.VISIBLE);
         }
-
-        // TODO add click listener for delete view and disply message dialog
     }
+
+    /**
+     * Generic display confirmation pop up
+     *
+     * @param message - Message to ask
+     */
+    public void displayConfirmationMessageDialog(String message, final int index) {
+        final Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
+        final Dialog dialog = new Dialog(this.getActivity());
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.share_confirm_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText("Confirm delete");
+        messageTextView.setText(Html.fromHtml(message));
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface, Typeface.BOLD);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+
+                // delete item
+                allSecretsList.remove(index);
+                adapter.notifyDataSetChanged();
+                setupActionBar(false, 0);
+            }
+        });
+
+        // cancel button
+        Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
+        cancelButton.setTypeface(typeface, Typeface.BOLD);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+                setupActionBar(false, 0);
+            }
+        });
+
+        dialog.show();
+    }
+
 }
