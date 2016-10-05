@@ -4,17 +4,23 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,6 +30,7 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.pojo.Stream;
 import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
@@ -37,8 +44,15 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private ImageView imageView;
     private String imageData;
     private Typeface typeface;
+    private TextView callingText;
+    private ImageView selfieIcon;
+
+    private AsyncTask<Void, Integer, Void> animTextTask;
 
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
+
+    //Set the radius of the Blur. Supported range 0 < radius <= 25
+    private static final float BLUR_RADIUS = 5f;
 
     // senz message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -76,6 +90,8 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     }
 
     private void initUi() {
+        selfieIcon = (ImageView) findViewById(R.id.selfie_image);
+        callingText = (TextView) findViewById(R.id.selfie_calling_text);
         imageView = (ImageView) findViewById(R.id.imageView);
         loadingView = findViewById(R.id.selfie_loading_view);
         selfieCallingText = (TextView) findViewById(R.id.selfie_calling_text);
@@ -92,10 +108,12 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             imageView.setVisibility(View.VISIBLE);
             imageData = intent.getStringExtra("IMAGE");
             imageView.setImageBitmap(new ImageUtils().decodeBitmap(imageData));
+            stopAnimatingLoaderText();
         } else {
             loadingView.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
             setupUserImage(intent.getStringExtra("SENDER"));
+            startAnimatingIcon();
         }
 
         if (intent.hasExtra("QUICK_PREVIEW")) {
@@ -103,10 +121,22 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         }
     }
 
+    private void startAnimatingIcon(){
+        Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.vibrate);
+        selfieIcon.startAnimation(anim);
+    }
+
+    private void stopAnimatingLoaderText(){
+        if(animTextTask != null)
+            animTextTask.cancel(true);
+    }
+
     private void setupUserImage(String sender) {
         String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
-        if (userImage != null)
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+        if (userImage != null) {
+            Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(blur(bitmap));
+        }
 
         usernameText.setText("@" + sender);
     }
@@ -199,5 +229,22 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    public Bitmap blur(Bitmap image) {
+        if (null == image) return null;
+
+        Bitmap outputBitmap = Bitmap.createBitmap(image);
+        final RenderScript renderScript = RenderScript.create(this);
+        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
+        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+
+        //Intrinsic Gausian blur filter
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        theIntrinsic.setRadius(BLUR_RADIUS);
+        theIntrinsic.setInput(tmpIn);
+        theIntrinsic.forEach(tmpOut);
+        tmpOut.copyTo(outputBitmap);
+        return outputBitmap;
     }
 }

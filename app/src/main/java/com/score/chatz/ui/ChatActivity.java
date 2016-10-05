@@ -272,7 +272,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateSecretList() {
-        if (secretAdapter != null) {
+        if (secretAdapter != null && secretList.size() > 0) {
             Secret lastSecret = secretList.getYongest();
             if (lastSecret != null) {
                 ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecretz(thisUser, lastSecret.getTimeStamp());

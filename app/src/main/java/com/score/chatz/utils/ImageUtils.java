@@ -242,5 +242,4 @@ public class ImageUtils {
         byte data[] = Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
-
 }
