@@ -132,5 +132,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
             delete.setVisibility(View.GONE);
             name.setVisibility(View.VISIBLE);
         }
+
+        // TODO add click listener for delete view and disply message dialog
     }
 }
