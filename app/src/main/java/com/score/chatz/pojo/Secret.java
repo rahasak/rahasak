@@ -5,6 +5,7 @@ package com.score.chatz.pojo;
  */
 
 import com.score.senzc.pojos.User;
+
 public class Secret {
     private String blob;
     private User user;
