@@ -75,6 +75,7 @@ public class LastItemChatListAdapter extends BaseAdapter {
             holder.sender = (TextView) view.findViewById(R.id.sender);
             holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
             holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
+            holder.selected = (ImageView) view.findViewById(R.id.selected);
 
             holder.sender.setTypeface(typeface, Typeface.NORMAL);
             holder.message.setTypeface(typeface, Typeface.NORMAL);
@@ -109,6 +110,12 @@ public class LastItemChatListAdapter extends BaseAdapter {
         if (secret.getUser().getUserImage() != null) {
             loadBitmap(secret.getUser().getUserImage(), viewHolder.userImage);
         }
+
+        if (secret.isViewed()) {
+            viewHolder.selected.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.selected.setVisibility(View.GONE);
+        }
     }
 
     private void loadBitmap(String data, ImageView imageView) {
@@ -127,5 +134,6 @@ public class LastItemChatListAdapter extends BaseAdapter {
         TextView sender;
         TextView sentTime;
         com.github.siyamed.shapeimageview.RoundedImageView userImage;
+        ImageView selected;
     }
 }

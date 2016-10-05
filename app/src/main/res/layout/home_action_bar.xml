@@ -16,7 +16,6 @@
         android:scaleType="fitXY"
         android:src="@drawable/rahaslogo" />
 
-
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="30dp"
@@ -36,5 +35,16 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="5dp"
+        android:adjustViewBounds="true"
+        android:padding="4dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/bin1"
+        android:visibility="gone" />
 </RelativeLayout>

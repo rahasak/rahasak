@@ -7,11 +7,13 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class LastItemChatListFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class LastItemChatListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final String TAG = LastItemChatListFragment.class.getName();
 
@@ -65,12 +67,14 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getListView().setOnItemClickListener(this);
+        getListView().setOnItemLongClickListener(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         displayUserList();
+        setupActionBar(false);
 
         //getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
@@ -95,8 +99,38 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
-        startActivity(intent);
+        Secret secret = allSecretsList.get(position);
+        if (secret.isViewed()) {
+            secret.setViewed(false);
+            adapter.notifyDataSetChanged();
+            setupActionBar(false);
+        } else {
+            Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+            intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        Secret secret = allSecretsList.get(position);
+        secret.setViewed(true);
+        adapter.notifyDataSetChanged();
+        setupActionBar(true);
+
+        return true;
+    }
+
+    private void setupActionBar(boolean enableDelete) {
+        ImageView delete = (ImageView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.delete);
+        TextView name = (TextView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.user_name);
+
+        if (enableDelete) {
+            delete.setVisibility(View.VISIBLE);
+            name.setVisibility(View.GONE);
+        } else {
+            delete.setVisibility(View.GONE);
+            name.setVisibility(View.VISIBLE);
+        }
     }
 }
