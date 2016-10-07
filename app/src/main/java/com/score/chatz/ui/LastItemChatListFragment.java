@@ -183,6 +183,10 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
                 // delete item
                 allSecretsList.remove(index);
                 adapter.notifyDataSetChanged();
+
+                // delete from db
+                //new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser();
+
                 setupActionBar(false, 0);
             }
         });

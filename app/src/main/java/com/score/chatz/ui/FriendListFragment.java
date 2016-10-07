@@ -9,13 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -82,7 +80,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     public void onResume() {
         super.onResume();
         displayUserList();
-        setupActionBar(false);
 
         //getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
@@ -110,21 +107,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             adapter = new FriendListAdapter(getContext(), userPermissionList);
             getListView().setAdapter(adapter);
         }
-    }
-
-    private void setupActionBar(boolean enableDelete) {
-        ImageView delete = (ImageView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.delete);
-        TextView name = (TextView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.user_name);
-
-        if (enableDelete) {
-            delete.setVisibility(View.VISIBLE);
-            name.setVisibility(View.GONE);
-        } else {
-            delete.setVisibility(View.GONE);
-            name.setVisibility(View.VISIBLE);
-        }
-
-        // TODO add click listener for delete view and disply message dialog
     }
 
 }

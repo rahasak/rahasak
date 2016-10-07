@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -77,6 +76,7 @@ public class HomeActivity extends AppCompatActivity {
         toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
         setSupportActionBar(toolbar);
     }
+
     private void setupActionBar() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.home_action_bar, null));
@@ -134,18 +134,22 @@ public class HomeActivity extends AppCompatActivity {
         activateTabOne();
     }
 
-    private void activateTabOne(){
+    private void activateTabOne() {
         tabOneActive.setVisibility(View.VISIBLE);
         tabOneDeActive.setVisibility(View.INVISIBLE);
         tabTwoActive.setVisibility(View.INVISIBLE);
         tabTwoDeActive.setVisibility(View.VISIBLE);
     }
 
-    private void activateTabTwo(){
+    private void activateTabTwo() {
         tabOneActive.setVisibility(View.INVISIBLE);
         tabOneDeActive.setVisibility(View.VISIBLE);
         tabTwoActive.setVisibility(View.VISIBLE);
         tabTwoDeActive.setVisibility(View.INVISIBLE);
+
+        // disable action bar icon
+        ImageView delete = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.delete);
+        delete.setVisibility(View.GONE);
     }
 
     private void setupViewPager(ViewPager viewPager) {

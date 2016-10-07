@@ -710,6 +710,11 @@ public class SenzorsDbSource {
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
                 SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?",
                 new String[]{user.getUsername()});
+
+        // delete last secret
+        db.delete(SenzorsDbContract.LatestChat.TABLE_NAME,
+                SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?",
+                new String[]{user.getUsername()});
     }
 
     public void insertImageToDB(String username, String encodedImage) {
