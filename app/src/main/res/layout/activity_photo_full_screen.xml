@@ -87,7 +87,7 @@
                             android:id="@+id/selfie_image"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
-                            android:src="@drawable/selfie"/>
+                            android:src="@drawable/eyes_right"/>
 
 
                         <LinearLayout

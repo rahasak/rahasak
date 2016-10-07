@@ -45,9 +45,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private String imageData;
     private Typeface typeface;
     private TextView callingText;
-    private ImageView selfieIcon;
+    private ImageView waitingIcon;
 
-    private AsyncTask<Void, Integer, Void> animTextTask;
+    private AsyncTask animWaitingIcon;
 
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
 
@@ -85,12 +85,18 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         initIntent();
     }
 
-    private void setUpFonts(){
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        animWaitingIcon.cancel(true);
+    }
+
+    private void setUpFonts() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
     }
 
     private void initUi() {
-        selfieIcon = (ImageView) findViewById(R.id.selfie_image);
+        waitingIcon = (ImageView) findViewById(R.id.selfie_image);
         callingText = (TextView) findViewById(R.id.selfie_calling_text);
         imageView = (ImageView) findViewById(R.id.imageView);
         loadingView = findViewById(R.id.selfie_loading_view);
@@ -108,12 +114,11 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             imageView.setVisibility(View.VISIBLE);
             imageData = intent.getStringExtra("IMAGE");
             imageView.setImageBitmap(new ImageUtils().decodeBitmap(imageData));
-            stopAnimatingLoaderText();
         } else {
             loadingView.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
             setupUserImage(intent.getStringExtra("SENDER"));
-            startAnimatingIcon();
+            startAnimatingWaitingIcon();
         }
 
         if (intent.hasExtra("QUICK_PREVIEW")) {
@@ -121,14 +126,8 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         }
     }
 
-    private void startAnimatingIcon(){
-        Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.vibrate);
-        selfieIcon.startAnimation(anim);
-    }
-
-    private void stopAnimatingLoaderText(){
-        if(animTextTask != null)
-            animTextTask.cancel(true);
+    private void startAnimatingWaitingIcon() {
+        animWaitingIcon = new AnimtingWaitingIconTask().execute();
     }
 
     private void setupUserImage(String sender) {
@@ -246,5 +245,32 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         theIntrinsic.forEach(tmpOut);
         tmpOut.copyTo(outputBitmap);
         return outputBitmap;
+    }
+
+    public class AnimtingWaitingIconTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                while (true) {
+                    PhotoFullScreenActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            waitingIcon.setImageDrawable(getResources().getDrawable(R.drawable.eyes_left));
+                        }
+                    });
+                    Thread.sleep(1000);
+                    PhotoFullScreenActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            waitingIcon.setImageDrawable(getResources().getDrawable(R.drawable.eyes_right));
+                        }
+                    });
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
     }
 }
