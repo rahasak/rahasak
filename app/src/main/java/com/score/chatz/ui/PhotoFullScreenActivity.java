@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +29,6 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
-import com.score.chatz.pojo.Stream;
 import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
@@ -88,7 +86,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        animWaitingIcon.cancel(true);
+        if (animWaitingIcon != null) animWaitingIcon.cancel(true);
     }
 
     private void setUpFonts() {

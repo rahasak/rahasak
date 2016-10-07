@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -34,6 +35,10 @@ import java.util.ArrayList;
 public class LastItemChatListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final String TAG = LastItemChatListFragment.class.getName();
+
+    private ActionBar actionBar;
+    private ImageView actionBarDelete;
+    private TextView actionBarName;
 
     private ArrayList<Secret> allSecretsList;
     private LastItemChatListAdapter adapter;
@@ -65,6 +70,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupEmptyTextFont();
+        initActionBar();
     }
 
     @Override
@@ -78,7 +84,6 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     public void onResume() {
         super.onResume();
         displayUserList();
-        setupActionBar(false, 0);
 
         //getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
@@ -88,6 +93,12 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         super.onPause();
 
         //getActivity().unregisterReceiver(senzReceiver);
+    }
+
+    private void initActionBar() {
+        actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBarDelete = (ImageView) actionBar.getCustomView().findViewById(R.id.delete);
+        actionBarName = (TextView) actionBar.getCustomView().findViewById(R.id.user_name);
     }
 
     /**
@@ -107,7 +118,8 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         if (secret.isViewed()) {
             secret.setViewed(false);
             adapter.notifyDataSetChanged();
-            setupActionBar(false, 0);
+            actionBarDelete.setVisibility(View.GONE);
+            actionBarName.setVisibility(View.VISIBLE);
         } else {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
             intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
@@ -116,34 +128,22 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     }
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
         Secret secret = allSecretsList.get(position);
         secret.setViewed(true);
         adapter.notifyDataSetChanged();
-        setupActionBar(true, position);
+
+        actionBarDelete.setVisibility(View.VISIBLE);
+        actionBarName.setVisibility(View.GONE);
+        actionBarDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // delete item
+                displayConfirmationMessageDialog("Are you sure your want to delete the secret", position);
+            }
+        });
 
         return true;
-    }
-
-    private void setupActionBar(boolean enableDelete, final int index) {
-        ImageView delete = (ImageView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.delete);
-        TextView name = (TextView) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView().findViewById(R.id.user_name);
-
-        if (enableDelete) {
-            delete.setVisibility(View.VISIBLE);
-            name.setVisibility(View.GONE);
-
-            // handle delete
-            delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    displayConfirmationMessageDialog("Are you sure your want to delete the secret", index);
-                }
-            });
-        } else {
-            delete.setVisibility(View.GONE);
-            name.setVisibility(View.VISIBLE);
-        }
     }
 
     /**
@@ -184,10 +184,11 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
                 allSecretsList.remove(index);
                 adapter.notifyDataSetChanged();
 
-                // delete from db
+                // TODO delete from db
                 //new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser();
 
-                setupActionBar(false, 0);
+                actionBarDelete.setVisibility(View.GONE);
+                actionBarName.setVisibility(View.VISIBLE);
             }
         });
 
@@ -197,7 +198,8 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
-                setupActionBar(false, 0);
+                actionBarDelete.setVisibility(View.GONE);
+                actionBarName.setVisibility(View.VISIBLE);
             }
         });
 
