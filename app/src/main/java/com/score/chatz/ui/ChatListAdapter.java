@@ -14,13 +14,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.LimitedList;
+import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.TimeUtils;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,12 +37,12 @@ import java.util.List;
 class ChatListAdapter extends BaseAdapter {
 
     private Context context;
-    private List<Secret> secretList;
+    private LimitedList<Secret> secretList;
     private SenzorsDbSource dbSource;
 
     private Typeface typeface;
 
-    ChatListAdapter(Context context, List<Secret> secretList) {
+    ChatListAdapter(Context context, LimitedList<Secret> secretList) {
         this.context = context;
         this.secretList = secretList;
         this.dbSource = new SenzorsDbSource(context);
@@ -161,6 +169,32 @@ class ChatListAdapter extends BaseAdapter {
                 holder.mySoundView.setVisibility(View.VISIBLE);
                 holder.friendSoundView.setVisibility(View.GONE);
             }
+        } else if (secret.getType().equalsIgnoreCase("MISSED_IMAGE")) {
+            holder.soundLayout.setVisibility(View.GONE);
+            holder.messageLayout.setVisibility(View.GONE);
+            holder.imageLayout.setVisibility(View.VISIBLE);
+
+            // TODO
+            holder.friendStatusLayout.setVisibility(View.GONE);
+            holder.myStatusLayout.setVisibility(View.GONE);
+            if (secret.isSender()) {
+                holder.myImageView.setVisibility(View.GONE);
+                holder.friendImageView.setVisibility(View.VISIBLE);
+                holder.friendImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.missed_selfie_call));
+            }
+        } else if (secret.getType().equalsIgnoreCase("MISSED_SOUND")) {
+            holder.soundLayout.setVisibility(View.GONE);
+            holder.messageLayout.setVisibility(View.GONE);
+            holder.imageLayout.setVisibility(View.VISIBLE);
+
+            // TODO
+            holder.friendStatusLayout.setVisibility(View.GONE);
+            holder.myStatusLayout.setVisibility(View.GONE);
+            if (secret.isSender()) {
+                holder.myImageView.setVisibility(View.GONE);
+                holder.friendImageView.setVisibility(View.VISIBLE);
+                holder.friendImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.missed_audio_call));
+            }
         }
 
         // set status and time
@@ -229,6 +263,67 @@ class ChatListAdapter extends BaseAdapter {
                 context.startActivity(intent);
             }
         });
+
+        holder.friendImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                HashMap<String, String> senzAttributes;
+                if (((ImageView) v).getDrawable().getConstantState().equals(context.getResources().getDrawable(R.drawable.missed_selfie_call).getConstantState())) {
+                    // create senz attributes
+                    senzAttributes = new HashMap<>();
+                    senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+                    senzAttributes.put("cam", "");
+                    senzAttributes.put("uid", secret.getId());
+
+                    // new senz
+                    String id = "_ID";
+                    String signature = "_SIGNATURE";
+                    SenzTypeEnum senzType = SenzTypeEnum.GET;
+                    Senz senz = null;
+                    try {
+                        senz = new Senz(id, signature, senzType, secret.getUser(), PreferenceUtils.getUser(context), senzAttributes);
+                    } catch (NoUserException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    Intent intent = IntentProvider.getCameraIntent(context);
+                    intent.putExtra("Senz", senz);
+                    intent.putExtra("MISSED_SELFIE_CALL", "MISSED_SELFIE_CALL");
+                    context.startActivity(intent);
+                } else if(((ImageView) v).getDrawable().getConstantState().equals(context.getResources().getDrawable(R.drawable.missed_audio_call).getConstantState())) {
+                    // create senz attributes
+                    senzAttributes = new HashMap<>();
+                    senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+                    senzAttributes.put("mic", "");
+                    senzAttributes.put("uid", secret.getId());
+
+                    // new senz
+                    String id = "_ID";
+                    String signature = "_SIGNATURE";
+                    SenzTypeEnum senzType = SenzTypeEnum.GET;
+                    Senz senz = null;
+                    try {
+                        senz = new Senz(id, signature, senzType, secret.getUser(), PreferenceUtils.getUser(context), senzAttributes);
+                    } catch (NoUserException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    Intent intent = new Intent();
+                    intent.setClass(context, RecordingActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("Senz", senz);
+                    intent.putExtra("MISSED_AUDIO_CALL", "MISSED_AUDIO_CALL");
+                    context.startActivity(intent);
+                }
+
+                // Remove missed call from list and db so you can't use it again and again
+                secretList.remove(secret);
+                notifyDataSetChanged();
+                dbSource.deleteSecret(secret);
+
+            }
+        });
     }
 
     /**
@@ -258,6 +353,7 @@ class ChatListAdapter extends BaseAdapter {
 
         ImageView myPendingIconView;
         ImageView friendPendingIconView;
+
     }
 
 }

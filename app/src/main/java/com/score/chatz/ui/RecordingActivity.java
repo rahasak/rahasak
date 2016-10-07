@@ -56,6 +56,9 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private ImageView startBtn;
     private RippleBackground goRipple;
 
+    private boolean isRecordingStarted;
+    private boolean isRecordingOver;
+
     private Senz thisSenz;
     private SenzorsDbSource dbSource;
     private AudioRecorder audioRecorder;
@@ -91,6 +94,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         @Override
         public void onFinish() {
             sendBusySenz();
+            saveMissedCall();
             RecordingActivity.this.finish();
         }
 
@@ -132,6 +136,17 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         setupWakeLock();
         startTimerToEndRequest();
         setupUserImage();
+        startMicIfMissedCall();
+    }
+
+    private void startMicIfMissedCall(){
+        if(getIntent().hasExtra("MISSED_AUDIO_CALL")){
+            stopVibrations();
+            cancelTimerToServe();
+            startRecording();
+            moving_layout.setVisibility(View.INVISIBLE);
+            doneBtn.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -274,17 +289,26 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                         .start();
                 if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside start button region
-                    stopVibrations();
-                    cancelTimerToServe();
-                    startRecording();
-                    moving_layout.setVisibility(View.INVISIBLE);
-                    doneBtn.setVisibility(View.VISIBLE);
+                    if(!isRecordingStarted) {
+                        isRecordingStarted = true;
+
+                        stopVibrations();
+                        cancelTimerToServe();
+                        startRecording();
+                        moving_layout.setVisibility(View.INVISIBLE);
+                        doneBtn.setVisibility(View.VISIBLE);
+                    }
                 } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside cancel button region
-                    stopVibrations();
-                    cancelTimerToServe();
-                    sendBusySenz();
-                    this.finish();
+                    if(!isRecordingOver) {
+                        isRecordingOver = true;
+
+                        stopVibrations();
+                        cancelTimerToServe();
+                        sendBusySenz();
+                        saveMissedCall();
+                        this.finish();
+                    }
                 }
                 break;
             case (MotionEvent.ACTION_UP):
@@ -298,6 +322,15 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                 break;
         }
         return true;
+    }
+
+    private void saveMissedCall(){
+        String uid = SenzUtils.getUniqueRandomNumber();
+        Secret newSecret = new Secret("", "MISSED_SOUND", thisSenz.getSender(), true);
+        Long timeStamp = System.currentTimeMillis();
+        newSecret.setTimeStamp(timeStamp);
+        newSecret.setId(uid);
+        new SenzorsDbSource(this).createSecret(newSecret);
     }
 
     private void startRecording() {

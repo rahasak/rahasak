@@ -81,6 +81,16 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         getSupportActionBar().hide();
         startTimerToEndRequest();
         setupUserImage();
+        startCameraIfMissedCall();
+    }
+
+    private void startCameraIfMissedCall(){
+        if(getIntent().hasExtra("MISSED_SELFIE_CALL")){
+            stopVibrations();
+            cancelTimerToServe();
+            startQuickCountdownToPhoto();
+            isPhotoTaken = true;
+        }
     }
 
     @Override
@@ -230,6 +240,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                         cancelTimerToServe();
                         sendBusySenz();
                         stopVibrations();
+                        saveMissedCall();
                         this.finish();
                     }
                 }
@@ -305,6 +316,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             @Override
             public void onFinish() {
                 sendBusySenz();
+                saveMissedCall();
                 PhotoActivity.this.finish();
             }
 
@@ -313,6 +325,15 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                 Log.i(TAG, "Time in count down -" + millisUntilFinished);
             }
         }.start();
+    }
+
+    private void saveMissedCall(){
+        String uid = SenzUtils.getUniqueRandomNumber();
+        Secret newSecret = new Secret("", "MISSED_IMAGE", originalSenz.getSender(), true);
+        Long timeStamp = System.currentTimeMillis();
+        newSecret.setTimeStamp(timeStamp);
+        newSecret.setId(uid);
+        new SenzorsDbSource(this).createSecret(newSecret);
     }
 
     private void sendBusySenz() {
