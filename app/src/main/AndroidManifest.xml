@@ -101,7 +101,7 @@
         <activity
             android:name=".ui.PhotoActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".ui.UserProfileActivity"
             android:screenOrientation="portrait"

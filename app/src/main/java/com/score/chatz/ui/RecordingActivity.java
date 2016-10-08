@@ -115,7 +115,6 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         }
     };
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

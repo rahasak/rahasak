@@ -196,7 +196,7 @@ class SenHandler {
     private void handleCam(Senz senz, SenzService senzService) {
         try {
             Intent intent = IntentProvider.getCameraIntent(senzService.getApplicationContext());
-            intent.putExtra("Senz", senz);
+            intent.putExtra("USER", senz.getSender());
             senzService.getApplicationContext().startActivity(intent);
         } catch (Exception e) {
             // fail to access camera
@@ -208,7 +208,7 @@ class SenHandler {
         Intent intent = new Intent();
         intent.setClass(senzService.getApplicationContext(), RecordingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("Senz", senz);
+        intent.putExtra("SENZ", senz);
         senzService.getApplicationContext().startActivity(intent);
     }
 

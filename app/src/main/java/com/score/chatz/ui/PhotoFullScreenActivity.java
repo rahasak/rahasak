@@ -245,7 +245,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         return outputBitmap;
     }
 
-    // TODO refactor with fr    ame animation
+    // TODO refactor with frame animation
     public class AnimtingWaitingIconTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {

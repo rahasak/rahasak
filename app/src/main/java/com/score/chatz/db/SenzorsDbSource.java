@@ -189,7 +189,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER, secret.isSender() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, secret.isViewed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED, 0);
 
