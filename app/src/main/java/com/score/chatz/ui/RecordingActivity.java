@@ -375,6 +375,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("status", "901");
+        senzAttributes.put("uid", thisSenz.getAttributes().get("uid"));
 
         // new senz
         String id = "_ID";

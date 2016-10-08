@@ -339,6 +339,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("uid", originalSenz.getAttributes().get("uid"));
         senzAttributes.put("status", "801");
 
         // new senz
