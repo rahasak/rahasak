@@ -174,7 +174,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
-            if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("RECEIVED")) {
+                // GET msg delivered
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
                 // user busy
                 displayInformationMessageDialog("info", "user busy");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {

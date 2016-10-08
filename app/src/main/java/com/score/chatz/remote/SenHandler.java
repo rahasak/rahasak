@@ -104,11 +104,15 @@ class SenHandler {
 
     private void handleGet(Senz senz, SenzService senzService) {
         if (senz.getAttributes().containsKey("cam")) {
-            // TODO send ack 800 first
+            // send ack back
+            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
 
             // launch camera
             handleCam(senz, senzService);
         } else if (senz.getAttributes().containsKey("mic")) {
+            // send ack back
+            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
+
             // launch mic
             handleMic(senz, senzService);
         } else if (senz.getAttributes().containsKey("lat")) {
@@ -120,13 +124,13 @@ class SenHandler {
     private void handleData(Senz senz, SenzService senzService) {
         // save in db
         if (senz.getAttributes().containsKey("status")) {
-            // status
+            // status coming from switch
             // broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg")) {
             // rahasa
             // send ack
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "700"));
+            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
 
             try {
                 // save and broadcast

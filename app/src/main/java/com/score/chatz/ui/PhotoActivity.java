@@ -84,8 +84,8 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         startCameraIfMissedCall();
     }
 
-    private void startCameraIfMissedCall(){
-        if(getIntent().hasExtra("MISSED_SELFIE_CALL")){
+    private void startCameraIfMissedCall() {
+        if (getIntent().hasExtra("MISSED_SELFIE_CALL")) {
             stopVibrations();
             cancelTimerToServe();
             startQuickCountdownToPhoto();
@@ -327,7 +327,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         }.start();
     }
 
-    private void saveMissedCall(){
+    private void saveMissedCall() {
         String uid = SenzUtils.getUniqueRandomNumber();
         Secret newSecret = new Secret("", "MISSED_IMAGE", originalSenz.getSender(), true);
         Long timeStamp = System.currentTimeMillis();
@@ -376,6 +376,25 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         senzList.add(stopStreamSenz);
 
         sendInOrder(senzList);
+    }
+
+    private Senz getStream(Senz senz, byte[] image, String uid) {
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        String imageString = new ImageUtils().encodeBitmap(image);
+        if (senz.getAttributes().containsKey("cam")) {
+            senzAttributes.put("cam", imageString);
+        }
+
+        senzAttributes.put("uid", uid);
+
+        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
     }
 
     /**

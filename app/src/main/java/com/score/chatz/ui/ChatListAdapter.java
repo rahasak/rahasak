@@ -22,14 +22,12 @@ import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.LimitedList;
 import com.score.chatz.utils.PreferenceUtils;
-import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by eranga on 9/28/16
@@ -291,7 +289,7 @@ class ChatListAdapter extends BaseAdapter {
                     intent.putExtra("Senz", senz);
                     intent.putExtra("MISSED_SELFIE_CALL", "MISSED_SELFIE_CALL");
                     context.startActivity(intent);
-                } else if(((ImageView) v).getDrawable().getConstantState().equals(context.getResources().getDrawable(R.drawable.missed_audio_call).getConstantState())) {
+                } else if (((ImageView) v).getDrawable().getConstantState().equals(context.getResources().getDrawable(R.drawable.missed_audio_call).getConstantState())) {
                     // create senz attributes
                     senzAttributes = new HashMap<>();
                     senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
@@ -353,7 +351,6 @@ class ChatListAdapter extends BaseAdapter {
 
         ImageView myPendingIconView;
         ImageView friendPendingIconView;
-
     }
 
 }

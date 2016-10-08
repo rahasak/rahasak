@@ -19,7 +19,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
@@ -410,10 +409,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (senz.getAttributes().containsKey("status")) {
             // status message
             String msg = senz.getAttributes().get("status");
-            if (msg != null && msg.equalsIgnoreCase("700")) {
+            if (msg != null && msg.equalsIgnoreCase("DELIVERED")) {
+                // message delivered to user
                 onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("901")) {
-                Toast.makeText(this, "User busy", Toast.LENGTH_LONG).show();
+            } else if (msg != null && msg.equalsIgnoreCase("RECEIVED")) {
+                // message received to server
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message

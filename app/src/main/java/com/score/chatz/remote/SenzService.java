@@ -36,17 +36,16 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-
 public class SenzService extends Service {
 
     private static final String TAG = SenzService.class.getName();
 
     // socket host, port
-    //public static final String SENZ_HOST = "10.2.2.49";
+    public static final String SENZ_HOST = "10.2.2.49";
     //public static final String SENZ_HOST = "udp.mysensors.info";
-    private static final String SENZ_HOST = "52.77.228.195";
+    //private static final String SENZ_HOST = "52.77.228.195";
 
-    public static final int SENZ_PORT = 7070;
+    public static final int SENZ_PORT = 7272;
 
     // senz socket
     private Socket socket;
