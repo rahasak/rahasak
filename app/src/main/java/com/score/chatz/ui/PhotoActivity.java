@@ -54,7 +54,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private Senz originalSenz;
     private CountDownTimer cancelTimer;
 
-    private static final int TIME_TO_SERVE_REQUEST = 30000;
+    private static final int TIME_TO_SERVE_REQUEST = 10000;
     private static final int TIME_TO_QUICK_PHOTO = 3000;
 
     private float dX, dY, startX, startY;
@@ -138,8 +138,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         quickCountdownText.setVisibility(View.INVISIBLE);
         callingUserInfo = findViewById(R.id.sender_info);
         buttonControls = findViewById(R.id.moving_layout);
-
-        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void hideUiControls() {
@@ -150,6 +148,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
         ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + originalSenz.getSender().getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupUserImage() {
@@ -376,25 +375,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         senzList.add(stopStreamSenz);
 
         sendInOrder(senzList);
-    }
-
-    private Senz getStream(Senz senz, byte[] image, String uid) {
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        String imageString = new ImageUtils().encodeBitmap(image);
-        if (senz.getAttributes().containsKey("cam")) {
-            senzAttributes.put("cam", imageString);
-        }
-
-        senzAttributes.put("uid", uid);
-
-        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
     }
 
     /**

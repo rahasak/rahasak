@@ -412,8 +412,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (msg != null && msg.equalsIgnoreCase("DELIVERED")) {
                 // message delivered to user
                 onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("RECEIVED")) {
-                // message received to server
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message

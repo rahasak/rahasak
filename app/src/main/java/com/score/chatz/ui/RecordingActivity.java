@@ -63,7 +63,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private SenzorsDbSource dbSource;
     private AudioRecorder audioRecorder;
 
-    private static final int TIME_TO_SERVE_REQUEST = 30000;
+    private static final int TIME_TO_SERVE_REQUEST = 10000;
     private static final int START_TIME = 7;
 
     private float dX, dY, startX, startY;
@@ -139,8 +139,8 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         startMicIfMissedCall();
     }
 
-    private void startMicIfMissedCall(){
-        if(getIntent().hasExtra("MISSED_AUDIO_CALL")){
+    private void startMicIfMissedCall() {
+        if (getIntent().hasExtra("MISSED_AUDIO_CALL")) {
             stopVibrations();
             cancelTimerToServe();
             startRecording();
@@ -289,7 +289,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                         .start();
                 if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside start button region
-                    if(!isRecordingStarted) {
+                    if (!isRecordingStarted) {
                         isRecordingStarted = true;
 
                         stopVibrations();
@@ -300,7 +300,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                     }
                 } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside cancel button region
-                    if(!isRecordingOver) {
+                    if (!isRecordingOver) {
                         isRecordingOver = true;
 
                         stopVibrations();
@@ -324,7 +324,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         return true;
     }
 
-    private void saveMissedCall(){
+    private void saveMissedCall() {
         String uid = SenzUtils.getUniqueRandomNumber();
         Secret newSecret = new Secret("", "MISSED_SOUND", thisSenz.getSender(), true);
         Long timeStamp = System.currentTimeMillis();

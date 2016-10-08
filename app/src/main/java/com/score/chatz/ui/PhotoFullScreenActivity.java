@@ -42,7 +42,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private ImageView imageView;
     private String imageData;
     private Typeface typeface;
-    private TextView callingText;
     private ImageView waitingIcon;
 
     private AsyncTask animWaitingIcon;
@@ -95,7 +94,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private void initUi() {
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
-        callingText = (TextView) findViewById(R.id.selfie_calling_text);
         imageView = (ImageView) findViewById(R.id.imageView);
         loadingView = findViewById(R.id.selfie_loading_view);
         selfieCallingText = (TextView) findViewById(R.id.selfie_calling_text);
@@ -174,7 +172,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
-            if (senz.getAttributes().get("status").equalsIgnoreCase("RECEIVED")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED")) {
                 // GET msg delivered
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
                 // user busy
@@ -247,6 +245,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         return outputBitmap;
     }
 
+    // TODO refactor with fr    ame animation
     public class AnimtingWaitingIconTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
