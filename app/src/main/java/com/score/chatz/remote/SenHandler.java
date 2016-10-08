@@ -158,6 +158,10 @@ class SenHandler {
         } else if (SenzUtils.isStreamOff(senz)) {
             // stream off, last stream
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
+
+            // send status back first
+            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
+
             stream.setActive(false);
 
             // new stream senz

@@ -336,10 +336,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     }
 
     private void sendBusySenz() {
+        String uid = SenzUtils.getUniqueRandomNumber();
+
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("uid", originalSenz.getAttributes().get("uid"));
+        senzAttributes.put("uid", uid);
         senzAttributes.put("status", "801");
 
         // new senz
@@ -365,9 +367,9 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         // stream on senz
         // stream content
         // stream off senz
-        Senz startStreamSenz = getStartStreamSenz(senz);
+        Senz startStreamSenz = getStartStreamSenz(senz, uid);
         ArrayList<Senz> photoSenzList = getPhotoStreamSenz(senz, image, context, uid);
-        Senz stopStreamSenz = getStopStreamSenz(senz);
+        Senz stopStreamSenz = getStopStreamSenz(senz, uid);
 
         // populate list
         ArrayList<Senz> senzList = new ArrayList<>();
@@ -431,11 +433,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      * @param senz original senz
      * @return senz
      */
-    private Senz getStartStreamSenz(Senz senz) {
+    private Senz getStartStreamSenz(Senz senz, String uid) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("cam", "on");
+        senzAttributes.put("uid", uid);
 
         // new senz
         String id = "_ID";
@@ -451,11 +454,12 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      * @param senz original senz
      * @return senz
      */
-    private Senz getStopStreamSenz(Senz senz) {
+    private Senz getStopStreamSenz(Senz senz, String uid) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("cam", "off");
+        senzAttributes.put("uid", uid);
 
         // new senz
         String id = "_ID";
