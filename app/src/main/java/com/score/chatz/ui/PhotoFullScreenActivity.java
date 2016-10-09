@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,8 +45,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private Typeface typeface;
     private ImageView waitingIcon;
 
-    private AsyncTask animWaitingIcon;
-
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
 
     //Set the radius of the Blur. Supported range 0 < radius <= 25
@@ -80,12 +79,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         setUpFonts();
         initUi();
         initIntent();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (animWaitingIcon != null) animWaitingIcon.cancel(true);
     }
 
     private void setUpFonts() {
@@ -123,7 +116,8 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     }
 
     private void startAnimatingWaitingIcon() {
-        animWaitingIcon = new AnimtingWaitingIconTask().execute();
+        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
+        anim.start();
     }
 
     private void setupUserImage(String sender) {
@@ -243,33 +237,5 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         theIntrinsic.forEach(tmpOut);
         tmpOut.copyTo(outputBitmap);
         return outputBitmap;
-    }
-
-    // TODO refactor with frame animation
-    public class AnimtingWaitingIconTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                while (true) {
-                    PhotoFullScreenActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            waitingIcon.setImageDrawable(getResources().getDrawable(R.drawable.eyes_left));
-                        }
-                    });
-                    Thread.sleep(1000);
-                    PhotoFullScreenActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            waitingIcon.setImageDrawable(getResources().getDrawable(R.drawable.eyes_right));
-                        }
-                    });
-                    Thread.sleep(1000);
-                }
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            return null;
-        }
     }
 }

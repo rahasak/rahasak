@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -34,6 +35,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     private TextView playingText;
     private TextView usernameText;
     private TextView micCallingText;
+    private ImageView waitingIcon;
 
     private Typeface typeface;
 
@@ -94,6 +96,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     }
 
     private void setupUi() {
+        waitingIcon = (ImageView) findViewById(R.id.selfie_image);
         loadingView = findViewById(R.id.mic_loading_view);
 
         playingText = (TextView) findViewById(R.id.mic_playingText);
@@ -127,7 +130,13 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
             loadingView.setVisibility(View.VISIBLE);
             playingText.setVisibility(View.INVISIBLE);
             setupUserImage(intent.getStringExtra("SENDER"));
+            startAnimatingWaitingIcon();
         }
+    }
+
+    private void startAnimatingWaitingIcon() {
+        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
+        anim.start();
     }
 
     private void setupUserImage(String sender) {
