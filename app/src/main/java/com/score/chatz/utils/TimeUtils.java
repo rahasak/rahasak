@@ -26,7 +26,7 @@ public class TimeUtils {
         String time = null;
         try {
             Date now = new Date();
-            long deltaSeconds = TimeUnit.MILLISECONDS.toSeconds(now.getTime() / 1000 - timestamp);
+            long deltaSeconds = now.getTime() / 1000 - timestamp;
 
             if (deltaSeconds < 3) {
                 time = "now";
