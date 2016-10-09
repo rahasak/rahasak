@@ -404,7 +404,7 @@ public class SenzorsDbSource {
      * @return
      */
     public ArrayList<Secret> getSecretz(User user, Long timestamp) {
-        ArrayList<Secret> secretList = new ArrayList();
+        ArrayList secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, missed, delivered, dispatched, timestamp " +

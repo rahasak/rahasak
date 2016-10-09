@@ -362,9 +362,9 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         // stream on senz
         // stream content
         // stream off senz
-        Senz startStreamSenz = getStartStreamSenz(uid);
-        ArrayList<Senz> photoSenzList = getPhotoStreamSenz(image, context, uid);
-        Senz stopStreamSenz = getStopStreamSenz(uid);
+        Senz startStreamSenz = getStartStreamSenz(uid, timestamp);
+        ArrayList<Senz> photoSenzList = getPhotoStreamSenz(image, context, uid, timestamp);
+        Senz stopStreamSenz = getStopStreamSenz(uid, timestamp);
 
         // populate list
         ArrayList<Senz> senzList = new ArrayList<>();
@@ -383,12 +383,11 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      * @param uid     unique id
      * @return list of decomposed senz's
      */
-    private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid) {
+    private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid, Long timestamp) {
         String imageString = new ImageUtils().encodeBitmap(image);
 
         Secret newSecret = new Secret(imageString, "IMAGE", user, false);
-        Long timeStamp = System.currentTimeMillis();
-        newSecret.setTimeStamp(timeStamp);
+        newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(false);
         new SenzorsDbSource(context).createSecret(newSecret);
@@ -404,8 +403,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
 
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-
+            senzAttributes.put("time", timestamp.toString());
             senzAttributes.put("cam", packet.trim());
             senzAttributes.put("uid", uid);
 
@@ -421,10 +419,10 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      *
      * @return senz
      */
-    private Senz getStartStreamSenz(String uid) {
+    private Senz getStartStreamSenz(String uid, Long timestamp) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("cam", "on");
         senzAttributes.put("uid", uid);
 
@@ -441,10 +439,10 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      *
      * @return senz
      */
-    private Senz getStopStreamSenz(String uid) {
+    private Senz getStopStreamSenz(String uid, Long timestamp) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("cam", "off");
         senzAttributes.put("uid", uid);
 

@@ -324,7 +324,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private void saveMissedCall() {
         Secret newSecret = new Secret("", "MISSED_SOUND", user, true);
-        Long timeStamp = System.currentTimeMillis()/1000;
+        Long timeStamp = System.currentTimeMillis() / 1000;
         newSecret.setTimeStamp(timeStamp);
         newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
         new SenzorsDbSource(this).createSecret(newSecret);
@@ -351,12 +351,12 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         if (audioRecorder.getRecording() != null) {
             String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
             Secret secret = new Secret(sound, "SOUND", user, false);
-            Long timeStamp = System.currentTimeMillis()/1000;
+            Long timeStamp = System.currentTimeMillis() / 1000;
             secret.setTimeStamp(timeStamp);
             String uid = SenzUtils.getUid(this, timeStamp.toString());
             secret.setId(uid);
             dbSource.createSecret(secret);
-            sendSound(secret, uid);
+            sendSound(secret, uid, timeStamp);
 
             this.finish();
         }
@@ -378,11 +378,11 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         send(_senz);
     }
 
-    private void sendSound(final Secret secret, final String uid) {
+    private void sendSound(final Secret secret, final String uid, final Long timestamp) {
         // compose senzes
-        Senz startSenz = getStartSoundSharingSenz(uid);
-        ArrayList<Senz> micSenzList = getSoundStreamingSenz(secret, uid);
-        Senz stopSenz = getStopSoundSharingSenz(uid);
+        Senz startSenz = getStartSoundSharingSenz(uid, timestamp);
+        ArrayList<Senz> micSenzList = getSoundStreamingSenz(secret, uid, timestamp);
+        Senz stopSenz = getStopSoundSharingSenz(uid, timestamp);
 
         ArrayList<Senz> senzList = new ArrayList<>();
         senzList.add(startSenz);
@@ -392,7 +392,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         sendInOrder(senzList);
     }
 
-    private ArrayList<Senz> getSoundStreamingSenz(Secret secret, String uid) {
+    private ArrayList<Senz> getSoundStreamingSenz(Secret secret, String uid, Long timestamp) {
         String soundString = secret.getBlob();
 
         ArrayList<Senz> senzList = new ArrayList<>();
@@ -405,7 +405,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("time", timestamp.toString());
             senzAttributes.put("mic", aSound.trim());
             senzAttributes.put("uid", uid);
 
@@ -415,11 +415,11 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         return senzList;
     }
 
-    private Senz getStartSoundSharingSenz(String uid) {
+    private Senz getStartSoundSharingSenz(String uid, Long timestamp) {
         //senz is the original senz
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("mic", "on");
         senzAttributes.put("uid", uid);
 
@@ -430,11 +430,11 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         return new Senz(id, signature, senzType, null, user, senzAttributes);
     }
 
-    private Senz getStopSoundSharingSenz(String uid) {
+    private Senz getStopSoundSharingSenz(String uid, Long timestamp) {
         // create senz attributes
         //senz is the original senz
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("mic", "off");
         senzAttributes.put("uid", uid);
 

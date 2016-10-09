@@ -129,7 +129,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        Secret secret = allSecretsList.get(position);
+        final Secret secret = allSecretsList.get(position);
         secret.setViewed(true);
         adapter.notifyDataSetChanged();
 
@@ -139,7 +139,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
             @Override
             public void onClick(View v) {
                 // delete item
-                displayConfirmationMessageDialog("Are you sure your want to delete the secret", position);
+                displayConfirmationMessageDialog("Are you sure your want to delete the secret", position, secret);
             }
         });
 
@@ -151,7 +151,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
      *
      * @param message - Message to ask
      */
-    public void displayConfirmationMessageDialog(String message, final int index) {
+    public void displayConfirmationMessageDialog(String message, final int index, final Secret secret) {
         final Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
         final Dialog dialog = new Dialog(this.getActivity());
 
@@ -184,8 +184,8 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
                 allSecretsList.remove(index);
                 adapter.notifyDataSetChanged();
 
-                // TODO delete from db
-                //new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser();
+                // delete from db
+                new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser(secret.getUser());
 
                 actionBarDelete.setVisibility(View.GONE);
                 actionBarName.setVisibility(View.VISIBLE);
