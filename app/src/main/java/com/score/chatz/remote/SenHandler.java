@@ -195,6 +195,7 @@ class SenHandler {
     private void handleCam(Senz senz, SenzService senzService) {
         try {
             Intent intent = new Intent(senzService.getApplicationContext(), PhotoActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("USER", senz.getSender());
             senzService.getApplicationContext().startActivity(intent);
         } catch (Exception e) {

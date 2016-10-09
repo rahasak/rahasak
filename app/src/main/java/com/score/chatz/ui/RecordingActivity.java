@@ -374,7 +374,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, user, null, senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, null, user, senzAttributes);
         send(_senz);
     }
 
