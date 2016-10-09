@@ -76,7 +76,7 @@
                 android:orientation="vertical">
 
 
-                <com.github.siyamed.shapeimageview.CircularImageView
+                <!--<com.github.siyamed.shapeimageview.CircularImageView
                     android:id="@+id/user_profile_image"
                     android:layout_width="130dp"
                     android:layout_height="130dp"
@@ -87,7 +87,13 @@
                     android:src="@drawable/rahaslogo"
                     app:siBorderAlpha="0.0"
                     android:padding="10dp"
-                    app:siSquare="true" />
+                    app:siSquare="true" />-->
+
+                <ImageView
+                    android:id="@+id/selfie_image"
+                    android:layout_width="80dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/eyes_moving" />
 
                 <LinearLayout
                     android:id="@+id/loading_info_box"
@@ -97,25 +103,15 @@
                     android:layout_marginTop="20dp"
                     android:orientation="horizontal">
 
-                    <ProgressBar
-                        android:id="@+id/progressBar"
-                        style="?android:attr/progressBarStyleSmall"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="center"
-                        android:layout_marginRight="5dp"
-                        android:visibility="gone"
-                        android:indeterminate="true">
-                    </ProgressBar>
 
                     <TextView
                         android:id="@+id/mic_calling_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:text="Secret calling..."
+                        android:text="Mic calling..."
                         android:textColor="@color/colorPrimary"
-                        android:textSize="25sp" />
+                        android:textSize="45sp" />
                 </LinearLayout>
 
                 <TextView
