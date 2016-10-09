@@ -317,14 +317,19 @@ public class UserProfileActivity extends BaseActivity {
     }
 
     private void handleDataSenz(Senz senz) {
-        ActivityUtils.cancelProgressDialog();
         if (senz.getAttributes().containsKey("status")) {
             // status response received
-            if (senz.getAttributes().get("status").equalsIgnoreCase("701")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED")) {
+                // delivery message
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("701")) {
+                ActivityUtils.cancelProgressDialog();
+
                 // permission sharing done
                 if (currentSenz.getAttributes().get("uid").equalsIgnoreCase(senz.getAttributes().get("uid"))) {
                     updatePermission(currentSenz);
                 }
+            } else {
+                //ActivityUtils.cancelProgressDialog();
             }
         }
     }
