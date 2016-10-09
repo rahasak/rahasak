@@ -37,8 +37,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     // camera related variables
     private android.hardware.Camera mCamera;
     private CameraPreview mCameraPreview;
-    private boolean isPhotoTaken;
-    private boolean isPhotoCancelled;
 
     // UI elements
     private View callingUserInfo;
@@ -87,7 +85,6 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
             stopVibrations();
             cancelTimerToServe();
             startQuickCountdownToPhoto();
-            isPhotoTaken = true;
         }
     }
 
@@ -216,21 +213,15 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                 if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside start button region
                     stopVibrations();
-                    if (!isPhotoTaken) {
-                        cancelTimerToServe();
-                        startQuickCountdownToPhoto();
-                        isPhotoTaken = true;
-                    }
+                    cancelTimerToServe();
+                    startQuickCountdownToPhoto();
                 } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
                     // Inside cancel button region
-                    if (!isPhotoCancelled) {
-                        isPhotoCancelled = true;
-                        cancelTimerToServe();
-                        sendBusySenz();
-                        stopVibrations();
-                        saveMissedSelfie();
-                        this.finish();
-                    }
+                    cancelTimerToServe();
+                    sendBusySenz();
+                    stopVibrations();
+                    saveMissedSelfie();
+                    this.finish();
                 }
                 break;
             case (MotionEvent.ACTION_UP):
