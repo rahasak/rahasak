@@ -4,22 +4,12 @@ package com.score.chatz.pojo;
  * Created by eranga on 9/18/16.
  */
 public class Stream {
-    private boolean isActive;
     private String user;
     private StringBuffer streamBuffer;
 
-    public Stream(boolean isActive, String user, StringBuffer streamBuffer) {
-        this.isActive = isActive;
+    public Stream(String user) {
         this.user = user;
-        this.streamBuffer = streamBuffer;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
+        this.streamBuffer = new StringBuffer();
     }
 
     public String getUser() {

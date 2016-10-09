@@ -10,7 +10,6 @@ public class Secret {
     private String id;
     private String blob;
     private User user;
-    private User receiver;
     private String type;
     private boolean isViewed;
     private boolean isMissed;
@@ -48,14 +47,6 @@ public class Secret {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public User getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
     }
 
     public String getType() {

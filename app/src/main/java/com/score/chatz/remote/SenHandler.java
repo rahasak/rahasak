@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.services.LocationService;
+import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
@@ -154,15 +154,13 @@ class SenHandler {
         if (SenzUtils.isStreamOn(senz)) {
             // stream on, first stream
             Log.d(TAG, "stream ON from " + senz.getSender().getUsername());
-            stream = new Stream(true, senz.getSender().getUsername(), new StringBuffer());
+            stream = new Stream(senz.getSender().getUsername());
         } else if (SenzUtils.isStreamOff(senz)) {
             // stream off, last stream
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
 
             // send status back first
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
-
-            stream.setActive(false);
 
             // new stream senz
             HashMap<String, String> attributes = new HashMap<>();
@@ -172,8 +170,11 @@ class SenHandler {
                 attributes.put("mic", stream.getStream());
 
             attributes.put("uid", senz.getAttributes().get("uid"));
+            attributes.put("time", senz.getAttributes().get("time"));
 
             Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
+
+            Log.d(TAG, "stream ---- " + stream.getStream());
 
             // save in db
             // broadcast
@@ -193,7 +194,7 @@ class SenHandler {
 
     private void handleCam(Senz senz, SenzService senzService) {
         try {
-            Intent intent = IntentProvider.getCameraIntent(senzService.getApplicationContext());
+            Intent intent = new Intent(senzService.getApplicationContext(), PhotoActivity.class);
             intent.putExtra("USER", senz.getSender());
             senzService.getApplicationContext().startActivity(intent);
         } catch (Exception e) {
@@ -217,7 +218,7 @@ class SenHandler {
     }
 
     private void broadcastSenz(Senz senz, Context context) {
-        Intent intent = IntentProvider.getSenzIntent();
+        Intent intent = new Intent("com.score.chatz.SENZ");
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }

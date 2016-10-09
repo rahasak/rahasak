@@ -96,22 +96,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     onSenzStreamReceived(senz);
                     break;
                 case SHARE:
-                    onSenzShareReceived(senz);
+                    updatePermissions();
                     break;
                 default:
                     break;
             }
-        }
-    };
-
-    // senz timeout
-    private BroadcastReceiver senzTimeoutReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Time out for senz");
-
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            onSenzTimeoutReceived(senz);
         }
     };
 
@@ -155,7 +144,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
-        registerReceiver(senzTimeoutReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.TIMEOUT));
 
         // update list
         updateSecretList();
@@ -165,7 +153,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public void onPause() {
         super.onPause();
         unregisterReceiver(senzReceiver);
-        unregisterReceiver(senzTimeoutReceiver);
     }
 
     @Override
@@ -308,9 +295,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             // create secret
             Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
-            secret.setReceiver(thisUser);
-
-            Long timestamp = System.currentTimeMillis()/1000;
+            Long timestamp = System.currentTimeMillis() / 1000;
             secret.setTimeStamp(timestamp);
             secret.setId(SenzUtils.getUid(this, timestamp.toString()));
 
@@ -424,31 +409,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
-            onNewSenzReceived(senz);
+            onSenzMsgReceived(senz);
         } else if (senz.getAttributes().containsKey("lat")) {
             // location received
         }
     }
 
     private void onSenzStreamReceived(Senz senz) {
-        onNewSenzReceived(senz);
-    }
-
-    private void onSenzShareReceived(Senz senz) {
-        updatePermissions();
-    }
-
-    public void onSenzTimeoutReceived(Senz senz) {
-        String uid = senz.getAttributes().get("uid");
-        new SenzorsDbSource(this).markSecretDeliveryFailed(uid);
-
-        // update failed message in list
-        for (Secret secret : secretList) {
-            if (secret.getId().equalsIgnoreCase(uid)) {
-                //secret.setDeliveryFailed(true);
-                secretAdapter.notifyDataSetChanged();
-            }
+        Secret secret;
+        if (senz.getAttributes().containsKey("mic")) {
+            secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
+        } else {
+            secret = new Secret(senz.getAttributes().get("cam"), "PHOTO", thisUser, true);
         }
+        secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+        secret.setId(senz.getAttributes().get("uid"));
+
+        secretList.add(secret);
+        secretAdapter.notifyDataSetChanged();
     }
 
     private void onSenzStatusReceived(Senz senz) {
@@ -464,23 +442,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void onNewSenzReceived(Senz senz) {
+    private void onSenzMsgReceived(Senz senz) {
         try {
-            Secret secret;
             if (senz.getAttributes().containsKey("msg")) {
                 String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
-                secret = new Secret(msg, "TEXT", thisUser, true);
-            } else if (senz.getAttributes().containsKey("mic")) {
-                secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
-            } else {
-                secret = new Secret(senz.getAttributes().get("cam"), "PHOTO", thisUser, true);
-            }
-            secret.setReceiver(senz.getReceiver());
-            secret.setTimeStamp(System.currentTimeMillis());
-            secret.setId(senz.getAttributes().get("uid"));
+                Secret secret = new Secret(msg, "TEXT", thisUser, true);
+                secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+                secret.setId(senz.getAttributes().get("uid"));
 
-            secretList.add(secret);
-            secretAdapter.notifyDataSetChanged();
+                secretList.add(secret);
+                secretAdapter.notifyDataSetChanged();
+            }
         } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
         }

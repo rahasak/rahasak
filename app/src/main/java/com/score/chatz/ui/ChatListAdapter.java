@@ -75,7 +75,7 @@ class ChatListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         final ViewHolder holder;
-        final Secret secret = (Secret) getItem(position);
+        final Secret secret = secretList.get(position);
         final int type = getItemViewType(position);
 
         if (view == null) {

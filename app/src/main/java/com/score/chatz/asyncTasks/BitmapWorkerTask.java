@@ -33,6 +33,7 @@ public class BitmapWorkerTask extends AsyncTask<BitmapTaskParams, Void, Bitmap> 
             final ImageView imageView = imageViewReference.get();
             if (imageView != null) {
                 imageView.setImageBitmap(bitmap);
+                imageView.invalidate();
             }
         }
     }
