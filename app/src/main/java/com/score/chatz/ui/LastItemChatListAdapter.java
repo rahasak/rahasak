@@ -103,7 +103,7 @@ public class LastItemChatListAdapter extends BaseAdapter {
         if (secret.getTimeStamp() != null) {
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
-            viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
+            viewHolder.sentTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
         if (secret.getUser().getUserImage() != null) {

@@ -93,31 +93,34 @@ public class SenzParser {
     }
 
     public static void main(String args[]) {
-        String senzMessage3 = "STREAM " +
-                "#msg UserCreated " +
-                "#pubkey sd23453451234sfsdfd==  " +
-                "#time 1441806897.71 " +
-                "#msg1 #msg2 rtt " +
-                "@senzswitch " +
-                "^era " +
-                "v50I88VzgvBvubCjGitTMO9";
+        System.out.println(System.currentTimeMillis()/1000);
+        System.out.println(System.currentTimeMillis());
 
-        //parse(senzMessage3);
-
-        LimitedList<String> list = new LimitedList<>(3);
-        list.add("era");
-        System.out.println(list);
-
-        list.add("nan");
-        System.out.println(list);
-
-        list.add("edsd");
-        System.out.println(list);
-
-        list.add("kesdf");
-        System.out.println(list);
-
-        list.add("ioio");
-        System.out.println(list);
+//        String senzMessage3 = "STREAM " +
+//                "#msg UserCreated " +
+//                "#pubkey sd23453451234sfsdfd==  " +
+//                "#time 1441806897.71 " +
+//                "#msg1 #msg2 rtt " +
+//                "@senzswitch " +
+//                "^era " +
+//                "v50I88VzgvBvubCjGitTMO9";
+//
+//        //parse(senzMessage3);
+//
+//        LimitedList<String> list = new LimitedList<>(3);
+//        list.add("era");
+//        System.out.println(list);
+//
+//        list.add("nan");
+//        System.out.println(list);
+//
+//        list.add("edsd");
+//        System.out.println(list);
+//
+//        list.add("kesdf");
+//        System.out.println(list);
+//
+//        list.add("ioio");
+//        System.out.println(list);
     }
 }

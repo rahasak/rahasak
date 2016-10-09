@@ -163,7 +163,7 @@ class ChatListAdapter extends BaseAdapter {
         if (secret.getTimeStamp() != null) {
             java.sql.Timestamp timestamp = new java.sql.Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
-            holder.chatTime.setText(TimeUtils.getTimeInWords(date));
+            holder.chatTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
         holder.chatCam.setOnClickListener(new View.OnClickListener() {
