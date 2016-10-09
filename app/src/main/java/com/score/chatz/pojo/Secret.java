@@ -7,16 +7,16 @@ package com.score.chatz.pojo;
 import com.score.senzc.pojos.User;
 
 public class Secret {
+    private String id;
     private String blob;
     private User user;
     private User receiver;
     private String type;
     private boolean isViewed;
+    private boolean isMissed;
     private boolean isDelivered;
+    private boolean isDispatched;
     private Long timeStamp;
-    private Long seenTimeStamp;
-    private String id;
-    private boolean isDeliveryFailed;
     private boolean isSender;
 
     public Secret(String blob, String type, User user, boolean isSender) {
@@ -24,6 +24,14 @@ public class Secret {
         this.user = user;
         this.type = type;
         this.isSender = isSender;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getBlob() {
@@ -66,6 +74,14 @@ public class Secret {
         isViewed = viewed;
     }
 
+    public boolean isMissed() {
+        return isMissed;
+    }
+
+    public void setMissed(boolean missed) {
+        isMissed = missed;
+    }
+
     public boolean isDelivered() {
         return isDelivered;
     }
@@ -74,36 +90,20 @@ public class Secret {
         isDelivered = delivered;
     }
 
+    public boolean isDispatched() {
+        return isDispatched;
+    }
+
+    public void setDispatched(boolean dispatched) {
+        isDispatched = dispatched;
+    }
+
     public Long getTimeStamp() {
         return timeStamp;
     }
 
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
-    }
-
-    public Long getSeenTimeStamp() {
-        return seenTimeStamp;
-    }
-
-    public void setSeenTimeStamp(Long seenTimeStamp) {
-        this.seenTimeStamp = seenTimeStamp;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public boolean isDeliveryFailed() {
-        return isDeliveryFailed;
-    }
-
-    public void setDeliveryFailed(boolean deliveryFailed) {
-        isDeliveryFailed = deliveryFailed;
     }
 
     public boolean isSender() {
@@ -119,6 +119,7 @@ public class Secret {
         if (!(other instanceof Secret)) {
             return false;
         }
+
         Secret that = (Secret) other;
         return this.id.equalsIgnoreCase(that.id);
     }

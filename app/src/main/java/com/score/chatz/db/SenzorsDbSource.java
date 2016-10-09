@@ -190,6 +190,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, secret.isViewed() ? 1 : 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_MISSED, secret.isMissed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED, 0);
 
@@ -345,7 +346,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, delivered, dispatched, timestamp " +
+        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, missed, delivered, dispatched, timestamp " +
                 "FROM secret WHERE user = ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
 
@@ -356,6 +357,7 @@ public class SenzorsDbSource {
         String _secretUser;
         int _secretIsSender;
         int _isViewed;
+        int _isMissed;
         int _secretIsDelivered;
         int _secretIsDispatched;
         Long _secretTimestamp;
@@ -370,6 +372,7 @@ public class SenzorsDbSource {
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
+            _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretIsDispatched = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED));
 
@@ -377,8 +380,9 @@ public class SenzorsDbSource {
             Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1);
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
+            secret.setMissed(_isMissed == 1);
             secret.setDelivered(_secretIsDelivered == 1);
-            secret.setDeliveryFailed(_secretIsDispatched == 1);
+            secret.setDispatched(_secretIsDispatched == 1);
             secret.setTimeStamp(_secretTimestamp);
 
             // fill secret list
@@ -403,7 +407,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, delivered, dispatched, timestamp " +
+        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, missed, delivered, dispatched, timestamp " +
                 "FROM secret WHERE user = ? AND timestamp > ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{user.getUsername(), timestamp.toString()});
 
@@ -414,6 +418,7 @@ public class SenzorsDbSource {
         String _secretUser;
         int _secretIsSender;
         int _isViewed;
+        int _isMissed;
         int _secretIsDelivered;
         int _secretIsDispatched;
         Long _secretTimestamp;
@@ -428,6 +433,7 @@ public class SenzorsDbSource {
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
+            _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretIsDispatched = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED));
 
@@ -435,8 +441,9 @@ public class SenzorsDbSource {
             Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1);
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
+            secret.setMissed(_isMissed == 1);
             secret.setDelivered(_secretIsDelivered == 1);
-            secret.setDeliveryFailed(_secretIsDispatched == 1);
+            secret.setDispatched(_secretIsDispatched == 1);
             secret.setTimeStamp(_secretTimestamp);
 
             // fill secret list

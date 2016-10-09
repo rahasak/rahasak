@@ -26,7 +26,6 @@ import java.util.Date;
  */
 public class LastItemChatListAdapter extends BaseAdapter {
 
-    private static final String TAG = ChatFragmentListAdapter.class.getName();
     private Context context;
     private ArrayList<Secret> userSecretList;
     private Typeface typeface;

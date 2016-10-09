@@ -136,7 +136,7 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatMicHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
-            if (secret.isViewed()) {
+            if (secret.isMissed()) {
                 holder.chatCam.setImageResource(R.drawable.missed_selfie_call);
             } else {
                 new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
@@ -144,10 +144,6 @@ class ChatListAdapter extends BaseAdapter {
         } else if (secret.getType().equalsIgnoreCase("SOUND")) {
             holder.chatCamHolder.setVisibility(View.GONE);
             holder.chatMicHolder.setVisibility(View.VISIBLE);
-            holder.chatMsgHolder.setVisibility(View.GONE);
-        } else if (secret.getType().equalsIgnoreCase("CAM_MIS")) {
-            holder.chatCamHolder.setVisibility(View.VISIBLE);
-            holder.chatMicHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.GONE);
         }
 
@@ -173,7 +169,7 @@ class ChatListAdapter extends BaseAdapter {
         holder.chatCam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (secret.isViewed()) {
+                if (secret.isMissed()) {
                     // missed
                     // start photo activity
                     Intent intent = new Intent(context, PhotoActivity.class);

@@ -170,9 +170,6 @@ class SenHandler {
                 attributes.put("cam", stream.getStream());
             else
                 attributes.put("mic", stream.getStream());
-
-            // TODO - Refactor this comment
-            //attributes.put("uid", senz.getAttributes().get("uid"));
             attributes.put("uid", SenzUtils.getUniqueRandomNumber());
 
             Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
@@ -229,6 +226,7 @@ class SenHandler {
         final Secret secret = new Secret(blob, type, user, true);
         secret.setId(SenzUtils.getUniqueRandomNumber());
         secret.setTimeStamp(System.currentTimeMillis());
+        secret.setMissed(false);
 
         // save secret async
         new Thread(new Runnable() {

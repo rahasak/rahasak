@@ -18,7 +18,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 16;
+    private static final int DATABASE_VERSION = 20;
     private static final String DATABASE_NAME = "Rahaz.db";
 
     // data types, keywords and queries
@@ -52,6 +52,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Secret.COLUMN_BLOB_TYPE + TEXT_TYPE + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_BLOB + TEXT_TYPE + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_VIEWED + INT_TYPE + ", " +
+                    SenzorsDbContract.Secret.COLUMN_NAME_MISSED + INT_TYPE + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED + INT_TYPE + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED + INT_TYPE +
                     " )";
