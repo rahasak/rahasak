@@ -29,6 +29,7 @@ import com.score.chatz.asyncTasks.RahasPlayer;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.interfaces.IRahasPlayListener;
 import com.score.chatz.utils.ImageUtils;
+import com.score.chatz.utils.PhotoUtils;
 import com.score.senzc.pojos.Senz;
 
 public class AudioFullScreenActivity extends AppCompatActivity implements IRahasPlayListener {
@@ -151,7 +152,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
         if (userImage != null) {
             Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(blur(bitmap));
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new PhotoUtils().blur(bitmap, BLUR_RADIUS, this));
         }
 
         usernameText.setText("@" + sender);
@@ -193,22 +194,5 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     @Override
     public void onFinishPlay() {
         this.finish();
-    }
-
-    public Bitmap blur(Bitmap image) {
-        if (null == image) return null;
-
-        Bitmap outputBitmap = Bitmap.createBitmap(image);
-        final RenderScript renderScript = RenderScript.create(this);
-        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
-        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
-
-        //Intrinsic Gausian blur filter
-        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
-        theIntrinsic.setRadius(BLUR_RADIUS);
-        theIntrinsic.setInput(tmpIn);
-        theIntrinsic.forEach(tmpOut);
-        tmpOut.copyTo(outputBitmap);
-        return outputBitmap;
     }
 }
