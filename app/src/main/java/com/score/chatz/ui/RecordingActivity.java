@@ -38,6 +38,8 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 import com.skyfishjy.library.RippleBackground;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,12 +50,13 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private View moving_layout;
     private Button doneBtn;
-    private TextView mTimerTextView;
     private Rect startBtnRectRelativeToScreen;
     private Rect cancelBtnRectRelativeToScreen;
     private CircularImageView cancelBtn;
     private ImageView startBtn;
     private RippleBackground goRipple;
+    private TextView briefIntroTextView;
+    private TextView countDownTextView;
 
     private boolean isRecordingStarted;
     private boolean isRecordingOver;
@@ -124,6 +127,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         dbSource = new SenzorsDbSource(this);
         audioRecorder = new AudioRecorder();
 
+        setUpFonts();
         setupUi();
         setupDontBtn();
         setupSwipeBtns();
@@ -135,6 +139,10 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         startTimerToEndRequest();
         setupUserImage();
         startMicIfMissedCall();
+    }
+
+    private void setUpFonts() {
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
     }
 
     private void startMicIfMissedCall() {
@@ -184,9 +192,14 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private void setupUi() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
-        this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
-        this.mTimerTextView.setText(START_TIME + "");
-        this.moving_layout = findViewById(R.id.moving_layout);
+        countDownTextView = (TextView) this.findViewById(R.id.time_countdown);
+        countDownTextView.setText(START_TIME + "");
+        briefIntroTextView = (TextView)findViewById(R.id.share_secret_brief);
+        moving_layout = findViewById(R.id.moving_layout);
+
+
+        countDownTextView.setTypeface(typeface, Typeface.BOLD);
+        briefIntroTextView.setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupWakeLock() {
@@ -339,7 +352,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mTimerTextView.setText(count + "");
+                countDownTextView.setText(count + "");
             }
         });
     }

@@ -6,7 +6,7 @@
     android:background="@color/black">
 
     <TextView
-        android:id="@+id/timer"
+        android:id="@+id/time_countdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="false"
@@ -14,16 +14,15 @@
         android:text="0"
         android:textColor="@color/colorPrimary"
         android:textSize="100sp"
-        android:textStyle="bold"
-        android:typeface="monospace" />
+        android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/share_secret_brief"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/timer"
+        android:layout_above="@+id/time_countdown"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="30dp"
         android:gravity="center_horizontal"
         android:text="Share a secret under 7 seconds."
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -190,14 +189,14 @@
     <Button
         android:id="@+id/done_btn"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="80dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:background="@drawable/rounded_corner_button"
         android:text="Done"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:layout_height="55dp" />
 
 
 </RelativeLayout>
