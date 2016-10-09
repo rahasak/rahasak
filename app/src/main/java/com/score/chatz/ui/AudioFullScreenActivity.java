@@ -4,9 +4,14 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
@@ -38,6 +43,9 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     private ImageView waitingIcon;
 
     private Typeface typeface;
+
+    //Set the radius of the Blur. Supported range 0 < radius <= 25
+    private static final float BLUR_RADIUS = 5f;
 
     // senz message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -141,8 +149,10 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
 
     private void setupUserImage(String sender) {
         String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
-        if (userImage != null)
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+        if (userImage != null) {
+            Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(blur(bitmap));
+        }
 
         usernameText.setText("@" + sender);
     }
@@ -183,5 +193,22 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     @Override
     public void onFinishPlay() {
         this.finish();
+    }
+
+    public Bitmap blur(Bitmap image) {
+        if (null == image) return null;
+
+        Bitmap outputBitmap = Bitmap.createBitmap(image);
+        final RenderScript renderScript = RenderScript.create(this);
+        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
+        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+
+        //Intrinsic Gausian blur filter
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        theIntrinsic.setRadius(BLUR_RADIUS);
+        theIntrinsic.setInput(tmpIn);
+        theIntrinsic.forEach(tmpOut);
+        tmpOut.copyTo(outputBitmap);
+        return outputBitmap;
     }
 }
