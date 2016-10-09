@@ -205,7 +205,7 @@ class SenHandler {
         Intent intent = new Intent();
         intent.setClass(senzService.getApplicationContext(), RecordingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("SENZ", senz);
+        intent.putExtra("USER", senz.getSender());
         senzService.getApplicationContext().startActivity(intent);
     }
 

@@ -29,7 +29,6 @@ import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.SecretsUtil;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
@@ -358,7 +357,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
             String uid = SenzUtils.getUniqueRandomNumber();
             secret.setId(uid);
             dbSource.createSecret(secret);
-            sendSound(secret, this, uid);
+            sendSound(secret, uid);
 
             this.finish();
         }
@@ -381,11 +380,11 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         send(_senz);
     }
 
-    private void sendSound(final Secret secret, final Context context, final String uid) {
+    private void sendSound(final Secret secret, final String uid) {
         // compose senzes
-        Senz startSenz = getStartSoundSharingSenz(secret, context, uid);
-        ArrayList<Senz> micSenzList = getSoundStreamingSenz(secret, context, uid);
-        Senz stopSenz = getStopSoundSharingSenz(secret, context, uid);
+        Senz startSenz = getStartSoundSharingSenz(uid);
+        ArrayList<Senz> micSenzList = getSoundStreamingSenz(secret, uid);
+        Senz stopSenz = getStopSoundSharingSenz(uid);
 
         ArrayList<Senz> senzList = new ArrayList<>();
         senzList.add(startSenz);
@@ -395,7 +394,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         sendInOrder(senzList);
     }
 
-    private ArrayList<Senz> getSoundStreamingSenz(Secret secret, Context context, String uid) {
+    private ArrayList<Senz> getSoundStreamingSenz(Secret secret, String uid) {
         String soundString = secret.getBlob();
 
         ArrayList<Senz> senzList = new ArrayList<>();
@@ -412,13 +411,13 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
             senzAttributes.put("mic", aSound.trim());
             senzAttributes.put("uid", uid);
 
-            Senz _senz = new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getUser(), senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, null, user, senzAttributes);
             senzList.add(_senz);
         }
         return senzList;
     }
 
-    private Senz getStartSoundSharingSenz(Secret secret, Context context, String uid) {
+    private Senz getStartSoundSharingSenz(String uid) {
         //senz is the original senz
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -430,10 +429,10 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-        return new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getReceiver(), senzAttributes);
+        return new Senz(id, signature, senzType, null, user, senzAttributes);
     }
 
-    private Senz getStopSoundSharingSenz(Secret secret, Context context, String uid) {
+    private Senz getStopSoundSharingSenz(String uid) {
         // create senz attributes
         //senz is the original senz
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -445,7 +444,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-        return new Senz(id, signature, senzType, SecretsUtil.getCurrentUser(context), secret.getReceiver(), senzAttributes);
+        return new Senz(id, signature, senzType, null, user, senzAttributes);
     }
 
     private String[] split(String src, int len) {

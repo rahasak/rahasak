@@ -189,7 +189,7 @@ class ChatListAdapter extends BaseAdapter {
             }
         });
 
-        holder.chatMsg.setOnClickListener(new View.OnClickListener() {
+        holder.chatMic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, AudioFullScreenActivity.class);
