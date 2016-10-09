@@ -85,7 +85,7 @@ public class SenzService extends Service {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
-            SenzTracker.getInstance(SenzService.this).startSenzTrack(senz);
+            //SenzTracker.getInstance(SenzService.this).startSenzTrack(senz);
             writeSenz(senz);
         }
 

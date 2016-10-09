@@ -155,7 +155,6 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_PERMISSION_CONFIG);
         db.execSQL(SQL_DELETE_LATEST_CHAT);
 
-
         onCreate(db);
     }
 

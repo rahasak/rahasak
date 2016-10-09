@@ -38,8 +38,8 @@ class SenHandler {
 
     void handle(String senzMsg, SenzService senzService) {
         Senz senz = SenzParser.parse(senzMsg);
-        if (senz.getSenzType() != SenzTypeEnum.STREAM)
-            SenzTracker.getInstance(senzService).stopSenzTrack(senz);
+        //if (senz.getSenzType() != SenzTypeEnum.STREAM)
+        //SenzTracker.getInstance(senzService).stopSenzTrack(senz);
         switch (senz.getSenzType()) {
             case SHARE:
                 Log.d(TAG, "SHARE received");
@@ -160,7 +160,7 @@ class SenHandler {
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
 
             // send status back first
-            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
 
             stream.setActive(false);
 

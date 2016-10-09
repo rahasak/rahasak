@@ -59,7 +59,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private boolean isRecordingStarted;
     private boolean isRecordingOver;
 
-    private Senz thisSenz;
+    private User user;
     private SenzorsDbSource dbSource;
     private AudioRecorder audioRecorder;
 
@@ -121,7 +121,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         setContentView(R.layout.activity_recording);
 
         Intent intent = getIntent();
-        thisSenz = intent.getParcelableExtra("Senz");
+        user = intent.getParcelableExtra("USER");
         dbSource = new SenzorsDbSource(this);
         audioRecorder = new AudioRecorder();
 
@@ -218,12 +218,12 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
-        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + thisSenz.getSender().getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + user.getUsername());
         ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupUserImage() {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(thisSenz.getSender().getUsername());
+        String userImage = new SenzorsDbSource(this).getImageFromDB(user.getUsername());
         if (userImage != null)
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
@@ -325,7 +325,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
     private void saveMissedCall() {
         String uid = SenzUtils.getUniqueRandomNumber();
-        Secret newSecret = new Secret("", "MISSED_SOUND", thisSenz.getSender(), true);
+        Secret newSecret = new Secret("", "MISSED_SOUND", user, true);
         Long timeStamp = System.currentTimeMillis();
         newSecret.setTimeStamp(timeStamp);
         newSecret.setId(uid);
@@ -351,7 +351,8 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         // stops the recording activity
         audioRecorder.stopRecording();
         if (audioRecorder.getRecording() != null) {
-            Secret secret = getSoundSecret(thisSenz.getSender(), thisSenz.getReceiver(), Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
+            String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
+            Secret secret = new Secret(sound, "SOUND", user, false);
             Long _timeStamp = System.currentTimeMillis();
             secret.setTimeStamp(_timeStamp);
             String uid = SenzUtils.getUniqueRandomNumber();
@@ -363,24 +364,20 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         }
     }
 
-    private Secret getSoundSecret(User sender, User receiver, String sound) {
-        Secret secret = new Secret(sound, "SOUND", SecretsUtil.getTheUser(sender, receiver, getApplicationContext()), false);
-        secret.setReceiver(sender);
-        return secret;
-    }
-
     private void sendBusySenz() {
+        String uid = SenzUtils.getUniqueRandomNumber();
+
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("status", "901");
-        senzAttributes.put("uid", thisSenz.getAttributes().get("uid"));
+        senzAttributes.put("uid", uid);
 
         // new senz
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, thisSenz.getReceiver(), thisSenz.getSender(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, user, null, senzAttributes);
         send(_senz);
     }
 
