@@ -160,7 +160,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
 
         // keep only last message
-        //new SenzorsDbSource(this).deleteAllSecretsExceptLast(thisUser.getUsername());
+        new SenzorsDbSource(this).deleteAllSecretsExceptLast(thisUser.getUsername());
     }
 
     protected void bindToService() {
