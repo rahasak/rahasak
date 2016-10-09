@@ -86,10 +86,21 @@ public class SenzUtils {
         return senz;
     }
 
-    public static String getUniqueRandomNumber() {
-        Long number = (long) Math.floor(Math.random() * 900000000L) + 10000000L;
-        return number.toString();
+    public static String getUid(Context context, String timestamp) {
+        try {
+            String username = PreferenceUtils.getUser(context).getUsername();
+            return username + timestamp;
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
+
+        return timestamp;
     }
+
+//    public static String getUniqueRandomNumber() {
+//        Long number = (long) Math.floor(Math.random() * 900000000L) + 10000000L;
+//        return number.toString();
+//    }
 
     public static boolean isStreamOn(Senz senz) {
         return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("on") ||

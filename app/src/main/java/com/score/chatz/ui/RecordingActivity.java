@@ -323,11 +323,10 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     }
 
     private void saveMissedCall() {
-        String uid = SenzUtils.getUniqueRandomNumber();
         Secret newSecret = new Secret("", "MISSED_SOUND", user, true);
-        Long timeStamp = System.currentTimeMillis();
+        Long timeStamp = System.currentTimeMillis()/1000;
         newSecret.setTimeStamp(timeStamp);
-        newSecret.setId(uid);
+        newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
         new SenzorsDbSource(this).createSecret(newSecret);
     }
 
@@ -352,9 +351,9 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         if (audioRecorder.getRecording() != null) {
             String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
             Secret secret = new Secret(sound, "SOUND", user, false);
-            Long _timeStamp = System.currentTimeMillis();
-            secret.setTimeStamp(_timeStamp);
-            String uid = SenzUtils.getUniqueRandomNumber();
+            Long timeStamp = System.currentTimeMillis()/1000;
+            secret.setTimeStamp(timeStamp);
+            String uid = SenzUtils.getUid(this, timeStamp.toString());
             secret.setId(uid);
             dbSource.createSecret(secret);
             sendSound(secret, uid);
@@ -364,13 +363,12 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     }
 
     private void sendBusySenz() {
-        String uid = SenzUtils.getUniqueRandomNumber();
-
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("status", "901");
-        senzAttributes.put("uid", uid);
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
         // new senz
         String id = "_ID";

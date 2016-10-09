@@ -170,7 +170,8 @@ class SenHandler {
                 attributes.put("cam", stream.getStream());
             else
                 attributes.put("mic", stream.getStream());
-            attributes.put("uid", SenzUtils.getUniqueRandomNumber());
+
+            attributes.put("uid", senz.getAttributes().get("uid"));
 
             Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
 
@@ -224,8 +225,9 @@ class SenHandler {
     private void saveSecret(String blob, String type, User user, final Context context) {
         // create secret
         final Secret secret = new Secret(blob, type, user, true);
-        secret.setId(SenzUtils.getUniqueRandomNumber());
-        secret.setTimeStamp(System.currentTimeMillis());
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        secret.setId(SenzUtils.getUid(context, timestamp.toString()));
+        secret.setTimeStamp(timestamp);
         secret.setMissed(false);
 
         // save secret async

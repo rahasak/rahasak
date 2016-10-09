@@ -309,8 +309,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             // create secret
             Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
             secret.setReceiver(thisUser);
-            secret.setTimeStamp(System.currentTimeMillis());
-            secret.setId(SenzUtils.getUniqueRandomNumber());
+
+            Long timestamp = System.currentTimeMillis()/1000;
+            secret.setTimeStamp(timestamp);
+            secret.setId(SenzUtils.getUid(this, timestamp.toString()));
 
             // send secret
             // save secret
@@ -329,10 +331,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
         senzAttributes.put("lat", "");
         senzAttributes.put("lon", "");
-        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
+
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
         // new senz
         String id = "_ID";
@@ -348,9 +353,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("cam", "");
-        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
+
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
         // new senz
         String id = "_ID";
@@ -366,9 +373,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put("mic", "");
-        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
+
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
         // new senz
         String id = "_ID";

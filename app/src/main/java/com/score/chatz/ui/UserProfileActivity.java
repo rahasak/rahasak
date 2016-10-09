@@ -228,9 +228,10 @@ public class UserProfileActivity extends BaseActivity {
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        String timestamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
+        senzAttributes.put("time", timestamp);
         senzAttributes.put("cam", "");
-        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp));
 
         // new senz
         String id = "_ID";
@@ -298,8 +299,10 @@ public class UserProfileActivity extends BaseActivity {
         } else {
             senzAttributes.put(permName, permValue);
         }
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
+
+        String timestamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
+        senzAttributes.put("time", timestamp);
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp));
 
         // new senz
         String id = "_ID";

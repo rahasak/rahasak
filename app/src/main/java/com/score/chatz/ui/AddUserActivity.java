@@ -108,8 +108,8 @@ public class AddUserActivity extends BaseActivity {
                 lowerCaseText();
             }
 
-            private void lowerCaseText(){
-                if(!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
+            private void lowerCaseText() {
+                if (!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
                     String usernameText = editTextUserId.getText().toString();
                     usernameText = usernameText.toLowerCase();
                     editTextUserId.setText(usernameText);
@@ -201,8 +201,10 @@ public class AddUserActivity extends BaseActivity {
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("msg", "");
         senzAttributes.put("status", "");
-        senzAttributes.put("uid", SenzUtils.getUniqueRandomNumber());
-        senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
         // new senz
         String id = "_ID";

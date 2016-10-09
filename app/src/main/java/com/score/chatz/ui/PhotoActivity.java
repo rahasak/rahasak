@@ -319,21 +319,22 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
     }
 
     private void saveMissedSelfie() {
-        String uid = SenzUtils.getUniqueRandomNumber();
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        String uid = SenzUtils.getUid(this, timestamp.toString());
         Secret newSecret = new Secret("", "IMAGE", user, true);
-        Long timeStamp = System.currentTimeMillis();
-        newSecret.setTimeStamp(timeStamp);
+        newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(true);
         new SenzorsDbSource(this).createSecret(newSecret);
     }
 
     private void sendBusySenz() {
-        String uid = SenzUtils.getUniqueRandomNumber();
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        String uid = SenzUtils.getUid(this, timestamp.toString());
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("uid", uid);
         senzAttributes.put("status", "801");
 
@@ -355,7 +356,8 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
      */
     private void sendPhotoSenz(final byte[] image, final Context context) {
         // compose senz
-        String uid = SenzUtils.getUniqueRandomNumber();
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        String uid = SenzUtils.getUid(this, timestamp.toString());
 
         // stream on senz
         // stream content
