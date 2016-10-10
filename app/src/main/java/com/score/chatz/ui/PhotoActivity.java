@@ -55,7 +55,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
 
     private CountDownTimer cancelTimer;
 
-    private static final int TIME_TO_SERVE_REQUEST = 10000;
+    private static final int TIME_TO_SERVE_REQUEST = 15000;
     private static final int TIME_TO_QUICK_PHOTO = 3000;
 
     private float dX, dY, startX, startY;

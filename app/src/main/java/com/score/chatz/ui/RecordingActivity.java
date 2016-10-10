@@ -65,7 +65,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
     private SenzorsDbSource dbSource;
     private AudioRecorder audioRecorder;
 
-    private static final int TIME_TO_SERVE_REQUEST = 10000;
+    private static final int TIME_TO_SERVE_REQUEST = 15000;
     private static final int START_TIME = 7;
 
     private float dX, dY, startX, startY;
