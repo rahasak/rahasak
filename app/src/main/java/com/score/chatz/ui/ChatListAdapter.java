@@ -13,14 +13,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
 import com.score.chatz.utils.TimeUtils;
-
-import java.util.Date;
 
 /**
  * Created by eranga on 9/28/16
@@ -75,7 +72,7 @@ class ChatListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         final ViewHolder holder;
-        final Secret secret = (Secret) getItem(position);
+        final Secret secret = secretList.get(position);
         final int type = getItemViewType(position);
 
         if (view == null) {
@@ -139,7 +136,8 @@ class ChatListAdapter extends BaseAdapter {
             if (secret.isMissed()) {
                 holder.chatCam.setImageResource(R.drawable.missed_selfie_call);
             } else {
-                new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
+                //new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
+                holder.chatCam.setImageBitmap(new ImageUtils().decodeBitmap(secret.getBlob()));
             }
         } else if (secret.getType().equalsIgnoreCase("SOUND")) {
             holder.chatCamHolder.setVisibility(View.GONE);
@@ -161,8 +159,6 @@ class ChatListAdapter extends BaseAdapter {
         }
 
         if (secret.getTimeStamp() != null) {
-            java.sql.Timestamp timestamp = new java.sql.Timestamp(secret.getTimeStamp());
-            Date date = new Date(timestamp.getTime());
             holder.chatTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 

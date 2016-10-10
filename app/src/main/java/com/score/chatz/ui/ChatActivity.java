@@ -417,19 +417,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void onSenzStreamReceived(Senz senz) {
         // update list
-        updateSecretList();
+        //updateSecretList();
 
-//        Secret secret;
-//        if (senz.getAttributes().containsKey("mic")) {
-//            secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
-//        } else {
-//            secret = new Secret(senz.getAttributes().get("cam"), "PHOTO", thisUser, true);
-//        }
-//        secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
-//        secret.setId(senz.getAttributes().get("uid"));
-//
-//        secretList.add(secret);
-//        secretAdapter.notifyDataSetChanged();
+        Secret secret;
+        if (senz.getAttributes().containsKey("cam")) {
+            secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", thisUser, true);
+        } else {
+            secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
+        }
+        secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+        secret.setId(senz.getAttributes().get("uid"));
+
+        secretList.add(secret);
+        secretAdapter.notifyDataSetChanged();
     }
 
     private void onSenzStatusReceived(Senz senz) {

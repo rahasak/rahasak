@@ -135,7 +135,10 @@ class SenHandler {
             try {
                 // save and broadcast
                 String rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
-                saveSecret(rahasa, "TEXT", senz.getSender(), senzService.getApplicationContext());
+
+                Long timestamp = (System.currentTimeMillis() / 1000);
+                saveSecret(timestamp, senz.getAttributes().get("uid"), rahasa, "TEXT", senz.getSender(), senzService.getApplicationContext());
+                senz.getAttributes().put("time", timestamp.toString());
                 broadcastSenz(senz, senzService.getApplicationContext());
 
                 // show notification
@@ -169,8 +172,9 @@ class SenHandler {
             else
                 attributes.put("mic", stream.getStream());
 
+            Long timestamp = (System.currentTimeMillis() / 1000);
             attributes.put("uid", senz.getAttributes().get("uid"));
-            attributes.put("time", senz.getAttributes().get("time"));
+            attributes.put("time", timestamp.toString());
 
             Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
 
@@ -179,9 +183,9 @@ class SenHandler {
             // save in db
             // broadcast
             if (senz.getAttributes().containsKey("cam"))
-                saveSecret(stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
             else
-                saveSecret(stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
             broadcastSenz(streamSenz, senzService.getApplicationContext());
         } else {
             // middle stream
@@ -224,11 +228,10 @@ class SenHandler {
         context.sendBroadcast(intent);
     }
 
-    private void saveSecret(String blob, String type, User user, final Context context) {
+    private void saveSecret(Long timestamp, String uid, String blob, String type, User user, final Context context) {
         // create secret
         final Secret secret = new Secret(blob, type, user, true);
-        Long timestamp = (System.currentTimeMillis() / 1000);
-        secret.setId(SenzUtils.getUid(context, timestamp.toString()));
+        secret.setId(uid);
         secret.setTimeStamp(timestamp);
         secret.setMissed(false);
 
