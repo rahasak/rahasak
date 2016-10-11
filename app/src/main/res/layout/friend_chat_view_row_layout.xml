@@ -41,8 +41,8 @@
         android:orientation="horizontal">
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:layout_alignParentLeft="true"
             android:background="@drawable/image_border"
             android:padding="5dp">
