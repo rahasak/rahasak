@@ -703,6 +703,14 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         //String sqlDelete = "delete from secret where uid in (select uid from secret where _id not in (select _id from secret where user = '" + username + "' order by _id DESC limit 1) and user = '" + username + "')";
 
+//        String sqlDelete =
+//                "delete from secret where " +
+//                        "uid in " +
+//                        "(select uid from secret where " +
+//                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
+//                        "user = '" + username + "' and " +
+//                        "viewed = 1)";
+
         // TODO refactor/optimize this
         String sqlDelete = "uid in (select uid from secret where _id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and user = '" + username + "')";
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
