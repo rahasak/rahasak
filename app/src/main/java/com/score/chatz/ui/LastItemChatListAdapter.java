@@ -17,9 +17,7 @@ import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.TimeUtils;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by lakmalcaldera on 8/19/16.
@@ -93,7 +91,11 @@ public class LastItemChatListAdapter extends BaseAdapter {
         viewHolder.sender.setText("@" + secret.getUser().getUsername());
 
         if (secret.getType().equalsIgnoreCase("IMAGE")) {
-            viewHolder.message.setText("Selfie secret");
+            if (secret.isMissed()) {
+                viewHolder.message.setText("Missed selfie");
+            } else {
+                viewHolder.message.setText("Selfie secret");
+            }
         } else if (secret.getType().equalsIgnoreCase("SOUND")) {
             viewHolder.message.setText("Audio secret");
         } else if (secret.getType().equalsIgnoreCase("TEXT")) {
@@ -101,8 +103,6 @@ public class LastItemChatListAdapter extends BaseAdapter {
         }
 
         if (secret.getTimeStamp() != null) {
-            Timestamp timestamp = new Timestamp(secret.getTimeStamp());
-            Date date = new Date(timestamp.getTime());
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
