@@ -94,7 +94,9 @@
                             android:paddingRight="7dp"
                             android:textColor="@color/android_grey"
                             android:textColorHint="@color/clouds"
-                            android:textSize="20sp" />
+                            android:textSize="20sp"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -184,7 +186,7 @@
                                     android:layout_height="20dp"
                                     android:background="@drawable/left_border"
                                     android:layout_gravity="bottom"
-                                    android:layout_marginBottom="10dp"></FrameLayout>
+                                    android:layout_marginBottom="12dp"></FrameLayout>
 
                                 <TextView
                                     android:id="@+id/sendBtn"
@@ -198,7 +200,7 @@
                                     android:text="SEND"
                                     android:textAlignment="center"
                                     android:textColor="@color/colorPrimary"
-                                    android:paddingBottom="10dp"
+                                    android:paddingBottom="13dp"
                                     android:gravity="bottom|center" />
                             </FrameLayout>
 
