@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.score.chatz.R;
+import com.score.chatz.application.SenzApplication;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
 import com.score.chatz.ui.ChatActivity;
@@ -48,7 +49,7 @@ class SenzNotificationManager {
         } else {
             intent = new Intent(context, HomeActivity.class);
         }
-        
+
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -82,7 +83,9 @@ class SenzNotificationManager {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
-            if (NotificationUtils.isBackgroundRunning(context) || !NotificationUtils.isAppInteractable(context) || NotificationUtils.isScreenLocked(context)) {
+            //if (NotificationUtils.isBackgroundRunning(context) || !NotificationUtils.isAppInteractable(context) || NotificationUtils.isScreenLocked(context)) {
+            if (!SenzApplication.isOnChat()) {
+                // display other types of notification when user not on chat
                 Notification notification = getNotification(senzNotification);
                 notification.flags |= Notification.FLAG_AUTO_CANCEL;
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

@@ -9,6 +9,8 @@ import android.app.Application;
  */
 public class SenzApplication extends Application {
 
+    private static boolean onChat = false;
+
     /**
      * {@inheritDoc}
      */
@@ -25,4 +27,12 @@ public class SenzApplication extends Application {
         super.onTerminate();
     }
 
+    public static boolean isOnChat() {
+        return onChat;
+    }
+
+    public static void setOnChat(boolean onChat) {
+        SenzApplication.onChat = onChat;
+    }
+    
 }

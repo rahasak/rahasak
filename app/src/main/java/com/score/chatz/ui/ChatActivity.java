@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
@@ -142,16 +143,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+
+        // on chat
+        SenzApplication.setOnChat(true);
+
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
 
         // update list
         updateSecretList();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
+
+        // not on chat
+        SenzApplication.setOnChat(false);
+
         unregisterReceiver(senzReceiver);
     }
 
