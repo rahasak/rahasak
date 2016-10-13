@@ -6,15 +6,15 @@
 
 
     <ImageView
-        android:layout_width="35dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="15dp"
-        android:layout_marginTop="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rahaslogo"
         android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/rahaslogo" />
+        android:cropToPadding="false"
+        android:layout_width="40dp" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
