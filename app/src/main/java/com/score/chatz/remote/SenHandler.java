@@ -126,6 +126,7 @@ class SenHandler {
         if (senz.getAttributes().containsKey("status")) {
             // status coming from switch
             // broadcast
+            updateStatus(senz, senzService.getApplicationContext());
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg")) {
             // rahasa
@@ -187,6 +188,10 @@ class SenHandler {
             else
                 saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
             broadcastSenz(streamSenz, senzService.getApplicationContext());
+
+            // show notification
+            SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                    NotificationUtils.getNewSecretNotification(senz.getSender().getUsername(), "New secret received "));
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam"))
@@ -242,6 +247,20 @@ class SenHandler {
                 new SenzorsDbSource(context).createSecret(secret);
             }
         }).start();
+    }
+
+    private void updateStatus(Senz senz, final Context context) {
+        final String uid = senz.getAttributes().get("uid");
+        String status = senz.getAttributes().get("status");
+        if (status.equalsIgnoreCase("DELIVERED")) {
+            // update status in db
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new SenzorsDbSource(context).markSecretDelievered(uid);
+                }
+            }).start();
+        }
     }
 
 }
