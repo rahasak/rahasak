@@ -106,6 +106,8 @@ public class SenzService extends Service {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         Log.d(TAG, "onCreate called");
 
         registerReceivers();
@@ -113,6 +115,8 @@ public class SenzService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
         Log.d(TAG, "onStartCommand executed");
 
         // init comm
@@ -122,11 +126,13 @@ public class SenzService extends Service {
             Log.e(TAG, "no network to start senzcomm");
         }
 
-        return Service.START_STICKY;
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
+
         Log.d(TAG, "onDestroy");
 
         unRegisterReceivers();
