@@ -36,9 +36,9 @@ public class NotificationUtils {
     public static SenzNotification getStreamNotification(String user, boolean isCam) {
         String msg;
         if (isCam) {
-            msg = "New camera secret received";
+            msg = "New selfie secret received";
         } else {
-            msg = "New mic secret received";
+            msg = "New voice secret received";
         }
 
         return new SenzNotification(R.drawable.rahaslogo, "@" + user, msg, user, NotificationType.NEW_SECRET);
