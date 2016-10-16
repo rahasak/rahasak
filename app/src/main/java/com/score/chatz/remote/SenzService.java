@@ -42,8 +42,8 @@ public class SenzService extends Service {
 
     // socket host, port
     //public static final String SENZ_HOST = "10.2.2.49";
-    //public static final String SENZ_HOST = "udp.mysensors.info";
-    private static final String SENZ_HOST = "52.77.228.195";
+    public static final String SENZ_HOST = "udp.mysensors.info";
+    //private static final String SENZ_HOST = "52.77.228.195";
 
     public static final int SENZ_PORT = 7070;
 

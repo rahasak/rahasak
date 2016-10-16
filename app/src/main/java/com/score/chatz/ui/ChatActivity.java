@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
@@ -152,7 +153,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // update list
         updateSecretList();
-
     }
 
     @Override
@@ -321,8 +321,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onClickLocation() {
-        // Go to locations waiting page
-        navigateToLocationView();
+        ActivityUtils.showProgressDialog(this, "Please wait");
 
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -416,19 +415,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (msg != null && msg.equalsIgnoreCase("DELIVERED")) {
                 // message delivered to user
                 onSenzStatusReceived(senz);
+            } else if (msg != null && msg.equalsIgnoreCase("NO_LOCATION")) {
+                ActivityUtils.cancelProgressDialog();
+                Toast.makeText(this, "No location available", Toast.LENGTH_LONG).show();
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
             onSenzMsgReceived(senz);
         } else if (senz.getAttributes().containsKey("lat")) {
             // location received
+            ActivityUtils.cancelProgressDialog();
+            onLocationReceived(senz);
         }
     }
 
     private void onSenzStreamReceived(Senz senz) {
-        // update list
-        //updateSecretList();
-
         Secret secret;
         if (senz.getAttributes().containsKey("cam")) {
             secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", thisUser, true);
@@ -471,6 +472,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void onLocationReceived(Senz senz) {
+        // start map activity
+        Intent mapIntent = new Intent(this, SenzMapActivity.class);
+        mapIntent.putExtra("SENZ", senz);
+        startActivity(mapIntent);
+    }
+
     private void updatePermissions() {
         UserPermission userPerm = new SenzorsDbSource(this).getUserPermission(thisUser);
         if (userPerm != null) {
@@ -503,13 +511,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void navigateToLocationView() {
-        // start map activity
-        Intent mapIntent = new Intent(this, SenzMapActivity.class);
-        startActivity(mapIntent);
-        overridePendingTransition(R.anim.right_in, R.anim.stay_in);
-    }
-
     private void send(Senz senz) {
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
@@ -525,5 +526,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             ActivityUtils.showCustomToast("No network connection available.", this);
         }
     }
+
 
 }

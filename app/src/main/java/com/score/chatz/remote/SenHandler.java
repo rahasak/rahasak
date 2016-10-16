@@ -7,7 +7,6 @@ import android.util.Log;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.Stream;
-import com.score.chatz.services.LocationService;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
@@ -222,7 +221,7 @@ class SenHandler {
     }
 
     private void handleLocation(Senz senz, SenzService senzService) {
-        Intent intent = new Intent(senzService.getApplicationContext(), LocationService.class);
+        Intent intent = new Intent(senzService.getApplicationContext(), LatLonService.class);
         intent.putExtra("SENZ", senz);
         senzService.getApplicationContext().startService(intent);
     }
