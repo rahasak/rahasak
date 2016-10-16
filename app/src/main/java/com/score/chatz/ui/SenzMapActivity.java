@@ -160,7 +160,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
      * @param latLng
      */
     private void displayMyLocation(LatLng latLng) {
-        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_me)));
+        marker = map.addMarker(new MarkerOptions().position(latLng).title("@Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_me)));
 
         // set zoom level
         LatLngBounds.Builder builder = new LatLngBounds.Builder();

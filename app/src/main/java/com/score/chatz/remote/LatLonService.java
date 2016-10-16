@@ -60,14 +60,18 @@ public class LatLonService extends Service implements GoogleApiClient.Connection
     };
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+
+        initLoc();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
         this.thisSenz = intent.getExtras().getParcelable("SENZ");
-
         bindService();
-        initLoc();
-
         return START_STICKY;
     }
 
@@ -90,6 +94,9 @@ public class LatLonService extends Service implements GoogleApiClient.Connection
                 sendLocationProviderNotEnabled();
             }
         }
+
+        // stop
+        stopSelf();
     }
 
     @Override
