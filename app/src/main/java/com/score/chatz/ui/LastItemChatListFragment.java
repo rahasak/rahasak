@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -50,7 +51,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
             Log.d(TAG, "Got new user from Senz service");
 
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            if (senz.getSenzType() == SenzTypeEnum.SHARE) {
+            if (senz.getSenzType() == SenzTypeEnum.DATA) {
                 displayUserList();
             }
         }
@@ -85,14 +86,14 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         super.onResume();
         displayUserList();
 
-        //getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        //getActivity().unregisterReceiver(senzReceiver);
+        getActivity().unregisterReceiver(senzReceiver);
     }
 
     private void initActionBar() {

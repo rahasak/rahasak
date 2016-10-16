@@ -37,8 +37,6 @@ class SenHandler {
 
     void handle(String senzMsg, SenzService senzService) {
         Senz senz = SenzParser.parse(senzMsg);
-        //if (senz.getSenzType() != SenzTypeEnum.STREAM)
-        //SenzTracker.getInstance(senzService).stopSenzTrack(senz);
         switch (senz.getSenzType()) {
             case SHARE:
                 Log.d(TAG, "SHARE received");
@@ -73,7 +71,7 @@ class SenHandler {
 
             // show notification to current user
             SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                    NotificationUtils.getNewUserNotification(senz.getSender().getUsername()));
+                    NotificationUtils.getUserNotification(senz.getSender().getUsername()));
 
             // broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
@@ -83,7 +81,7 @@ class SenHandler {
             if (senz.getAttributes().containsKey("cam")) {
                 dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("cam"), null, null);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "cam", senz.getAttributes().get("cam")));
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "camera", senz.getAttributes().get("cam")));
             } else if (senz.getAttributes().containsKey("mic")) {
                 dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("mic"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
@@ -91,7 +89,7 @@ class SenHandler {
             } else if (senz.getAttributes().containsKey("lat")) {
                 dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "lat", senz.getAttributes().get("lat")));
+                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "location", senz.getAttributes().get("lat")));
             }
 
             // send status
@@ -143,7 +141,7 @@ class SenHandler {
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getNewSecretNotification(senz.getSender().getUsername(), rahasa));
+                        NotificationUtils.getSecretNotification(senz.getSender().getUsername(), rahasa));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -178,19 +176,18 @@ class SenHandler {
 
             Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
 
-            Log.d(TAG, "stream ---- " + stream.getStream());
-
             // save in db
             // broadcast
             if (senz.getAttributes().containsKey("cam"))
                 saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
             else
                 saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
+
             broadcastSenz(streamSenz, senzService.getApplicationContext());
 
             // show notification
             SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                    NotificationUtils.getNewSecretNotification(senz.getSender().getUsername(), "New secret received "));
+                    NotificationUtils.getStreamNotification(senz.getSender().getUsername(), senz.getAttributes().containsKey("cam")));
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam"))

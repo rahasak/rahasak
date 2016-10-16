@@ -34,6 +34,28 @@ class SenzNotificationManager {
     }
 
     /**
+     * Display notification from here
+     *
+     * @param senzNotification
+     */
+    void showNotification(SenzNotification senzNotification) {
+        if (senzNotification.getNotificationType() == NotificationType.NEW_PERMISSION) {
+            Notification notification = getNotification(senzNotification);
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+        } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
+            if (!SenzApplication.isOnChat()) {
+                // display other types of notification when user not on chat
+                Notification notification = getNotification(senzNotification);
+                notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+            }
+        }
+    }
+
+    /**
      * Get notification to create/ update
      * We need to create or update notification in different scenarios
      *
@@ -61,37 +83,10 @@ class SenzNotificationManager {
                 .setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntent);
 
-        if (senzNotification.getNotificationType() != NotificationType.NEW_SECRET) {
-            builder.setVibrate(new long[]{1000, 1000});
-        }
-
         Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
         builder.setSound(sound);
 
         return builder.build();
-    }
-
-    /**
-     * Display notification from here
-     *
-     * @param senzNotification
-     */
-    void showNotification(SenzNotification senzNotification) {
-        if (senzNotification.getNotificationType() == NotificationType.NEW_PERMISSION || senzNotification.getNotificationType() == NotificationType.NEW_USER) {
-            Notification notification = getNotification(senzNotification);
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
-        } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
-            //if (NotificationUtils.isBackgroundRunning(context) || !NotificationUtils.isAppInteractable(context) || NotificationUtils.isScreenLocked(context)) {
-            if (!SenzApplication.isOnChat()) {
-                // display other types of notification when user not on chat
-                Notification notification = getNotification(senzNotification);
-                notification.flags |= Notification.FLAG_AUTO_CANCEL;
-                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
-            }
-        }
     }
 
     /**
