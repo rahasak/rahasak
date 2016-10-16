@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.score.chatz.interfaces.IRahasPlayListener;
 import com.score.chatz.utils.AudioUtils;
@@ -14,6 +15,8 @@ import com.score.chatz.utils.AudioUtils;
  */
 public class RahasPlayer extends AsyncTask<String, String, String> {
 
+    private final static String TAG = RahasPlayer.class.getName();
+
     private byte[] rahasa;
     private Context context;
     private IRahasPlayListener listener;
@@ -22,10 +25,14 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
         this.rahasa = rahasa;
         this.context = context;
         this.listener = listener;
+
+        Log.d(TAG, "init player");
     }
 
     @Override
     protected String doInBackground(String... params) {
+        Log.d(TAG, "playing secret");
+
         int bufferSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
         AudioTrack rahasaTrack = new AudioTrack(
                 AudioManager.STREAM_VOICE_CALL,
@@ -48,6 +55,8 @@ public class RahasPlayer extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String s) {
+        Log.d(TAG, "finish playing secret");
+
         super.onPostExecute(s);
         listener.onFinishPlay();
     }

@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
@@ -74,7 +72,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
             // display stream
             loadingView.setVisibility(View.INVISIBLE);
             playingText.setVisibility(View.VISIBLE);
-            new RahasPlayer(Base64.decode(senz.getAttributes().get("mic"), 0), getApplicationContext(), this).execute("Rahsa");
+            playSecret(Base64.decode(senz.getAttributes().get("mic"), 0));
         }
     }
 
@@ -134,12 +132,22 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         if (intent.hasExtra("SOUND")) {
             loadingView.setVisibility(View.INVISIBLE);
             playingText.setVisibility(View.VISIBLE);
-            new RahasPlayer(Base64.decode(intent.getStringExtra("SOUND"), 0), getApplicationContext(), this).execute("Rahsa");
+            playSecret(Base64.decode(intent.getStringExtra("SOUND"), 0));
         } else {
             loadingView.setVisibility(View.VISIBLE);
             playingText.setVisibility(View.INVISIBLE);
             setupUserImage(intent.getStringExtra("SENDER"));
             startAnimatingWaitingIcon();
+        }
+    }
+
+    private void playSecret(byte[] rahasa) {
+        RahasPlayer rahasPlayer = new RahasPlayer(rahasa, getApplicationContext(), this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            rahasPlayer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            rahasPlayer.execute("PLAY");
         }
     }
 
