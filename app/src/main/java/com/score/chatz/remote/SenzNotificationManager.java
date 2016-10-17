@@ -78,6 +78,7 @@ class SenzNotificationManager {
         // build notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(senzNotification.getTitle())
+                .setAutoCancel(true)
                 .setContentText(senzNotification.getMessage())
                 .setSmallIcon(senzNotification.getIcon())
                 .setWhen(System.currentTimeMillis())

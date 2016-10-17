@@ -22,11 +22,11 @@ public class NotificationUtils {
             msg = "Your " + permissionName + " permission has been revoked";
         }
 
-        return new SenzNotification(R.drawable.rahaslogo, "@" + user, msg, user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getUserNotification(String user) {
-        return new SenzNotification(R.drawable.rahaslogo, "@" + user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon, "@" + user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getSecretNotification(String user, String message) {
@@ -41,7 +41,7 @@ public class NotificationUtils {
             msg = "New voice secret received";
         }
 
-        return new SenzNotification(R.drawable.rahaslogo, "@" + user, msg, user, NotificationType.NEW_SECRET);
+        return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_SECRET);
     }
 
 }
