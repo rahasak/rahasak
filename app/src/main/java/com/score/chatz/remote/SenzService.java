@@ -42,8 +42,8 @@ public class SenzService extends Service {
 
     // socket host, port
     //public static final String SENZ_HOST = "10.2.2.49";
-    public static final String SENZ_HOST = "udp.mysensors.info";
-    //private static final String SENZ_HOST = "52.77.228.195";
+    //public static final String SENZ_HOST = "udp.mysensors.info";
+    private static final String SENZ_HOST = "52.77.228.195";
 
     public static final int SENZ_PORT = 7070;
 
@@ -156,6 +156,8 @@ public class SenzService extends Service {
     }
 
     private void initSoc() {
+        Log.d(TAG, "Reset socket");
+
         try {
             socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -170,6 +172,8 @@ public class SenzService extends Service {
     }
 
     private void resetSoc() {
+        Log.d(TAG, "Reset socket");
+
         if (isOnline) {
             isOnline = false;
 
@@ -186,6 +190,8 @@ public class SenzService extends Service {
     }
 
     private void initReader() {
+        Log.d(TAG, "Init reader");
+
         try {
             String line;
             while (isOnline && (line = reader.readLine()) != null) {
@@ -210,6 +216,8 @@ public class SenzService extends Service {
     }
 
     public void writeSenz(final Senz senz) {
+        Log.d(TAG, "Send PING");
+
         new Thread(new Runnable() {
             public void run() {
                 // sign and write senz
