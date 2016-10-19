@@ -11,6 +11,8 @@ public class SenzApplication extends Application {
 
     private static boolean onChat = false;
 
+    private static String userOnChat = null;
+
     /**
      * {@inheritDoc}
      */
@@ -34,5 +36,12 @@ public class SenzApplication extends Application {
     public static void setOnChat(boolean onChat) {
         SenzApplication.onChat = onChat;
     }
-    
+
+    public static String getUserOnChat() {
+        return userOnChat;
+    }
+
+    public static void setUserOnChat(String userOnChat) {
+        SenzApplication.userOnChat = userOnChat;
+    }
 }

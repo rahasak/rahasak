@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.score.chatz.R;
 import com.score.chatz.application.SenzApplication;
@@ -17,6 +18,8 @@ import com.score.chatz.ui.HomeActivity;
 import com.score.chatz.utils.NotificationUtils;
 
 class SenzNotificationManager {
+
+    private static final String TAG = SenzNotificationManager.class.getName();
 
     private Context context;
     private static SenzNotificationManager instance;
@@ -45,7 +48,10 @@ class SenzNotificationManager {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
-            if (!SenzApplication.isOnChat()) {
+            if (SenzApplication.isOnChat() && SenzApplication.getUserOnChat().equalsIgnoreCase(senzNotification.getSender())) {
+                // message for currently chatting user
+                Log.d(TAG, "Message for chatting user " + senzNotification.getSender());
+            } else {
                 // display other types of notification when user not on chat
                 Notification notification = getNotification(senzNotification);
                 notification.flags |= Notification.FLAG_AUTO_CANCEL;

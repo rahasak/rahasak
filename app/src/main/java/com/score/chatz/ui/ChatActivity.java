@@ -147,6 +147,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // on chat
         SenzApplication.setOnChat(true);
+        SenzApplication.setUserOnChat(thisUser.getUsername());
 
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
@@ -161,6 +162,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // not on chat
         SenzApplication.setOnChat(false);
+        SenzApplication.setUserOnChat(null);
 
         unregisterReceiver(senzReceiver);
     }
@@ -430,17 +432,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onSenzStreamReceived(Senz senz) {
-        Secret secret;
-        if (senz.getAttributes().containsKey("cam")) {
-            secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", thisUser, true);
-        } else {
-            secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
-        }
-        secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
-        secret.setId(senz.getAttributes().get("uid"));
+        if (senz.getSender().getUsername().equalsIgnoreCase(thisUser.getUsername())) {
+            Secret secret;
+            if (senz.getAttributes().containsKey("cam")) {
+                secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", thisUser, true);
+            } else {
+                secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
+            }
+            secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+            secret.setId(senz.getAttributes().get("uid"));
 
-        secretList.add(secret);
-        secretAdapter.notifyDataSetChanged();
+            secretList.add(secret);
+            secretAdapter.notifyDataSetChanged();
+        }
     }
 
     private void onSenzStatusReceived(Senz senz) {
@@ -457,18 +461,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onSenzMsgReceived(Senz senz) {
-        try {
-            if (senz.getAttributes().containsKey("msg")) {
-                String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
-                Secret secret = new Secret(msg, "TEXT", thisUser, true);
-                secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
-                secret.setId(senz.getAttributes().get("uid"));
+        if (senz.getSender().getUsername().equalsIgnoreCase(thisUser.getUsername())) {
+            try {
+                if (senz.getAttributes().containsKey("msg")) {
+                    String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
+                    Secret secret = new Secret(msg, "TEXT", thisUser, true);
+                    secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+                    secret.setId(senz.getAttributes().get("uid"));
 
-                secretList.add(secret);
-                secretAdapter.notifyDataSetChanged();
+                    secretList.add(secret);
+                    secretAdapter.notifyDataSetChanged();
+                }
+            } catch (UnsupportedEncodingException ex) {
+                ex.printStackTrace();
             }
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
         }
     }
 
