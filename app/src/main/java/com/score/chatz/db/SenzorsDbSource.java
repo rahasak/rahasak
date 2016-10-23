@@ -81,6 +81,25 @@ public class SenzorsDbSource {
         }
     }
 
+    public boolean isAddedUser(String username) {
+        // get matching user if exists
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
+                new String[]{username}, // prams
+                null, // order by
+                null, // group by
+                null); // join
+
+        if (cursor.moveToFirst()) {
+            // clear
+            cursor.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Update permissions given to current user by others/Friends
      *

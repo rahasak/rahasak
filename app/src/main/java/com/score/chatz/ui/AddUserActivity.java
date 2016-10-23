@@ -1,5 +1,6 @@
 package com.score.chatz.ui;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -170,7 +171,7 @@ public class AddUserActivity extends BaseActivity {
     }
 
     private void onClickShare() {
-        String username = editTextUserId.getText().toString().trim();
+        final String username = editTextUserId.getText().toString().trim();
         User registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
@@ -178,8 +179,13 @@ public class AddUserActivity extends BaseActivity {
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
-                    share();
+                    //Only share if user is not already added before..
+                    if(!new SenzorsDbSource(AddUserActivity.this).isAddedUser(username)) {
+                        ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
+                        share();
+                    }else{
+                        ActivityUtils.showCustomToast("This user has already been added", AddUserActivity.this);
+                    }
                 }
             });
         } catch (InvalidInputFieldsException e) {
