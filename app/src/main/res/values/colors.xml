@@ -35,6 +35,7 @@
     <color name="android_grey">#636363</color>
     <color name="android_green">#a9d063</color>
     <color name="translucent_black">#80000000</color>
+    <color name="translucent_theme">#49f88f8c</color>
     <color name="translucent_red">#F2FF6666</color>
 
     <color name="my_chat_message">@color/colorPrimary</color>

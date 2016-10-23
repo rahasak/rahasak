@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecordingActivity extends AppCompatActivity implements View.OnTouchListener {
+public class RecordingActivity extends AppCompatActivity{
 
     private static final String TAG = RecordingActivity.class.getName();
 
@@ -130,10 +130,9 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         setUpFonts();
         setupUi();
         setupDontBtn();
-        setupSwipeBtns();
-        startBtnAnimations();
+        //startBtnAnimations();
         startVibrations();
-        setupHandlesForSwipeBtnContainers();
+        //setupHandlesForSwipeBtnContainers();
         setupPhotoRequestTitle();
         setupWakeLock();
         startTimerToEndRequest();
@@ -200,6 +199,37 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
 
         countDownTextView.setTypeface(typeface, Typeface.BOLD);
         briefIntroTextView.setTypeface(typeface, Typeface.NORMAL);
+
+        cancelBtn = (CircularImageView) findViewById(R.id.cancel);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isRecordingOver) {
+                    isRecordingOver = true;
+
+                    stopVibrations();
+                    cancelTimerToServe();
+                    sendBusySenz();
+                    saveMissedCall();
+                    RecordingActivity.this.finish();
+                }
+            }
+        });
+        startBtn = (ImageView) findViewById(R.id.start);
+        startBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isRecordingStarted) {
+                    isRecordingStarted = true;
+
+                    stopVibrations();
+                    cancelTimerToServe();
+                    startRecording();
+                    moving_layout.setVisibility(View.INVISIBLE);
+                    doneBtn.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void setupWakeLock() {
@@ -258,11 +288,6 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
             requestTimer.cancel();
     }
 
-    private void setupSwipeBtns() {
-        cancelBtn = (CircularImageView) findViewById(R.id.cancel);
-        startBtn = (ImageView) findViewById(R.id.start);
-    }
-
     private void startVibrations() {
         VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
     }
@@ -271,7 +296,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
         VibrationUtils.stopVibration(this);
     }
 
-    private void setupHandlesForSwipeBtnContainers() {
+    /*private void setupHandlesForSwipeBtnContainers() {
         goRipple.setOnTouchListener(this);
     }
 
@@ -333,7 +358,7 @@ public class RecordingActivity extends AppCompatActivity implements View.OnTouch
                 break;
         }
         return true;
-    }
+    }*/
 
     private void saveMissedCall() {
         Secret newSecret = new Secret("", "MISSED_SOUND", user, true);

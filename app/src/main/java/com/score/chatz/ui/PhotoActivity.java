@@ -31,7 +31,7 @@ import com.skyfishjy.library.RippleBackground;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PhotoActivity extends BaseActivity implements View.OnTouchListener {
+public class PhotoActivity extends BaseActivity {
     protected static final String TAG = PhotoActivity.class.getName();
 
     // camera related variables
@@ -76,7 +76,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         initUi();
         setupTitle();
         setupUserImage();
-        initBtnAnimations();
+        //initBtnAnimations();
         startVibrations();
         startTimerToEndRequest();
         startCameraIfMissedCall();
@@ -142,10 +142,34 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         buttonControls = findViewById(R.id.moving_layout);
 
         cancelBtn = (CircularImageView) findViewById(R.id.cancel);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isPhotoCancelled) {
+                    isPhotoCancelled = true;
+                    cancelTimerToServe();
+                    sendBusySenz();
+                    stopVibrations();
+                    saveMissedSelfie();
+                    PhotoActivity.this.finish();
+                }
+            }
+        });
         startBtn = (ImageView) findViewById(R.id.start);
+        startBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopVibrations();
+                if (!isPhotoTaken) {
+                    cancelTimerToServe();
+                    startQuickCountdownToPhoto();
+                    isPhotoTaken = true;
+                }
+            }
+        });
 
-        goRipple = (RippleBackground) findViewById(R.id.go_ripple);
-        goRipple.setOnTouchListener(this);
+        /*goRipple = (RippleBackground) findViewById(R.id.go_ripple);
+        goRipple.setOnTouchListener(this);*/
     }
 
     private void setupTitle() {
@@ -195,7 +219,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
         VibrationUtils.stopVibration(this);
     }
 
-    @Override
+    /*@Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case (MotionEvent.ACTION_DOWN):
@@ -244,7 +268,7 @@ public class PhotoActivity extends BaseActivity implements View.OnTouchListener 
                 break;
         }
         return true;
-    }
+    }*/
 
     private void startQuickCountdownToPhoto() {
         quickCountdownText.setVisibility(View.VISIBLE);

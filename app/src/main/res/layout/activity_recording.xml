@@ -37,10 +37,9 @@
 
 
         <com.github.siyamed.shapeimageview.CircularImageView
-            android:id="@+id/cancel"
+            android:id="@+id/start"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_alignBaseline="@+id/go_ripple"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
@@ -48,16 +47,15 @@
             android:layout_marginBottom="60dp"
             android:layout_marginLeft="30dp"
             android:adjustViewBounds="true"
-            android:background="@drawable/vibrating_image"
             android:cropToPadding="true"
-            android:src="@drawable/fail"
+            android:src="@drawable/answer_call"
             app:siBorderAlpha="0.0"
             app:siBorderWidth="0dp"
             app:siSquare="true" />
 
 
         <com.github.siyamed.shapeimageview.CircularImageView
-            android:id="@+id/start"
+            android:id="@+id/cancel"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_alignParentBottom="true"
@@ -67,50 +65,13 @@
             android:layout_marginBottom="60dp"
             android:layout_marginRight="30dp"
             android:adjustViewBounds="true"
-            android:background="@drawable/vibrating_image"
             android:cropToPadding="true"
             android:foregroundGravity="center"
             android:scaleType="fitXY"
-            android:src="@drawable/success"
+            android:src="@drawable/cancel_call"
             app:siBorderAlpha="0.0"
             app:siBorderWidth="0dp"
             app:siSquare="true" />
-
-        <com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/go_ripple"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="false"
-            android:layout_centerHorizontal="true"
-            android:background="@color/transparent"
-            android:foregroundGravity="center_horizontal"
-            android:gravity="center_horizontal"
-            app:rb_color="#F5F5F5"
-            app:rb_duration="1000"
-            app:rb_radius="32dp"
-            app:rb_rippleAmount="2"
-            app:rb_scale="3">
-
-            <com.github.siyamed.shapeimageview.CircularImageView
-                android:id="@+id/selector"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:background="@drawable/vibrating_image"
-                android:cropToPadding="true"
-                android:foregroundGravity="center"
-                android:scaleType="centerInside"
-                android:src="@drawable/microphone_picker"
-                app:siBorderAlpha="0.0"
-                app:siBorderWidth="0dp"
-                app:siSquare="true" />
-        </com.skyfishjy.library.RippleBackground>
 
 
     </RelativeLayout>
@@ -119,7 +80,9 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_centerVertical="false"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/sender_info"
+        android:background="@color/translucent_theme">
 
         <FrameLayout
             android:layout_width="0dp"
@@ -127,7 +90,6 @@
             android:layout_weight="1"></FrameLayout>
 
         <LinearLayout
-            android:id="@+id/sender_info"
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_centerVertical="false"
@@ -147,7 +109,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="Eranga"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/white"
                     android:textSize="50dp" />
 
                 <TextView
@@ -157,7 +119,7 @@
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:text="Mic request"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/white"
                     android:textSize="20dp" />
 
             </LinearLayout>
