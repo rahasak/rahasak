@@ -30,7 +30,7 @@ public class NotificationUtils {
     }
 
     public static SenzNotification getSecretNotification(String user, String message) {
-        return new SenzNotification(R.drawable.rahaslogo, "@" + user, message, user, NotificationType.NEW_SECRET);
+        return new SenzNotification(R.drawable.notification_icon, "@" + user, message, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getStreamNotification(String user, boolean isCam) {
