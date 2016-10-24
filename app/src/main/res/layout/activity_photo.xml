@@ -22,11 +22,11 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:layout_marginBottom="60dp"
-            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:src="@drawable/answer_call"
@@ -35,12 +35,11 @@
             app:siSquare="true"
             android:id="@+id/start" />
 
-
         <com.github.siyamed.shapeimageview.CircularImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:foregroundGravity="center"
@@ -50,7 +49,7 @@
             app:siBorderWidth="0dp"
             app:siSquare="true"
             android:layout_alignTop="@+id/start"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:layout_marginEnd="31dp"
             android:id="@+id/cancel" />
 
