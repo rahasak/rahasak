@@ -1,6 +1,8 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.hardware.Camera;
@@ -21,6 +23,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.ImageUtils;
+import com.score.chatz.utils.PhotoUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
 import com.score.senzc.enums.SenzTypeEnum;
