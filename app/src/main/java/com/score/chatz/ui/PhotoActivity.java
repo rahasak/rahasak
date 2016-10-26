@@ -1,18 +1,13 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,13 +18,11 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.ImageUtils;
-import com.score.chatz.utils.PhotoUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
-import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,11 +40,8 @@ public class PhotoActivity extends BaseActivity {
     private View callingUserInfo;
     private View buttonControls;
     private TextView quickCountdownText;
-    private Rect startBtnRectRelativeToScreen;
-    private Rect cancelBtnRectRelativeToScreen;
     private CircularImageView cancelBtn;
     private ImageView startBtn;
-    private RippleBackground goRipple;
 
     // selfie request user
     private User user;
@@ -60,8 +50,6 @@ public class PhotoActivity extends BaseActivity {
 
     private static final int TIME_TO_SERVE_REQUEST = 15000;
     private static final int TIME_TO_QUICK_PHOTO = 3000;
-
-    private float dX, dY, startX, startY;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +67,6 @@ public class PhotoActivity extends BaseActivity {
         initUi();
         setupTitle();
         setupUserImage();
-        //initBtnAnimations();
         startVibrations();
         startTimerToEndRequest();
         startCameraIfMissedCall();
@@ -170,9 +157,6 @@ public class PhotoActivity extends BaseActivity {
                 }
             }
         });
-
-        /*goRipple = (RippleBackground) findViewById(R.id.go_ripple);
-        goRipple.setOnTouchListener(this);*/
     }
 
     private void setupTitle() {
@@ -192,26 +176,11 @@ public class PhotoActivity extends BaseActivity {
         buttonControls.setVisibility(View.INVISIBLE);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
-            cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
-        }
-    }
-
     private void releaseCamera() {
         if (mCamera != null) {
             Log.d(TAG, "Stopping preview in SurfaceDestroyed().");
             mCamera.release();
         }
-    }
-
-    private void initBtnAnimations() {
-        Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake);
-        goRipple.startRippleAnimation();
-        goRipple.startAnimation(anim);
     }
 
     private void startVibrations() {
@@ -221,57 +190,6 @@ public class PhotoActivity extends BaseActivity {
     private void stopVibrations() {
         VibrationUtils.stopVibration(this);
     }
-
-    /*@Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case (MotionEvent.ACTION_DOWN):
-                v.clearAnimation();
-                startX = v.getX();
-                startY = v.getY();
-                dX = v.getX() - event.getRawX();
-                dY = v.getY() - event.getRawY();
-
-                break;
-
-            case (MotionEvent.ACTION_MOVE):
-                v.animate()
-                        .x(event.getRawX() + dX)
-                        .y(event.getRawY() + dY)
-                        .setDuration(0)
-                        .start();
-                if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
-                    // Inside start button region
-                    stopVibrations();
-                    if (!isPhotoTaken) {
-                        cancelTimerToServe();
-                        startQuickCountdownToPhoto();
-                        isPhotoTaken = true;
-                    }
-                } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
-                    // Inside cancel button region
-                    if (!isPhotoCancelled) {
-                        isPhotoCancelled = true;
-                        cancelTimerToServe();
-                        sendBusySenz();
-                        stopVibrations();
-                        saveMissedSelfie();
-                        this.finish();
-                    }
-                }
-                break;
-            case (MotionEvent.ACTION_UP):
-                v.animate()
-                        .x(startX)
-                        .y(startY)
-                        .setDuration(0)
-                        .start();
-                Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake);
-                v.startAnimation(anim);
-                break;
-        }
-        return true;
-    }*/
 
     private void startQuickCountdownToPhoto() {
         quickCountdownText.setVisibility(View.VISIBLE);

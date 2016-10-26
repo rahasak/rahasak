@@ -4,9 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -15,10 +12,8 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,7 +26,6 @@ import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.PhotoUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.chatz.utils.VibrationUtils;
@@ -39,25 +33,19 @@ import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
-import com.skyfishjy.library.RippleBackground;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecordingActivity extends AppCompatActivity{
+public class RecordingActivity extends AppCompatActivity {
 
     private static final String TAG = RecordingActivity.class.getName();
 
     private View moving_layout;
     private Button doneBtn;
-    private Rect startBtnRectRelativeToScreen;
-    private Rect cancelBtnRectRelativeToScreen;
     private CircularImageView cancelBtn;
     private ImageView startBtn;
-    private RippleBackground goRipple;
     private TextView briefIntroTextView;
     private TextView countDownTextView;
 
@@ -70,8 +58,6 @@ public class RecordingActivity extends AppCompatActivity{
 
     private static final int TIME_TO_SERVE_REQUEST = 15000;
     private static final int START_TIME = 7;
-
-    private float dX, dY, startX, startY;
 
     protected Typeface typeface;
 
@@ -99,7 +85,7 @@ public class RecordingActivity extends AppCompatActivity{
         @Override
         public void onFinish() {
             sendBusySenz();
-            saveMissedCall();
+            //saveMissedCall();
             RecordingActivity.this.finish();
         }
 
@@ -196,7 +182,7 @@ public class RecordingActivity extends AppCompatActivity{
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
         countDownTextView = (TextView) this.findViewById(R.id.time_countdown);
         countDownTextView.setText(START_TIME + "");
-        briefIntroTextView = (TextView)findViewById(R.id.share_secret_brief);
+        briefIntroTextView = (TextView) findViewById(R.id.share_secret_brief);
         moving_layout = findViewById(R.id.moving_layout);
 
 
@@ -213,7 +199,7 @@ public class RecordingActivity extends AppCompatActivity{
                     stopVibrations();
                     cancelTimerToServe();
                     sendBusySenz();
-                    saveMissedCall();
+                    //saveMissedCall();
                     RecordingActivity.this.finish();
                 }
             }
@@ -273,15 +259,6 @@ public class RecordingActivity extends AppCompatActivity{
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
-            cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
-        }
-    }
-
     private void startTimerToEndRequest() {
         requestTimer.start();
     }
@@ -298,70 +275,6 @@ public class RecordingActivity extends AppCompatActivity{
     private void stopVibrations() {
         VibrationUtils.stopVibration(this);
     }
-
-    /*private void setupHandlesForSwipeBtnContainers() {
-        goRipple.setOnTouchListener(this);
-    }
-
-    private void startBtnAnimations() {
-        Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake);
-        goRipple = (RippleBackground) findViewById(R.id.go_ripple);
-        goRipple.startRippleAnimation();
-        goRipple.startAnimation(anim);
-    }
-
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case (MotionEvent.ACTION_DOWN):
-                v.clearAnimation();
-                startX = v.getX();
-                startY = v.getY();
-                dX = v.getX() - event.getRawX();
-                dY = v.getY() - event.getRawY();
-
-                break;
-            case (MotionEvent.ACTION_MOVE):
-                v.animate()
-                        .x(event.getRawX() + dX)
-                        .y(event.getRawY() + dY)
-                        .setDuration(0)
-                        .start();
-                if (startBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
-                    // Inside start button region
-                    if (!isRecordingStarted) {
-                        isRecordingStarted = true;
-
-                        stopVibrations();
-                        cancelTimerToServe();
-                        startRecording();
-                        moving_layout.setVisibility(View.INVISIBLE);
-                        doneBtn.setVisibility(View.VISIBLE);
-                    }
-                } else if (cancelBtnRectRelativeToScreen.contains((int) (event.getRawX()), (int) (event.getRawY()))) {
-                    // Inside cancel button region
-                    if (!isRecordingOver) {
-                        isRecordingOver = true;
-
-                        stopVibrations();
-                        cancelTimerToServe();
-                        sendBusySenz();
-                        saveMissedCall();
-                        this.finish();
-                    }
-                }
-                break;
-            case (MotionEvent.ACTION_UP):
-                v.animate()
-                        .x(startX)
-                        .y(startY)
-                        .setDuration(0)
-                        .start();
-                Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake);
-                v.startAnimation(anim);
-                break;
-        }
-        return true;
-    }*/
 
     private void saveMissedCall() {
         Secret newSecret = new Secret("", "MISSED_SOUND", user, true);
