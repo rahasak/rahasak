@@ -209,6 +209,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, secret.isViewed() ? 1 : 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_MISSED, secret.isMissed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED, 0);
@@ -217,7 +218,6 @@ public class SenzorsDbSource {
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
 
         insertRecordIntoLatestChat(secret);
-
     }
 
     private void insertRecordIntoLatestChat(Secret secret) {
@@ -254,6 +254,8 @@ public class SenzorsDbSource {
         // content values to inset
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 1);
+        long timestamp = System.currentTimeMillis() / 1000;
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP, timestamp);
 
         // update
         db.update(SenzorsDbContract.Secret.TABLE_NAME,
@@ -267,7 +269,7 @@ public class SenzorsDbSource {
      *
      * @param uid unique identifier of message
      */
-    public void markSecretDelievered(String uid) {
+    public void markSecretDelivered(String uid) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         try {
             db.beginTransaction();
@@ -275,32 +277,6 @@ public class SenzorsDbSource {
             // content values to inset
             ContentValues values = new ContentValues();
             values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 1);
-
-            // update
-            db.update(SenzorsDbContract.Secret.TABLE_NAME,
-                    values,
-                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
-                    new String[]{uid});
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    /**
-     * Mark message as delivery Failed
-     *
-     * @param uid unique identifier of message
-     */
-    public void markSecretDeliveryFailed(String uid) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        try {
-            db.beginTransaction();
-
-            // content values to inset
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED, 0);
 
             // update
             db.update(SenzorsDbContract.Secret.TABLE_NAME,
@@ -361,11 +337,11 @@ public class SenzorsDbSource {
      *
      * @return sensor list
      */
-    public ArrayList<Secret> getSecretz(User user) {
+    public ArrayList<Secret> getSecrets(User user) {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, missed, delivered, dispatched, timestamp " +
+        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, view_timestamp, missed, delivered, dispatched, timestamp " +
                 "FROM secret WHERE user = ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
 
@@ -380,6 +356,7 @@ public class SenzorsDbSource {
         int _secretIsDelivered;
         int _secretIsDispatched;
         Long _secretTimestamp;
+        Long _secretViewTimestamp;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -391,6 +368,7 @@ public class SenzorsDbSource {
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
+            _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
             _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretIsDispatched = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED));
@@ -403,6 +381,7 @@ public class SenzorsDbSource {
             secret.setDelivered(_secretIsDelivered == 1);
             secret.setDispatched(_secretIsDispatched == 1);
             secret.setTimeStamp(_secretTimestamp);
+            secret.setViewedTimeStamp(_secretViewTimestamp);
 
             // fill secret list
             secretList.add(secret);
@@ -422,11 +401,11 @@ public class SenzorsDbSource {
      * @param timestamp
      * @return
      */
-    public ArrayList<Secret> getSecretz(User user, Long timestamp) {
+    public ArrayList<Secret> getSecrets(User user, Long timestamp) {
         ArrayList secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, missed, delivered, dispatched, timestamp " +
+        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, view_timestamp, missed, delivered, dispatched, timestamp " +
                 "FROM secret WHERE user = ? AND timestamp > ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{user.getUsername(), timestamp.toString()});
 
@@ -441,6 +420,7 @@ public class SenzorsDbSource {
         int _secretIsDelivered;
         int _secretIsDispatched;
         Long _secretTimestamp;
+        Long _secretViewTimestamp;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -452,6 +432,7 @@ public class SenzorsDbSource {
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
+            _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
             _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
             _secretIsDelivered = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELIVERED));
             _secretIsDispatched = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED));
@@ -464,6 +445,7 @@ public class SenzorsDbSource {
             secret.setDelivered(_secretIsDelivered == 1);
             secret.setDispatched(_secretIsDispatched == 1);
             secret.setTimeStamp(_secretTimestamp);
+            secret.setViewedTimeStamp(_secretViewTimestamp);
 
             // fill secret list
             secretList.add(secret);
@@ -731,11 +713,11 @@ public class SenzorsDbSource {
 //                        "missed = 0)";
 
         String sqlDelete =
-                    "uid in " +
-                    "(select uid from secret where " +
-                    "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
-                    "user = '" + username + "' and " +
-                    "missed = 0)";
+                "uid in " +
+                        "(select uid from secret where " +
+                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
+                        "user = '" + username + "' and " +
+                        "missed = 0)";
 
         // TODO refactor/optimize this
         //String sqlDelete = "uid in (select uid from secret where _id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 7) and user = '" + username + "')";

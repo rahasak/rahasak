@@ -80,7 +80,6 @@ public class RecordingActivity extends AppCompatActivity {
         }
     };
 
-
     private CountDownTimer requestTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
         @Override
         public void onFinish() {

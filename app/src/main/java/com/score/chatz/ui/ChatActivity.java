@@ -259,7 +259,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initSecretList() {
-        ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecretz(thisUser);
+        ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(thisUser);
         secretList = new LimitedList<>(tmpList.size());
         for (Secret secret : tmpList) {
             secretList.add(secret);
@@ -273,7 +273,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (secretAdapter != null && secretList.size() > 0) {
             Secret lastSecret = secretList.getYongest();
             if (lastSecret != null) {
-                ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecretz(thisUser, lastSecret.getTimeStamp());
+                ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(thisUser, lastSecret.getTimeStamp());
                 secretList.addAll(tmpList);
                 secretAdapter.notifyDataSetChanged();
             }
@@ -450,7 +450,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void onSenzStatusReceived(Senz senz) {
         // update senz in db
         String uid = senz.getAttributes().get("uid");
-        new SenzorsDbSource(this).markSecretDelievered(uid);
+        new SenzorsDbSource(this).markSecretDelivered(uid);
 
         for (Secret secret : secretList) {
             if (secret.getId().equalsIgnoreCase(uid)) {

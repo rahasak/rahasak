@@ -22,6 +22,7 @@ public class SenzorsDbContract {
         public static final String COLUMN_BLOB_TYPE = "type";
         public static final String COLUMN_NAME_BLOB = "blob";
         public static final String COLUMN_NAME_VIEWED = "viewed";
+        public static final String COLUMN_NAME_VIEWED_TIMESTAMP = "view_timestamp";
         public static final String COLUMN_NAME_MISSED = "missed";
         public static final String COLUMN_NAME_DELIVERED = "delivered";
         public static final String COLUMN_NAME_DISPATCHED = "dispatched";

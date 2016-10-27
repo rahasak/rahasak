@@ -16,6 +16,7 @@ public class Secret {
     private boolean isDelivered;
     private boolean isDispatched;
     private Long timeStamp;
+    private Long viewedTimeStamp;
     private boolean isSender;
 
     public Secret(String blob, String type, User user, boolean isSender) {
@@ -95,6 +96,14 @@ public class Secret {
 
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public Long getViewedTimeStamp() {
+        return viewedTimeStamp;
+    }
+
+    public void setViewedTimeStamp(Long viewedTimeStamp) {
+        this.viewedTimeStamp = viewedTimeStamp;
     }
 
     public boolean isSender() {

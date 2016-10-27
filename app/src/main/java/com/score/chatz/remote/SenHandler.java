@@ -253,7 +253,7 @@ class SenHandler {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    new SenzorsDbSource(context).markSecretDelievered(uid);
+                    new SenzorsDbSource(context).markSecretDelivered(uid);
                 }
             }).start();
         }
