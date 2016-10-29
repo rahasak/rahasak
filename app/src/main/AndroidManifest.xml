@@ -30,6 +30,10 @@
     <!-- access to vibrate phone -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- access to retrive contacts on phone -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
@@ -53,9 +57,9 @@
             android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />
 
         <!-- debug key -->
-        <!--<meta-data-->
-        <!--android:name="com.google.android.maps.v2.API_KEY"-->
-        <!--android:value="AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s" />-->
+        <!-- <meta-data -->
+        <!-- android:name="com.google.android.maps.v2.API_KEY" -->
+        <!-- android:value="AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s" /> -->
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -70,6 +74,7 @@
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -118,15 +123,18 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
 
+        <activity
+            android:name=".ui.ContactsListActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme"/>
+
         <!-- Servicves -->
         <service
             android:name=".services.LocationService"
             android:enabled="true" />
-
         <service
             android:name=".remote.LatLonService"
             android:enabled="true" />
-
         <service
             android:name=".remote.SenzService"
             android:enabled="true">

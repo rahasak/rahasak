@@ -39,6 +39,7 @@ public class AddUserActivity extends BaseActivity {
     // Ui elements
     private TextView invite_text;
     private Button addFriendBtn;
+    private Button openContactsBtn;
     private EditText editTextUserId;
     private Toolbar toolbar;
 
@@ -61,6 +62,7 @@ public class AddUserActivity extends BaseActivity {
         setupUiElements();
         setupActionBar();
         setupAddUsersBtn();
+        setupOpenContactsBtn();
         setupFonts();
         setupBackBtn();
         setupEditTextView();
@@ -155,6 +157,17 @@ public class AddUserActivity extends BaseActivity {
     public void onPause() {
         super.onPause();
         unregisterReceiver(senzReceiver);
+    }
+
+    private void setupOpenContactsBtn() {
+        openContactsBtn = (Button) findViewById(R.id.add_from_contacts_btn);
+        openContactsBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Click action
+                Intent intent = new Intent(AddUserActivity.this, ContactsListActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setupAddUsersBtn() {
