@@ -13,7 +13,9 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.ui.AddUserActivity;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
@@ -87,7 +89,10 @@ public class SenzService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Add user sms received. init add user.");
-            share(intent.getStringExtra("USERNAME"));
+            String usernameToAdd = intent.getStringExtra("USERNAME").trim();
+            if(!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
+                share(usernameToAdd);
+            }
         }
     };
 
@@ -357,6 +362,20 @@ public class SenzService extends Service {
         protected void onPostExecute(Object o) {
             Log.e(TAG, "Stop SenzComm");
             resetSoc();
+        }
+    }
+
+    private boolean isCurrentUser(String username){
+        String currentUser = "";
+        try{
+            currentUser = PreferenceUtils.getUser(SenzService.this).getUsername();
+        }catch (NoUserException e){
+            e.printStackTrace();
+        }
+        if(currentUser.toLowerCase().equalsIgnoreCase(username)){
+            return true;
+        }else{
+            return false;
         }
     }
 

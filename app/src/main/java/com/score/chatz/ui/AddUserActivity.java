@@ -23,8 +23,10 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
+import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -193,11 +195,13 @@ public class AddUserActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     //Only share if user is not already added before..
-                    if(!new SenzorsDbSource(AddUserActivity.this).isAddedUser(username)) {
+                    if (!new SenzorsDbSource(AddUserActivity.this).isAddedUser(username) && !isCurrentUser(username)) {
                         ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
                         share();
-                    }else{
+                    } else if (new SenzorsDbSource(AddUserActivity.this).isAddedUser(username)) {
                         ActivityUtils.showCustomToast("This user has already been added", AddUserActivity.this);
+                    } else if (isCurrentUser(username)) {
+                        ActivityUtils.showCustomToast("You cannot add yourself", AddUserActivity.this);
                     }
                 }
             });
@@ -280,6 +284,20 @@ public class AddUserActivity extends BaseActivity {
                 String message = "<font size=10>Seems we couldn't connect you with </font> <font color=#F88F8C>" + "<b>" + user + "</b>" + "</font>";
                 displayInformationMessageDialog("Fail", message);
             }
+        }
+    }
+
+    private boolean isCurrentUser(String username) {
+        String currentUser = "";
+        try {
+            currentUser = PreferenceUtils.getUser(AddUserActivity.this).getUsername();
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
+        if (currentUser.toLowerCase().equalsIgnoreCase(username)) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
