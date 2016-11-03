@@ -240,12 +240,6 @@ public class AddUserActivity extends BaseActivity {
      * Clear input fields and reset activity components
      */
     private void onPostShare(Senz senz) {
-        // save user in db
-        SenzorsDbSource dbSource = new SenzorsDbSource(this);
-        dbSource.getOrCreateUser(senz.getSender().getUsername());
-        dbSource.createPermissionsForUser(senz);
-        dbSource.createConfigurablePermissionsForUser(senz);
-
         ActivityUtils.showCustomToast("Successfully added " + editTextUserId.getText().toString().trim(), this);
         editTextUserId.setText("");
 

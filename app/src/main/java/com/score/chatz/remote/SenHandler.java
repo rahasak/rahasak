@@ -7,6 +7,7 @@ import android.util.Log;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.Stream;
+import com.score.chatz.ui.AddUserActivity;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
@@ -61,20 +62,23 @@ class SenHandler {
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().containsKey("status")) {
             // new user
             // new user permissions, save to db
-            SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
-            dbSource.getOrCreateUser(senz.getSender().getUsername());
-            dbSource.createPermissionsForUser(senz);
-            dbSource.createConfigurablePermissionsForUser(senz);
+            if(!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
+                SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+                dbSource.getOrCreateUser(senz.getSender().getUsername());
+                dbSource.createPermissionsForUser(senz);
+                dbSource.createConfigurablePermissionsForUser(senz);
 
-            // send ack
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
 
-            // show notification to current user
-            SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                    NotificationUtils.getUserNotification(senz.getSender().getUsername()));
+                // send ack
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
 
-            // broadcast
-            broadcastSenz(senz, senzService.getApplicationContext());
+                // show notification to current user
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getUserNotification(senz.getSender().getUsername()));
+
+                // broadcast
+                broadcastSenz(senz, senzService.getApplicationContext());
+            }
         } else {
             // #mic #cam #lat #lon permission
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
@@ -124,6 +128,19 @@ class SenHandler {
             // status coming from switch
             // broadcast
             updateStatus(senz, senzService.getApplicationContext());
+
+            //Only for case of add user, need to handle here to make more generic as you can now add users via sms also, thus cannot gurantee which activity user will be in, when recevie this status code
+            String status = senz.getAttributes().get("status");
+            if (status != null && status.equalsIgnoreCase("701")) {
+                // save user in db
+                if(!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
+                    SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+                    dbSource.getOrCreateUser(senz.getSender().getUsername());
+                    dbSource.createPermissionsForUser(senz);
+                    dbSource.createConfigurablePermissionsForUser(senz);
+                }
+            }
+
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg")) {
             // rahasa

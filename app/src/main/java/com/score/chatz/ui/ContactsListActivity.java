@@ -1,5 +1,11 @@
 package com.score.chatz.ui;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -10,9 +16,12 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.os.Bundle;
 
 import com.score.chatz.R;
+import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.PreferenceUtils;
 
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -22,6 +31,7 @@ import android.provider.ContactsContract;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class ContactsListActivity extends BaseActivity implements
         LoaderManager.LoaderCallbacks<Cursor>,
@@ -199,14 +209,21 @@ public class ContactsListActivity extends BaseActivity implements
             }
 
             String confirmationMessage = "<font size=10>Are you sure you want to share your username with </font> <font color=#F88F8C>" + "<b>" + item_DisplayName + "</b>" + "</font> (" + mobileNumber + "), via sms?";
-            displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //Eranga, I think you know what to do here :)
-                }
-            });
+
+            final String finalMobileNumber = mobileNumber;
+            try {
+                final String username = PreferenceUtils.getUser(this).getUsername();
+                displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendSMS(finalMobileNumber, "#Rahasak\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username);
+                    }
+                });
+            }catch (NoUserException ex){
+                ex.printStackTrace();
+            }
         } else {
-            ActivityUtils.showCustomToast("This user has no mobile number", this);
+            ActivityUtils.showCustomToastShort("This user has no mobile number", this);
         }
     }
 
@@ -233,5 +250,78 @@ public class ContactsListActivity extends BaseActivity implements
         // Delete the reference to the existing Cursor
         mCursorAdapter.swapCursor(null);
     }
+
+    //---sends an SMS message to another device---
+    private void sendSMS(String phoneNumber, String message)
+    {
+        String SENT = "SMS_SENT";
+        String DELIVERED = "SMS_DELIVERED";
+
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
+                new Intent(SENT), 0);
+
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+                new Intent(DELIVERED), 0);
+
+        //---when the SMS has been sent---
+        registerReceiver(new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode())
+                {
+                    case Activity.RESULT_OK:
+                        ActivityUtils.showCustomToastShort("SMS sent",
+                                getBaseContext());
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        ActivityUtils.showCustomToastShort("Generic failure",
+                                getBaseContext());
+                        break;
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                        ActivityUtils.showCustomToastShort("No service",
+                                getBaseContext());
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        ActivityUtils.showCustomToastShort("Null PDU",
+                                getBaseContext());
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        ActivityUtils.showCustomToastShort("Radio off",
+                                getBaseContext());
+                        break;
+                }
+                ActivityUtils.cancelProgressDialog();
+                unregisterReceiver(this);
+            }
+        }, new IntentFilter(SENT));
+
+        //---when the SMS has been delivered---
+        registerReceiver(new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode())
+                {
+                    case Activity.RESULT_OK:
+                        ActivityUtils.showCustomToastShort("SMS delivered",
+                                getBaseContext());
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        ActivityUtils.showCustomToastShort("SMS not delivered",
+                                getBaseContext());
+                        break;
+                }
+                ActivityUtils.cancelProgressDialog();
+                unregisterReceiver(this);
+            }
+        }, new IntentFilter(DELIVERED));
+
+        // Show loader
+        ActivityUtils.showProgressDialog(ContactsListActivity.this, "Please wait...");
+
+        SmsManager sms = SmsManager.getDefault();
+        Log.i(TAG, "SMS Body -> " + message);
+        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+    }
+
 
 }

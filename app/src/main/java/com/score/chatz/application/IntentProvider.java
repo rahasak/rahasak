@@ -20,20 +20,20 @@ import com.score.chatz.ui.RecordingActivity;
 public class IntentProvider {
     private static final String TAG = IntentProvider.class.getName();
 
-    public static Intent getSenzIntent() {
+    public static Intent getTimeoutIntent() {
         Intent intent = null;
         try {
-            intent = getIntent(getIntentType(INTENT_TYPE.SENZ));
+            intent = getIntent(getIntentType(INTENT_TYPE.TIMEOUT));
         } catch (InvalidIntentType ex) {
             Log.e(TAG, "No such intent, " + ex);
         }
         return intent;
     }
 
-    public static Intent getTimeoutIntent() {
+    public static Intent getSmsReceivedIntent() {
         Intent intent = null;
         try {
-            intent = getIntent(getIntentType(INTENT_TYPE.TIMEOUT));
+            intent = getIntent(getIntentType(INTENT_TYPE.SMS_RECEIVED));
         } catch (InvalidIntentType ex) {
             Log.e(TAG, "No such intent, " + ex);
         }
@@ -88,6 +88,10 @@ public class IntentProvider {
                 // Depressing!! That #$%! is not online!! :)
                 intentString = "com.score.chatz.TIMEOUT";
                 break;
+            case SMS_RECEIVED:
+                // Depressing!! That #$%! is not online!! :)
+                intentString = "com.score.chatz.SMS_RECEIVED";
+                break;
             default:
                 throw new InvalidIntentType();
         }
@@ -105,6 +109,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        SENZ, TIMEOUT
+        SENZ, TIMEOUT, SMS_RECEIVED
     }
 }

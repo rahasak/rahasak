@@ -142,4 +142,17 @@ public class ActivityUtils {
         toast.show();
     }
 
+    public static void showCustomToastShort(String message, Context context){
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layout = inflater.inflate(R.layout.custom_toast, null);
+        TextView text = (TextView) layout.findViewById(R.id.text);
+        text.setText(message);
+
+        Toast toast = new Toast(context);
+        toast.setGravity(Gravity.BOTTOM, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
+    }
+
 }

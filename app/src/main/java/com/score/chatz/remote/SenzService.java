@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
@@ -19,7 +20,9 @@ import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 import java.util.List;
 
 public class SenzService extends Service {
@@ -43,7 +47,10 @@ public class SenzService extends Service {
     // socket host, port
     //public static final String SENZ_HOST = "10.2.2.49";
     //public static final String SENZ_HOST = "udp.mysensors.info";
+
     private static final String SENZ_HOST = "52.77.228.195";
+
+    //private static final String SENZ_HOST = "connect.rahasak.com";
 
     public static final int SENZ_PORT = 7070;
 
@@ -74,6 +81,44 @@ public class SenzService extends Service {
             }
         }
     };
+
+    // broadcst receiver to automatically add user when valid sms is received
+    private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Add user sms received. init add user.");
+            share(intent.getStringExtra("USERNAME"));
+        }
+    };
+
+    /**
+     * Share current sensor
+     * Need to send share query to server via web socket
+     */
+    private void share(String username) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("msg", "");
+        senzAttributes.put("status", "");
+
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+        User receiver = new User("", username.trim());
+        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+        // send to service
+        try {
+            apiEndPoints.send(senz);
+        }catch (RemoteException ex){
+            ex.printStackTrace();
+        }
+    }
 
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
@@ -148,11 +193,13 @@ public class SenzService extends Service {
         IntentFilter networkFilter = new IntentFilter();
         networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, networkFilter);
+        registerReceiver(smsReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_RECEIVED));
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
+        unregisterReceiver(smsReceiver);
     }
 
     private void initSoc() {
