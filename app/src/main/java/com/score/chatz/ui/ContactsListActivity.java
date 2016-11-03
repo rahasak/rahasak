@@ -66,7 +66,7 @@ public class ContactsListActivity extends BaseActivity implements
     private static final String SELECTION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ?" : ContactsContract.Contacts.DISPLAY_NAME + " LIKE ?";
 
     // Defines a variable for the search string, by default list loads nothing, thus empty string
-    private String mSearchString = "";
+    private String mSearchString = "%%";
     private String[] mSelectionArgs = {mSearchString};
 
     // Content loader identifier
@@ -219,7 +219,7 @@ public class ContactsListActivity extends BaseActivity implements
                         sendSMS(finalMobileNumber, "#Rahasak\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username);
                     }
                 });
-            }catch (NoUserException ex){
+            } catch (NoUserException ex) {
                 ex.printStackTrace();
             }
         } else {
@@ -252,8 +252,7 @@ public class ContactsListActivity extends BaseActivity implements
     }
 
     //---sends an SMS message to another device---
-    private void sendSMS(String phoneNumber, String message)
-    {
+    private void sendSMS(String phoneNumber, String message) {
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
 
@@ -264,30 +263,25 @@ public class ContactsListActivity extends BaseActivity implements
                 new Intent(DELIVERED), 0);
 
         //---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         ActivityUtils.showCustomToastShort("SMS sent",
                                 getBaseContext());
                         break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        ActivityUtils.showCustomToastShort("Generic failure",
-                                getBaseContext());
+                        Log.e(TAG, "Generic failure");
                         break;
                     case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        ActivityUtils.showCustomToastShort("No service",
-                                getBaseContext());
+                        Log.e(TAG, "No service");
                         break;
                     case SmsManager.RESULT_ERROR_NULL_PDU:
-                        ActivityUtils.showCustomToastShort("Null PDU",
-                                getBaseContext());
+                        Log.e(TAG, "Null PDU");
                         break;
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        ActivityUtils.showCustomToastShort("Radio off",
-                                getBaseContext());
+                        Log.e(TAG, "Radio off");
                         break;
                 }
                 ActivityUtils.cancelProgressDialog();
@@ -296,11 +290,10 @@ public class ContactsListActivity extends BaseActivity implements
         }, new IntentFilter(SENT));
 
         //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         ActivityUtils.showCustomToastShort("SMS delivered",
                                 getBaseContext());

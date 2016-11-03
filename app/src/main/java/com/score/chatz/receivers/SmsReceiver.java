@@ -8,7 +8,6 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.remote.SenzService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
