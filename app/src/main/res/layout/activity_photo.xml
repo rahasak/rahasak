@@ -83,7 +83,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_gravity="top">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -108,8 +109,8 @@
 
         <com.github.siyamed.shapeimageview.CircularImageView
             android:id="@+id/user_profile_image"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
             android:layout_gravity="top|center"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
@@ -117,7 +118,7 @@
             app:siBorderAlpha="0.0"
             app:siBorderWidth="0dp"
             app:siSquare="true"
-            android:layout_margin="15dp"/>
+            android:layout_margin="5dp"/>
 
 
     </LinearLayout>

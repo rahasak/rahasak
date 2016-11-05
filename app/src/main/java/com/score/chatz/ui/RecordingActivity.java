@@ -188,6 +188,9 @@ public class RecordingActivity extends AppCompatActivity {
         countDownTextView.setTypeface(typeface, Typeface.BOLD);
         briefIntroTextView.setTypeface(typeface, Typeface.NORMAL);
 
+        countDownTextView.setVisibility(View.INVISIBLE);
+        briefIntroTextView.setVisibility(View.INVISIBLE);
+
         cancelBtn = (CircularImageView) findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,8 +216,11 @@ public class RecordingActivity extends AppCompatActivity {
                     stopVibrations();
                     cancelTimerToServe();
                     startRecording();
+
                     moving_layout.setVisibility(View.INVISIBLE);
                     doneBtn.setVisibility(View.VISIBLE);
+                    countDownTextView.setVisibility(View.VISIBLE);
+                    briefIntroTextView.setVisibility(View.VISIBLE);
                 }
             }
         });

@@ -2,38 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/audio_grey">
 
-    <ImageView
+    <!--<ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/mesh"
         android:id="@+id/bg_image"
-        android:scaleType="centerCrop" />
-
-    <TextView
-        android:id="@+id/time_countdown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="false"
-        android:layout_centerInParent="true"
-        android:text="0"
-        android:textColor="@color/colorPrimary"
-        android:textSize="100sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/share_secret_brief"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/time_countdown"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
-        android:gravity="center_horizontal"
-        android:text="Share a secret under 7 seconds."
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/colorPrimary" />
-
+        android:scaleType="centerCrop" />-->
 
     <RelativeLayout
         android:id="@+id/moving_layout"
@@ -81,6 +58,31 @@
 
     </RelativeLayout>
 
+
+    <TextView
+        android:id="@+id/time_countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="false"
+        android:layout_centerInParent="true"
+        android:text="0"
+        android:textColor="@color/colorPrimary"
+        android:textSize="100sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/share_secret_brief"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/time_countdown"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_horizontal"
+        android:text="Share a secret under 7 seconds."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -97,7 +99,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_centerVertical="false"
             android:layout_weight="20"
             android:orientation="horizontal">
@@ -107,7 +109,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_gravity="top">
 
                 <TextView
                     android:id="@+id/photo_request_user_name"
@@ -133,10 +136,10 @@
 
             <com.github.siyamed.shapeimageview.CircularImageView
                 android:id="@+id/user_profile_image"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="95dp"
+                android:layout_height="95dp"
                 android:layout_gravity="top|center"
-                android:layout_margin="15dp"
+                android:layout_margin="5dp"
                 android:adjustViewBounds="true"
                 android:cropToPadding="true"
                 android:src="@drawable/default_user"
