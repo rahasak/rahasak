@@ -15,7 +15,6 @@ import android.util.Log;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.ui.AddUserActivity;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
@@ -50,9 +49,8 @@ public class SenzService extends Service {
     //public static final String SENZ_HOST = "10.2.2.49";
     //public static final String SENZ_HOST = "udp.mysensors.info";
 
-    private static final String SENZ_HOST = "52.77.228.195";
-
-    //private static final String SENZ_HOST = "connect.rahasak.com";
+    //private static final String SENZ_HOST = "52.77.228.195";
+    private static final String SENZ_HOST = "connect.rahasak.com";
 
     public static final int SENZ_PORT = 7070;
 
@@ -90,7 +88,7 @@ public class SenzService extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Add user sms received. init add user.");
             String usernameToAdd = intent.getStringExtra("USERNAME").trim();
-            if(!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
+            if (!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
                 share(usernameToAdd);
             }
         }
@@ -120,7 +118,7 @@ public class SenzService extends Service {
         // send to service
         try {
             apiEndPoints.send(senz);
-        }catch (RemoteException ex){
+        } catch (RemoteException ex) {
             ex.printStackTrace();
         }
     }
@@ -365,16 +363,16 @@ public class SenzService extends Service {
         }
     }
 
-    private boolean isCurrentUser(String username){
+    private boolean isCurrentUser(String username) {
         String currentUser = "";
-        try{
+        try {
             currentUser = PreferenceUtils.getUser(SenzService.this).getUsername();
-        }catch (NoUserException e){
+        } catch (NoUserException e) {
             e.printStackTrace();
         }
-        if(currentUser.toLowerCase().equalsIgnoreCase(username)){
+        if (currentUser.toLowerCase().equalsIgnoreCase(username)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
