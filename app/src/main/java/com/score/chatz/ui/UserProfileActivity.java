@@ -328,6 +328,10 @@ public class UserProfileActivity extends BaseActivity {
                 if (currentSenz.getAttributes().get("uid").equalsIgnoreCase(senz.getAttributes().get("uid"))) {
                     updatePermission(currentSenz);
                 }
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
+                // user busy
+                ActivityUtils.cancelProgressDialog();
+                displayInformationMessageDialog("info", "user busy");
             } else {
                 //ActivityUtils.cancelProgressDialog();
             }

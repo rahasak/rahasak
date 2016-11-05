@@ -13,9 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
@@ -138,7 +136,7 @@ class ChatListAdapter extends BaseAdapter {
             if (secret.isMissed()) {
                 holder.chatCam.setImageResource(R.drawable.missed_selfie_call);
             } else {
-                new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
+                //new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
                 holder.chatCam.setImageBitmap(new ImageUtils().decodeBitmap(secret.getBlob()));
             }
         } else if (secret.getType().equalsIgnoreCase("SOUND")) {
