@@ -715,9 +715,8 @@ public class SenzorsDbSource {
         String sqlDelete =
                 "uid in " +
                         "(select uid from secret where " +
-                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
-                        "user = '" + username + "' and " +
-                        "missed = 0)";
+                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 7) and " +
+                        "user = '" + username + "')";
 
         // TODO refactor/optimize this
         //String sqlDelete = "uid in (select uid from secret where _id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 7) and user = '" + username + "')";
