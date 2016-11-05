@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzApplication;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
@@ -58,6 +59,11 @@ class SenzNotificationManager {
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
             }
+        }else if (senzNotification.getNotificationType() == NotificationType.NEW_SMS_ADD_FRIEND) {
+                Notification notification = getSmsNotification(senzNotification);
+                notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
         }
     }
 
@@ -89,6 +95,31 @@ class SenzNotificationManager {
                 .setSmallIcon(senzNotification.getIcon())
                 .setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntent);
+
+        Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
+        builder.setSound(sound);
+
+        return builder.build();
+    }
+
+    private Notification getSmsNotification(SenzNotification senzNotification) {
+
+        // set up intent
+        Intent smsReceivedIntent = IntentProvider.getSmsReceivedIntent();
+        smsReceivedIntent.putExtra("USERNAME_TO_ADD", senzNotification.getSender());
+
+        // set up pending intent
+        PendingIntent smsPendingIntent = PendingIntent.getBroadcast(context, 0, smsReceivedIntent,PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // build notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setContentTitle(senzNotification.getTitle())
+                .setAutoCancel(true)
+                .setContentText(senzNotification.getMessage())
+                .setSmallIcon(senzNotification.getIcon())
+                .setWhen(System.currentTimeMillis())
+                .addAction(R.drawable.reject, "Reject", smsPendingIntent)
+                .addAction(R.drawable.accept, "Accept", smsPendingIntent);
 
         Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
         builder.setSound(sound);

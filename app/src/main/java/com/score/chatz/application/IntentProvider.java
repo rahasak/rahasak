@@ -40,6 +40,16 @@ public class IntentProvider {
         return intent;
     }
 
+    public static Intent getAddUserIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.ADD_USER));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return intent;
+    }
+
     /**
      * Return the intent filter for the intent_type.
      *
@@ -89,8 +99,10 @@ public class IntentProvider {
                 intentString = "com.score.chatz.TIMEOUT";
                 break;
             case SMS_RECEIVED:
-                // Depressing!! That #$%! is not online!! :)
                 intentString = "com.score.chatz.SMS_RECEIVED";
+                break;
+            case ADD_USER:
+                intentString = "com.score.chatz.ADD_USER";
                 break;
             default:
                 throw new InvalidIntentType();
@@ -109,6 +121,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        SENZ, TIMEOUT, SMS_RECEIVED
+        SENZ, TIMEOUT, SMS_RECEIVED, ADD_USER
     }
 }

@@ -3,7 +3,10 @@ package com.score.chatz.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
@@ -30,16 +33,31 @@ public class SmsReceiver extends BroadcastReceiver {
                     for (int i = 0; i < msgs.length; i++) {
                         msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
+                        String msg_sender = null;
+                        String msg_phone_number = msgs[i].getOriginatingAddress();
                         String msg_body = msgs[i].getMessageBody();
+
+                        //Resolving the contact name from the contacts.
+                        Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(msg_phone_number));
+                        Cursor c = context.getContentResolver().query(lookupUri, new String[]{ContactsContract.Data.DISPLAY_NAME}, null, null, null);
+                        try {
+                            c.moveToFirst();
+                            msg_sender = c.getString(0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            c.close();
+                        }
+
                         if (isMessageFromRahasakApp(msg_body)) {
                             //Valid message
-                            Log.e(TAG, "Valid message. From another rahasak user. -> " + msg_body);
+                            Log.e(TAG, "Valid message. From another rahasak user. -> " + msg_body + "; sender -> " + msg_sender);
                             Log.e(TAG, "Username to register. ->" + getUsernameFromSms(msg_body));
 
-                            initAddUserFromSms(getUsernameFromSms(msg_body), context);
+                            initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, context);
                         } else {
                             //Not from rahasak, ignore
-                            Log.e(TAG, "Invalid message. Must ignore it. -> " + msg_body);
+                            Log.e(TAG, "Invalid message. Must ignore it. -> " + msg_body + "; sender -> " + msg_sender);
                             return;
                         }
                     }
@@ -61,9 +79,10 @@ public class SmsReceiver extends BroadcastReceiver {
         return matcher.group(1);
     }
 
-    private void initAddUserFromSms(String username, Context context) {
+    private void initAddUserFromSms(String username, String sender, Context context) {
         Intent smsReceivedIntent = IntentProvider.getSmsReceivedIntent();
-        smsReceivedIntent.putExtra("USERNAME", username);
+        smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
+        smsReceivedIntent.putExtra("SENDER", sender);
         context.sendBroadcast(smsReceivedIntent);
     }
 }

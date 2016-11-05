@@ -16,6 +16,7 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
@@ -82,12 +83,29 @@ public class SenzService extends Service {
         }
     };
 
-    // broadcst receiver to automatically add user when valid sms is received
+    // broadcst receiver to automatically notify user when sms received
     private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             Log.d(TAG, "Add user sms received. init add user.");
-            String usernameToAdd = intent.getStringExtra("USERNAME").trim();
+            String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
+            String usernameOfSender = null;
+            if(intent.hasExtra("SENDER"))
+                usernameOfSender = intent.getStringExtra("SENDER").trim();
+
+            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(
+                    NotificationUtils.getSmsNotification(usernameOfSender, usernameToAdd));
+        }
+    };
+
+    // broadcst receiver to automatically add user when received
+    private BroadcastReceiver addUserReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
+
             if (!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
                 share(usernameToAdd);
             }
@@ -197,12 +215,14 @@ public class SenzService extends Service {
         networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, networkFilter);
         registerReceiver(smsReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_RECEIVED));
+        registerReceiver(addUserReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.ADD_USER));
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
         unregisterReceiver(smsReceiver);
+        unregisterReceiver(addUserReceiver);
     }
 
     private void initSoc() {
