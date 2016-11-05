@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class LimitedList<K> extends ArrayList<K> {
 
-    private static final int DEFAULT_MAX_SIZE = 21;
+    private static final int DEFAULT_MAX_SIZE = 7;
 
     private int maxSize;
 
