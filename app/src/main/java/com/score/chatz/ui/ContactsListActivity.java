@@ -44,7 +44,7 @@ public class ContactsListActivity extends BaseActivity implements
     private Toolbar toolbar;
     private ListView mContactsList;
 
-    private SimpleCursorAdapter mCursorAdapter;
+    private ContactsListAdapter mCursorAdapter;
 
     /*
      * Defines an array that contains column names to move from
@@ -63,7 +63,7 @@ public class ContactsListActivity extends BaseActivity implements
     };
 
     // Defines the text expression
-    private static final String SELECTION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ?" : ContactsContract.Contacts.DISPLAY_NAME + " LIKE ?";
+    private static final String SELECTION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? AND " + ContactsContract.Contacts.HAS_PHONE_NUMBER + " =1" : ContactsContract.Contacts.DISPLAY_NAME + " LIKE ? AND " + ContactsContract.Contacts.HAS_PHONE_NUMBER + " =1";
 
     // Defines a variable for the search string, by default list loads nothing, thus empty string
     private String mSearchString = "%%";
@@ -115,7 +115,7 @@ public class ContactsListActivity extends BaseActivity implements
 
     private void setupContactsListAdapter() {
         // Gets a CursorAdapter
-        mCursorAdapter = new SimpleCursorAdapter(
+        mCursorAdapter = new ContactsListAdapter(
                 this,
                 R.layout.contacts_list_item,
                 null,
