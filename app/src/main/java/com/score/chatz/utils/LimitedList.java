@@ -12,7 +12,7 @@ public class LimitedList<K> extends ArrayList<K> {
     private int maxSize;
 
     public LimitedList(int size) {
-        if (size < DEFAULT_MAX_SIZE) {
+        if (size <= DEFAULT_MAX_SIZE) {
             this.maxSize = DEFAULT_MAX_SIZE;
         } else {
             this.maxSize = size;
