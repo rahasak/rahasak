@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="Selfie request"
+                android:text="Selfie calling"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20dp"
                 android:layout_marginLeft="15dp"/>
