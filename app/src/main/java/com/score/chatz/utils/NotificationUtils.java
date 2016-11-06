@@ -21,7 +21,7 @@ public class NotificationUtils {
 
     // notification Id
     public static final int MESSAGE_NOTIFICATION_ID = 1;
-    public static int notificationCounter = 0;
+    public static int notificationCounter = 2;
 
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         String msg;
