@@ -109,6 +109,19 @@ public class SenzService extends Service {
             if (!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
                 share(usernameToAdd);
             }
+
+            /*String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
+            int notificationId = intent.getIntExtra("NOTIFICATION_ID", NotificationUtils.MESSAGE_NOTIFICATION_ID);
+
+            if (new SenzorsDbSource(context).isAddedUser(usernameToAdd)) {
+                NotificationUtils.cancelNotification(notificationId, context);
+                ActivityUtils.showCustomToast("This user has already been added", context);
+            } else if (NetworkUtil.isAvailableNetwork(context) && !isCurrentUser(usernameToAdd)) {
+                NotificationUtils.cancelNotification(notificationId, context);
+                share(usernameToAdd);
+            } else {
+                ActivityUtils.showCustomToast(context.getResources().getString(R.string.no_internet), context);
+            }*/
         }
     };
 

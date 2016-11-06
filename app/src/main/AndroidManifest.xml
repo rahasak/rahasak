@@ -131,11 +131,10 @@
             android:name=".ui.AudioFullScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-
         <activity
             android:name=".ui.ContactsListActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme"/>
+            android:theme="@style/MyMaterialTheme" />
 
         <!-- Servicves -->
         <service
@@ -163,6 +162,8 @@
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
+        </receiver>
+        <receiver android:name=".receivers.NotificationActionReceiver">
         </receiver>
     </application>
 

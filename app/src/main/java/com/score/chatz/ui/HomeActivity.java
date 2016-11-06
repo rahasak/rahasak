@@ -1,8 +1,11 @@
 package com.score.chatz.ui;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,11 +20,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.remote.SenzService;
+import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.SenzUtils;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -63,6 +76,8 @@ public class HomeActivity extends AppCompatActivity {
         } catch (NoUserException ex) {
             Log.d(TAG, "No Registered User");
         }
+
+        onNewIntent(getIntent());
     }
 
     @Override
@@ -187,5 +202,32 @@ public class HomeActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.hasExtra("NOTIFICATION_ACCEPT")) {
+
+            int notificationId = intent.getIntExtra("NOTIFICATION_ID", NotificationUtils.MESSAGE_NOTIFICATION_ID);
+            String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
+
+            if (new SenzorsDbSource(this).isAddedUser(usernameToAdd)) {
+                NotificationUtils.cancelNotification(notificationId, this);
+                ActivityUtils.showCustomToast("This user has already been added", this);
+            } else if (NetworkUtil.isAvailableNetwork(this)) {
+                NotificationUtils.cancelNotification(notificationId, this);
+                addUser(usernameToAdd);
+            } else {
+                ActivityUtils.showCustomToast(this.getResources().getString(R.string.no_internet), this);
+            }
+        }
+
+    }
+
+    private void addUser(String username){
+        Intent smsReceivedIntent = IntentProvider.getAddUserIntent();
+        smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
+        this.sendBroadcast(smsReceivedIntent);
     }
 }

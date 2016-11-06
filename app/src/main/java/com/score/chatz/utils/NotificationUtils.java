@@ -1,8 +1,16 @@
 package com.score.chatz.utils;
 
+import android.app.ActivityManager;
+import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.os.Build;
+
 import com.score.chatz.R;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
+
+import java.util.List;
 
 /**
  * Utility class for create and update notifications
@@ -13,6 +21,7 @@ public class NotificationUtils {
 
     // notification Id
     public static final int MESSAGE_NOTIFICATION_ID = 1;
+    public static int notificationCounter = 0;
 
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         String msg;
@@ -49,6 +58,20 @@ public class NotificationUtils {
         String title = sender + " (@ " + rahasakUsername +")";
 
         return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, NotificationType.NEW_SMS_ADD_FRIEND);
+    }
+
+    public static void incrementNotificationId(){
+        ++notificationCounter;
+    }
+
+    public static int getNotificationId(){
+        return notificationCounter;
+    }
+
+    // Remove notification from tray
+    public static void cancelNotification(int NotificationId, Context context) {
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(NotificationId);
     }
 
 }
