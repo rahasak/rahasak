@@ -55,7 +55,7 @@ public class NotificationUtils {
 
     public static SenzNotification getSmsNotification(String sender, String rahasakUsername) {
         String msg = "Would you like share secrets?";
-        String title = sender + " (@ " + rahasakUsername +")";
+        String title = sender + " (@" + rahasakUsername +")";
 
         return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, NotificationType.NEW_SMS_ADD_FRIEND);
     }

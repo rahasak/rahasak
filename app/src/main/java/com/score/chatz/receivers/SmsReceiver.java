@@ -60,18 +60,6 @@ public class SmsReceiver extends BroadcastReceiver {
                             //Stop sms from reaching mail box :).Works for verision below kitkat only
                             abortBroadcast();
 
-                            //Manually delete sms for versions above kitkat
-                            final Context con = context;
-                            final String mb = msg_body;
-                            final String mn = msg_phone_number;
-                            new Timer().schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    deleteMessage(con);
-                                }
-                            }, 2000);
-
-
                             initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, context);
                         } else {
                             //Not from rahasak, ignore
