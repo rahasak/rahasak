@@ -31,17 +31,17 @@
 
         <ImageView
             android:id="@+id/tabOneActive"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="8dp"
-            android:src="@drawable/love_speech"/>
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:padding="7dp"
+            android:src="@drawable/eyes"/>
 
         <ImageView
             android:id="@+id/tabOneDeActive"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="8dp"
-            android:src="@drawable/love_speech_deactive"/>
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:padding="7dp"
+            android:src="@drawable/eyes_grey"/>
 
 
     </RelativeLayout>
