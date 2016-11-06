@@ -92,12 +92,13 @@
             <Button
                 android:layout_width="0dp"
                 android:textColor="@color/colorPrimary"
-                android:layout_height="45dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
-                android:layout_margin="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:id="@+id/information_message_dialog_layout_ok_button"
                 android:background="@color/transparent"
-                android:text="Ok">
+                android:text="OK">
             </Button>
 
         </LinearLayout>

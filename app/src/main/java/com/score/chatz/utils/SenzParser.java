@@ -52,11 +52,11 @@ public class SenzParser {
             }
         }
 
-        System.out.println(senz.getSender().getUsername());
-        System.out.println(senz.getReceiver().getUsername());
-        System.out.println(senz.getSenzType());
-        System.out.println(senz.getSignature());
-        System.out.println(senz.getAttributes().entrySet());
+//        System.out.println(senz.getSender().getUsername());
+//        System.out.println(senz.getReceiver().getUsername());
+//        System.out.println(senz.getSenzType());
+//        System.out.println(senz.getSignature());
+//        System.out.println(senz.getAttributes().entrySet());
 
         return senz;
     }

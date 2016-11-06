@@ -91,7 +91,7 @@ public class SenzService extends Service {
             Log.d(TAG, "Add user sms received. init add user.");
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
             String usernameOfSender = null;
-            if(intent.hasExtra("SENDER"))
+            if (intent.hasExtra("SENDER"))
                 usernameOfSender = intent.getStringExtra("SENDER").trim();
 
             SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(
@@ -270,7 +270,7 @@ public class SenzService extends Service {
 
                     // handle senz
                     if (!senz.equalsIgnoreCase("TAK")) {
-                        Log.d(TAG, "Senz received " + senz);
+                        //Log.d(TAG, "Senz received " + senz);
                         SenHandler.getInstance().handle(senz, SenzService.this);
                     }
                 }
