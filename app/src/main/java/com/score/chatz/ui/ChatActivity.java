@@ -300,88 +300,104 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onClickSend() {
-        String secretMsg = txtSecret.getText().toString().trim();
-        if (!secretMsg.isEmpty()) {
-            // clear text
-            txtSecret.setText("");
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            String secretMsg = txtSecret.getText().toString().trim();
+            if (!secretMsg.isEmpty()) {
+                // clear text
+                txtSecret.setText("");
 
-            // create secret
-            Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
-            Long timestamp = System.currentTimeMillis() / 1000;
-            secret.setTimeStamp(timestamp);
-            secret.setId(SenzUtils.getUid(this, timestamp.toString()));
+                // create secret
+                Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
+                Long timestamp = System.currentTimeMillis() / 1000;
+                secret.setTimeStamp(timestamp);
+                secret.setId(SenzUtils.getUid(this, timestamp.toString()));
 
-            // send secret
-            // save secret
-            sendSecret(secret);
-            saveSecretInDb(secret);
+                // send secret
+                // save secret
+                sendSecret(secret);
+                saveSecretInDb(secret);
 
-            // update list view
-            secretList.add(secret);
-            secretAdapter.notifyDataSetChanged();
+                // update list view
+                secretList.add(secret);
+                secretAdapter.notifyDataSetChanged();
+            }
+        } else {
+            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
         }
     }
 
     private void onClickLocation() {
-        ActivityUtils.showProgressDialog(this, "Please wait");
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            ActivityUtils.showProgressDialog(this, "Please wait");
 
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
 
-        senzAttributes.put("lat", "");
-        senzAttributes.put("lon", "");
+            senzAttributes.put("lat", "");
+            senzAttributes.put("lon", "");
 
-        Long timestamp = System.currentTimeMillis() / 1000;
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
+            Long timestamp = System.currentTimeMillis() / 1000;
+            senzAttributes.put("time", timestamp.toString());
+            senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.GET;
-        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
 
-        send(senz);
+            send(senz);
+        } else {
+            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void onClickPhoto() {
-        navigateToPhotoWait();
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            navigateToPhotoWait();
 
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("cam", "");
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("cam", "");
 
-        Long timestamp = System.currentTimeMillis() / 1000;
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
+            Long timestamp = System.currentTimeMillis() / 1000;
+            senzAttributes.put("time", timestamp.toString());
+            senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.GET;
-        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
 
-        send(senz);
+            send(senz);
+        } else {
+            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void onClickMic() {
-        navigateMicWait();
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            navigateMicWait();
 
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("mic", "");
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("mic", "");
 
-        Long timestamp = System.currentTimeMillis() / 1000;
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
+            Long timestamp = System.currentTimeMillis() / 1000;
+            senzAttributes.put("time", timestamp.toString());
+            senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.GET;
-        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
 
-        send(senz);
+            send(senz);
+        } else {
+            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void sendSecret(Secret secret) {

@@ -84,6 +84,9 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("902")) {
                 // camera error
                 displayInformationMessageDialog("error", "mic error");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
+                // camera error
+                displayInformationMessageDialog("Offline", "User offline");
             }
         }
     }

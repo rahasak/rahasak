@@ -11,10 +11,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -175,6 +171,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {
                 // camera error
                 displayInformationMessageDialog("error", "cam error");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
+                // camera error
+                displayInformationMessageDialog("Offline", "User offline");
             }
         }
     }
