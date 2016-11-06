@@ -130,6 +130,8 @@ public class ActivityUtils {
     }
 
     public static void showCustomToast(String message, Context context){
+        /*
+        Custom layout for Toast
         LayoutInflater inflater = LayoutInflater.from(context);
         View layout = inflater.inflate(R.layout.custom_toast, null);
         TextView text = (TextView) layout.findViewById(R.id.text);
@@ -140,10 +142,13 @@ public class ActivityUtils {
         toast.setDuration(Toast.LENGTH_LONG);
         toast.setView(layout);
         toast.show();
+        */
+
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
     public static void showCustomToastShort(String message, Context context){
-        LayoutInflater inflater = LayoutInflater.from(context);
+        /*LayoutInflater inflater = LayoutInflater.from(context);
         View layout = inflater.inflate(R.layout.custom_toast, null);
         TextView text = (TextView) layout.findViewById(R.id.text);
         text.setText(message);
@@ -152,7 +157,8 @@ public class ActivityUtils {
         toast.setGravity(Gravity.BOTTOM, 0, 0);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(layout);
-        toast.show();
+        toast.show();*/
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
 }

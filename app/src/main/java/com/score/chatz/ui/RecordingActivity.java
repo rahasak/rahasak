@@ -424,7 +424,7 @@ public class RecordingActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            ActivityUtils.showCustomToast("No network connection available.", this);
+            ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
     }
 
@@ -441,7 +441,7 @@ public class RecordingActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            ActivityUtils.showCustomToast("No network connection available.", this);
+            ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
     }
 

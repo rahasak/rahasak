@@ -545,7 +545,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         } else {
-            ActivityUtils.showCustomToast("No network connection available.", this);
+            ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
     }
 

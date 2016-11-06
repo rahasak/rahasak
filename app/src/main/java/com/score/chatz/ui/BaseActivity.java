@@ -185,7 +185,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
                 e.printStackTrace();
             }
         } else {
-            ActivityUtils.showCustomToast("No network connection available.", this);
+            ActivityUtils.showCustomToast(this.getResources().getString(R.string.no_internet), this);
         }
     }
 
@@ -201,7 +201,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
                 e.printStackTrace();
             }
         } else {
-            ActivityUtils.showCustomToast("No network connection available.", this);
+            ActivityUtils.showCustomToast(this.getResources().getString(R.string.no_internet), this);
         }
     }
 }

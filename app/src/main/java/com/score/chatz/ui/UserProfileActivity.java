@@ -38,6 +38,7 @@ public class UserProfileActivity extends BaseActivity {
     private Switch cameraSwitch;
     private Switch locationSwitch;
     private Switch micSwitch;
+    private Switch waitingForResponseSwitch;
     private ImageView userImageView;
 
     private User thisUser;
@@ -161,8 +162,10 @@ public class UserProfileActivity extends BaseActivity {
                         //Send permCam false to user
                         sendPermission("cam", "off");
                     }
+                    waitingForResponseSwitch = cameraSwitch;
                 } else {
                     Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                    resetStateOnSwitch(cameraSwitch, isChecked);
                 }
             }
         });
@@ -176,8 +179,10 @@ public class UserProfileActivity extends BaseActivity {
                         //Send permLoc false to user
                         sendPermission("loc", "off");
                     }
+                    waitingForResponseSwitch = locationSwitch;
                 } else {
                     Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                    resetStateOnSwitch(locationSwitch, isChecked);
                 }
             }
         });
@@ -191,11 +196,21 @@ public class UserProfileActivity extends BaseActivity {
                         //Send permMic false to user
                         sendPermission("mic", "off");
                     }
+                    waitingForResponseSwitch = micSwitch;
                 } else {
                     Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                    resetStateOnSwitch(micSwitch, isChecked);
                 }
             }
         });
+    }
+
+    private void resetStateOnSwitch(Switch swt, boolean currentState){
+        if(currentState){
+            swt.setChecked(false);
+        }else{
+            swt.setChecked(true);
+        }
     }
 
     @Override
@@ -215,7 +230,11 @@ public class UserProfileActivity extends BaseActivity {
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getProfilePhoto();
+                if (NetworkUtil.isAvailableNetwork(getBaseContext())) {
+                    getProfilePhoto();
+                } else {
+                    ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), getBaseContext());
+                }
             }
         });
     }
@@ -332,6 +351,10 @@ public class UserProfileActivity extends BaseActivity {
                 // user busy
                 ActivityUtils.cancelProgressDialog();
                 displayInformationMessageDialog("info", "user busy");
+            } else if(senz.getAttributes().get("status").equalsIgnoreCase("offline")){
+                resetStateOnSwitch(waitingForResponseSwitch, waitingForResponseSwitch.isChecked() ? true : false);
+                displayInformationMessageDialog("Offline", "User offline");
+                ActivityUtils.cancelProgressDialog();
             } else {
                 //ActivityUtils.cancelProgressDialog();
             }

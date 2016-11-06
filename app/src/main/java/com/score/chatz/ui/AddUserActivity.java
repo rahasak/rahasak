@@ -179,7 +179,7 @@ public class AddUserActivity extends BaseActivity {
                 if (NetworkUtil.isAvailableNetwork(AddUserActivity.this)) {
                     onClickShare();
                 } else {
-                    Toast.makeText(AddUserActivity.this, "No network connection available", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddUserActivity.this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
                 }
             }
         });
