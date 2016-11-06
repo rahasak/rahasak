@@ -33,4 +33,5 @@
     <string name="photo_request">Incomming selfie request from :</string>
     <string name="sound_request">Incoming mic request from :</string>
     <string name="rahasak">Rahasak</string>
+    <string name="connecting_with_server_error">Connection with server...</string>
 </resources>

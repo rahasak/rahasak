@@ -322,7 +322,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 secretAdapter.notifyDataSetChanged();
             }
         } else {
-            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -348,7 +348,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             send(senz);
         } else {
-            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -372,7 +372,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             send(senz);
         } else {
-            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -396,7 +396,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             send(senz);
         } else {
-            Toast.makeText(this, "No network available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }
     }
 

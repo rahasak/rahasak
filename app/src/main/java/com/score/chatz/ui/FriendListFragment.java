@@ -20,6 +20,7 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
@@ -42,6 +43,9 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
             Senz senz = intent.getExtras().getParcelable("SENZ");
             if (senz.getSenzType() == SenzTypeEnum.SHARE) {
+                displayUserList();
+            }else if(senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701")){
+                // New user added to list
                 displayUserList();
             }
         }
@@ -109,5 +113,4 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             getListView().setAdapter(adapter);
         }
     }
-
 }

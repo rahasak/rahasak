@@ -32,7 +32,7 @@ import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 
-public class UserProfileActivity extends BaseActivity {
+public class UserProfileActivity extends BaseActivity implements Switch.OnCheckedChangeListener {
     private static final String TAG = UserProfileActivity.class.getName();
 
     private Switch cameraSwitch;
@@ -65,7 +65,6 @@ public class UserProfileActivity extends BaseActivity {
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             thisUser = savedInstanceState.getParcelable(SENDER);
-            setupClickableImage();
         }
     }
 
@@ -96,10 +95,8 @@ public class UserProfileActivity extends BaseActivity {
 
         initUi();
         initThisUser();
-        setupActionBar();
         initPermissions();
         setupGetProfileImageBtn();
-        setupClickableImage();
         setupCoordinator();
         setupBackBtn();
     }
@@ -152,9 +149,17 @@ public class UserProfileActivity extends BaseActivity {
         cameraSwitch.setChecked(configurablePermission.getCamPerm());
         micSwitch.setChecked(configurablePermission.getMicPerm());
         locationSwitch.setChecked(configurablePermission.getLocPerm());
-        cameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (NetworkUtil.isAvailableNetwork(UserProfileActivity.this)) {
+
+        cameraSwitch.setOnCheckedChangeListener(this);
+        locationSwitch.setOnCheckedChangeListener(this);
+        micSwitch.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView == cameraSwitch) {
+            if (NetworkUtil.isAvailableNetwork(UserProfileActivity.this)) {
+                if (isServiceBound) {
                     if (isChecked) {
                         //Send permCam true to user
                         sendPermission("cam", "on");
@@ -164,14 +169,16 @@ public class UserProfileActivity extends BaseActivity {
                     }
                     waitingForResponseSwitch = cameraSwitch;
                 } else {
-                    Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                    ActivityUtils.showCustomToast(getResources().getString(R.string.connecting_with_server_error), getBaseContext());
                     resetStateOnSwitch(cameraSwitch, isChecked);
                 }
+            } else {
+                Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                resetStateOnSwitch(cameraSwitch, isChecked);
             }
-        });
-        locationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (NetworkUtil.isAvailableNetwork(UserProfileActivity.this)) {
+        } else if (buttonView == locationSwitch) {
+            if (NetworkUtil.isAvailableNetwork(UserProfileActivity.this)) {
+                if (isServiceBound) {
                     if (isChecked) {
                         //Send permLoc true to user
                         sendPermission("loc", "on");
@@ -181,14 +188,16 @@ public class UserProfileActivity extends BaseActivity {
                     }
                     waitingForResponseSwitch = locationSwitch;
                 } else {
-                    Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                    ActivityUtils.showCustomToast(getResources().getString(R.string.connecting_with_server_error), getBaseContext());
                     resetStateOnSwitch(locationSwitch, isChecked);
                 }
+            } else {
+                Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                resetStateOnSwitch(locationSwitch, isChecked);
             }
-        });
-        micSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (NetworkUtil.isAvailableNetwork(UserProfileActivity.this)) {
+        } else if (buttonView == micSwitch) {
+            if (NetworkUtil.isAvailableNetwork(UserProfileActivity.this)) {
+                if (isServiceBound) {
                     if (isChecked) {
                         //Send permMic true to user
                         sendPermission("mic", "on");
@@ -198,19 +207,29 @@ public class UserProfileActivity extends BaseActivity {
                     }
                     waitingForResponseSwitch = micSwitch;
                 } else {
-                    Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                    ActivityUtils.showCustomToast(getResources().getString(R.string.connecting_with_server_error), getBaseContext());
                     resetStateOnSwitch(micSwitch, isChecked);
                 }
+            } else {
+                Toast.makeText(UserProfileActivity.this, R.string.no_internet, Toast.LENGTH_SHORT).show();
+                resetStateOnSwitch(micSwitch, isChecked);
             }
-        });
+        }
     }
 
-    private void resetStateOnSwitch(Switch swt, boolean currentState){
-        if(currentState){
+    private void resetStateOnSwitch(Switch swt, boolean currentState) {
+        // Remove listener
+        swt.setOnCheckedChangeListener(null);
+
+        // Change view state
+        if (currentState) {
             swt.setChecked(false);
-        }else{
+        } else {
             swt.setChecked(true);
         }
+
+        // Attach listener again
+        swt.setOnCheckedChangeListener(this);
     }
 
     @Override
@@ -231,7 +250,11 @@ public class UserProfileActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (NetworkUtil.isAvailableNetwork(getBaseContext())) {
-                    getProfilePhoto();
+                    if (isServiceBound) {
+                        getProfilePhoto();
+                    } else {
+                        ActivityUtils.showCustomToast(getResources().getString(R.string.connecting_with_server_error), getBaseContext());
+                    }
                 } else {
                     ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), getBaseContext());
                 }
@@ -259,24 +282,6 @@ public class UserProfileActivity extends BaseActivity {
         Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
 
         send(senz);
-    }
-
-    private void setupClickableImage() {
-        //Update permissions
-        /*if (thisUserGivenPermission.getCamPerm()) {
-            tapImageText.setVisibility(View.VISIBLE);
-        } else {
-            tapImageText.setVisibility(View.INVISIBLE);
-        }*/
-    }
-
-    private void setupActionBar() {
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
-        //getSupportActionBar().setTitle("@" + thisUser.getUsername());
-        //getSupportActionBar().setHomeButtonEnabled(true);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().hide();
-
     }
 
     private void setupCoordinator() {
@@ -342,6 +347,7 @@ public class UserProfileActivity extends BaseActivity {
                 // delivery message
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("701")) {
                 ActivityUtils.cancelProgressDialog();
+                waitingForResponseSwitch = null;
 
                 // permission sharing done
                 if (currentSenz.getAttributes().get("uid").equalsIgnoreCase(senz.getAttributes().get("uid"))) {
@@ -351,8 +357,11 @@ public class UserProfileActivity extends BaseActivity {
                 // user busy
                 ActivityUtils.cancelProgressDialog();
                 displayInformationMessageDialog("info", "user busy");
-            } else if(senz.getAttributes().get("status").equalsIgnoreCase("offline")){
-                resetStateOnSwitch(waitingForResponseSwitch, waitingForResponseSwitch.isChecked() ? true : false);
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
+                if (waitingForResponseSwitch != null) {
+                    resetStateOnSwitch(waitingForResponseSwitch, waitingForResponseSwitch.isChecked() ? true : false);
+                    waitingForResponseSwitch = null;
+                }
                 displayInformationMessageDialog("Offline", "User offline");
                 ActivityUtils.cancelProgressDialog();
             } else {
