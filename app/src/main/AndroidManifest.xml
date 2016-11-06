@@ -39,6 +39,9 @@
     <!-- access to rec sms -->
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
+    <!-- access to delete sms -->
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+
     <!-- access to read sms -->
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -159,7 +162,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.SmsReceiver">
-            <intent-filter>
+            <intent-filter android:priority="1000">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>

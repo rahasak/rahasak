@@ -12,6 +12,9 @@ import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +57,21 @@ public class SmsReceiver extends BroadcastReceiver {
                             Log.e(TAG, "Valid message. From another rahasak user. -> " + msg_body + "; sender -> " + msg_sender);
                             Log.e(TAG, "Username to register. ->" + getUsernameFromSms(msg_body));
 
+                            //Stop sms from reaching mail box :).Works for verision below kitkat only
+                            abortBroadcast();
+
+                            //Manually delete sms for versions above kitkat
+                            final Context con = context;
+                            final String mb = msg_body;
+                            final String mn = msg_phone_number;
+                            new Timer().schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    deleteMessage(con);
+                                }
+                            }, 2000);
+
+
                             initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, context);
                         } else {
                             //Not from rahasak, ignore
@@ -84,5 +102,23 @@ public class SmsReceiver extends BroadcastReceiver {
         smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
         smsReceivedIntent.putExtra("SENDER", sender);
         context.sendBroadcast(smsReceivedIntent);
+    }
+
+    private int deleteMessage(Context context) {
+        Uri deleteUri = Uri.parse("content://sms");
+        int count = 0;
+        Cursor c = context.getContentResolver().query(deleteUri, null, null,
+                null, null);
+        while (c.moveToNext()) {
+            try {
+                // Delete the SMS
+                String pid = c.getString(0); // Get id;
+                String uri = "content://sms/" + pid;
+                count = context.getContentResolver().delete(Uri.parse(uri),
+                        null, null);
+            } catch (Exception e) {
+            }
+        }
+        return count;
     }
 }
