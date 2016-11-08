@@ -61,7 +61,7 @@ public class SenzService extends Service {
     private PrintWriter writer;
 
     // status of the online/offline
-    private boolean isOnline;
+    private boolean connected;
 
     // broadcast receiver to check network status changes
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
@@ -75,10 +75,7 @@ public class SenzService extends Service {
                 Log.d(TAG, "Network status changed[online]");
 
                 // init comm
-                new SenzComm().execute();
-            } else {
-                // means disconnected
-                resetSoc();
+                initSenzComm();
             }
         }
     };
@@ -134,11 +131,7 @@ public class SenzService extends Service {
         Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
         // send to service
-        try {
-            apiEndPoints.send(senz);
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        }
+        writeSenz(senz);
     }
 
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
@@ -174,7 +167,7 @@ public class SenzService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Log.d(TAG, "onCreate called");
+        Log.d(TAG, "onCreate..");
 
         registerReceivers();
     }
@@ -183,13 +176,13 @@ public class SenzService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        Log.d(TAG, "onStartCommand executed");
+        Log.d(TAG, "onStartCommand..");
 
         // init comm
         if (NetworkUtil.isAvailableNetwork(this)) {
-            new SenzComm().execute();
+            initSenzComm();
         } else {
-            Log.e(TAG, "no network to start senzcomm");
+            Log.e(TAG, "no network to start senzcomm | already connected");
         }
 
         return START_STICKY;
@@ -225,58 +218,50 @@ public class SenzService extends Service {
         unregisterReceiver(addUserReceiver);
     }
 
-    private void initSoc() {
-        Log.d(TAG, "Reset socket");
-
-        try {
-            socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
-            isOnline = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            isOnline = true;
+    private void initSenzComm() {
+        if (!connected) {
+            Log.d(TAG, "Not connected, so start senzcomm");
+            new SenzComm().execute();
+        } else {
+            Log.d(TAG, "Already connected");
+            sendPing();
         }
     }
 
-    private void resetSoc() {
+    private void initSoc() throws IOException {
+        Log.d(TAG, "Init socket");
+        socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
+        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+
+        connected = true;
+    }
+
+    private void resetSoc() throws IOException {
         Log.d(TAG, "Reset socket");
+        connected = false;
 
-        if (isOnline) {
-            isOnline = false;
-
-            try {
-                if (socket != null) {
-                    socket.close();
-                    reader.close();
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (socket != null) {
+            socket.close();
+            reader.close();
+            writer.close();
         }
     }
 
-    private void initReader() {
+    private void initReader() throws IOException {
         Log.d(TAG, "Init reader");
 
-        try {
-            String line;
-            while (isOnline && (line = reader.readLine()) != null) {
-                if (!line.isEmpty()) {
-                    String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
+        String line;
+        while (connected && (line = reader.readLine()) != null) {
+            if (!line.isEmpty()) {
+                String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
 
-                    // handle senz
-                    if (!senz.equalsIgnoreCase("TAK")) {
-                        //Log.d(TAG, "Senz received " + senz);
-                        SenHandler.getInstance().handle(senz, SenzService.this);
-                    }
+                // handle senz
+                if (!senz.equalsIgnoreCase("TAK")) {
+                    //Log.d(TAG, "Senz received " + senz);
+                    SenHandler.getInstance().handle(senz, SenzService.this);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -305,7 +290,7 @@ public class SenzService extends Service {
                     Log.d(TAG, "Senz to be send: " + message);
 
                     //  sends the message to the server
-                    if (isOnline) {
+                    if (connected) {
                         writer.println(message);
                         writer.flush();
                     } else {
@@ -345,7 +330,7 @@ public class SenzService extends Service {
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
-                        if (isOnline) {
+                        if (connected) {
                             writer.println(message);
                             writer.flush();
                         } else {
@@ -363,13 +348,17 @@ public class SenzService extends Service {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            if (!isOnline) {
+            if (!connected) {
                 Log.d(TAG, "Not online, so init comm");
-                initSoc();
-                sendPing();
-                initReader();
+                try {
+                    initSoc();
+                    sendPing();
+                    initReader();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else {
-                Log.d(TAG, "Online, so send ping");
+                Log.d(TAG, "Connected, so send ping");
                 sendPing();
             }
 
@@ -379,22 +368,24 @@ public class SenzService extends Service {
         @Override
         protected void onPostExecute(Object o) {
             Log.e(TAG, "Stop SenzComm");
-            resetSoc();
+
+            try {
+                resetSoc();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     private boolean isCurrentUser(String username) {
-        String currentUser = "";
         try {
-            currentUser = PreferenceUtils.getUser(SenzService.this).getUsername();
+            return PreferenceUtils.getUser(SenzService.this).getUsername().equalsIgnoreCase(username);
         } catch (NoUserException e) {
             e.printStackTrace();
         }
-        if (currentUser.toLowerCase().equalsIgnoreCase(username)) {
-            return true;
-        } else {
-            return false;
-        }
+
+        return false;
     }
 
 }
