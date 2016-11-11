@@ -63,8 +63,10 @@ public class SenzorsDbContract {
     public static abstract class User implements BaseColumns {
         public static final String TABLE_NAME = "user";
         public static final String COLUMN_NAME_USERNAME = "username";
-        public static final String COLUMN_NAME_IMAGE = "image";
         public static final String COLUMN_NAME_PHONE = "phone";
         public static final String COLUMN_NAME_PUBKEY = "pubkey";
+        public static final String COLUMN_NAME_PUBKEY_HASH = "pubkey_hash";
+        public static final String COLUMN_NAME_IS_ACTIVE = "is_active";
+        public static final String COLUMN_NAME_IMAGE = "image";
     }
 }

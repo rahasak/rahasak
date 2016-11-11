@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.UserPermission;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -98,6 +99,92 @@ public class SenzorsDbSource {
         } else {
             return false;
         }
+    }
+
+    public void createSecretUser(SecretUser secretUser) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, secretUser.getUsername());
+        if (secretUser.getPhone() != null && secretUser.getPhone().isEmpty())
+            values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, secretUser.getPhone());
+        if (secretUser.getPubKey() != null && secretUser.getPubKey().isEmpty())
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY, secretUser.getPubKey());
+        if (secretUser.getPubKeyHash() != null && secretUser.getPubKeyHash().isEmpty())
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH, secretUser.getPubKeyHash());
+        if (secretUser.getImage() != null && secretUser.getImage().isEmpty())
+            values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, secretUser.getImage());
+        values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, secretUser.isActive() ? 1 : 0);
+
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
+    }
+
+    public void updateSecretUser(String username, String key, String value) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        if (key.equalsIgnoreCase("phone")) {
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, value);
+        } else if (key.equalsIgnoreCase("pubkey")) {
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY, value);
+        } else if (key.equalsIgnoreCase("pubkey_hash")) {
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH, value);
+        } else if (key.equalsIgnoreCase("image")) {
+            values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, value);
+        }
+
+        // update
+        db.update(SenzorsDbContract.User.TABLE_NAME,
+                values,
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+                new String[]{username});
+    }
+
+    public void setSecretUserActive(String username, boolean isActive) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, isActive ? 1 : 0);
+
+        // update
+        db.update(SenzorsDbContract.User.TABLE_NAME,
+                values,
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+                new String[]{username});
+    }
+
+    public SecretUser getSecretUser(String username) {
+        // get matching user if exists
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
+                new String[]{username}, // prams
+                null, // order by
+                null, // group by
+                null); // join
+
+        if (cursor.moveToFirst()) {
+            // have matching user
+            // so get user data
+            // we return id as password since we no storing users password in database
+            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            String _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
+            String _pubKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY));
+            String _pubKeyHash = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH));
+            int _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
+            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+
+            // clear
+            cursor.close();
+
+            return new SecretUser(_username, _phone, _pubKey, _pubKeyHash, _image, _isActive == 1);
+        }
+
+        return null;
     }
 
     /**
