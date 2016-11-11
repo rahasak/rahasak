@@ -61,7 +61,8 @@ public class SenzService extends Service {
     private PrintWriter writer;
 
     // status of the online/offline
-    private boolean connected;
+    private boolean senzCommRunning;
+    private boolean connectedSwitch;
 
     // broadcast receiver to check network status changes
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
@@ -182,7 +183,7 @@ public class SenzService extends Service {
         if (NetworkUtil.isAvailableNetwork(this)) {
             initSenzComm();
         } else {
-            Log.e(TAG, "no network to start senzcomm | already connected");
+            Log.e(TAG, "no network to start senzcomm");
         }
 
         return START_STICKY;
@@ -219,11 +220,16 @@ public class SenzService extends Service {
     }
 
     private void initSenzComm() {
-        if (!connected) {
-            Log.d(TAG, "Not connected, so start senzcomm");
-            new SenzComm().execute();
+        if (!connectedSwitch) {
+            Log.d(TAG, "Not connectedSwitch, check to start senzcomm");
+            if (!senzCommRunning) {
+                senzCommRunning = true;
+                new SenzComm().execute();
+            } else {
+                Log.d(TAG, "Already running senzcomm exists..");
+            }
         } else {
-            Log.d(TAG, "Already connected");
+            Log.d(TAG, "Already connectedSwitch");
             sendPing();
         }
     }
@@ -234,12 +240,12 @@ public class SenzService extends Service {
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
-        connected = true;
+        connectedSwitch = true;
     }
 
     private void resetSoc() throws IOException {
         Log.d(TAG, "Reset socket");
-        connected = false;
+        connectedSwitch = false;
 
         if (socket != null) {
             socket.close();
@@ -252,7 +258,7 @@ public class SenzService extends Service {
         Log.d(TAG, "Init reader");
 
         String line;
-        while (connected && (line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             if (!line.isEmpty()) {
                 String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
 
@@ -290,11 +296,12 @@ public class SenzService extends Service {
                     Log.d(TAG, "Senz to be send: " + message);
 
                     //  sends the message to the server
-                    if (connected) {
+                    if (connectedSwitch) {
                         writer.println(message);
                         writer.flush();
                     } else {
                         Log.e(TAG, "Socket disconnected");
+                        //Toast.makeText(SenzService.this, "No connection", Toast.LENGTH_LONG).show();
                     }
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
                     e.printStackTrace();
@@ -330,7 +337,7 @@ public class SenzService extends Service {
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
-                        if (connected) {
+                        if (connectedSwitch) {
                             writer.println(message);
                             writer.flush();
                         } else {
@@ -348,7 +355,7 @@ public class SenzService extends Service {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            if (!connected) {
+            if (!connectedSwitch) {
                 Log.d(TAG, "Not online, so init comm");
                 try {
                     initSoc();
@@ -368,6 +375,7 @@ public class SenzService extends Service {
         @Override
         protected void onPostExecute(Object o) {
             Log.e(TAG, "Stop SenzComm");
+            senzCommRunning = false;
 
             try {
                 resetSoc();
@@ -375,7 +383,6 @@ public class SenzService extends Service {
                 e.printStackTrace();
             }
         }
-
     }
 
     private boolean isCurrentUser(String username) {
