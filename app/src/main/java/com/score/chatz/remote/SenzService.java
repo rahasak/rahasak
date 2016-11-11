@@ -92,8 +92,7 @@ public class SenzService extends Service {
             if (intent.hasExtra("SENDER"))
                 usernameOfSender = intent.getStringExtra("SENDER").trim();
 
-            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(
-                    NotificationUtils.getSmsNotification(usernameOfSender, usernameToAdd));
+            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(usernameOfSender, usernameToAdd));
         }
     };
 

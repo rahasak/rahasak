@@ -132,19 +132,18 @@
                     android:textSize="20dp" />
             </LinearLayout>
 
-
-            <com.github.siyamed.shapeimageview.CircularImageView
+            <com.github.siyamed.shapeimageview.RoundedImageView
                 android:id="@+id/user_profile_image"
-                android:layout_width="95dp"
-                android:layout_height="95dp"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
                 android:layout_gravity="top|center"
-                android:layout_margin="5dp"
                 android:adjustViewBounds="true"
                 android:cropToPadding="true"
                 android:src="@drawable/default_user"
                 app:siBorderAlpha="0.0"
                 app:siBorderWidth="0dp"
-                app:siSquare="true" />
+                app:siRadius="12dp"
+                android:layout_margin="5dp"/>
 
 
         </LinearLayout>

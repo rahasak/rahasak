@@ -7,7 +7,6 @@ import android.util.Log;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.Stream;
-import com.score.chatz.ui.AddUserActivity;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
@@ -62,12 +61,11 @@ class SenHandler {
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().containsKey("status")) {
             // new user
             // new user permissions, save to db
-            if(!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
+            if (!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
                 SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
                 dbSource.getOrCreateUser(senz.getSender().getUsername());
                 dbSource.createPermissionsForUser(senz);
                 dbSource.createConfigurablePermissionsForUser(senz);
-
 
                 // send ack
                 senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
@@ -133,7 +131,7 @@ class SenHandler {
             String status = senz.getAttributes().get("status");
             if (status != null && status.equalsIgnoreCase("701")) {
                 // save user in db
-                if(!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
+                if (!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
                     SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
                     dbSource.getOrCreateUser(senz.getSender().getUsername());
                     dbSource.createPermissionsForUser(senz);
