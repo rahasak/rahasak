@@ -29,7 +29,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
-                    SenzorsDbContract.User.COLOMN_NAME_IMAGE + TEXT_TYPE +
+                    SenzorsDbContract.User.COLUMN_NAME_IMAGE + TEXT_TYPE +
                     " )";
 
     private static final String SQL_CREATE_LATEST_CHAT =

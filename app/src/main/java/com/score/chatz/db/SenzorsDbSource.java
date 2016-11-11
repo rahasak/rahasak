@@ -59,7 +59,7 @@ public class SenzorsDbSource {
             // we return id as password since we no storing users password in database
             String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
 
             // clear
             cursor.close();
@@ -540,7 +540,7 @@ public class SenzorsDbSource {
             _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
 
             // create senz
-            _userimage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+            _userimage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
             user.setUserImage(_userimage);
             userPerm = new UserPermission(user, _camera, _location, _mic);
         }
@@ -669,7 +669,7 @@ public class SenzorsDbSource {
             // get user attributes
             _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
 
             // create senz
             User user = new User(_userId, _username);
@@ -748,7 +748,7 @@ public class SenzorsDbSource {
 
             // content values to inset
             ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
+            values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, encodedImage);
 
             // update
             db.update(SenzorsDbContract.User.TABLE_NAME,
@@ -776,7 +776,7 @@ public class SenzorsDbSource {
 
         // extract attributes
         if (cursor.moveToFirst()) {
-            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
         }
 
         Log.i(TAG, "USER IMAGE RETRIEVED FROM DB : " + _userImage);
