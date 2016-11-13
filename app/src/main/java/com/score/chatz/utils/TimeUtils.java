@@ -47,7 +47,7 @@ public class TimeUtils {
             } else {
                 time = getDateAndTimeSimpleDateFormat().format(new Date(timestamp * 1000));
             }
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

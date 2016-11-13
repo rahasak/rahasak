@@ -121,6 +121,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        initUser(intent);
+        setupActionBar();
+        initSecretList();
+        updatePermissions();
+        setupUserImage();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -226,6 +236,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initUser() {
         String username = getIntent().getStringExtra("SENDER");
+        thisUser = new User("", username);
+    }
+
+    private void initUser(Intent intent) {
+        String username = intent.getStringExtra("SENDER");
         thisUser = new User("", username);
     }
 
