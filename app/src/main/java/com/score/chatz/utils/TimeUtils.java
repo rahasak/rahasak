@@ -1,5 +1,7 @@
 package com.score.chatz.utils;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -43,10 +45,9 @@ public class TimeUtils {
             } else if (deltaSeconds < (60 * 60 * 24 * 2)) {
                 time = deltaSeconds / (60 * 60 * 24) + " days ago";
             } else {
-                time = getDateAndTimeSimpleDateFormat().format(new Date(timestamp));
+                time = getDateAndTimeSimpleDateFormat().format(new Date(timestamp * 1000));
             }
-
-
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
