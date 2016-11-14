@@ -1,32 +1,25 @@
 package com.score.chatz.pojo;
 
+import android.os.Parcelable;
+
+import com.score.senzc.pojos.User;
+
+import java.util.List;
+
 /**
  * Created by eranga on 11/11/16.
  */
 
-public class SecretUser {
-    String username;
+public class SecretUser extends User implements Parcelable {
     String phone;
+    String image;
     String pubKey;
     String pubKeyHash;
-    String image;
     boolean isActive;
+    List<Permission> permissions;
 
-    public SecretUser(String username, String phone, String pubKey, String pubKeyHash, String image, boolean isActive) {
-        this.username = username;
-        this.phone = phone;
-        this.pubKey = pubKey;
-        this.pubKeyHash = pubKeyHash;
-        this.image = image;
-        this.isActive = isActive;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public SecretUser(String id, String username) {
+        super(id, username);
     }
 
     public String getPhone() {
@@ -35,6 +28,14 @@ public class SecretUser {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getPubKey() {
@@ -53,19 +54,19 @@ public class SecretUser {
         this.pubKeyHash = pubKeyHash;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     public boolean isActive() {
         return isActive;
     }
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 }

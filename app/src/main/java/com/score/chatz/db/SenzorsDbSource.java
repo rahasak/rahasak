@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
-import com.score.chatz.pojo.UserPermission;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -36,72 +36,171 @@ public class SenzorsDbSource {
         this.context = context;
     }
 
-    /**
-     * Get user if exists in the database, other wise create user and return
-     *
-     * @param username username
-     * @return user
-     */
-    public User getOrCreateUser(String username) {
-        Log.d(TAG, "GetOrCreateUser: " + username);
+//    /**
+//     * Get user if exists in the database, other wise create user and return
+//     *
+//     * @param username username
+//     * @return user
+//     */
+//    public User getOrCreateUser(String username) {
+//        Log.d(TAG, "GetOrCreateUser: " + username);
+//
+//        // get matching user if exists
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+//        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+//                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
+//                new String[]{username}, // prams
+//                null, // order by
+//                null, // group by
+//                null); // join
+//
+//        if (cursor.moveToFirst()) {
+//            // have matching user
+//            // so get user data
+//            // we return id as password since we no storing users password in database
+//            String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+//            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+//            String _phoneNumber = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
+//
+//            // clear
+//            cursor.close();
+//
+//            Log.d(TAG, "have user, so return it: " + username);
+//            User user = new User(_id, _username);
+//            user.setPhoneNumber(_phoneNumber);
+//            return user;
+//        } else {
+//            // no matching user
+//            // so create user
+//            ContentValues values = new ContentValues();
+//            values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
+//
+//            // inset data
+//            long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
+//            //db.close();
+//
+//            Log.d(TAG, "no user, so user created: " + username + " " + id);
+//            return new User(Long.toString(id), username);
+//        }
+//    }
+//
+//    public boolean isAddedUser(String username) {
+//        // get matching user if exists
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+//        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+//                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
+//                new String[]{username}, // prams
+//                null, // order by
+//                null, // group by
+//                null); // join
+//
+//        if (cursor.moveToFirst()) {
+//            // clear
+//            cursor.close();
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
-        // get matching user if exists
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
-                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
-                new String[]{username}, // prams
-                null, // order by
-                null, // group by
-                null); // join
+//    /**
+//     * Update permissions given to current user by others/Friends
+//     *
+//     * @param user    Other user or friend
+//     * @param camPerm Camera Permission given to current user by friend
+//     * @param locPerm Locations Permission given to current user by friend
+//     */
+//    public void updatePermissions(User user, String camPerm, String locPerm, String micPerm) {
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+//
+//        // initial permissions
+//        int _camPerm = 0;
+//        int _locPerm = 0;
+//        int _micPerm = 0;
+//
+//        // Convert String value of boolean into an integer to be stored in sqlite (Since no support for boolean type)
+//        // update the inital variables with the new converted values
+//        if (camPerm != null) {
+//            _camPerm = camPerm.equalsIgnoreCase("on") ? 1 : 0;
+//        }
+//        if (locPerm != null) {
+//            _locPerm = locPerm.equalsIgnoreCase("on") ? 1 : 0;
+//        }
+//        if (micPerm != null) {
+//            _micPerm = micPerm.equalsIgnoreCase("on") ? 1 : 0;
+//        }
+//
+//        // content values to inset
+//        ContentValues values = new ContentValues();
+//        if (camPerm != null) {
+//            values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, _camPerm);
+//        }
+//        if (locPerm != null) {
+//            values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, _locPerm);
+//        }
+//        if (micPerm != null) {
+//            values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, _micPerm);
+//        }
+//
+//        // update
+//        db.update(SenzorsDbContract.Permission.TABLE_NAME,
+//                values,
+//                SenzorsDbContract.Permission.COLUMN_NAME_USER + " = ?",
+//                new String[]{user.getUsername()});
+//    }
+//
+//    /**
+//     * Update configurable permissions the current user gives to others/Friends
+//     * Configurable permissiona are used to persist the state of the switch the user can toggle
+//     *
+//     * @param user    Other user or friend
+//     * @param camPerm Camera Permission given by current user to a friend
+//     * @param locPerm Locations Permission given by current user to a friend
+//     */
+//    public void updateConfigurablePermissions(User user, String camPerm, String locPerm, String micPerm) {
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+//
+//        // intial permissions
+//        int _camPerm = 0;
+//        int _locPerm = 0;
+//        int _micPerm = 0;
+//
+//        // Convert String value of boolean into an integer to be stored in sqlite (Since no support for boolean type)
+//        // update the inital variables with the new converted values
+//        if (camPerm != null) {
+//            _camPerm = camPerm.equalsIgnoreCase("on") ? 1 : 0;
+//        }
+//        if (locPerm != null) {
+//            _locPerm = locPerm.equalsIgnoreCase("on") ? 1 : 0;
+//        }
+//        if (micPerm != null) {
+//            _micPerm = micPerm.equalsIgnoreCase("on") ? 1 : 0;
+//        }
+//
+//        // content values to inset
+//        ContentValues values = new ContentValues();
+//        if (camPerm != null) {
+//            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA, _camPerm);
+//        }
+//        if (locPerm != null) {
+//            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION, _locPerm);
+//        }
+//        if (micPerm != null) {
+//            values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, _micPerm);
+//        }
+//
+//        // update
+//        db.update(SenzorsDbContract.PermissionConfiguration.TABLE_NAME,
+//                values,
+//                SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + " = ?",
+//                new String[]{user.getUsername()});
+//    }
 
-        if (cursor.moveToFirst()) {
-            // have matching user
-            // so get user data
-            // we return id as password since we no storing users password in database
-            String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            String _phoneNumber = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
 
-            // clear
-            cursor.close();
+    /**********************************************************************************************/
+    /* BEGIN user related functions */
 
-            Log.d(TAG, "have user, so return it: " + username);
-            User user = new User(_id, _username);
-            user.setPhoneNumber(_phoneNumber);
-            return user;
-        } else {
-            // no matching user
-            // so create user
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
-
-            // inset data
-            long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
-            //db.close();
-
-            Log.d(TAG, "no user, so user created: " + username + " " + id);
-            return new User(Long.toString(id), username);
-        }
-    }
-
-    public boolean isAddedUser(String username) {
-        // get matching user if exists
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
-                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
-                new String[]{username}, // prams
-                null, // order by
-                null, // group by
-                null); // join
-
-        if (cursor.moveToFirst()) {
-            // clear
-            cursor.close();
-            return true;
-        } else {
-            return false;
-        }
-    }
+    /**********************************************************************************************/
 
     public void createSecretUser(SecretUser secretUser) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
@@ -110,7 +209,7 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, secretUser.getUsername());
         if (secretUser.getPhone() != null && secretUser.getPhone().isEmpty())
-            values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, secretUser.getPhone());
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, secretUser.getPhone());
         if (secretUser.getPubKey() != null && secretUser.getPubKey().isEmpty())
             values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY, secretUser.getPubKey());
         if (secretUser.getPubKeyHash() != null && secretUser.getPubKeyHash().isEmpty())
@@ -120,6 +219,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, secretUser.isActive() ? 1 : 0);
 
         // Insert the new row, if fails throw an error
+        // fails means user already exists
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
     }
 
@@ -136,8 +236,6 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH, value);
         } else if (key.equalsIgnoreCase("image")) {
             values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, value);
-        } else if (key.equalsIgnoreCase("is_active")) {
-            values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, value.equalsIgnoreCase("true") ? true : false);
         }
 
         // update
@@ -162,6 +260,8 @@ public class SenzorsDbSource {
     }
 
     public SecretUser getSecretUser(String username) {
+        // TODO get user with INNER JOIN permission
+
         // get matching user if exists
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
@@ -175,6 +275,7 @@ public class SenzorsDbSource {
             // have matching user
             // so get user data
             // we return id as password since we no storing users password in database
+            String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
             String _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             String _pubKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY));
@@ -185,104 +286,105 @@ public class SenzorsDbSource {
             // clear
             cursor.close();
 
-            return new SecretUser(_username, _phone, _pubKey, _pubKeyHash, _image, _isActive == 1);
+            SecretUser secretUser = new SecretUser(_id, _username);
+            secretUser.setPhone(_phone);
+            secretUser.setPhone(_pubKey);
+            secretUser.setPhone(_pubKeyHash);
+            secretUser.setImage(_image);
+            secretUser.setActive(_isActive == 1);
+
+            return secretUser;
         }
 
         return null;
     }
 
-    /**
-     * Update permissions given to current user by others/Friends
-     *
-     * @param user    Other user or friend
-     * @param camPerm Camera Permission given to current user by friend
-     * @param locPerm Locations Permission given to current user by friend
-     */
-    public void updatePermissions(User user, String camPerm, String locPerm, String micPerm) {
+    public List<SecretUser> getSecretUserList() {
+        // TODO get all secrets with INNER JOIN permission
+        // TODO use this function to populate friend list
+
+        return new ArrayList<>();
+    }
+
+    /**********************************************************************************************/
+    /* END user related functions */
+    /**********************************************************************************************/
+
+
+    /**********************************************************************************************/
+    /* BEGIN permission related functions */
+
+    /**********************************************************************************************/
+
+    public void createPermission(Permission permission) {
+        Log.d(TAG, "Add new permission for " + permission.getUsername() + "with isGiven=" + permission.isGiven());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // initial permissions
-        int _camPerm = 0;
-        int _locPerm = 0;
-        int _micPerm = 0;
-
-        // Convert String value of boolean into an integer to be stored in sqlite (Since no support for boolean type)
-        // update the inital variables with the new converted values
-        if (camPerm != null) {
-            _camPerm = camPerm.equalsIgnoreCase("on") ? 1 : 0;
-        }
-        if (locPerm != null) {
-            _locPerm = locPerm.equalsIgnoreCase("on") ? 1 : 0;
-        }
-        if (micPerm != null) {
-            _micPerm = micPerm.equalsIgnoreCase("on") ? 1 : 0;
-        }
 
         // content values to inset
         ContentValues values = new ContentValues();
-        if (camPerm != null) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, _camPerm);
-        }
-        if (locPerm != null) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, _locPerm);
-        }
-        if (micPerm != null) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, _micPerm);
-        }
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN, permission.isGiven() ? 1 : 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_USER, permission.getUsername());
+
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, null, values);
+    }
+
+    public void updatePermission(String username, String permName, boolean permVal, boolean isGiven) {
+        Log.d(TAG, "Update permission " + permName + "of " + username + "with isGiven=" + isGiven);
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(permName, permVal ? 1 : 0);
 
         // update
         db.update(SenzorsDbContract.Permission.TABLE_NAME,
                 values,
-                SenzorsDbContract.Permission.COLUMN_NAME_USER + " = ?",
-                new String[]{user.getUsername()});
+                SenzorsDbContract.Permission.COLUMN_NAME_USER + " = ? AND is_given = ?",
+                new String[]{username, isGiven ? "1" : "0"});
     }
 
-    /**
-     * Update configurable permissions the current user gives to others/Friends
-     * Configurable permissiona are used to persist the state of the switch the user can toggle
-     *
-     * @param user    Other user or friend
-     * @param camPerm Camera Permission given by current user to a friend
-     * @param locPerm Locations Permission given by current user to a friend
-     */
-    public void updateConfigurablePermissions(User user, String camPerm, String locPerm, String micPerm) {
+    public Permission getPermission(String username, boolean isGiven) {
+        // get matching user if exists
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        Cursor cursor = db.query(SenzorsDbContract.Permission.TABLE_NAME, // table
+                null, // columns
+                SenzorsDbContract.Permission.COLUMN_NAME_USER + "=? AND " + SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN + "=?", // constraint
+                new String[]{username, isGiven ? "1" : "0"}, // prams
+                null, // order by
+                null, // group by
+                null); // join
 
-        // intial permissions
-        int _camPerm = 0;
-        int _locPerm = 0;
-        int _micPerm = 0;
+        if (cursor.moveToFirst()) {
+            String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Permission._ID));
+            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            boolean _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+            boolean _cam = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+            boolean _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
 
-        // Convert String value of boolean into an integer to be stored in sqlite (Since no support for boolean type)
-        // update the inital variables with the new converted values
-        if (camPerm != null) {
-            _camPerm = camPerm.equalsIgnoreCase("on") ? 1 : 0;
-        }
-        if (locPerm != null) {
-            _locPerm = locPerm.equalsIgnoreCase("on") ? 1 : 0;
-        }
-        if (micPerm != null) {
-            _micPerm = micPerm.equalsIgnoreCase("on") ? 1 : 0;
-        }
+            // clear
+            cursor.close();
 
-        // content values to inset
-        ContentValues values = new ContentValues();
-        if (camPerm != null) {
-            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA, _camPerm);
-        }
-        if (locPerm != null) {
-            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION, _locPerm);
-        }
-        if (micPerm != null) {
-            values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, _micPerm);
+            Permission permission = new Permission(_id, _username, isGiven);
+            permission.setLoc(_location);
+            permission.setCam(_cam);
+            permission.setMic(_mic);
+
+            return permission;
         }
 
-        // update
-        db.update(SenzorsDbContract.PermissionConfiguration.TABLE_NAME,
-                values,
-                SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + " = ?",
-                new String[]{user.getUsername()});
+        return null;
     }
+
+    /**********************************************************************************************/
+    /* END permission related functions */
+    /**********************************************************************************************/
+
+    /**********************************************************************************************/
+    /* BEGIN secret related functions */
+    /**********************************************************************************************/
 
     /**
      * Create Secret message or images
@@ -381,6 +483,10 @@ public class SenzorsDbSource {
         }
     }
 
+    /**********************************************************************************************/
+    /* BEGIN secret related functions */
+    /**********************************************************************************************/
+
     /**
      * Add permissions for senz user
      *
@@ -428,19 +534,18 @@ public class SenzorsDbSource {
      *
      * @return sensor list
      */
-    public ArrayList<Secret> getSecrets(User user) {
+    public ArrayList<Secret> getSecrets(SecretUser secretUser) {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, view_timestamp, missed, delivered, dispatched, timestamp " +
                 "FROM secret WHERE user = ? ORDER BY _id ASC";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
+        Cursor cursor = db.rawQuery(query, new String[]{secretUser.getUsername()});
 
         // secret attr
         String _secretId;
         String _secretBlob;
         String _secretBlobType;
-        String _secretUser;
         int _secretIsSender;
         int _isViewed;
         int _isMissed;
@@ -454,7 +559,6 @@ public class SenzorsDbSource {
             // get secret attributes
             _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
-            _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_USER));
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
@@ -465,7 +569,7 @@ public class SenzorsDbSource {
             _secretIsDispatched = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED));
 
             // create secret
-            Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1);
+            Secret secret = new Secret(_secretBlob, _secretBlobType, secretUser, _secretIsSender == 1);
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
             secret.setMissed(_isMissed == 1);
@@ -488,17 +592,17 @@ public class SenzorsDbSource {
     /**
      * Get secrets from give timestamp, used for lazy loading!!!
      *
-     * @param user
+     * @param secretUser
      * @param timestamp
      * @return
      */
-    public ArrayList<Secret> getSecrets(User user, Long timestamp) {
+    public ArrayList<Secret> getSecrets(SecretUser secretUser, Long timestamp) {
         ArrayList secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, view_timestamp, missed, delivered, dispatched, timestamp " +
                 "FROM secret WHERE user = ? AND timestamp > ? ORDER BY _id ASC";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername(), timestamp.toString()});
+        Cursor cursor = db.rawQuery(query, new String[]{secretUser.getUsername(), timestamp.toString()});
 
         // secret attr
         String _secretId;
@@ -529,7 +633,7 @@ public class SenzorsDbSource {
             _secretIsDispatched = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DISPATCHED));
 
             // create secret
-            Secret secret = new Secret(_secretBlob, _secretBlobType, new User("", _secretUser), _secretIsSender == 1);
+            Secret secret = new Secret(_secretBlob, _secretBlobType, secretUser, _secretIsSender == 1);
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
             secret.setMissed(_isMissed == 1);
@@ -547,242 +651,6 @@ public class SenzorsDbSource {
 
         Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
         return secretList;
-    }
-
-    /**
-     * GEt list of the lates chat messages!!!!
-     *
-     * @return
-     */
-    public ArrayList<Secret> getLatestChatMessages() {
-        ArrayList<Secret> secretList = new ArrayList();
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
-                "GROUP BY user ORDER BY timestamp DESC";
-
-        Cursor cursor = db.rawQuery(query, null);
-
-        // secret attr
-        String _secretBlob;
-        String _secretBlobType;
-        String _secretUser;
-        Long _secretTimestamp;
-        int _secretIsSender;
-
-        // extract attributes
-        while (cursor.moveToNext()) {
-            // get secret attributes
-            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_BLOB));
-            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TYPE));
-            _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_USER));
-            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP));
-            _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
-
-
-            // create secret
-            User user = new User("", _secretUser);
-
-            user.setUserImage(getImageFromDB(_secretUser));
-            Secret secret = new Secret(_secretBlob, _secretBlobType, user, _secretIsSender == 1 ? true : false);
-            secret.setTimeStamp(_secretTimestamp);
-            // fill secret list
-            secretList.add(secret);
-        }
-
-        // clean
-        cursor.close();
-
-        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
-        return secretList;
-    }
-
-    /**
-     * Get User information like image and username with theirs permissions
-     * Inner Join happening under the hood to combine the user table with permissions table
-     *
-     * @param user
-     * @return
-     */
-    public UserPermission getUserAndPermission(User user) {
-        UserPermission userPerm = null;
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // join query to retrieve data
-        String query = "SELECT permission.camera, permission.location, permission.mic, user.image " +
-                "FROM user " +
-                "INNER JOIN permission " +
-                "ON user.username = permission.user WHERE permission.user = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
-
-        // user attributes
-        String _userimage;
-        boolean _location;
-        boolean _camera;
-        boolean _mic;
-
-        // extract attributes
-        if (cursor.moveToFirst()) {
-
-            // get permission attributes
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
-
-            // create senz
-            _userimage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
-            user.setUserImage(_userimage);
-            userPerm = new UserPermission(user, _camera, _location, _mic);
-        }
-
-        // clean
-        cursor.close();
-
-        return userPerm;
-    }
-
-    /**
-     * Get only permissions for the given user.
-     *
-     * @param user
-     * @return
-     */
-    public UserPermission getUserPermission(User user) {
-        UserPermission userPerm = null;
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // query
-        String query = "SELECT permission.location, permission.camera, permission.mic " +
-                "FROM permission " +
-                "WHERE permission.user = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
-
-        // user attributes
-        String _username;
-        boolean _location;
-        boolean _camera;
-        boolean _mic;
-        String _userId;
-
-        // extract attributes
-        if (cursor.moveToFirst()) {
-
-            // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
-
-            // create senz
-            userPerm = new UserPermission(user, _camera, _location, _mic);
-        }
-
-        // clean
-        cursor.close();
-
-        return userPerm;
-    }
-
-    /**
-     * Get User configuarable permission only for the given user
-     *
-     * @param user
-     * @return
-     */
-    public UserPermission getUserConfigPermission(User user) {
-        UserPermission userPerm = null;
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // join query to retrieve data
-        String query = "SELECT permission_config.location, permission_config.camera, permission_config.mic " +
-                "FROM permission_config " +
-                "WHERE permission_config.user = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
-
-        // user attributes
-        boolean _location;
-        boolean _camera;
-        boolean _mic;
-
-        // extract attributes
-        if (cursor.moveToFirst()) {
-
-            // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
-
-            // create senz
-            userPerm = new UserPermission(user, _camera, _location, _mic);
-        }
-
-        // clean
-        cursor.close();
-
-        return userPerm;
-    }
-
-    /**
-     * Get list of all users/friends and also their permissions in a List
-     *
-     * @return
-     */
-    public List<UserPermission> getUsersAndTheirPermissions() {
-        List<UserPermission> permissionList = new ArrayList();
-
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // join query to retrieve data
-        String query = "SELECT user._id, user.username, user.phone, user.image, user.is_active, permission.location, permission.camera, permission.mic " +
-                "FROM user " +
-                "INNER JOIN permission " +
-                "ON user.username = permission.user";
-        Cursor cursor = db.rawQuery(query, null);
-
-        // sensor/user attributes
-        String _username;
-        boolean _location;
-        boolean _camera;
-        boolean _mic;
-        boolean _isActive;
-        String _userId;
-        String _userImage;
-        String _userPhone;
-
-        // extract attributes
-        while (cursor.moveToNext()) {
-
-            // get permission attributes
-            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
-            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
-            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
-
-            // get user attributes
-            _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
-            _userPhone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
-
-            // create senz
-            User user = new User(_userId, _username);
-            user.setUserImage(_userImage);
-            user.setPhoneNumber(_userPhone);
-
-            _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE)) == 1 ? true : false;
-            user.setIsActive(_isActive);
-
-            UserPermission userPerm = new UserPermission(user, _camera, _location, _mic);
-
-            // fill senz list
-            permissionList.add(userPerm);
-        }
-
-        // clean
-        cursor.close();
-
-        return permissionList;
     }
 
     /**
@@ -838,53 +706,295 @@ public class SenzorsDbSource {
                 new String[]{user.getUsername()});
     }
 
-    public void insertImageToDB(String username, String encodedImage) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        try {
-            db.beginTransaction();
-            Log.i(TAG, "USER IMAGE STORED TO DB : " + encodedImage);
+    /**
+     * GEt list of the lates chat messages!!!!
+     *
+     * @return
+     */
+    public ArrayList<Secret> getLatestChatMessages() {
+        ArrayList<Secret> secretList = new ArrayList();
 
-            // content values to inset
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, encodedImage);
-
-            // update
-            db.update(SenzorsDbContract.User.TABLE_NAME,
-                    values,
-                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
-                    new String[]{username});
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    public String getImageFromDB(String username) {
+        // TODO JOIN with user to get user image
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
+                "GROUP BY user ORDER BY timestamp DESC";
 
-        // query
-        String query = "SELECT user.image " +
-                "FROM user " +
-                "WHERE user.username = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{username});
+        Cursor cursor = db.rawQuery(query, null);
 
-        // user attributes
-        String _userImage = null;
+        // secret attr
+        String _secretBlob;
+        String _secretBlobType;
+        String _secretUser;
+        Long _secretTimestamp;
+        int _secretIsSender;
 
         // extract attributes
-        if (cursor.moveToFirst()) {
-            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
-        }
+        while (cursor.moveToNext()) {
+            // get secret attributes
+            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_BLOB));
+            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TYPE));
+            _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_USER));
+            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP));
+            _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
 
-        Log.i(TAG, "USER IMAGE RETRIEVED FROM DB : " + _userImage);
+            // create secret
+            User user = new User("", _secretUser);
+
+            user.setUserImage(getImageFromDB(_secretUser));
+            Secret secret = new Secret(_secretBlob, _secretBlobType, user, _secretIsSender == 1 ? true : false);
+            secret.setTimeStamp(_secretTimestamp);
+            // fill secret list
+            secretList.add(secret);
+        }
 
         // clean
         cursor.close();
 
-        return _userImage;
-
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
     }
+
+    /**********************************************************************************************/
+    /* END secret related functions */
+    /**********************************************************************************************/
+
+//    /**
+//     * Get User information like image and username with theirs permissions
+//     * Inner Join happening under the hood to combine the user table with permissions table
+//     *
+//     * @param user
+//     * @return
+//     */
+//    public UserPermission getUserAndPermission(User user) {
+//        UserPermission userPerm = null;
+//
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+//
+//        // join query to retrieve data
+//        String query = "SELECT permission.camera, permission.location, permission.mic, user.image " +
+//                "FROM user " +
+//                "INNER JOIN permission " +
+//                "ON user.username = permission.user WHERE permission.user = ?";
+//        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
+//
+//        // user attributes
+//        String _userimage;
+//        boolean _location;
+//        boolean _camera;
+//        boolean _mic;
+//
+//        // extract attributes
+//        if (cursor.moveToFirst()) {
+//
+//            // get permission attributes
+//            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
+//            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
+//            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+//
+//            // create senz
+//            _userimage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+//            user.setUserImage(_userimage);
+//            userPerm = new UserPermission(user, _camera, _location, _mic);
+//        }
+//
+//        // clean
+//        cursor.close();
+//
+//        return userPerm;
+//    }
+//
+//    /**
+//     * Get only permissions for the given user.
+//     *
+//     * @param user
+//     * @return
+//     */
+//    public UserPermission getUserPermission(User user) {
+//        UserPermission userPerm = null;
+//
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+//
+//        // query
+//        String query = "SELECT permission.location, permission.camera, permission.mic " +
+//                "FROM permission " +
+//                "WHERE permission.user = ?";
+//        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
+//
+//        // user attributes
+//        String _username;
+//        boolean _location;
+//        boolean _camera;
+//        boolean _mic;
+//        String _userId;
+//
+//        // extract attributes
+//        if (cursor.moveToFirst()) {
+//
+//            // get permission attributes
+//            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
+//            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
+//            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+//
+//            // create senz
+//            userPerm = new UserPermission(user, _camera, _location, _mic);
+//        }
+//
+//        // clean
+//        cursor.close();
+//
+//        return userPerm;
+//    }
+//
+//    /**
+//     * Get User configuarable permission only for the given user
+//     *
+//     * @param user
+//     * @return
+//     */
+//    public UserPermission getUserConfigPermission(User user) {
+//        UserPermission userPerm = null;
+//
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+//
+//        // join query to retrieve data
+//        String query = "SELECT permission_config.location, permission_config.camera, permission_config.mic " +
+//                "FROM permission_config " +
+//                "WHERE permission_config.user = ?";
+//        Cursor cursor = db.rawQuery(query, new String[]{user.getUsername()});
+//
+//        // user attributes
+//        boolean _location;
+//        boolean _camera;
+//        boolean _mic;
+//
+//        // extract attributes
+//        if (cursor.moveToFirst()) {
+//
+//            // get permission attributes
+//            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
+//            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
+//            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+//
+//            // create senz
+//            userPerm = new UserPermission(user, _camera, _location, _mic);
+//        }
+//
+//        // clean
+//        cursor.close();
+//
+//        return userPerm;
+//    }
+//
+//    /**
+//     * Get list of all users/friends and also their permissions in a List
+//     *
+//     * @return
+//     */
+//    public List<UserPermission> getUsersAndTheirPermissions() {
+//        List<UserPermission> permissionList = new ArrayList();
+//
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+//
+//        // join query to retrieve data
+//        String query = "SELECT user._id, user.username, user.phone, user.image, user.is_active, permission.location, permission.camera, permission.mic " +
+//                "FROM user " +
+//                "INNER JOIN permission " +
+//                "ON user.username = permission.user";
+//        Cursor cursor = db.rawQuery(query, null);
+//
+//        // sensor/user attributes
+//        String _username;
+//        boolean _location;
+//        boolean _camera;
+//        boolean _mic;
+//        boolean _isActive;
+//        String _userId;
+//        String _userImage;
+//        String _userPhone;
+//
+//        // extract attributes
+//        while (cursor.moveToNext()) {
+//
+//            // get permission attributes
+//            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false;
+//            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1 ? true : false;
+//            _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1 ? true : false;
+//
+//            // get user attributes
+//            _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+//            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+//            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+//            _userPhone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
+//
+//            // create senz
+//            User user = new User(_userId, _username);
+//            user.setUserImage(_userImage);
+//            user.setPhoneNumber(_userPhone);
+//
+//            _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE)) == 1 ? true : false;
+//            user.setIsActive(_isActive);
+//
+//            UserPermission userPerm = new UserPermission(user, _camera, _location, _mic);
+//
+//            // fill senz list
+//            permissionList.add(userPerm);
+//        }
+//
+//        // clean
+//        cursor.close();
+//
+//        return permissionList;
+//    }
+//
+//
+//    public void insertImageToDB(String username, String encodedImage) {
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+//
+//        try {
+//            db.beginTransaction();
+//            Log.i(TAG, "USER IMAGE STORED TO DB : " + encodedImage);
+//
+//            // content values to inset
+//            ContentValues values = new ContentValues();
+//            values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, encodedImage);
+//
+//            // update
+//            db.update(SenzorsDbContract.User.TABLE_NAME,
+//                    values,
+//                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+//                    new String[]{username});
+//
+//            db.setTransactionSuccessful();
+//        } finally {
+//            db.endTransaction();
+//        }
+//    }
+//
+//    public String getImageFromDB(String username) {
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+//
+//        // query
+//        String query = "SELECT user.image " +
+//                "FROM user " +
+//                "WHERE user.username = ?";
+//        Cursor cursor = db.rawQuery(query, new String[]{username});
+//
+//        // user attributes
+//        String _userImage = null;
+//
+//        // extract attributes
+//        if (cursor.moveToFirst()) {
+//            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+//        }
+//
+//        Log.i(TAG, "USER IMAGE RETRIEVED FROM DB : " + _userImage);
+//
+//        // clean
+//        cursor.close();
+//
+//        return _userImage;
+//
+//    }
 
 }

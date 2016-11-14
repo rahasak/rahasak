@@ -18,6 +18,7 @@ class SenzorsDbContract {
         public static final String COLUMN_UNIQUE_ID = "uid";
         public static final String COLUMN_TIMESTAMP = "timestamp";
         public static final String COLUMN_NAME_USER = "user";
+        // TODO change this to my_secret
         public static final String COLUMN_NAME_IS_SENDER = "is_sender";
         public static final String COLUMN_BLOB_TYPE = "type";
         public static final String COLUMN_NAME_BLOB = "blob";
@@ -38,15 +39,32 @@ class SenzorsDbContract {
         public static final String COLUMN_TIMESTAMP = "timestamp";
     }
 
+    /* Inner class that defines the user table contents */
+    public static abstract class User implements BaseColumns {
+        public static final String TABLE_NAME = "user";
+        public static final String COLUMN_NAME_USERNAME = "username";
+        public static final String COLUMN_NAME_PHONE = "phone";
+        public static final String COLUMN_NAME_PUBKEY = "pubkey";
+        public static final String COLUMN_NAME_PUBKEY_HASH = "pubkey_hash";
+        public static final String COLUMN_NAME_IS_ACTIVE = "is_active";
+        public static final String COLUMN_NAME_IMAGE = "image";
+    }
+
     /* Inner class that defines permission control for the user
      * Add more permissions here in the future */
     public static abstract class Permission implements BaseColumns {
         public static final String TABLE_NAME = "permission";
-        public static final String COLUMN_NAME_LOCATION = "location";
-        public static final String COLUMN_NAME_CAMERA = "camera";
+        public static final String COLUMN_NAME_LOCATION = "loc";
+        public static final String COLUMN_NAME_CAMERA = "cam";
         public static final String COLUMN_NAME_MIC = "mic";
+        // is_given = true -> I have given this permission to other party
+        // is_given = false -> Other party has given this permission to me
+        // TODO change this to my_perm
+        public static final String COLUMN_NAME_IS_GIVEN = "is_given";
+
         public static final String COLUMN_NAME_USER = "user";
     }
+
 
     /* Inner class that defines permission control for the user
      * Add more permissions here in the future */
@@ -59,14 +77,4 @@ class SenzorsDbContract {
         public static final String COLOMN_NAME_USER = "user";
     }
 
-    /* Inner class that defines the user table contents */
-    public static abstract class User implements BaseColumns {
-        public static final String TABLE_NAME = "user";
-        public static final String COLUMN_NAME_USERNAME = "username";
-        public static final String COLUMN_NAME_PHONE = "phone";
-        public static final String COLUMN_NAME_PUBKEY = "pubkey";
-        public static final String COLUMN_NAME_PUBKEY_HASH = "pubkey_hash";
-        public static final String COLUMN_NAME_IS_ACTIVE = "is_active";
-        public static final String COLUMN_NAME_IMAGE = "image";
-    }
 }

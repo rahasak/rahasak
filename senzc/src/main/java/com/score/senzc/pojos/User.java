@@ -13,22 +13,16 @@ import android.os.Parcelable;
 public class User implements Parcelable {
     String id;
     String username;
-    String phone;
-    String image;
-    boolean isActive;
 
     public User(String id, String username) {
         this.id = id;
         this.username = username;
     }
 
-    public User(String id, String username, String image) {
-        this.id = id;
-        this.username = username;
-    }
     /**
      * Use when reconstructing User object from parcel
      * This will be used only by the 'CREATOR'
+     *
      * @param in a parcel to read this object
      */
     public User(Parcel in) {
@@ -48,7 +42,8 @@ public class User implements Parcelable {
     /**
      * Actual object serialization happens here, Write object content
      * to parcel one by one, reading should be done according to this write order
-     * @param dest parcel
+     *
+     * @param dest  parcel
      * @param flags Additional flags about how the object should be written
      */
     @Override
@@ -60,7 +55,7 @@ public class User implements Parcelable {
     /**
      * This field is needed for Android to be able to
      * create new objects, individually or as arrays
-     *
+     * <p>
      * If you don’t do that, Android framework will through exception
      * Parcelable protocol requires a Parcelable.Creator object called CREATOR
      */
@@ -87,37 +82,13 @@ public class User implements Parcelable {
         return username;
     }
 
-    public String getUserImage() {
-        return image;
-    }
-
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setPhoneNumber(String phone){
-        this.phone = phone;
-    }
-
-    public String getPhoneNumber(){
-        return phone;
-    }
-
-    public void setIsActive(boolean flag){
-        this.isActive = flag;
-    }
-
-    public boolean isActive(){
-        return isActive;
-    }
-
-    public void setUserImage(String image) {
-        this.image = image;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof User) {
+        if (obj instanceof User) {
             User toCompare = (User) obj;
             return (this.username.equalsIgnoreCase(toCompare.getUsername()));
         }

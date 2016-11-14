@@ -18,7 +18,7 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 24;
+    private static final int DATABASE_VERSION = 25;
     private static final String DATABASE_NAME = "Rahaz.db";
 
     // data types, keywords and queries
@@ -69,7 +69,8 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Permission.COLUMN_NAME_LOCATION + INT_TYPE + ", " +
                     SenzorsDbContract.Permission.COLUMN_NAME_MIC + INT_TYPE + ", " +
                     SenzorsDbContract.Permission.COLUMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
-                    "UNIQUE" + "(" + SenzorsDbContract.Permission.COLUMN_NAME_USER + ")" +
+                    SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN + INT_TYPE + ", " +
+                    "UNIQUE" + "(" + SenzorsDbContract.Permission.COLUMN_NAME_USER + "," + SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN + ")" +
                     " )";
 
     private static final String SQL_CREATE_PERMISSION_CONFIG =
@@ -126,14 +127,17 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, SQL_CREATE_USER);
         Log.d(TAG, SQL_CREATE_SECRET);
         Log.d(TAG, SQL_CREATE_PERMISSION);
-        Log.d(TAG, SQL_CREATE_PERMISSION_CONFIG);
         Log.d(TAG, SQL_CREATE_LATEST_CHAT);
 
-        db.execSQL(SQL_CREATE_USER);
+        Log.d(TAG, SQL_CREATE_PERMISSION_CONFIG);
+
         db.execSQL(SQL_CREATE_SECRET);
-        db.execSQL(SQL_CREATE_PERMISSION);
-        db.execSQL(SQL_CREATE_PERMISSION_CONFIG);
         db.execSQL(SQL_CREATE_LATEST_CHAT);
+        db.execSQL(SQL_CREATE_USER);
+        db.execSQL(SQL_CREATE_PERMISSION);
+
+        // TODO remove
+        db.execSQL(SQL_CREATE_PERMISSION_CONFIG);
     }
 
     /**

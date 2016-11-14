@@ -4,12 +4,10 @@ package com.score.chatz.pojo;
  * Created by Lakmal on 7/31/16.
  */
 
-import com.score.senzc.pojos.User;
-
 public class Secret {
     private String id;
     private String blob;
-    private User user;
+    private SecretUser user;
     private String type;
     private boolean isViewed;
     private boolean isMissed;
@@ -19,7 +17,7 @@ public class Secret {
     private Long viewedTimeStamp;
     private boolean isSender;
 
-    public Secret(String blob, String type, User user, boolean isSender) {
+    public Secret(String blob, String type, SecretUser user, boolean isSender) {
         this.blob = blob;
         this.user = user;
         this.type = type;
@@ -42,11 +40,11 @@ public class Secret {
         this.blob = blob;
     }
 
-    public User getUser() {
+    public SecretUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(SecretUser user) {
         this.user = user;
     }
 
