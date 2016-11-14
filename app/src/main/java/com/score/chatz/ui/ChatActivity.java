@@ -25,8 +25,9 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
@@ -42,6 +43,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,7 +63,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ListView listView;
     private ChatListAdapter secretAdapter;
 
-    private User thisUser;
+    private SecretUser secretUser;
     private LimitedList<Secret> secretList;
 
     // service interface
@@ -89,7 +91,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra("SENZ")) {
+            if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 switch (senz.getSenzType()) {
                     case DATA:
@@ -159,7 +161,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // on chat
         SenzApplication.setOnChat(true);
-        SenzApplication.setUserOnChat(thisUser.getUsername());
+        SenzApplication.setUserOnChat(secretUser.getUsername());
 
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
@@ -184,7 +186,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
 
         // keep only last message
-        new SenzorsDbSource(this).deleteAllSecretsExceptLast(thisUser.getUsername());
+        new SenzorsDbSource(this).deleteAllSecretsExceptLast(secretUser.getUsername());
     }
 
     protected void bindToService() {
@@ -238,12 +240,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initUser() {
         String username = getIntent().getStringExtra("SENDER");
-        thisUser = new User("", username);
+        secretUser = new SenzorsDbSource(this).getSecretUser(username);
     }
 
     private void initUser(Intent intent) {
         String username = intent.getStringExtra("SENDER");
-        thisUser = new User("", username);
+        secretUser = new SenzorsDbSource(this).getSecretUser(username);
     }
 
     private void setupToolbar() {
@@ -261,7 +263,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         TextView header = ((TextView) findViewById(R.id.user_name));
         header.setTypeface(typeface, Typeface.BOLD);
-        header.setText("@" + thisUser.getUsername());
+        header.setText("@" + secretUser.getUsername());
 
         btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
         btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_profile_image);
@@ -270,13 +272,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupUserImage() {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(this.thisUser.getUsername());
-        if (userImage != null)
-            btnUserSetting.setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+        if (secretUser.getImage() != null)
+            btnUserSetting.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
     }
 
     private void initSecretList() {
-        ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(thisUser);
+        ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(secretUser);
         secretList = new LimitedList<>(tmpList.size());
         for (Secret secret : tmpList) {
             secretList.add(secret);
@@ -290,7 +291,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (secretAdapter != null && secretList.size() > 0) {
             Secret lastSecret = secretList.getYongest();
             if (lastSecret != null) {
-                ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(thisUser, lastSecret.getTimeStamp());
+                ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(secretUser, lastSecret.getTimeStamp());
                 secretList.addAll(tmpList);
                 secretAdapter.notifyDataSetChanged();
             }
@@ -300,19 +301,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void navigateToProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("SENDER", thisUser.getUsername());
+        intent.putExtra("SENDER", secretUser.getUsername());
         startActivity(intent);
     }
 
     private void navigateToPhotoWait() {
         Intent intent = new Intent(this, PhotoFullScreenActivity.class);
-        intent.putExtra("SENDER", thisUser.getUsername());
+        intent.putExtra("SENDER", secretUser.getUsername());
         startActivity(intent);
     }
 
     private void navigateMicWait() {
         Intent intent = new Intent(this, AudioFullScreenActivity.class);
-        intent.putExtra("SENDER", thisUser.getUsername());
+        intent.putExtra("SENDER", secretUser.getUsername());
         startActivity(intent);
     }
 
@@ -324,7 +325,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 txtSecret.setText("");
 
                 // create secret
-                Secret secret = new Secret(secretMsg, "TEXT", thisUser, false);
+                Secret secret = new Secret(secretMsg, "TEXT", secretUser, false);
                 Long timestamp = System.currentTimeMillis() / 1000;
                 secret.setTimeStamp(timestamp);
                 secret.setId(SenzUtils.getUid(this, timestamp.toString()));
@@ -361,7 +362,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
         } else {
@@ -385,7 +386,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
         } else {
@@ -409,7 +410,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
         } else {
@@ -430,7 +431,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
-            Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
         } catch (UnsupportedEncodingException e) {
@@ -465,12 +466,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onSenzStreamReceived(Senz senz) {
-        if (senz.getSender().getUsername().equalsIgnoreCase(thisUser.getUsername())) {
+        if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
             Secret secret;
             if (senz.getAttributes().containsKey("cam")) {
-                secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", thisUser, true);
+                secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", secretUser, true);
             } else {
-                secret = new Secret(senz.getAttributes().get("mic"), "SOUND", thisUser, true);
+                secret = new Secret(senz.getAttributes().get("mic"), "SOUND", secretUser, true);
             }
             secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
             secret.setId(senz.getAttributes().get("uid"));
@@ -494,11 +495,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onSenzMsgReceived(Senz senz) {
-        if (senz.getSender().getUsername().equalsIgnoreCase(thisUser.getUsername())) {
+        if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
             try {
                 if (senz.getAttributes().containsKey("msg")) {
                     String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
-                    Secret secret = new Secret(msg, "TEXT", thisUser, true);
+                    Secret secret = new Secret(msg, "TEXT", secretUser, true);
                     secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
                     secret.setId(senz.getAttributes().get("uid"));
 
@@ -519,10 +520,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updatePermissions() {
-        UserPermission userPerm = new SenzorsDbSource(this).getUserPermission(thisUser);
-        if (userPerm != null) {
+        Permission permission = getPermission(secretUser.getPermissions(), false);
+        if (permission != null) {
             // location
-            if (userPerm.getLocPerm()) {
+            if (permission.isLoc()) {
                 btnLocation.setImageResource(R.drawable.perm_locations_active);
                 btnLocation.setEnabled(true);
             } else {
@@ -531,7 +532,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             // camera
-            if (userPerm.getCamPerm()) {
+            if (permission.isCam()) {
                 btnPhoto.setImageResource(R.drawable.perm_camera_active);
                 btnPhoto.setEnabled(true);
             } else {
@@ -540,7 +541,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             // mic
-            if (userPerm.getMicPerm()) {
+            if (permission.isMic()) {
                 btnMic.setImageResource(R.drawable.perm_mic_active);
                 btnMic.setEnabled(true);
             } else {
@@ -566,5 +567,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private Permission getPermission(List<Permission> permissionList, boolean isGiven) {
+        for (Permission permission : permissionList) {
+            if (permission.isGiven() == isGiven) return permission;
+        }
+
+        return null;
+    }
 
 }

@@ -16,13 +16,12 @@ import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.SecretUser;
-import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.PhoneUtils;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Lakmal on 8/6/16.
@@ -55,7 +54,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         // to findViewById() on each row.
         final ViewHolder holder;
 
-        final SecretUser secretUser = (SecretUser) getItem(i);
+        final SecretUser secretUser = getItem(i);
 
         if (view == null) {
             //inflate sensor list row layout
@@ -86,25 +85,27 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         // enable share and change color of view
         if (!secretUser.isActive()) {
             viewHolder.usernameView.setText("Friend request from @" + secretUser.getUsername());
-        }else{
+        } else {
             viewHolder.usernameView.setText("@" + secretUser.getUsername());
         }
         viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
         viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
-        if (secretUser.getPermissions().getCamPerm() == true) {
+        // get permission (isGiven = false)
+        Permission permission = getPermission(secretUser.getPermissions(), false);
+        if (permission.isCam()) {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
         } else {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_deactive, null));
         }
 
-        if (userPerm.getMicPerm() == true) {
+        if (permission.isMic()) {
             viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_active, null));
         } else {
             viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_deactive, null));
         }
 
-        if (userPerm.getLocPerm() == true) {
+        if (permission.isLoc()) {
             viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_active, null));
         } else {
             viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_deactive, null));
@@ -118,15 +119,15 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         if (secretUser.getPhone() != null && !secretUser.getPhone().equalsIgnoreCase("") || secretUser.getPhone() != null) {
             viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
             viewHolder.phoneBookNameView.setText(new PhoneUtils().getDisplayNameFromNumber(secretUser.getPhone(), context));
-        }else{
+        } else {
             viewHolder.phoneBookNameView.setVisibility(View.GONE);
         }
 
-        if (!userPerm.getUser().isActive()){
+        if (!secretUser.isActive()) {
             viewHolder.userCameraPermView.setVisibility(View.GONE);
             viewHolder.userMicPermView.setVisibility(View.GONE);
             viewHolder.userLocationPermView.setVisibility(View.GONE);
-        }else{
+        } else {
             viewHolder.userCameraPermView.setVisibility(View.VISIBLE);
             viewHolder.userMicPermView.setVisibility(View.VISIBLE);
             viewHolder.userLocationPermView.setVisibility(View.VISIBLE);
@@ -153,6 +154,13 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         ImageView userMicPermView;
     }
 
+    private Permission getPermission(List<Permission> permissionList, boolean isGiven) {
+        for (Permission permission : permissionList) {
+            if (permission.isGiven() == isGiven) return permission;
+        }
+
+        return null;
+    }
 
 }
 

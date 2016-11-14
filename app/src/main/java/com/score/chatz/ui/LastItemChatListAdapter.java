@@ -106,8 +106,8 @@ public class LastItemChatListAdapter extends BaseAdapter {
             viewHolder.sentTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
-        if (secret.getUser().getUserImage() != null) {
-            loadBitmap(secret.getUser().getUserImage(), viewHolder.userImage);
+        if (secret.getUser().getImage() != null) {
+            loadBitmap(secret.getUser().getImage(), viewHolder.userImage);
         }
 
         if (secret.isViewed()) {

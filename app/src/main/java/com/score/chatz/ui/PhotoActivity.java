@@ -16,6 +16,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.SenzUtils;
@@ -44,7 +45,7 @@ public class PhotoActivity extends BaseActivity {
     private ImageView startBtn;
 
     // selfie request user
-    private User user;
+    private SecretUser secretUser;
 
     private CountDownTimer cancelTimer;
 

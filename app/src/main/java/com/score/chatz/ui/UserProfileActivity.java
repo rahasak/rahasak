@@ -21,7 +21,8 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
-import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.pojo.Permission;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.NetworkUtil;
@@ -31,6 +32,7 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class UserProfileActivity extends BaseActivity implements Switch.OnCheckedChangeListener {
     private static final String TAG = UserProfileActivity.class.getName();
@@ -41,8 +43,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private Switch waitingForResponseSwitch;
     private ImageView userImageView;
 
-    private User thisUser;
-    private UserPermission configurablePermission;
+    private SecretUser secretUser;
 
     private Senz currentSenz;
 
@@ -53,7 +54,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
-        savedInstanceState.putParcelable(SENDER, thisUser);
+        //savedInstanceState.putParcelable(SENDER, thisUser);
 
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
@@ -64,7 +65,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            thisUser = savedInstanceState.getParcelable(SENDER);
+            //thisUser = savedInstanceState.getParcelable(SENDER);
         }
     }
 
@@ -136,19 +137,17 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private void initThisUser() {
         Intent intent = getIntent();
         String username = intent.getStringExtra("SENDER");
-        thisUser = new User("", username);
+        secretUser = dbSource.getSecretUser(username);
     }
 
     private void initPermissions() {
-        configurablePermission = dbSource.getUserConfigPermission(thisUser);
+        if (secretUser.getImage() != null)
+            userImageView.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
 
-        String userImage = new SenzorsDbSource(this).getImageFromDB(this.thisUser.getUsername());
-        if (userImage != null)
-            userImageView.setImageBitmap(new ImageUtils().decodeBitmap(userImage));
-
-        cameraSwitch.setChecked(configurablePermission.getCamPerm());
-        micSwitch.setChecked(configurablePermission.getMicPerm());
-        locationSwitch.setChecked(configurablePermission.getLocPerm());
+        Permission permission = getPermission(secretUser.getPermissions(), true);
+        cameraSwitch.setChecked(permission.isCam());
+        micSwitch.setChecked(permission.isLoc());
+        locationSwitch.setChecked(permission.isMic());
 
         cameraSwitch.setOnCheckedChangeListener(this);
         locationSwitch.setOnCheckedChangeListener(this);
@@ -279,7 +278,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.GET;
-        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
         send(senz);
     }
@@ -287,7 +286,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private void setupCoordinator() {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("@" + thisUser.getUsername());
+        collapsingToolbar.setTitle("@" + secretUser.getUsername());
         collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
 
@@ -332,7 +331,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-        Senz senz = new Senz(id, signature, senzType, null, thisUser, senzAttributes);
+        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
         currentSenz = senz;
 
@@ -376,7 +375,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
             // save profile picture in db
             String encodedImage = senz.getAttributes().get("cam");
-            dbSource.insertImageToDB(thisUser.getUsername(), encodedImage);
+            dbSource.updateSecretUser(secretUser.getUsername(), "image", encodedImage);
 
             // display image
             userImageView.setImageBitmap(new ImageUtils().decodeBitmap(encodedImage));
@@ -385,14 +384,22 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     private void updatePermission(Senz senz) {
         if (senz.getAttributes().containsKey("lat")) {
-            dbSource.updateConfigurablePermissions(senz.getReceiver(), null, senz.getAttributes().get("lat"), null);
+            dbSource.updatePermission(senz.getReceiver().getUsername(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"), true);
         }
         if (senz.getAttributes().containsKey("cam")) {
-            dbSource.updateConfigurablePermissions(senz.getReceiver(), senz.getAttributes().get("cam"), null, null);
+            dbSource.updatePermission(senz.getReceiver().getUsername(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"), true);
         }
         if (senz.getAttributes().containsKey("mic")) {
-            dbSource.updateConfigurablePermissions(senz.getReceiver(), null, null, senz.getAttributes().get("mic"));
+            dbSource.updatePermission(senz.getReceiver().getUsername(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"), true);
         }
+    }
+
+    private Permission getPermission(List<Permission> permissionList, boolean isGiven) {
+        for (Permission permission : permissionList) {
+            if (permission.isGiven() == isGiven) return permission;
+        }
+
+        return null;
     }
 
 }
