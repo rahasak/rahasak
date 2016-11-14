@@ -17,6 +17,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
@@ -88,11 +89,12 @@ public class SenzService extends Service {
 
             Log.d(TAG, "Add user sms received. init add user.");
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
+            String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
             String usernameOfSender = null;
             if (intent.hasExtra("SENDER"))
                 usernameOfSender = intent.getStringExtra("SENDER").trim();
 
-            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(usernameOfSender, usernameToAdd));
+            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(usernameOfSender, phoneNumber,usernameToAdd));
         }
     };
 
@@ -102,9 +104,10 @@ public class SenzService extends Service {
         public void onReceive(Context context, Intent intent) {
 
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
+            String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
 
             if (!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
-                share(usernameToAdd);
+                shareWithPhoneNumber(usernameToAdd, phoneNumber);
             }
         }
     };
@@ -113,11 +116,12 @@ public class SenzService extends Service {
      * Share current sensor
      * Need to send share query to server via web socket
      */
-    private void share(String username) {
+    private void shareWithPhoneNumber(String username, String phoneNumber) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("msg", "");
         senzAttributes.put("status", "");
+        senzAttributes.put("phone", phoneNumber);
 
         Long timestamp = (System.currentTimeMillis() / 1000);
         senzAttributes.put("time", timestamp.toString());

@@ -11,6 +11,7 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.utils.PhoneUtils;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,21 +37,9 @@ public class SmsReceiver extends BroadcastReceiver {
                     for (int i = 0; i < msgs.length; i++) {
                         msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
-                        String msg_sender = null;
                         String msg_phone_number = msgs[i].getOriginatingAddress();
+                        String msg_sender = new PhoneUtils().getDisplayNameFromNumber(msg_phone_number, context);
                         String msg_body = msgs[i].getMessageBody();
-
-                        //Resolving the contact name from the contacts.
-                        Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(msg_phone_number));
-                        Cursor c = context.getContentResolver().query(lookupUri, new String[]{ContactsContract.Data.DISPLAY_NAME}, null, null, null);
-                        try {
-                            c.moveToFirst();
-                            msg_sender = c.getString(0);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        } finally {
-                            c.close();
-                        }
 
                         if (isMessageFromRahasakApp(msg_body)) {
                             //Valid message
@@ -60,7 +49,7 @@ public class SmsReceiver extends BroadcastReceiver {
                             //Stop sms from reaching mail box :).Works for verision below kitkat only
                             abortBroadcast();
 
-                            initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, context);
+                            initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, msg_phone_number,context);
                         } else {
                             //Not from rahasak, ignore
                             Log.e(TAG, "Invalid message. Must ignore it. -> " + msg_body + "; sender -> " + msg_sender);
@@ -85,9 +74,10 @@ public class SmsReceiver extends BroadcastReceiver {
         return matcher.group(1);
     }
 
-    private void initAddUserFromSms(String username, String sender, Context context) {
+    private void initAddUserFromSms(String username, String sender, String phoneNumber,Context context) {
         Intent smsReceivedIntent = IntentProvider.getSmsReceivedIntent();
         smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
+        smsReceivedIntent.putExtra("SENDER_PHONE_NUMBER", phoneNumber);
         smsReceivedIntent.putExtra("SENDER", sender);
         context.sendBroadcast(smsReceivedIntent);
     }

@@ -60,13 +60,15 @@ public class SenzorsDbSource {
             // we return id as password since we no storing users password in database
             String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+            String _phoneNumber = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
 
             // clear
             cursor.close();
 
             Log.d(TAG, "have user, so return it: " + username);
-            return new User(_id, _username);
+            User user = new User(_id, _username);
+            user.setPhoneNumber(_phoneNumber);
+            return user;
         } else {
             // no matching user
             // so create user
@@ -731,7 +733,7 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
         // join query to retrieve data
-        String query = "SELECT user._id, user.username, user.image, permission.location, permission.camera, permission.mic " +
+        String query = "SELECT user._id, user.username, user.phone, user.image, permission.location, permission.camera, permission.mic " +
                 "FROM user " +
                 "INNER JOIN permission " +
                 "ON user.username = permission.user";
@@ -744,6 +746,7 @@ public class SenzorsDbSource {
         boolean _mic;
         String _userId;
         String _userImage;
+        String _userPhone;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -757,10 +760,12 @@ public class SenzorsDbSource {
             _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
             _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+            _userPhone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
 
             // create senz
             User user = new User(_userId, _username);
             user.setUserImage(_userImage);
+            user.setPhoneNumber(_userPhone);
             UserPermission userPerm = new UserPermission(user, _camera, _location, _mic);
 
             // fill senz list

@@ -10,6 +10,7 @@ import com.score.chatz.pojo.Stream;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -66,9 +67,15 @@ class SenHandler {
                 dbSource.getOrCreateUser(senz.getSender().getUsername());
                 dbSource.createPermissionsForUser(senz);
                 dbSource.createConfigurablePermissionsForUser(senz);
-
-                // send ack
-                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+                if (senz.getAttributes().containsKey("phone")) {
+                    // send ack
+                    Senz senzToAddPhone = SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701");
+                    senzToAddPhone.getAttributes().put("phone", senz.getAttributes().get("phone"));
+                    senzService.writeSenz(senzToAddPhone);
+                }else{
+                    // send ack
+                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+                }
 
                 // show notification to current user
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
@@ -136,6 +143,8 @@ class SenHandler {
                     dbSource.getOrCreateUser(senz.getSender().getUsername());
                     dbSource.createPermissionsForUser(senz);
                     dbSource.createConfigurablePermissionsForUser(senz);
+                    if (senz.getAttributes().containsKey("phone"))
+                        dbSource.updateSecretUser(senz.getSender().getUsername(), "phone", senz.getAttributes().get("phone"));
                 }
             }
 

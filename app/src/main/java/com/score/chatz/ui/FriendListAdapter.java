@@ -17,6 +17,9 @@ import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.PhoneUtils;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -62,6 +65,7 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
             holder = new ViewHolder();
             holder.userImageView = (RoundedImageView) view.findViewById(R.id.user_image);
             holder.usernameView = (TextView) view.findViewById(R.id.user_name);
+            holder.phoneBookNameView = (TextView) view.findViewById(R.id.user_name_from_contacts);
             holder.userLocationPermView = (ImageView) view.findViewById(R.id.perm_locations);
             holder.userCameraPermView = (ImageView) view.findViewById(R.id.perm_camera);
             holder.userMicPermView = (ImageView) view.findViewById(R.id.perm_mic);
@@ -81,6 +85,7 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
         // enable share and change color of view
         viewHolder.usernameView.setText("@" + userPerm.getUser().getUsername());
         viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
+        viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
         if (userPerm.getCamPerm() == true) {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
@@ -107,6 +112,13 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
 
             loadBitmap(userPerm.getUser().getUserImage(), viewHolder.userImageView);
         }
+
+        if (userPerm.getUser().getPhoneNumber() != null && !userPerm.getUser().getPhoneNumber().equalsIgnoreCase("") || userPerm.getUser().getPhoneNumber() != null) {
+            viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
+            viewHolder.phoneBookNameView.setText(new PhoneUtils().getDisplayNameFromNumber(userPerm.getUser().getPhoneNumber(), context));
+        }else{
+            viewHolder.phoneBookNameView.setVisibility(View.GONE);
+        }
     }
 
     private void loadBitmap(String data, ImageView imageView) {
@@ -123,6 +135,7 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
     static class ViewHolder {
         RoundedImageView userImageView;
         TextView usernameView;
+        TextView phoneBookNameView;
         ImageView userCameraPermView;
         ImageView userLocationPermView;
         ImageView userMicPermView;

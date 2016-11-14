@@ -8,6 +8,7 @@ public class SenzNotification {
     String title;
     String message;
     String sender;
+    String senderPhone;
     NotificationType notificationType;
 
     public SenzNotification(int icon, String title, String message, String sender, NotificationType notificationType) {
@@ -16,6 +17,15 @@ public class SenzNotification {
         this.message = message;
         this.sender = sender;
         this.notificationType = notificationType;
+    }
+
+    public SenzNotification(int icon, String title, String message, String sender, String senderPhone, NotificationType notificationType) {
+        this.icon = icon;
+        this.title = title;
+        this.message = message;
+        this.sender = sender;
+        this.notificationType = notificationType;
+        this.senderPhone = senderPhone;
     }
 
     public int getIcon() {
@@ -44,6 +54,10 @@ public class SenzNotification {
 
     public String getSender() {
         return sender;
+    }
+
+    public String getSenderPhone() {
+        return senderPhone;
     }
 
     public void setSender(String sender) {

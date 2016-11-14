@@ -126,6 +126,7 @@ class SenzNotificationManager {
         Intent acceptIntent = new Intent(context, HomeActivity.class);
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         acceptIntent.putExtra("NOTIFICATION_ACCEPT", "NOTIFICATION_ACCEPT");
+        acceptIntent.putExtra("SENDER_PHONE_NUMBER", senzNotification.getSenderPhone());
         acceptIntent.putExtra("USERNAME_TO_ADD", senzNotification.getSender());
         acceptIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationId());
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

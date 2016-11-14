@@ -53,11 +53,11 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_SECRET);
     }
 
-    public static SenzNotification getSmsNotification(String sender, String rahasakUsername) {
+    public static SenzNotification getSmsNotification(String sender, String senderPhone, String rahasakUsername) {
         String msg = "Would you like share secrets?";
         String title = sender + " (@" + rahasakUsername +")";
 
-        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, NotificationType.NEW_SMS_ADD_FRIEND);
+        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, senderPhone, NotificationType.NEW_SMS_ADD_FRIEND);
     }
 
     public static void incrementNotificationId(){

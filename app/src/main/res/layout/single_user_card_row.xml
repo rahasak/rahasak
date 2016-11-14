@@ -37,15 +37,23 @@ android:layout_height="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="10dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:text="Lakmal"
             android:id="@+id/user_name"
             android:layout_centerVertical="true"
@@ -53,7 +61,20 @@ android:layout_height="match_parent"
             android:textSize="20sp"
             android:ellipsize="end"
             android:singleLine="true"
-            android:layout_toLeftOf="@+id/perm_locations" />
+            android:gravity="center_vertical" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="Lakmal"
+                android:id="@+id/user_name_from_contacts"
+                android:layout_centerVertical="true"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:gravity="center_vertical" />
+        </LinearLayout>
 
         <ImageView
             android:layout_width="20dp"
@@ -64,7 +85,8 @@ android:layout_height="match_parent"
             android:layout_alignTop="@+id/user_name"
             android:layout_marginLeft="10dp"
             android:layout_toLeftOf="@+id/perm_mic"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical" />
 
         <ImageView
             android:layout_width="20dp"
@@ -74,7 +96,8 @@ android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:layout_marginLeft="10dp"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/perm_camera" />
+            android:layout_toLeftOf="@+id/perm_camera"
+            android:layout_gravity="center_vertical" />
 
         <ImageView
             android:layout_width="20dp"
@@ -83,14 +106,14 @@ android:layout_height="match_parent"
             android:src="@drawable/perm_camera_active"
             android:adjustViewBounds="true"
             android:layout_marginLeft="10dp"
-            android:layout_gravity="right"
+            android:layout_gravity="right|center_vertical"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentStart="false"
             android:layout_centerVertical="true"
-            android:layout_marginRight="20dp" />
+            android:layout_marginRight="5dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

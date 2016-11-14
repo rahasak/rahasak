@@ -18,6 +18,7 @@ import android.os.Bundle;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.PreferenceUtils;
 
 import android.support.v7.widget.Toolbar;
@@ -103,6 +104,7 @@ public class ContactsListActivity extends BaseActivity implements
 
         // Initializes the loader
         getSupportLoaderManager().initLoader(CONTENT_LOADER_ID, null, this);
+        Log.i(TAG, "MY PHONE NUMBER - " + new PhoneUtils().getPhoneNumber(this));
     }
 
     private void setupContactsList() {

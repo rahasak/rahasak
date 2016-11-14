@@ -13,6 +13,7 @@ import android.os.Parcelable;
 public class User implements Parcelable {
     String id;
     String username;
+    String phone;
     String image;
 
     public User(String id, String username) {
@@ -91,6 +92,14 @@ public class User implements Parcelable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setPhoneNumber(String phone){
+        this.phone = phone;
+    }
+
+    public String getPhoneNumber(){
+        return phone;
     }
 
     public void setUserImage(String image) {
