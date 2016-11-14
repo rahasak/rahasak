@@ -11,6 +11,7 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.remote.SenzNotificationManager;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PhoneUtils;
@@ -77,24 +78,20 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private void initAddUserFromSms(String username, String sender, String phoneNumber,Context context) {
+        // Show Notification
         SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(sender, phoneNumber,username));
-    }
 
-    private int deleteMessage(Context context) {
-        Uri deleteUri = Uri.parse("content://sms");
-        int count = 0;
-        Cursor c = context.getContentResolver().query(deleteUri, null, null,
-                null, null);
-        while (c.moveToNext()) {
-            try {
-                // Delete the SMS
-                String pid = c.getString(0); // Get id;
-                String uri = "content://sms/" + pid;
-                count = context.getContentResolver().delete(Uri.parse(uri),
-                        null, null);
-            } catch (Exception e) {
-            }
+        if (!new SenzorsDbSource(context).isAddedUser(username)) {
+            // Add Pending User to databse
+            SenzorsDbSource dbSource = new SenzorsDbSource(context);
+            dbSource.getOrCreateUser(username);
+            dbSource.createPermissionsForUser(username);
+            dbSource.updateSecretUser(username, "phone", phoneNumber);
+
+            // Sent local intent to update view
+            Intent intent = new Intent("com.score.chatz.SENZ");
+            intent.putExtra("SMS_RECEIVED", "SMS_RECEIVED");
+            context.sendBroadcast(intent);
         }
-        return count;
     }
 }

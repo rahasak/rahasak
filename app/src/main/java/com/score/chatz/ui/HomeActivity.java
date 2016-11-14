@@ -213,7 +213,7 @@ public class HomeActivity extends AppCompatActivity {
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
             String senderPhone = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
 
-            if (new SenzorsDbSource(this).isAddedUser(usernameToAdd)) {
+            if (new SenzorsDbSource(this).getSecretUser(usernameToAdd).isActive()) {
                 NotificationUtils.cancelNotification(notificationId, this);
                 ActivityUtils.showCustomToast("This user has already been added", this);
             } else if (NetworkUtil.isAvailableNetwork(this)) {
@@ -223,10 +223,9 @@ public class HomeActivity extends AppCompatActivity {
                 ActivityUtils.showCustomToast(this.getResources().getString(R.string.no_internet), this);
             }
         }
-
     }
 
-    private void addUser(String username, String phoneNumber){
+    public void addUser(String username, String phoneNumber){
         Intent smsReceivedIntent = IntentProvider.getAddUserIntent();
         smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
         smsReceivedIntent.putExtra("SENDER_PHONE_NUMBER", phoneNumber);

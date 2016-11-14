@@ -15,6 +15,7 @@ public class User implements Parcelable {
     String username;
     String phone;
     String image;
+    boolean isActive;
 
     public User(String id, String username) {
         this.id = id;
@@ -100,6 +101,14 @@ public class User implements Parcelable {
 
     public String getPhoneNumber(){
         return phone;
+    }
+
+    public void setIsActive(boolean flag){
+        this.isActive = flag;
+    }
+
+    public boolean isActive(){
+        return isActive;
     }
 
     public void setUserImage(String image) {

@@ -89,19 +89,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            switch (senz.getSenzType()) {
-                case DATA:
-                    onDataReceived(senz);
-                    break;
-                case STREAM:
-                    onSenzStreamReceived(senz);
-                    break;
-                case SHARE:
-                    updatePermissions();
-                    break;
-                default:
-                    break;
+            if(intent.hasExtra("SENZ")) {
+                Senz senz = intent.getExtras().getParcelable("SENZ");
+                switch (senz.getSenzType()) {
+                    case DATA:
+                        onDataReceived(senz);
+                        break;
+                    case STREAM:
+                        onSenzStreamReceived(senz);
+                        break;
+                    case SHARE:
+                        updatePermissions();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     };

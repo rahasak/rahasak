@@ -11,11 +11,6 @@ import android.telephony.TelephonyManager;
  */
 
 public class PhoneUtils {
-    public String getPhoneNumber(Context context){
-        TelephonyManager tMgr = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        String mPhoneNumber = tMgr.getSimSerialNumber();
-        return  mPhoneNumber;
-    }
 
     public String getDisplayNameFromNumber(String phoneNumber, Context context){
         String displayName = phoneNumber;

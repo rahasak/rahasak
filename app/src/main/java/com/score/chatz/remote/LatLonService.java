@@ -70,6 +70,7 @@ public class LatLonService extends Service implements GoogleApiClient.Connection
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        if(intent.hasExtra("SENZ"))
         this.thisSenz = intent.getExtras().getParcelable("SENZ");
         bindService();
         return START_STICKY;

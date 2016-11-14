@@ -83,7 +83,11 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
 
     private void setUpRow(int i, UserPermission userPerm, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        viewHolder.usernameView.setText("@" + userPerm.getUser().getUsername());
+        if (!userPerm.getUser().isActive()) {
+            viewHolder.usernameView.setText("Friend request from @" + userPerm.getUser().getUsername());
+        }else{
+            viewHolder.usernameView.setText("@" + userPerm.getUser().getUsername());
+        }
         viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
         viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
@@ -118,6 +122,16 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
             viewHolder.phoneBookNameView.setText(new PhoneUtils().getDisplayNameFromNumber(userPerm.getUser().getPhoneNumber(), context));
         }else{
             viewHolder.phoneBookNameView.setVisibility(View.GONE);
+        }
+
+        if (!userPerm.getUser().isActive()){
+            viewHolder.userCameraPermView.setVisibility(View.GONE);
+            viewHolder.userMicPermView.setVisibility(View.GONE);
+            viewHolder.userLocationPermView.setVisibility(View.GONE);
+        }else{
+            viewHolder.userCameraPermView.setVisibility(View.VISIBLE);
+            viewHolder.userMicPermView.setVisibility(View.VISIBLE);
+            viewHolder.userLocationPermView.setVisibility(View.VISIBLE);
         }
     }
 

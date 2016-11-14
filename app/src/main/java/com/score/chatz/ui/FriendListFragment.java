@@ -21,6 +21,8 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
@@ -41,13 +43,20 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got new user from Senz service");
 
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            if (senz.getSenzType() == SenzTypeEnum.SHARE) {
-                displayUserList();
-            }else if(senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701")){
-                // New user added to list
+            Senz senz = null;
+            if (intent.hasExtra("SENZ")) {
+                senz = intent.getExtras().getParcelable("SENZ");
+                if (senz.getSenzType() == SenzTypeEnum.SHARE) {
+                    displayUserList();
+                } else if (senz.getSenzType() == SenzTypeEnum.DATA && senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701")) {
+                    // New user added to list via user action after an sms
+                    ActivityUtils.cancelProgressDialog();
+                    displayUserList();
+                }
+            } else if (senz == null && intent.hasExtra("SMS_RECEIVED")) {
                 displayUserList();
             }
+
         }
     };
 
@@ -76,9 +85,20 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra("SENDER", userPermissionList.get(position).getUser().getUsername());
-        startActivity(intent);
+        final int pos = position;
+        if (userPermissionList.get(position).getUser().isActive()) {
+            Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+            intent.putExtra("SENDER", userPermissionList.get(position).getUser().getUsername());
+            startActivity(intent);
+        } else {
+            ActivityUtils.displayConfirmationMessageDialog("Confirm User", "Would you like to add this user(" + new PhoneUtils().getDisplayNameFromNumber(userPermissionList.get(position).getUser().getPhoneNumber(), getActivity()) + ") to your friends list?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                    ((HomeActivity) getActivity()).addUser(userPermissionList.get(pos).getUser().getUsername(), userPermissionList.get(pos).getUser().getPhoneNumber());
+                }
+            });
+        }
     }
 
     @Override

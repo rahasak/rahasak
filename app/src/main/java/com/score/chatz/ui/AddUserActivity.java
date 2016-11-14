@@ -50,8 +50,10 @@ public class AddUserActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
 
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            handleSenz(senz);
+            if(intent.hasExtra("SENZ")) {
+                Senz senz = intent.getExtras().getParcelable("SENZ");
+                handleSenz(senz);
+            }
         }
     };
 

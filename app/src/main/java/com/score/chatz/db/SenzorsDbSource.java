@@ -136,6 +136,8 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH, value);
         } else if (key.equalsIgnoreCase("image")) {
             values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, value);
+        } else if (key.equalsIgnoreCase("is_active")) {
+            values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, value.equalsIgnoreCase("true") ? true : false);
         }
 
         // update
@@ -382,10 +384,10 @@ public class SenzorsDbSource {
     /**
      * Add permissions for senz user
      *
-     * @param senz
+     * @param username
      */
-    public void createPermissionsForUser(Senz senz) {
-        Log.d(TAG, "Add New Permission: adding permission from - " + senz.getSender());
+    public void createPermissionsForUser(String username) {
+        Log.d(TAG, "Add New Permission: adding permission from - " + username);
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // content values to inset
@@ -393,7 +395,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, 0);
-        values.put(SenzorsDbContract.Permission.COLUMN_NAME_USER, senz.getSender().getUsername());
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_USER, username);
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, null, values);
@@ -733,7 +735,7 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
         // join query to retrieve data
-        String query = "SELECT user._id, user.username, user.phone, user.image, permission.location, permission.camera, permission.mic " +
+        String query = "SELECT user._id, user.username, user.phone, user.image, user.is_active, permission.location, permission.camera, permission.mic " +
                 "FROM user " +
                 "INNER JOIN permission " +
                 "ON user.username = permission.user";
@@ -744,6 +746,7 @@ public class SenzorsDbSource {
         boolean _location;
         boolean _camera;
         boolean _mic;
+        boolean _isActive;
         String _userId;
         String _userImage;
         String _userPhone;
@@ -766,6 +769,10 @@ public class SenzorsDbSource {
             User user = new User(_userId, _username);
             user.setUserImage(_userImage);
             user.setPhoneNumber(_userPhone);
+
+            _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE)) == 1 ? true : false;
+            user.setIsActive(_isActive);
+
             UserPermission userPerm = new UserPermission(user, _camera, _location, _mic);
 
             // fill senz list

@@ -104,7 +104,6 @@ public class ContactsListActivity extends BaseActivity implements
 
         // Initializes the loader
         getSupportLoaderManager().initLoader(CONTENT_LOADER_ID, null, this);
-        Log.i(TAG, "MY PHONE NUMBER - " + new PhoneUtils().getPhoneNumber(this));
     }
 
     private void setupContactsList() {

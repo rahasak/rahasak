@@ -65,7 +65,7 @@ class SenHandler {
             if (!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
                 SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
                 dbSource.getOrCreateUser(senz.getSender().getUsername());
-                dbSource.createPermissionsForUser(senz);
+                dbSource.createPermissionsForUser(senz.getSender().getUsername());
                 dbSource.createConfigurablePermissionsForUser(senz);
                 if (senz.getAttributes().containsKey("phone")) {
                     // send ack
@@ -129,6 +129,8 @@ class SenHandler {
 
     private void handleData(Senz senz, SenzService senzService) {
         // save in db
+        SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+
         if (senz.getAttributes().containsKey("status")) {
             // status coming from switch
             // broadcast
@@ -138,14 +140,19 @@ class SenHandler {
             String status = senz.getAttributes().get("status");
             if (status != null && status.equalsIgnoreCase("701")) {
                 // save user in db
-                if (!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
-                    SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+                if (!dbSource.isAddedUser(senz.getSender().getUsername())) {
                     dbSource.getOrCreateUser(senz.getSender().getUsername());
-                    dbSource.createPermissionsForUser(senz);
+                    dbSource.createPermissionsForUser(senz.getSender().getUsername());
                     dbSource.createConfigurablePermissionsForUser(senz);
                     if (senz.getAttributes().containsKey("phone"))
                         dbSource.updateSecretUser(senz.getSender().getUsername(), "phone", senz.getAttributes().get("phone"));
+                }else{
+                    // Check if user is a pending user, if so handle
+                    if(!dbSource.getSecretUser(senz.getSender().getUsername()).isActive()){
+                        dbSource.createConfigurablePermissionsForUser(senz);
+                    }
                 }
+                dbSource.updateSecretUser(senz.getSender().getUsername(), "is_active", "true");
             }
 
             broadcastSenz(senz, senzService.getApplicationContext());

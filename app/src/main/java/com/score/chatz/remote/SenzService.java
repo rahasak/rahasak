@@ -92,7 +92,7 @@ public class SenzService extends Service {
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
             String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
 
-            if (!new SenzorsDbSource(SenzService.this).isAddedUser(usernameToAdd) && !isCurrentUser(usernameToAdd)) {
+            if (!isCurrentUser(usernameToAdd)) {
                 shareWithPhoneNumber(usernameToAdd, phoneNumber);
             }
         }

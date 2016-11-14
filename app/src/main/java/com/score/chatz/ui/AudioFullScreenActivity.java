@@ -53,16 +53,18 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
             Log.d(TAG, "Got message from Senz service");
 
             // extract senz
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            switch (senz.getSenzType()) {
-                case DATA:
-                    onSenzReceived(senz);
-                    break;
-                case STREAM:
-                    onSenzStreamReceived(senz);
-                    break;
-                default:
-                    break;
+            if(intent.hasExtra("SENZ")) {
+                Senz senz = intent.getExtras().getParcelable("SENZ");
+                switch (senz.getSenzType()) {
+                    case DATA:
+                        onSenzReceived(senz);
+                        break;
+                    case STREAM:
+                        onSenzStreamReceived(senz);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     };

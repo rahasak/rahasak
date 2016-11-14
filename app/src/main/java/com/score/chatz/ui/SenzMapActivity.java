@@ -70,12 +70,14 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initExtra() {
-        thisSenz = getIntent().getParcelableExtra("SENZ");
+        if(getIntent().hasExtra("SENZ")) {
+            thisSenz = getIntent().getParcelableExtra("SENZ");
 
-        // location coordinate
-        double lat = Double.parseDouble(thisSenz.getAttributes().get("lat"));
-        double lan = Double.parseDouble(thisSenz.getAttributes().get("lon"));
-        thisUserLatLng = new LatLng(lat, lan);
+            // location coordinate
+            double lat = Double.parseDouble(thisSenz.getAttributes().get("lat"));
+            double lan = Double.parseDouble(thisSenz.getAttributes().get("lon"));
+            thisUserLatLng = new LatLng(lat, lan);
+        }
     }
 
     private void initToolbar() {

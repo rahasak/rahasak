@@ -50,9 +50,11 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got new user from Senz service");
 
-            Senz senz = intent.getExtras().getParcelable("SENZ");
-            if (senz.getSenzType() == SenzTypeEnum.DATA) {
-                displayUserList();
+            if(intent.hasExtra("SENZ")) {
+                Senz senz = intent.getExtras().getParcelable("SENZ");
+                if (senz.getSenzType() == SenzTypeEnum.DATA) {
+                    displayUserList();
+                }
             }
         }
     };
