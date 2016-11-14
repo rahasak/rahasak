@@ -313,7 +313,7 @@ public class SenzorsDbSource {
         return null;
     }
 
-    public List<SecretUser> getSecretUserList() {
+    public ArrayList<SecretUser> getSecretUserList() {
 
         // Two permission variables - isGiven and !isGiven
         final int NO_PERMISSION_VARIABLES = 2;
@@ -325,7 +325,7 @@ public class SenzorsDbSource {
                 "ON user.username = permission.user GROUP BY user.username";
         Cursor cursor = db.rawQuery(query, null);
 
-        List<SecretUser> secretUserList = new ArrayList<>();
+        ArrayList<SecretUser> secretUserList = new ArrayList<>();
 
         while(cursor.moveToNext()) {
 

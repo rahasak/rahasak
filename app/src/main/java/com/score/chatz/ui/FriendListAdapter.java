@@ -16,6 +16,7 @@ import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.PhoneUtils;
 
@@ -26,16 +27,16 @@ import java.util.ArrayList;
 /**
  * Created by Lakmal on 8/6/16.
  */
-class FriendListAdapter extends ArrayAdapter<UserPermission> {
+class FriendListAdapter extends ArrayAdapter<SecretUser> {
     Context context;
     private Typeface typeface;
 
-    ArrayList<UserPermission> userPermissionList;
+    ArrayList<SecretUser> friendsList;
 
-    public FriendListAdapter(Context _context, ArrayList<UserPermission> userPermsList) {
+    public FriendListAdapter(Context _context, ArrayList<SecretUser> userPermsList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, userPermsList);
         context = _context;
-        userPermissionList = userPermsList;
+        friendsList = userPermsList;
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
@@ -54,7 +55,7 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
         // to findViewById() on each row.
         final ViewHolder holder;
 
-        final UserPermission userPerm = (UserPermission) getItem(i);
+        final SecretUser secretUser = (SecretUser) getItem(i);
 
         if (view == null) {
             //inflate sensor list row layout
@@ -76,22 +77,22 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
             holder = (ViewHolder) view.getTag();
         }
 
-        setUpRow(i, userPerm, view, holder);
+        setUpRow(i, secretUser, view, holder);
 
         return view;
     }
 
-    private void setUpRow(int i, UserPermission userPerm, View view, ViewHolder viewHolder) {
+    private void setUpRow(int i, SecretUser secretUser, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        if (!userPerm.getUser().isActive()) {
-            viewHolder.usernameView.setText("Friend request from @" + userPerm.getUser().getUsername());
+        if (!secretUser.isActive()) {
+            viewHolder.usernameView.setText("Friend request from @" + secretUser.getUsername());
         }else{
-            viewHolder.usernameView.setText("@" + userPerm.getUser().getUsername());
+            viewHolder.usernameView.setText("@" + secretUser.getUsername());
         }
         viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
         viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
-        if (userPerm.getCamPerm() == true) {
+        if (secretUser.getPermissions().getCamPerm() == true) {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
         } else {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_deactive, null));
@@ -110,16 +111,13 @@ class FriendListAdapter extends ArrayAdapter<UserPermission> {
         }
         viewHolder.userImageView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.default_user, null));
         //Extracting user image
-        if (userPerm.getUser().getUserImage() != null) {
-            //viewHolder.userImageView.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(userPerm.getUser().getUserImage().getBytes()), -90));
-            //loadBitmap(CameraUtils.getBytesFromImage(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(Base64.decode(userPerm.getUser().getUserImage(), 0)), -90)), viewHolder.userImageView);
-
-            loadBitmap(userPerm.getUser().getUserImage(), viewHolder.userImageView);
+        if (secretUser.getImage() != null) {
+            loadBitmap(secretUser.getImage(), viewHolder.userImageView);
         }
 
-        if (userPerm.getUser().getPhoneNumber() != null && !userPerm.getUser().getPhoneNumber().equalsIgnoreCase("") || userPerm.getUser().getPhoneNumber() != null) {
+        if (secretUser.getPhone() != null && !secretUser.getPhone().equalsIgnoreCase("") || secretUser.getPhone() != null) {
             viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
-            viewHolder.phoneBookNameView.setText(new PhoneUtils().getDisplayNameFromNumber(userPerm.getUser().getPhoneNumber(), context));
+            viewHolder.phoneBookNameView.setText(new PhoneUtils().getDisplayNameFromNumber(secretUser.getPhone(), context));
         }else{
             viewHolder.phoneBookNameView.setVisibility(View.GONE);
         }

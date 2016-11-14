@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NotificationUtils;
@@ -27,6 +28,7 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +37,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     private static final String TAG = FriendListFragment.class.getName();
 
-    private ArrayList<UserPermission> userPermissionList;
+    private ArrayList<SecretUser> friendsList;
     private FriendListAdapter adapter;
 
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -86,16 +88,16 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final int pos = position;
-        if (userPermissionList.get(position).getUser().isActive()) {
+        if (friendsList.get(position).isActive()) {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-            intent.putExtra("SENDER", userPermissionList.get(position).getUser().getUsername());
+            intent.putExtra("SENDER", friendsList.get(position).getUsername());
             startActivity(intent);
         } else {
-            ActivityUtils.displayConfirmationMessageDialog("Confirm User", "Would you like to add this user(" + new PhoneUtils().getDisplayNameFromNumber(userPermissionList.get(position).getUser().getPhoneNumber(), getActivity()) + ") to your friends list?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
+            ActivityUtils.displayConfirmationMessageDialog("Confirm User", "Would you like to add this user(" + new PhoneUtils().getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity()) + ") to your friends list?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                    ((HomeActivity) getActivity()).addUser(userPermissionList.get(pos).getUser().getUsername(), userPermissionList.get(pos).getUser().getPhoneNumber());
+                    ((HomeActivity) getActivity()).addUser(friendsList.get(pos).getUsername(), friendsList.get(pos).getPhone());
                 }
             });
         }
@@ -122,14 +124,14 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
      */
     private void displayUserList() {
         // get User from db
-        userPermissionList = (ArrayList<UserPermission>) new SenzorsDbSource(this.getActivity()).getUsersAndTheirPermissions();
+        friendsList = new SenzorsDbSource(this.getActivity()).getSecretUserList();
         // construct list adapter
-        if (userPermissionList.size() > 0) {
-            adapter = new FriendListAdapter(getContext(), userPermissionList);
+        if (friendsList.size() > 0) {
+            adapter = new FriendListAdapter(getContext(), friendsList);
             adapter.notifyDataSetChanged();
             getListView().setAdapter(adapter);
         } else {
-            adapter = new FriendListAdapter(getContext(), userPermissionList);
+            adapter = new FriendListAdapter(getContext(), friendsList);
             getListView().setAdapter(adapter);
         }
     }
