@@ -260,22 +260,20 @@ public class SenzorsDbSource {
     }
 
     public SecretUser getSecretUser(String username) {
-        // TODO get user with INNER JOIN permission
 
-        // get matching user if exists
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
-                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
-                new String[]{username}, // prams
-                null, // order by
-                null, // group by
-                null); // join
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT * " +
+                "FROM secret " +
+                "INNER JOIN permission " +
+                "ON user.username = permission.user " +
+                "WHERE user = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{username});
 
         if (cursor.moveToFirst()) {
             // have matching user
             // so get user data
             // we return id as password since we no storing users password in database
-            String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            String _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
             String _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             String _pubKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY));
@@ -283,15 +281,31 @@ public class SenzorsDbSource {
             int _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
             String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
 
+            String _permID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Permission._ID));
+            boolean _cameraPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+            boolean _locationPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+            boolean _micPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
+            boolean _isGiven = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN)) == 1;
+
             // clear
             cursor.close();
 
-            SecretUser secretUser = new SecretUser(_id, _username);
+            SecretUser secretUser = new SecretUser(_userID, _username);
             secretUser.setPhone(_phone);
             secretUser.setPhone(_pubKey);
             secretUser.setPhone(_pubKeyHash);
             secretUser.setImage(_image);
             secretUser.setActive(_isActive == 1);
+
+            Permission permission = new Permission(_permID, _username, _isGiven);
+            permission.setCam(_cameraPerm);
+            permission.setLoc(_locationPerm);
+            permission.setMic(_micPerm);
+
+            List<Permission> permList = new ArrayList<>();
+            permList.add(permission);
+
+            secretUser.setPermissions(permList);
 
             return secretUser;
         }
@@ -300,10 +314,73 @@ public class SenzorsDbSource {
     }
 
     public List<SecretUser> getSecretUserList() {
-        // TODO get all secrets with INNER JOIN permission
-        // TODO use this function to populate friend list
 
-        return new ArrayList<>();
+        // Two permission variables - isGiven and !isGiven
+        final int NO_PERMISSION_VARIABLES = 2;
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT * " +
+                "FROM secret " +
+                "INNER JOIN permission " +
+                "ON user.username = permission.user GROUP BY user.username";
+        Cursor cursor = db.rawQuery(query, null);
+
+        List<SecretUser> secretUserList = new ArrayList<>();
+
+        while(cursor.moveToNext()) {
+
+            String _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            String _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
+            String _pubKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY));
+            String _pubKeyHash = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH));
+            int _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
+            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+
+            SecretUser secretUser = new SecretUser(_userID, _username);
+            secretUser.setPhone(_phone);
+            secretUser.setPhone(_pubKey);
+            secretUser.setPhone(_pubKeyHash);
+            secretUser.setImage(_image);
+            secretUser.setActive(_isActive == 1);
+
+            List<Permission> permList = new ArrayList<>();
+            for(int i = 0; i < NO_PERMISSION_VARIABLES; i++){
+
+                // Create Permissiosn
+                String _permID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Permission._ID));
+                boolean _cameraPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
+                boolean _locationPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
+                boolean _micPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
+                boolean _isGiven = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN)) == 1;
+
+                Permission permission = new Permission(_permID, _username, _isGiven);
+                permission.setCam(_cameraPerm);
+                permission.setLoc(_locationPerm);
+                permission.setMic(_micPerm);
+
+                permList.add(permission);
+
+                if(i == NO_PERMISSION_VARIABLES - 1){
+                    secretUser.setPermissions(permList);
+                }
+
+                // Move to next permission
+                cursor.moveToNext();
+            }
+
+            // Add created User to list
+            secretUserList.add(secretUser);
+
+            // Move to next user
+            cursor.moveToNext();
+        }
+
+        // clear
+        cursor.close();
+
+
+        return secretUserList;
     }
 
     /**********************************************************************************************/
@@ -716,33 +793,47 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         // TODO JOIN with user to get user image
+        //SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        //String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
+        //        "GROUP BY user ORDER BY timestamp DESC";
+
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
-                "GROUP BY user ORDER BY timestamp DESC";
+        String query = "SELECT * " +
+                "FROM latest_chat " +
+                "INNER JOIN user " +
+                "ON user.username = latest_chat.user GROUP BY user.username ORDER BY timestamp DESC";
 
         Cursor cursor = db.rawQuery(query, null);
 
         // secret attr
+        String _userID;
         String _secretBlob;
         String _secretBlobType;
         String _secretUser;
         Long _secretTimestamp;
+        String _image;
         int _secretIsSender;
+        int _isActive;
 
         // extract attributes
         while (cursor.moveToNext()) {
             // get secret attributes
+            _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_BLOB));
             _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TYPE));
             _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_USER));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP));
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
 
-            // create secret
-            User user = new User("", _secretUser);
+            // get user attributes
+            _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
+            _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
 
-            user.setUserImage(getImageFromDB(_secretUser));
-            Secret secret = new Secret(_secretBlob, _secretBlobType, user, _secretIsSender == 1 ? true : false);
+            SecretUser secretUser = new SecretUser(_userID, _secretUser);
+            secretUser.setImage(_image);
+            secretUser.setActive(_isActive == 1);
+
+            Secret secret = new Secret(_secretBlob, _secretBlobType, secretUser, _secretIsSender == 1);
             secret.setTimeStamp(_secretTimestamp);
             // fill secret list
             secretList.add(secret);
