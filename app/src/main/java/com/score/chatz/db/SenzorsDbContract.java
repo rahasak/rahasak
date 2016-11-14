@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SenzorsDbContract {
+class SenzorsDbContract {
 
     public SenzorsDbContract() {
     }

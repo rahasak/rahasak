@@ -10,7 +10,7 @@ import android.util.Log;
  *
  * @author erangaeb@gmail.com(eranga herath)
  */
-public class SenzorsDbHelper extends SQLiteOpenHelper {
+class SenzorsDbHelper extends SQLiteOpenHelper {
 
     private static final String TAG = SenzorsDbHelper.class.getName();
 
