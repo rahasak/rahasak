@@ -82,21 +82,7 @@ public class SenzService extends Service {
         }
     };
 
-    // broadcst receiver to automatically notify user when sms received
-    private BroadcastReceiver smsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
 
-            Log.d(TAG, "Add user sms received. init add user.");
-            String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
-            String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
-            String usernameOfSender = null;
-            if (intent.hasExtra("SENDER"))
-                usernameOfSender = intent.getStringExtra("SENDER").trim();
-
-            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(usernameOfSender, phoneNumber,usernameToAdd));
-        }
-    };
 
     // broadcst receiver to automatically add user when received
     private BroadcastReceiver addUserReceiver = new BroadcastReceiver() {
@@ -211,14 +197,12 @@ public class SenzService extends Service {
         IntentFilter networkFilter = new IntentFilter();
         networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, networkFilter);
-        registerReceiver(smsReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_RECEIVED));
         registerReceiver(addUserReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.ADD_USER));
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
-        unregisterReceiver(smsReceiver);
         unregisterReceiver(addUserReceiver);
     }
 

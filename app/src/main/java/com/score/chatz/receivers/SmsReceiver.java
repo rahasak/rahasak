@@ -11,6 +11,8 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.remote.SenzNotificationManager;
+import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PhoneUtils;
 
 import java.util.Timer;
@@ -75,11 +77,7 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private void initAddUserFromSms(String username, String sender, String phoneNumber,Context context) {
-        Intent smsReceivedIntent = IntentProvider.getSmsReceivedIntent();
-        smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
-        smsReceivedIntent.putExtra("SENDER_PHONE_NUMBER", phoneNumber);
-        smsReceivedIntent.putExtra("SENDER", sender);
-        context.sendBroadcast(smsReceivedIntent);
+        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(sender, phoneNumber,username));
     }
 
     private int deleteMessage(Context context) {
