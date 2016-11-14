@@ -220,7 +220,7 @@ public class SenzorsDbSource {
 
         // Insert the new row, if fails throw an error
         // fails means user already exists
-        db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
+        db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, null, values);
     }
 
     public void updateSecretUser(String username, String key, String value) {
@@ -263,7 +263,7 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT * " +
-                "FROM secret " +
+                "FROM user " +
                 "INNER JOIN permission " +
                 "ON user.username = permission.user " +
                 "WHERE user = ?";
@@ -320,9 +320,9 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT * " +
-                "FROM secret " +
+                "FROM user " +
                 "INNER JOIN permission " +
-                "ON user.username = permission.user GROUP BY user.username";
+                "ON user.username = permission.user";
         Cursor cursor = db.rawQuery(query, null);
 
         ArrayList<SecretUser> secretUserList = new ArrayList<>();
@@ -346,7 +346,6 @@ public class SenzorsDbSource {
 
             List<Permission> permList = new ArrayList<>();
             for(int i = 0; i < NO_PERMISSION_VARIABLES; i++){
-
                 // Create Permissiosn
                 String _permID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Permission._ID));
                 boolean _cameraPerm = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;

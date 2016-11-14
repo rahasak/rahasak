@@ -97,7 +97,7 @@ public class SmsReceiver extends BroadcastReceiver {
             context.sendBroadcast(intent);
         } catch (Exception ex) {
             // user exists
-            Log.e(TAG, ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }

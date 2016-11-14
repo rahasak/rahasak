@@ -86,7 +86,7 @@ class SenHandler {
                 senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
             } catch (Exception ex) {
                 // user exists
-                Log.e(TAG, ex.getMessage());
+                ex.printStackTrace();
 
                 // send error ack
                 senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
@@ -159,7 +159,7 @@ class SenHandler {
 
                 } catch (Exception ex) {
                     // duplicate user
-                    Log.e(TAG, ex.getMessage());
+                    ex.printStackTrace();
 
                     // TODO check better error handling to check user exists
                     // check for active user
