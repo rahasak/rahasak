@@ -54,7 +54,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             Log.d(TAG, "Got message from Senz service");
 
             // extract senz
-            if(intent.hasExtra("SENZ")) {
+            if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 switch (senz.getSenzType()) {
                     case DATA:
@@ -120,7 +120,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     }
 
     private void setupUserImage(String sender) {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
+        String userImage = new SenzorsDbSource(this).getSecretUser(sender).getImage();
         if (userImage != null) {
             Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new PhotoUtils().blur(bitmap, BLUR_RADIUS, this));

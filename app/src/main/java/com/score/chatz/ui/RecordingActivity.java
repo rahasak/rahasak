@@ -22,6 +22,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.ImageUtils;
@@ -52,7 +53,8 @@ public class RecordingActivity extends AppCompatActivity {
     private boolean isRecordingStarted;
     private boolean isRecordingOver;
 
-    private User user;
+    private String username;
+    private SecretUser secretUser;
     private SenzorsDbSource dbSource;
     private AudioRecorder audioRecorder;
 
@@ -111,9 +113,11 @@ public class RecordingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recording);
 
         Intent intent = getIntent();
-        user = intent.getParcelableExtra("USER");
         dbSource = new SenzorsDbSource(this);
         audioRecorder = new AudioRecorder();
+
+        username = intent.getStringExtra("USER");
+        secretUser = dbSource.getSecretUser(username);
 
         setUpFonts();
         setupUi();
@@ -254,14 +258,13 @@ public class RecordingActivity extends AppCompatActivity {
 
     private void setupPhotoRequestTitle() {
         ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
-        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + user.getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + secretUser.getUsername());
         ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupUserImage() {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(user.getUsername());
-        if (userImage != null)
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+        if (secretUser.getImage() != null)
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
     }
 
     private void startTimerToEndRequest() {
@@ -282,7 +285,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void saveMissedCall() {
-        Secret newSecret = new Secret("", "MISSED_SOUND", user, true);
+        Secret newSecret = new Secret("", "MISSED_SOUND", secretUser, true);
         Long timeStamp = System.currentTimeMillis() / 1000;
         newSecret.setTimeStamp(timeStamp);
         newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
@@ -309,7 +312,7 @@ public class RecordingActivity extends AppCompatActivity {
         audioRecorder.stopRecording();
         if (audioRecorder.getRecording() != null) {
             String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
-            Secret secret = new Secret(sound, "SOUND", user, false);
+            Secret secret = new Secret(sound, "SOUND", secretUser, false);
             Long timeStamp = System.currentTimeMillis() / 1000;
             secret.setTimeStamp(timeStamp);
             String uid = SenzUtils.getUid(this, timeStamp.toString());
@@ -333,7 +336,7 @@ public class RecordingActivity extends AppCompatActivity {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, null, user, senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
         send(_senz);
     }
 
@@ -368,7 +371,7 @@ public class RecordingActivity extends AppCompatActivity {
             senzAttributes.put("mic", aSound.trim());
             senzAttributes.put("uid", uid);
 
-            Senz _senz = new Senz(id, signature, senzType, null, user, senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
             senzList.add(_senz);
         }
         return senzList;
@@ -386,7 +389,7 @@ public class RecordingActivity extends AppCompatActivity {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-        return new Senz(id, signature, senzType, null, user, senzAttributes);
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
     }
 
     private Senz getStopSoundSharingSenz(String uid, Long timestamp) {
@@ -401,7 +404,7 @@ public class RecordingActivity extends AppCompatActivity {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-        return new Senz(id, signature, senzType, null, user, senzAttributes);
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
     }
 
     private String[] split(String src, int len) {

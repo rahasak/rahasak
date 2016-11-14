@@ -45,6 +45,7 @@ public class PhotoActivity extends BaseActivity {
     private ImageView startBtn;
 
     // selfie request user
+    private String username;
     private SecretUser secretUser;
 
     private CountDownTimer cancelTimer;
@@ -58,7 +59,8 @@ public class PhotoActivity extends BaseActivity {
         setContentView(R.layout.activity_photo);
 
         // user
-        user = getIntent().getParcelableExtra("USER");
+        username = getIntent().getStringExtra("USER");
+        secretUser = new SenzorsDbSource(this).getSecretUser(username);
 
         //init camera
         initCameraPreview();
@@ -162,14 +164,13 @@ public class PhotoActivity extends BaseActivity {
 
     private void setupTitle() {
         ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
-        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + user.getUsername());
+        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + secretUser.getUsername());
         ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void setupUserImage() {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(user.getUsername());
-        if (userImage != null)
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(userImage));
+        if (secretUser.getImage() != null)
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
     }
 
     private void hideUiControls() {
@@ -267,7 +268,7 @@ public class PhotoActivity extends BaseActivity {
     private void saveMissedSelfie() {
         Long timestamp = (System.currentTimeMillis() / 1000);
         String uid = SenzUtils.getUid(this, timestamp.toString());
-        Secret newSecret = new Secret("", "IMAGE", user, true);
+        Secret newSecret = new Secret("", "IMAGE", secretUser, true);
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(true);
@@ -288,7 +289,7 @@ public class PhotoActivity extends BaseActivity {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, null, user, senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
         send(_senz);
     }
 
@@ -332,7 +333,7 @@ public class PhotoActivity extends BaseActivity {
     private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid, Long timestamp) {
         String imageString = new ImageUtils().encodeBitmap(image);
 
-        Secret newSecret = new Secret(imageString, "IMAGE", user, false);
+        Secret newSecret = new Secret(imageString, "IMAGE", secretUser, false);
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(false);
@@ -353,7 +354,7 @@ public class PhotoActivity extends BaseActivity {
             senzAttributes.put("cam", packet.trim());
             senzAttributes.put("uid", uid);
 
-            Senz _senz = new Senz(id, signature, senzType, null, user, senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
             senzList.add(_senz);
         }
 
@@ -377,7 +378,7 @@ public class PhotoActivity extends BaseActivity {
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.STREAM;
 
-        return new Senz(id, signature, senzType, null, user, senzAttributes);
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
     }
 
     /**
@@ -397,7 +398,7 @@ public class PhotoActivity extends BaseActivity {
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.STREAM;
 
-        return new Senz(id, signature, senzType, null, user, senzAttributes);
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
     }
 
     private String[] split(String src, int len) {

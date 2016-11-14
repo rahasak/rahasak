@@ -248,7 +248,7 @@ class SenHandler {
         try {
             Intent intent = new Intent(senzService.getApplicationContext(), PhotoActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("USER", senz.getSender());
+            intent.putExtra("USER", senz.getSender().getUsername());
             senzService.getApplicationContext().startActivity(intent);
         } catch (Exception e) {
             // fail to access camera
@@ -260,7 +260,7 @@ class SenHandler {
         Intent intent = new Intent();
         intent.setClass(senzService.getApplicationContext(), RecordingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("USER", senz.getSender());
+        intent.putExtra("USER", senz.getSender().getUsername());
         senzService.getApplicationContext().startActivity(intent);
     }
 

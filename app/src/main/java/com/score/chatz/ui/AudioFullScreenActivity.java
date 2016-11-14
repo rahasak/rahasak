@@ -26,6 +26,7 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.RahasPlayer;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.interfaces.IRahasPlayListener;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.PhotoUtils;
 import com.score.senzc.pojos.Senz;
@@ -43,6 +44,8 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
 
     private Typeface typeface;
 
+    private SecretUser secretUser;
+
     //Set the radius of the Blur. Supported range 0 < radius <= 25
     private static final float BLUR_RADIUS = 5f;
 
@@ -53,7 +56,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
             Log.d(TAG, "Got message from Senz service");
 
             // extract senz
-            if(intent.hasExtra("SENZ")) {
+            if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 switch (senz.getSenzType()) {
                     case DATA:
@@ -162,9 +165,9 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     }
 
     private void setupUserImage(String sender) {
-        String userImage = new SenzorsDbSource(this).getImageFromDB(sender);
-        if (userImage != null) {
-            Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
+        secretUser = new SenzorsDbSource(this).getSecretUser(sender);
+        if (secretUser.getImage() != null) {
+            Bitmap bitmap = new ImageUtils().decodeBitmap(secretUser.getImage());
             ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new PhotoUtils().blur(bitmap, BLUR_RADIUS, this));
         }
 
