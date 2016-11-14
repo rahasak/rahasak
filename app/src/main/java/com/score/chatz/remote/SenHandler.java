@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.NotificationUtils;
-import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -62,20 +63,18 @@ class SenHandler {
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().containsKey("status")) {
             // new user
             // new user permissions, save to db
-            if (!new SenzorsDbSource(senzService.getBaseContext()).isAddedUser(senz.getSender().getUsername())) {
-                SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
-                dbSource.getOrCreateUser(senz.getSender().getUsername());
-                dbSource.createPermissionsForUser(senz.getSender().getUsername());
-                dbSource.createConfigurablePermissionsForUser(senz);
-                if (senz.getAttributes().containsKey("phone")) {
-                    // send ack
-                    Senz senzToAddPhone = SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701");
-                    senzToAddPhone.getAttributes().put("phone", senz.getAttributes().get("phone"));
-                    senzService.writeSenz(senzToAddPhone);
-                }else{
-                    // send ack
-                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
-                }
+            SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+            try {
+                // create user
+                SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
+                dbSource.createSecretUser(secretUser);
+
+                // create permission
+                dbSource.createPermission(new Permission("id", secretUser.getUsername(), true));
+                dbSource.createPermission(new Permission("id", secretUser.getUsername(), false));
+
+                // activate user
+                dbSource.setSecretUserActive(secretUser.getUsername(), true);
 
                 // show notification to current user
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
@@ -83,20 +82,28 @@ class SenHandler {
 
                 // broadcast
                 broadcastSenz(senz, senzService.getApplicationContext());
+
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+            } catch (Exception ex) {
+                // user exists
+                Log.e(TAG, ex.getMessage());
+
+                // send error ack
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
             }
         } else {
             // #mic #cam #lat #lon permission
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
             if (senz.getAttributes().containsKey("cam")) {
-                dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("cam"), null, null);
+                dbSource.updatePermission(senz.getSender().getUsername(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"), false);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "camera", senz.getAttributes().get("cam")));
             } else if (senz.getAttributes().containsKey("mic")) {
-                dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("mic"));
+                dbSource.updatePermission(senz.getSender().getUsername(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"), false);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "mic", senz.getAttributes().get("mic")));
             } else if (senz.getAttributes().containsKey("lat")) {
-                dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("lat"), null);
+                dbSource.updatePermission(senz.getSender().getUsername(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"), false);
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "location", senz.getAttributes().get("lat")));
             }
@@ -138,21 +145,30 @@ class SenHandler {
 
             //Only for case of add user, need to handle here to make more generic as you can now add users via sms also, thus cannot gurantee which activity user will be in, when recevie this status code
             String status = senz.getAttributes().get("status");
-            if (status != null && status.equalsIgnoreCase("701")) {
+            if (status.equalsIgnoreCase("701")) {
+                // user added successfully
                 // save user in db
-                if (!dbSource.isAddedUser(senz.getSender().getUsername())) {
-                    dbSource.getOrCreateUser(senz.getSender().getUsername());
-                    dbSource.createPermissionsForUser(senz.getSender().getUsername());
-                    dbSource.createConfigurablePermissionsForUser(senz);
-                    if (senz.getAttributes().containsKey("phone"))
-                        dbSource.updateSecretUser(senz.getSender().getUsername(), "phone", senz.getAttributes().get("phone"));
-                }else{
-                    // Check if user is a pending user, if so handle
-                    if(!dbSource.getSecretUser(senz.getSender().getUsername()).isActive()){
-                        dbSource.createConfigurablePermissionsForUser(senz);
+                try {
+                    // create user
+                    SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
+                    dbSource.createSecretUser(secretUser);
+
+                    // create permission
+                    dbSource.createPermission(new Permission("id", secretUser.getUsername(), true));
+                    dbSource.createPermission(new Permission("id", secretUser.getUsername(), false));
+
+                } catch (Exception ex) {
+                    // duplicate user
+                    Log.e(TAG, ex.getMessage());
+
+                    // TODO check better error handling to check user exists
+                    // check for active user
+                    SecretUser secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
+                    if (!secretUser.isActive()) {
+                        // activate user
+                        dbSource.setSecretUserActive(secretUser.getUsername(), true);
                     }
                 }
-                dbSource.updateSecretUser(senz.getSender().getUsername(), "is_active", "true");
             }
 
             broadcastSenz(senz, senzService.getApplicationContext());
@@ -262,7 +278,7 @@ class SenHandler {
 
     private void saveSecret(Long timestamp, String uid, String blob, String type, User user, final Context context) {
         // create secret
-        final Secret secret = new Secret(blob, type, user, true);
+        final Secret secret = new Secret(blob, type, new SecretUser(user.getId(), user.getUsername()), true);
         secret.setId(uid);
         secret.setTimeStamp(timestamp);
         secret.setMissed(false);

@@ -3,22 +3,17 @@ package com.score.chatz.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.pojo.Permission;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.remote.SenzNotificationManager;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PhoneUtils;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Handler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +47,7 @@ public class SmsReceiver extends BroadcastReceiver {
                             //Stop sms from reaching mail box :).Works for verision below kitkat only
                             abortBroadcast();
 
-                            initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, msg_phone_number,context);
+                            initAddUserFromSms(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, msg_phone_number, context);
                         } else {
                             //Not from rahasak, ignore
                             Log.e(TAG, "Invalid message. Must ignore it. -> " + msg_body + "; sender -> " + msg_sender);
@@ -77,21 +72,32 @@ public class SmsReceiver extends BroadcastReceiver {
         return matcher.group(1);
     }
 
-    private void initAddUserFromSms(String username, String sender, String phoneNumber,Context context) {
-        // Show Notification
-        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(sender, phoneNumber,username));
+    private void initAddUserFromSms(String username, String contactName, String contactPhone, Context context) {
+        // chow Notification
+        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactPhone, username));
 
-        if (!new SenzorsDbSource(context).isAddedUser(username)) {
-            // Add Pending User to databse
-            SenzorsDbSource dbSource = new SenzorsDbSource(context);
-            dbSource.getOrCreateUser(username);
-            dbSource.createPermissionsForUser(username);
-            dbSource.updateSecretUser(username, "phone", phoneNumber);
+        SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        try {
+            // create user
+            SecretUser secretUser = new SecretUser("id", username);
+            secretUser.setPhone(contactName);
+            secretUser.setPhone(contactPhone);
+            dbSource.createSecretUser(secretUser);
+
+            // create permission
+            dbSource.createPermission(new Permission("id", secretUser.getUsername(), true));
+            dbSource.createPermission(new Permission("id", secretUser.getUsername(), false));
+
+            // activate user
+            dbSource.setSecretUserActive(secretUser.getUsername(), false);
 
             // Sent local intent to update view
             Intent intent = new Intent("com.score.chatz.SENZ");
             intent.putExtra("SMS_RECEIVED", "SMS_RECEIVED");
             context.sendBroadcast(intent);
+        } catch (Exception ex) {
+            // user exists
+            Log.e(TAG, ex.getMessage());
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.score.chatz.ui;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.PreferenceUtils;
@@ -50,7 +50,7 @@ public class AddUserActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
 
-            if(intent.hasExtra("SENZ")) {
+            if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 handleSenz(senz);
             }
@@ -197,13 +197,14 @@ public class AddUserActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     //Only share if user is not already added before..
-                    if (!new SenzorsDbSource(AddUserActivity.this).isAddedUser(username) && !isCurrentUser(username)) {
+                    SecretUser secretUser = new SenzorsDbSource(AddUserActivity.this).getSecretUser(username);
+                    if (isCurrentUser(username)) {
+                        ActivityUtils.showCustomToast("You cannot add yourself", AddUserActivity.this);
+                    } else if (secretUser != null) {
+                        ActivityUtils.showCustomToast("This user has already been added", AddUserActivity.this);
+                    } else {
                         ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
                         share();
-                    } else if (new SenzorsDbSource(AddUserActivity.this).isAddedUser(username)) {
-                        ActivityUtils.showCustomToast("This user has already been added", AddUserActivity.this);
-                    } else if (isCurrentUser(username)) {
-                        ActivityUtils.showCustomToast("You cannot add yourself", AddUserActivity.this);
                     }
                 }
             });
