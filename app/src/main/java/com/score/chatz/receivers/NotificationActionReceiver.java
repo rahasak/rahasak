@@ -23,30 +23,11 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // Handle Notificaiton Action
-        if (intent.hasExtra("NOTIFICATION_ACCEPT")) {
-            onReceiveAcceptAction(context, intent);
-        } else if (intent.hasExtra("NOTIFICATION_DISMISS")) {
+        // Handle Dismiss notification with out bringing the app to the foreground
+        if(intent.hasExtra("NOTIFICATION_DISMISS")) {
             onReceiveDismissAction(context, intent);
         }
     }
-
-    private void onReceiveAcceptAction(Context context, Intent intent) {
-        // Notification id. Default is MESSAGE_NOTIFICATION_ID, which is our normal notifications
-        int notificationId = intent.getIntExtra("NOTIFICATION_ID", NotificationUtils.MESSAGE_NOTIFICATION_ID);
-        String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
-
-        if (new SenzorsDbSource(context).isAddedUser(usernameToAdd)){
-            cancelNotification(notificationId, context);
-            ActivityUtils.showCustomToast("This user has already been added", context);
-        }else if (NetworkUtil.isAvailableNetwork(context)) {
-            cancelNotification(notificationId, context);
-            broadcastIntentToAddUser(context, usernameToAdd);
-        } else {
-            ActivityUtils.showCustomToast(context.getResources().getString(R.string.no_internet), context);
-        }
-    }
-
     private void onReceiveDismissAction(Context context, Intent intent) {
         // Notification id
         int notificationId = intent.getIntExtra("NOTIFICATION_ID", NotificationUtils.MESSAGE_NOTIFICATION_ID);
@@ -57,12 +38,5 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private void cancelNotification(int NotificationId, Context context) {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(NotificationId);
-    }
-
-    // Broadcast intent to service to add user
-    private void broadcastIntentToAddUser(Context context, String username) {
-        Intent smsReceivedIntent = IntentProvider.getAddUserIntent();
-        smsReceivedIntent.putExtra("USERNAME_TO_ADD", username);
-        context.sendBroadcast(smsReceivedIntent);
     }
 }
