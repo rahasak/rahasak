@@ -19,7 +19,7 @@ import com.score.chatz.ui.ChatActivity;
 import com.score.chatz.ui.HomeActivity;
 import com.score.chatz.utils.NotificationUtils;
 
-class SenzNotificationManager {
+public class SenzNotificationManager {
 
     private static final String TAG = SenzNotificationManager.class.getName();
 
@@ -30,7 +30,7 @@ class SenzNotificationManager {
         this.context = context;
     }
 
-    static SenzNotificationManager getInstance(Context context) {
+    public static SenzNotificationManager getInstance(Context context) {
         if (instance == null) {
             instance = new SenzNotificationManager(context);
         }
@@ -43,7 +43,7 @@ class SenzNotificationManager {
      *
      * @param senzNotification
      */
-    void showNotification(SenzNotification senzNotification) {
+    public void showNotification(SenzNotification senzNotification) {
         if (senzNotification.getNotificationType() == NotificationType.NEW_PERMISSION) {
             Notification notification = getNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
