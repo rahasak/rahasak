@@ -37,9 +37,9 @@ public class SenzorsDbSource {
     public boolean isExistingUser(String username) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        Cursor cursor = db.query(SenzorsDbContract.Permission.TABLE_NAME, // table
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
                 null, // columns
-                SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?", // constraint
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
                 new String[]{username}, // prams
                 null, // order by
                 null, // group by
@@ -113,9 +113,9 @@ public class SenzorsDbSource {
 
     public SecretUser getSecretUser(String username) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.Permission.TABLE_NAME, // table
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
                 null, // columns
-                SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?", // constraint
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
                 new String[]{username}, // prams
                 null, // order by
                 null, // group by
@@ -158,7 +158,7 @@ public class SenzorsDbSource {
 
     public ArrayList<SecretUser> getSecretUserList() {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.Permission.TABLE_NAME, // table
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
                 null, // columns
                 null,
                 null, // selection
@@ -297,7 +297,7 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.LatestChat.COLUMN_USER, secret.getUser().getUsername());
         values.put(SenzorsDbContract.LatestChat.COLUMN_BLOB, secret.getBlob());
-        values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
+            values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
         values.put(SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER, secret.isSender());
         values.put(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP, secret.getTimeStamp());
 
