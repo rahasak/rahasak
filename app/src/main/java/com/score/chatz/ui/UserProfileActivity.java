@@ -144,7 +144,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         if (secretUser.getImage() != null)
             userImageView.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
 
-        Permission permission = getPermission(secretUser.getPermissions(), true);
+        Permission permission = secretUser.getGivenPermission();
         cameraSwitch.setChecked(permission.isCam());
         micSwitch.setChecked(permission.isLoc());
         locationSwitch.setChecked(permission.isMic());

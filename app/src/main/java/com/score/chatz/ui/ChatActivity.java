@@ -520,7 +520,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updatePermissions() {
-        Permission permission = getPermission(secretUser.getPermissions(), false);
+        Permission permission = secretUser.getGivenPermission();
         if (permission != null) {
             // location
             if (permission.isLoc()) {
@@ -565,14 +565,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
-    }
-
-    private Permission getPermission(List<Permission> permissionList, boolean isGiven) {
-        for (Permission permission : permissionList) {
-            if (permission.isGiven() == isGiven) return permission;
-        }
-
-        return null;
     }
 
 }

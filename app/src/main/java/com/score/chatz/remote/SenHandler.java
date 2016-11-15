@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.Stream;
@@ -69,12 +68,8 @@ class SenHandler {
                 SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
                 dbSource.createSecretUser(secretUser);
 
-                // create permission
-                dbSource.createPermission(new Permission("id", secretUser.getUsername(), true));
-                dbSource.createPermission(new Permission("id", secretUser.getUsername(), false));
-
                 // activate user
-                dbSource.setSecretUserActive(secretUser.getUsername(), true);
+                dbSource.activateSecretUser(secretUser.getUsername(), true);
 
                 // show notification to current user
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
@@ -152,11 +147,6 @@ class SenHandler {
                     // create user
                     SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
                     dbSource.createSecretUser(secretUser);
-
-                    // create permission
-                    dbSource.createPermission(new Permission("id", secretUser.getUsername(), true));
-                    dbSource.createPermission(new Permission("id", secretUser.getUsername(), false));
-
                 } catch (Exception ex) {
                     // duplicate user
                     ex.printStackTrace();
@@ -166,7 +156,7 @@ class SenHandler {
                     SecretUser secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
                     if (!secretUser.isActive()) {
                         // activate user
-                        dbSource.setSecretUserActive(secretUser.getUsername(), true);
+                        dbSource.activateSecretUser(secretUser.getUsername(), true);
                     }
                 }
             }

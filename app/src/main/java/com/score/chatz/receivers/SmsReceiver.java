@@ -8,7 +8,6 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.remote.SenzNotificationManager;
 import com.score.chatz.utils.NotificationUtils;
@@ -84,12 +83,8 @@ public class SmsReceiver extends BroadcastReceiver {
             secretUser.setPhone(contactPhone);
             dbSource.createSecretUser(secretUser);
 
-            // create permission
-            dbSource.createPermission(new Permission("id", secretUser.getUsername(), true));
-            dbSource.createPermission(new Permission("id", secretUser.getUsername(), false));
-
             // activate user
-            dbSource.setSecretUserActive(secretUser.getUsername(), false);
+            dbSource.activateSecretUser(secretUser.getUsername(), false);
 
             // Sent local intent to update view
             Intent intent = new Intent("com.score.chatz.SENZ");

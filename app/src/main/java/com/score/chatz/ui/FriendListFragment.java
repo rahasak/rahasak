@@ -20,15 +20,12 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.SecretUser;
-import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
-import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PhoneUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.

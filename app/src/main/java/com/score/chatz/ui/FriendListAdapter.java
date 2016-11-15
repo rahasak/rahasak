@@ -92,7 +92,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
         // get permission (isGiven = false)
-        Permission permission = getPermission(secretUser.getPermissions(), false);
+        Permission permission = secretUser.getRecvPermission();
         if (permission.isCam()) {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
         } else {

@@ -9,12 +9,10 @@ public class Permission {
     boolean loc;
     boolean cam;
     boolean mic;
-    String username;
     boolean isGiven;
 
-    public Permission(String id, String username, boolean isGiven) {
+    public Permission(String id, boolean isGiven) {
         this.id = id;
-        this.username = username;
         this.isGiven = isGiven;
     }
 
@@ -48,14 +46,6 @@ public class Permission {
 
     public void setMic(boolean mic) {
         this.mic = mic;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public boolean isGiven() {

@@ -4,8 +4,6 @@ import android.os.Parcelable;
 
 import com.score.senzc.pojos.User;
 
-import java.util.List;
-
 /**
  * Created by eranga on 11/11/16.
  */
@@ -16,7 +14,8 @@ public class SecretUser extends User implements Parcelable {
     String pubKey;
     String pubKeyHash;
     boolean isActive;
-    List<Permission> permissions;
+    Permission givenPermission;
+    Permission recvPermission;
 
     public SecretUser(String id, String username) {
         super(id, username);
@@ -62,11 +61,20 @@ public class SecretUser extends User implements Parcelable {
         isActive = active;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
+    public Permission getGivenPermission() {
+        return givenPermission;
     }
 
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
+    public void setGivenPermission(Permission givenPermission) {
+        this.givenPermission = givenPermission;
     }
+
+    public Permission getRecvPermission() {
+        return recvPermission;
+    }
+
+    public void setRecvPermission(Permission recvPermission) {
+        this.recvPermission = recvPermission;
+    }
+
 }
