@@ -87,7 +87,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         final int pos = position;
         if (friendsList.get(position).isActive()) {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-            intent.putExtra("SENDER", friendsList.get(position).getUsername());
+            intent.putExtra("SENDER", friendsList.get(position));
             startActivity(intent);
         } else {
             ActivityUtils.displayConfirmationMessageDialog("Confirm User", "Would you like to add this user(" + new PhoneUtils().getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity()) + ") to your friends list?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {

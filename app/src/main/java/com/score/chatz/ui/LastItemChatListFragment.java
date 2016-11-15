@@ -125,7 +125,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
             actionBarName.setVisibility(View.VISIBLE);
         } else {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-            intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
+            intent.putExtra("SENDER", allSecretsList.get(position).getUser());
             startActivity(intent);
         }
     }

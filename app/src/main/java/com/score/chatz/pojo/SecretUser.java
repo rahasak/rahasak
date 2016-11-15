@@ -1,25 +1,87 @@
 package com.score.chatz.pojo;
 
+import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.score.senzc.pojos.User;
 
 /**
- * Created by eranga on 11/11/16.
+ * Created by eranga on 11/11/16
  */
-
 public class SecretUser extends User implements Parcelable {
-    String phone;
-    String image;
-    String pubKey;
-    String pubKeyHash;
-    boolean isActive;
-    Permission givenPermission;
-    Permission recvPermission;
+    private String phone;
+    private String image;
+    private String pubKey;
+    private String pubKeyHash;
+    private boolean isActive;
+    private Permission givenPermission;
+    private Permission recvPermission;
 
     public SecretUser(String id, String username) {
         super(id, username);
     }
+
+    /**
+     * Use when reconstructing User object from parcel
+     * This will be used only by the 'CREATOR'
+     *
+     * @param in a parcel to read this object
+     */
+    public SecretUser(Parcel in) {
+        super(in);
+        this.phone = in.readString();
+        this.image = in.readString();
+        this.pubKey = in.readString();
+        this.pubKeyHash = in.readString();
+        this.isActive = in.readByte() != 0;
+        this.givenPermission = in.readParcelable(Permission.class.getClassLoader());
+        this.recvPermission = in.readParcelable(Permission.class.getClassLoader());
+    }
+
+    /**
+     * Define the kind of object that you gonna parcel,
+     * You can use hashCode() here
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Actual object serialization happens here, Write object content
+     * to parcel one by one, reading should be done according to this write order
+     *
+     * @param dest  parcel
+     * @param flags Additional flags about how the object should be written
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(phone);
+        dest.writeString(image);
+        dest.writeString(pubKey);
+        dest.writeString(pubKeyHash);
+        dest.writeByte((byte) (isActive ? 1 : 0));
+        dest.writeParcelable(givenPermission, flags);
+        dest.writeParcelable(recvPermission, flags);
+    }
+
+    /**
+     * This field is needed for Android to be able to
+     * create new objects, individually or as arrays
+     * <p>
+     * If you don’t do that, Android framework will through exception
+     * Parcelable protocol requires a Parcelable.Creator object called CREATOR
+     */
+    public static final Creator<SecretUser> CREATOR = new Creator<SecretUser>() {
+        public SecretUser createFromParcel(Parcel in) {
+            return new SecretUser(in);
+        }
+
+        public SecretUser[] newArray(int size) {
+            return new SecretUser[size];
+        }
+    };
 
     public String getPhone() {
         return phone;

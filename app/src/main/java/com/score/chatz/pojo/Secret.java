@@ -3,7 +3,6 @@ package com.score.chatz.pojo;
 /**
  * Created by Lakmal on 7/31/16.
  */
-
 public class Secret {
     private String id;
     private String blob;

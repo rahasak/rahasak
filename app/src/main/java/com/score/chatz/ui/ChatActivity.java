@@ -43,7 +43,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -239,8 +238,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initUser() {
-        String username = getIntent().getStringExtra("SENDER");
-        secretUser = new SenzorsDbSource(this).getSecretUser(username);
+        secretUser = getIntent().getParcelableExtra("SENDER");
     }
 
     private void initUser(Intent intent) {
@@ -301,7 +299,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void navigateToProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("SENDER", secretUser.getUsername());
+        intent.putExtra("SENDER", secretUser);
         startActivity(intent);
     }
 

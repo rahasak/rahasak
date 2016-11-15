@@ -54,7 +54,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
-        //savedInstanceState.putParcelable(SENDER, thisUser);
+        savedInstanceState.putParcelable(SENDER, secretUser);
 
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
@@ -65,7 +65,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            //thisUser = savedInstanceState.getParcelable(SENDER);
+            secretUser = savedInstanceState.getParcelable(SENDER);
         }
     }
 
@@ -136,8 +136,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     private void initThisUser() {
         Intent intent = getIntent();
-        String username = intent.getStringExtra("SENDER");
-        secretUser = dbSource.getSecretUser(username);
+        secretUser = intent.getParcelableExtra("SENDER");
     }
 
     private void initPermissions() {
