@@ -93,19 +93,19 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
 
         // get permission (isGiven = false)
         Permission permission = secretUser.getRecvPermission();
-        if (permission.isCam()) {
+        if (permission != null && permission.isCam()) {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
         } else {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_deactive, null));
         }
 
-        if (permission.isMic()) {
+        if (permission != null && permission.isMic()) {
             viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_active, null));
         } else {
             viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_deactive, null));
         }
 
-        if (permission.isLoc()) {
+        if (permission != null && permission.isLoc()) {
             viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_active, null));
         } else {
             viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_deactive, null));

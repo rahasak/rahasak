@@ -64,7 +64,7 @@ public class SenzNotificationManager {
                 Notification notification = getSmsNotification(senzNotification);
                 notification.flags |= Notification.FLAG_AUTO_CANCEL;
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(NotificationUtils.getNotificationId(), notification);
+                notificationManager.notify(NotificationUtils.getNotificationIdForSMS(), notification);
         }
     }
 
@@ -106,9 +106,6 @@ public class SenzNotificationManager {
 
     private Notification getSmsNotification(SenzNotification senzNotification) {
 
-        // Give new id to next notification
-        NotificationUtils.incrementNotificationId();
-
         // 1. Sending intent to Custom Receiver is aways with an empty bundle, android reuse itents issue
         // Setup pending intent for accept action
         /*Intent acceptIntent = new Intent(context, NotificationActionReceiver.class);
@@ -128,7 +125,8 @@ public class SenzNotificationManager {
         acceptIntent.putExtra("NOTIFICATION_ACCEPT", "NOTIFICATION_ACCEPT");
         acceptIntent.putExtra("SENDER_PHONE_NUMBER", senzNotification.getSenderPhone());
         acceptIntent.putExtra("USERNAME_TO_ADD", senzNotification.getSender());
-        acceptIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationId());
+        acceptIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationIdForSMS());
+        acceptIntent.putExtra("SENDER_UID", senzNotification.getUid());
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent smsAcceptIntent = PendingIntent.getActivity(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -136,7 +134,7 @@ public class SenzNotificationManager {
         // Setup pending intent for dismiss action
         Intent dismissIntent = new Intent(context, NotificationActionReceiver.class);
         dismissIntent.putExtra("NOTIFICATION_DISMISS", "NOTIFICATION_DISMISS");
-        dismissIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationId());
+        dismissIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationIdForSMS());
         dismissIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent smsDismissIntent = PendingIntent.getBroadcast(context, 0, dismissIntent, PendingIntent.FLAG_CANCEL_CURRENT);

@@ -154,9 +154,10 @@ class SenHandler {
                     // TODO check better error handling to check user exists
                     // check for active user
                     SecretUser secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
+                    secretUser.setUid(senz.getAttributes().get("uid"));
                     if (!secretUser.isActive()) {
                         // activate user
-                        dbSource.activateSecretUser(secretUser.getUsername(), true);
+                        dbSource.activateSecretUserFromUid(secretUser.getUid(), true);
                     }
                 }
             }

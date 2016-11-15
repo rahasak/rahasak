@@ -12,6 +12,7 @@ import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.remote.SenzNotificationManager;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.utils.SenzUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,15 +73,19 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private void initAddUserFromSms(String username, String contactName, String contactPhone, Context context) {
-        // chow Notification
-        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactPhone, username));
 
+        // Generate uid
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        String uid = SenzUtils.getUid(context, timestamp.toString());
+
+        // chow Notification
+        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactPhone, uid, username));
         SenzorsDbSource dbSource = new SenzorsDbSource(context);
         try {
             // create user
             SecretUser secretUser = new SecretUser("id", username);
-            secretUser.setPhone(contactName);
             secretUser.setPhone(contactPhone);
+            secretUser.setUid(uid);
             dbSource.createSecretUser(secretUser);
 
             // activate user
@@ -88,7 +93,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
             // Sent local intent to update view
             Intent intent = new Intent("com.score.chatz.SENZ");
-            intent.putExtra("SMS_RECEIVED", "SMS_RECEIVED");
+            intent.putExtra("UPDATE_UI_ON_NEW_ADDED_USER", "UPDATE_UI_ON_NEW_ADDED_USER");
             context.sendBroadcast(intent);
         } catch (Exception ex) {
             // user exists

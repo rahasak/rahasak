@@ -21,7 +21,7 @@ public class NotificationUtils {
 
     // notification Id
     public static final int MESSAGE_NOTIFICATION_ID = 1;
-    public static int notificationCounter = 2;
+    public static final int SMS_NOTIFICATION_ID = 2;
 
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         String msg;
@@ -53,19 +53,15 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_SECRET);
     }
 
-    public static SenzNotification getSmsNotification(String contactName, String contactPhone, String rahasakUsername) {
+    public static SenzNotification getSmsNotification(String contactName, String contactPhone, String senderUid, String rahasakUsername) {
         String msg = "Would you like share secrets?";
         String title = contactName + " (@" + rahasakUsername +")";
 
-        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, contactPhone, NotificationType.NEW_SMS_ADD_FRIEND);
+        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, contactPhone, senderUid,NotificationType.NEW_SMS_ADD_FRIEND);
     }
 
-    public static void incrementNotificationId(){
-        ++notificationCounter;
-    }
-
-    public static int getNotificationId(){
-        return notificationCounter;
+    public static int getNotificationIdForSMS(){
+        return SMS_NOTIFICATION_ID;
     }
 
     // Remove notification from tray

@@ -52,7 +52,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                     ActivityUtils.cancelProgressDialog();
                     displayUserList();
                 }
-            } else if (senz == null && intent.hasExtra("SMS_RECEIVED")) {
+            } else if (senz == null && intent.hasExtra("UPDATE_UI_ON_NEW_ADDED_USER")) {
                 displayUserList();
             }
 
@@ -94,7 +94,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                 @Override
                 public void onClick(View v) {
                     ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                    ((HomeActivity) getActivity()).addUser(friendsList.get(pos).getUsername(), friendsList.get(pos).getPhone());
+                    ((HomeActivity) getActivity()).addUser(friendsList.get(pos).getUsername(), friendsList.get(pos).getPhone(), friendsList.get(pos).getUid());
                 }
             });
         }

@@ -28,7 +28,7 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_LATEST_CHAT =
             "CREATE TABLE " + SenzorsDbContract.LatestChat.TABLE_NAME + " (" +
                     SenzorsDbContract.LatestChat._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.LatestChat.COLUMN_USER + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
+                    SenzorsDbContract.LatestChat.COLUMN_USER + TEXT_TYPE + " UNIQUE NOT NULL" + "," +
                     SenzorsDbContract.LatestChat.COLUMN_BLOB + TEXT_TYPE + "," +
                     SenzorsDbContract.LatestChat.COLUMN_TYPE + TEXT_TYPE + "," +
                     SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER + INT_TYPE + ", " +
@@ -54,7 +54,8 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
+                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + " UNIQUE NOT NULL" + "," +
+                    SenzorsDbContract.User.COLUMN_UNIQUE_ID + TEXT_TYPE + ", " +
                     SenzorsDbContract.User.COLUMN_NAME_PHONE + TEXT_TYPE + "," +
                     SenzorsDbContract.User.COLUMN_NAME_PUBKEY + TEXT_TYPE + "," +
                     SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH + TEXT_TYPE + "," +

@@ -5,6 +5,7 @@ import com.score.chatz.enums.NotificationType;
 public class SenzNotification {
 
     int icon;
+    String uid;
     String title;
     String message;
     String sender;
@@ -19,13 +20,22 @@ public class SenzNotification {
         this.notificationType = notificationType;
     }
 
-    public SenzNotification(int icon, String title, String message, String sender, String senderPhone, NotificationType notificationType) {
+    public SenzNotification(int icon, String title, String message, String sender, String senderPhone, String senderUid, NotificationType notificationType) {
         this.icon = icon;
         this.title = title;
         this.message = message;
         this.sender = sender;
         this.notificationType = notificationType;
         this.senderPhone = senderPhone;
+        this.uid = senderUid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public int getIcon() {

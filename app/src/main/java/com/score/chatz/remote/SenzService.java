@@ -91,9 +91,10 @@ public class SenzService extends Service {
 
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
             String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
+            String senderUid = intent.getStringExtra("SENDER_UID").trim();
 
             if (!isCurrentUser(usernameToAdd)) {
-                shareWithPhoneNumber(usernameToAdd, phoneNumber);
+                shareWithPhoneNumber(usernameToAdd, phoneNumber, senderUid);
             }
         }
     };
@@ -102,16 +103,15 @@ public class SenzService extends Service {
      * Share current sensor
      * Need to send share query to server via web socket
      */
-    private void shareWithPhoneNumber(String username, String phoneNumber) {
+    private void shareWithPhoneNumber(String username, String phoneNumber, String uid) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("msg", "");
         senzAttributes.put("status", "");
-        senzAttributes.put("phone", phoneNumber);
 
         Long timestamp = (System.currentTimeMillis() / 1000);
         senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
+        senzAttributes.put("uid", uid);
 
         // new senz
         String id = "_ID";

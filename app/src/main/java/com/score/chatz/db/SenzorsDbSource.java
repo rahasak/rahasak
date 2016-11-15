@@ -58,7 +58,7 @@ public class SenzorsDbSource {
         // content values to inset
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, secretUser.getUsername());
-        if (secretUser.getPhone() != null && secretUser.getPhone().isEmpty())
+        if (secretUser.getPhone() != null)
             values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, secretUser.getPhone());
         if (secretUser.getPubKey() != null && secretUser.getPubKey().isEmpty())
             values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY, secretUser.getPubKey());
@@ -66,6 +66,8 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH, secretUser.getPubKeyHash());
         if (secretUser.getImage() != null && secretUser.getImage().isEmpty())
             values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, secretUser.getImage());
+        if (secretUser.getUid() != null)
+            values.put(SenzorsDbContract.User.COLUMN_UNIQUE_ID, secretUser.getUid());
         values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, secretUser.isActive() ? 1 : 0);
         values.put(SenzorsDbContract.User.COLUMN_NAME_GIVEN_PERM, givenPermId);
         values.put(SenzorsDbContract.User.COLUMN_NAME_RECV_PERM, recvPermId);
@@ -109,6 +111,20 @@ public class SenzorsDbSource {
                 values,
                 SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
                 new String[]{username});
+    }
+
+    public void activateSecretUserFromUid(String uid, boolean isActive) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, isActive ? 1 : 0);
+
+        // update
+        db.update(SenzorsDbContract.User.TABLE_NAME,
+                values,
+                SenzorsDbContract.User.COLUMN_UNIQUE_ID + " = ?",
+                new String[]{uid});
     }
 
     public SecretUser getSecretUser(String username) {
@@ -170,6 +186,7 @@ public class SenzorsDbSource {
 
         while (cursor.moveToNext()) {
             String _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            String _userUid = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_UNIQUE_ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
             String _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             String _pubKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY));
@@ -184,9 +201,10 @@ public class SenzorsDbSource {
             Permission recvPerm = getPermission(_recvPermId, false);
 
             SecretUser secretUser = new SecretUser(_userID, _username);
+            secretUser.setUid(_userUid);
             secretUser.setPhone(_phone);
-            secretUser.setPhone(_pubKey);
-            secretUser.setPhone(_pubKeyHash);
+            secretUser.setPubKey(_pubKey);
+            secretUser.setPubKeyHash(_pubKeyHash);
             secretUser.setImage(_image);
             secretUser.setActive(_isActive == 1);
             secretUser.setGivenPermission(givenPerm);
