@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.telephony.TelephonyManager;
 
 /**
  * Created by Lakmal on 11/14/16.
@@ -12,7 +11,7 @@ import android.telephony.TelephonyManager;
 
 public class PhoneUtils {
 
-    public String getDisplayNameFromNumber(String phoneNumber, Context context){
+    public String getDisplayNameFromNumber(String phoneNumber, Context context) {
         String displayName = phoneNumber;
         //Resolving the contact name from the contacts.
         Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));

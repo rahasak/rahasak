@@ -50,7 +50,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got new user from Senz service");
 
-            if(intent.hasExtra("SENZ")) {
+            if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 if (senz.getSenzType() == SenzTypeEnum.DATA) {
                     displayUserList();
@@ -125,7 +125,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
             actionBarName.setVisibility(View.VISIBLE);
         } else {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-            intent.putExtra("SENDER", allSecretsList.get(position).getUser());
+            intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
             startActivity(intent);
         }
     }

@@ -49,12 +49,12 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     SenzorsDbSource dbSource;
 
-    private final static String SENDER = "SENDER";
+    private final static String SECRET_USER = "SECRET_USER";
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
-        savedInstanceState.putParcelable(SENDER, secretUser);
+        savedInstanceState.putParcelable(SECRET_USER, secretUser);
 
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
@@ -65,7 +65,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            secretUser = savedInstanceState.getParcelable(SENDER);
+            secretUser = savedInstanceState.getParcelable(SECRET_USER);
         }
     }
 
@@ -135,8 +135,9 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     }
 
     private void initThisUser() {
-        Intent intent = getIntent();
-        secretUser = intent.getParcelableExtra("SENDER");
+//        String username = getIntent().getExtras().getString("SENDER");
+//        secretUser = new SenzorsDbSource(this).getSecretUser(username);
+        secretUser = getIntent().getExtras().getParcelable("SECRET_USER");
     }
 
     private void initPermissions() {
@@ -383,13 +384,13 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     private void updatePermission(Senz senz) {
         if (senz.getAttributes().containsKey("lat")) {
-            dbSource.updatePermission(senz.getReceiver().getUsername(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"), true);
+            dbSource.updatePermission(secretUser.getGivenPermission().getId(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
         }
         if (senz.getAttributes().containsKey("cam")) {
-            dbSource.updatePermission(senz.getReceiver().getUsername(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"), true);
+            dbSource.updatePermission(secretUser.getGivenPermission().getId(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"));
         }
         if (senz.getAttributes().containsKey("mic")) {
-            dbSource.updatePermission(senz.getReceiver().getUsername(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"), true);
+            dbSource.updatePermission(secretUser.getGivenPermission().getId(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
         }
     }
 

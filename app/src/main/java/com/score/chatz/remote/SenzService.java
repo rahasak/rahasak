@@ -13,11 +13,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.NotificationUtils;
-import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
@@ -82,19 +79,16 @@ public class SenzService extends Service {
         }
     };
 
-
-
     // broadcst receiver to automatically add user when received
     private BroadcastReceiver addUserReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             String usernameToAdd = intent.getStringExtra("USERNAME_TO_ADD").trim();
             String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
             String senderUid = intent.getStringExtra("SENDER_UID").trim();
 
             if (!isCurrentUser(usernameToAdd)) {
-                shareWithPhoneNumber(usernameToAdd, phoneNumber, senderUid);
+                shareWithPhoneNumber(usernameToAdd, senderUid);
             }
         }
     };
@@ -103,7 +97,7 @@ public class SenzService extends Service {
      * Share current sensor
      * Need to send share query to server via web socket
      */
-    private void shareWithPhoneNumber(String username, String phoneNumber, String uid) {
+    private void shareWithPhoneNumber(String username, String uid) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("msg", "");

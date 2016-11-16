@@ -70,8 +70,8 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initExtra() {
-        if(getIntent().hasExtra("SENZ")) {
-            thisSenz = getIntent().getParcelableExtra("SENZ");
+        if (getIntent().hasExtra("SENZ")) {
+            thisSenz = getIntent().getExtras().getParcelable("SENZ");
 
             // location coordinate
             double lat = Double.parseDouble(thisSenz.getAttributes().get("lat"));

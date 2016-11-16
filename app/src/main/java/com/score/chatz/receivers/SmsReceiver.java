@@ -88,9 +88,6 @@ public class SmsReceiver extends BroadcastReceiver {
             secretUser.setUid(uid);
             dbSource.createSecretUser(secretUser);
 
-            // activate user
-            dbSource.activateSecretUser(secretUser.getUsername(), false);
-
             // Sent local intent to update view
             Intent intent = new Intent("com.score.chatz.SENZ");
             intent.putExtra("UPDATE_UI_ON_NEW_ADDED_USER", "UPDATE_UI_ON_NEW_ADDED_USER");

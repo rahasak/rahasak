@@ -89,16 +89,17 @@ class SenHandler {
         } else {
             // #mic #cam #lat #lon permission
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+            SecretUser secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
             if (senz.getAttributes().containsKey("cam")) {
-                dbSource.updatePermission(senz.getSender().getUsername(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"), false);
+                dbSource.updatePermission(secretUser.getRecvPermission().getId(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "camera", senz.getAttributes().get("cam")));
             } else if (senz.getAttributes().containsKey("mic")) {
-                dbSource.updatePermission(senz.getSender().getUsername(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"), false);
+                dbSource.updatePermission(secretUser.getRecvPermission().getId(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "mic", senz.getAttributes().get("mic")));
             } else if (senz.getAttributes().containsKey("lat")) {
-                dbSource.updatePermission(senz.getSender().getUsername(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"), false);
+                dbSource.updatePermission(secretUser.getRecvPermission().getId(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "location", senz.getAttributes().get("lat")));
             }
@@ -143,25 +144,18 @@ class SenHandler {
             if (status.equalsIgnoreCase("701")) {
                 // user added successfully
                 // save user in db
-                try {
-                    // create user
+                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
+                    // existing user, activate it
+                    dbSource.activateSecretUser(senz.getSender().getUsername(), true);
+                } else {
+                    // TODO verify and remove this logic
+                    // not existing user,
+                    // create and activate user
                     SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
                     dbSource.createSecretUser(secretUser);
-                } catch (Exception ex) {
-                    // duplicate user
-                    ex.printStackTrace();
-
-                    // TODO check better error handling to check user exists
-                    // check for active user
-                    SecretUser secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
-                    secretUser.setUid(senz.getAttributes().get("uid"));
-                    if (!secretUser.isActive()) {
-                        // activate user
-                        dbSource.activateSecretUserFromUid(secretUser.getUid(), true);
-                    }
+                    dbSource.activateSecretUser(secretUser.getUsername(), true);
                 }
             }
-
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg")) {
             // rahasa

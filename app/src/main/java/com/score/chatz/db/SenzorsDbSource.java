@@ -39,7 +39,7 @@ public class SenzorsDbSource {
 
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
                 null, // columns
-                SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", // constraint
                 new String[]{username}, // prams
                 null, // order by
                 null, // group by
@@ -52,8 +52,8 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // create two empty permissions
-        String givenPermId = createPermission(new Permission("id", false));
-        String recvPermId = createPermission(new Permission("id", true));
+        String givenPermId = createPermission(new Permission("id", true));
+        String recvPermId = createPermission(new Permission("id", false));
 
         // content values to inset
         ContentValues values = new ContentValues();
@@ -113,25 +113,11 @@ public class SenzorsDbSource {
                 new String[]{username});
     }
 
-    public void activateSecretUserFromUid(String uid, boolean isActive) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, isActive ? 1 : 0);
-
-        // update
-        db.update(SenzorsDbContract.User.TABLE_NAME,
-                values,
-                SenzorsDbContract.User.COLUMN_UNIQUE_ID + " = ?",
-                new String[]{uid});
-    }
-
     public SecretUser getSecretUser(String username) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
                 null, // columns
-                SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", // constraint
                 new String[]{username}, // prams
                 null, // order by
                 null, // group by
@@ -151,8 +137,8 @@ public class SenzorsDbSource {
             String _givenPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_GIVEN_PERM));
             String _recvPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_RECV_PERM));
 
-            Permission givenPerm = getPermission(_givenPermId, true);
-            Permission recvPerm = getPermission(_recvPermId, false);
+            Permission givenPerm = getPermission(_givenPermId);
+            Permission recvPerm = getPermission(_recvPermId);
 
             // clear
             cursor.close();
@@ -197,8 +183,8 @@ public class SenzorsDbSource {
             String _recvPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_RECV_PERM));
 
             // get permission
-            Permission givenPerm = getPermission(_givenPermId, true);
-            Permission recvPerm = getPermission(_recvPermId, false);
+            Permission givenPerm = getPermission(_givenPermId);
+            Permission recvPerm = getPermission(_recvPermId);
 
             SecretUser secretUser = new SecretUser(_userID, _username);
             secretUser.setUid(_userUid);
@@ -237,8 +223,7 @@ public class SenzorsDbSource {
         return Long.toString(id);
     }
 
-    public void updatePermission(String id, String permName, boolean permVal, boolean isGiven) {
-        Log.d(TAG, "Update permission with isGiven=" + isGiven);
+    public void updatePermission(String id, String permName, boolean permVal) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -247,17 +232,17 @@ public class SenzorsDbSource {
         // update
         db.update(SenzorsDbContract.Permission.TABLE_NAME,
                 values,
-                SenzorsDbContract.Permission._ID + " = ? AND is_given = ?",
-                new String[]{id, isGiven ? "1" : "0"});
+                SenzorsDbContract.Permission._ID + " =?",
+                new String[]{id});
     }
 
-    public Permission getPermission(String id, boolean isGiven) {
+    public Permission getPermission(String id) {
         // get matching user if exists
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.Permission.TABLE_NAME, // table
                 null, // columns
-                SenzorsDbContract.Permission._ID + "=? AND " + SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN + "=?", // constraint
-                new String[]{id, isGiven ? "1" : "0"}, // prams
+                SenzorsDbContract.Permission._ID + " = ?", // constraint
+                new String[]{id}, // prams
                 null, // order by
                 null, // group by
                 null); // join
@@ -266,11 +251,12 @@ public class SenzorsDbSource {
             boolean _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
             boolean _cam = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
             boolean _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
+            boolean _isGiven = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN)) == 1;
 
             // clear
             cursor.close();
 
-            Permission permission = new Permission(id, isGiven);
+            Permission permission = new Permission(id, _isGiven);
             permission.setLoc(_location);
             permission.setCam(_cam);
             permission.setMic(_mic);
@@ -315,14 +301,14 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.LatestChat.COLUMN_USER, secret.getUser().getUsername());
         values.put(SenzorsDbContract.LatestChat.COLUMN_BLOB, secret.getBlob());
-            values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
+        values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
         values.put(SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER, secret.isSender());
         values.put(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP, secret.getTimeStamp());
 
         //First update the table
         int rowCount = db.update(SenzorsDbContract.LatestChat.TABLE_NAME,
                 values,
-                SenzorsDbContract.LatestChat.COLUMN_USER + " =?",
+                SenzorsDbContract.LatestChat.COLUMN_USER + " = ?",
                 new String[]{secret.getUser().getUsername()});
 
         //If not rows were affected!!then insert
@@ -348,7 +334,7 @@ public class SenzorsDbSource {
         // update
         db.update(SenzorsDbContract.Secret.TABLE_NAME,
                 values,
-                SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
+                SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
                 new String[]{uid});
     }
 
@@ -369,7 +355,7 @@ public class SenzorsDbSource {
             // update
             db.update(SenzorsDbContract.Secret.TABLE_NAME,
                     values,
-                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " =?",
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
                     new String[]{uid});
 
             db.setTransactionSuccessful();
@@ -512,7 +498,7 @@ public class SenzorsDbSource {
 
         // delete senz of given user
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
-                SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + "=?",
+                SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
                 new String[]{secret.getId()});
     }
 
@@ -546,12 +532,12 @@ public class SenzorsDbSource {
 
         // delete senz of given user
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
-                SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?",
+                SenzorsDbContract.Secret.COLUMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
 
         // delete last secret
         db.delete(SenzorsDbContract.LatestChat.TABLE_NAME,
-                SenzorsDbContract.Secret.COLUMN_NAME_USER + "=?",
+                SenzorsDbContract.Secret.COLUMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
     }
 

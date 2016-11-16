@@ -238,7 +238,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initUser() {
-        secretUser = getIntent().getParcelableExtra("SENDER");
+        String username = getIntent().getExtras().getString("SENDER");
+        secretUser = new SenzorsDbSource(this).getSecretUser(username);
     }
 
     private void initUser(Intent intent) {
@@ -299,7 +300,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void navigateToProfile() {
         Intent intent = new Intent(this, UserProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("SENDER", secretUser);
+        intent.putExtra("SECRET_USER", secretUser);
         startActivity(intent);
     }
 
