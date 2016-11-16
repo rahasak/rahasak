@@ -62,6 +62,10 @@ public class SenzService extends Service {
     private boolean senzCommRunning;
     private boolean connectedSwitch;
 
+    // keep retry count
+    private static int MAX_RETRY_COUNT = 3;
+    private static int RETRY_COUNT = 0;
+
     // broadcast receiver to check network status changes
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -162,12 +166,7 @@ public class SenzService extends Service {
 
         Log.d(TAG, "onStartCommand..");
 
-        // init comm
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            initSenzComm();
-        } else {
-            Log.e(TAG, "no network to start senzcomm");
-        }
+        initSenzComm();
 
         return START_STICKY;
     }
@@ -201,17 +200,21 @@ public class SenzService extends Service {
     }
 
     private void initSenzComm() {
-        if (!connectedSwitch) {
-            Log.d(TAG, "Not connectedSwitch, check to start senzcomm");
-            if (!senzCommRunning) {
-                senzCommRunning = true;
-                new SenzComm().execute();
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            if (!connectedSwitch) {
+                Log.d(TAG, "Not connectedSwitch, check to start senzcomm");
+                if (!senzCommRunning) {
+                    senzCommRunning = true;
+                    new SenzComm().execute();
+                } else {
+                    Log.d(TAG, "Already running senzcomm exists..");
+                }
             } else {
-                Log.d(TAG, "Already running senzcomm exists..");
+                Log.d(TAG, "Already connectedSwitch");
+                sendPing();
             }
         } else {
-            Log.d(TAG, "Already connectedSwitch");
-            sendPing();
+            Log.d(TAG, "No network to init senzcomm");
         }
     }
 
@@ -222,6 +225,7 @@ public class SenzService extends Service {
         writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
         connectedSwitch = true;
+        RETRY_COUNT = 0;
     }
 
     private void resetSoc() throws IOException {
@@ -362,6 +366,13 @@ public class SenzService extends Service {
                 resetSoc();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+
+            // retry
+            RETRY_COUNT++;
+            if (RETRY_COUNT < MAX_RETRY_COUNT) {
+                Log.d(TAG, "Retry with " + RETRY_COUNT);
+                initSenzComm();
             }
         }
     }
