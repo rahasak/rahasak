@@ -87,7 +87,7 @@ public class SenzService extends Service {
             String phoneNumber = intent.getStringExtra("SENDER_PHONE_NUMBER").trim();
             String senderUid = intent.getStringExtra("SENDER_UID").trim();
 
-            if (!isCurrentUser(usernameToAdd)) {
+            if (!SenzUtils.isCurrentUser(usernameToAdd, SenzService.this)) {
                 shareWithPhoneNumber(usernameToAdd, senderUid);
             }
         }
@@ -332,10 +332,10 @@ public class SenzService extends Service {
         }).start();
     }
 
-    class SenzComm extends AsyncTask {
+    class SenzComm extends AsyncTask<String, String, Integer> {
 
         @Override
-        protected Object doInBackground(Object[] params) {
+        protected Integer doInBackground(String[] params) {
             if (!connectedSwitch) {
                 Log.d(TAG, "Not online, so init comm");
                 try {
@@ -350,11 +350,11 @@ public class SenzService extends Service {
                 sendPing();
             }
 
-            return null;
+            return 0;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
+        protected void onPostExecute(Integer status) {
             Log.e(TAG, "Stop SenzComm");
             senzCommRunning = false;
 
@@ -364,16 +364,6 @@ public class SenzService extends Service {
                 e.printStackTrace();
             }
         }
-    }
-
-    private boolean isCurrentUser(String username) {
-        try {
-            return PreferenceUtils.getUser(SenzService.this).getUsername().equalsIgnoreCase(username);
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
 }

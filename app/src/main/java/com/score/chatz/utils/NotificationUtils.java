@@ -1,16 +1,11 @@
 package com.score.chatz.utils;
 
-import android.app.ActivityManager;
 import android.app.NotificationManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
 
 import com.score.chatz.R;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
-
-import java.util.List;
 
 /**
  * Utility class for create and update notifications
@@ -55,12 +50,12 @@ public class NotificationUtils {
 
     public static SenzNotification getSmsNotification(String contactName, String contactPhone, String senderUid, String rahasakUsername) {
         String msg = "Would you like share secrets?";
-        String title = contactName + " (@" + rahasakUsername +")";
+        String title = contactName + " (@" + rahasakUsername + ")";
 
-        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, contactPhone, senderUid,NotificationType.NEW_SMS_ADD_FRIEND);
+        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, contactPhone, senderUid, NotificationType.NEW_SMS_ADD_FRIEND);
     }
 
-    public static int getNotificationIdForSMS(){
+    public static int getNotificationIdForSMS() {
         return SMS_NOTIFICATION_ID;
     }
 

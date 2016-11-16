@@ -22,11 +22,9 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
-import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -198,7 +196,7 @@ public class AddUserActivity extends BaseActivity {
                 public void onClick(View v) {
                     //Only share if user is not already added before..
                     SecretUser secretUser = new SenzorsDbSource(AddUserActivity.this).getSecretUser(username);
-                    if (isCurrentUser(username)) {
+                    if (SenzUtils.isCurrentUser(username, AddUserActivity.this)) {
                         ActivityUtils.showCustomToast("You cannot add yourself", AddUserActivity.this);
                     } else if (secretUser != null) {
                         ActivityUtils.showCustomToast("This user has already been added", AddUserActivity.this);
@@ -290,17 +288,4 @@ public class AddUserActivity extends BaseActivity {
         }
     }
 
-    private boolean isCurrentUser(String username) {
-        String currentUser = "";
-        try {
-            currentUser = PreferenceUtils.getUser(AddUserActivity.this).getUsername();
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
-        if (currentUser.toLowerCase().equalsIgnoreCase(username)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

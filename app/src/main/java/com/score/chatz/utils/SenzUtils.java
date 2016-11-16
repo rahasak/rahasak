@@ -97,11 +97,6 @@ public class SenzUtils {
         return timestamp;
     }
 
-//    public static String getUniqueRandomNumber() {
-//        Long number = (long) Math.floor(Math.random() * 900000000L) + 10000000L;
-//        return number.toString();
-//    }
-
     public static boolean isStreamOn(Senz senz) {
         return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("on") ||
                 senz.getAttributes().containsKey("mic") && senz.getAttributes().get("mic").equalsIgnoreCase("on");
@@ -110,6 +105,16 @@ public class SenzUtils {
     public static boolean isStreamOff(Senz senz) {
         return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("off") ||
                 senz.getAttributes().containsKey("mic") && senz.getAttributes().get("mic").equalsIgnoreCase("off");
+    }
+
+    public static boolean isCurrentUser(String username, Context context) {
+        try {
+            return PreferenceUtils.getUser(context).getUsername().equalsIgnoreCase(username);
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }
