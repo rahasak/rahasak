@@ -27,7 +27,6 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.utils.ImageUtils;
-import com.score.chatz.utils.PhotoUtils;
 import com.score.senzc.pojos.Senz;
 
 public class PhotoFullScreenActivity extends AppCompatActivity {
@@ -123,7 +122,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         String userImage = new SenzorsDbSource(this).getSecretUser(sender).getImage();
         if (userImage != null) {
             Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new PhotoUtils().blur(bitmap, BLUR_RADIUS, this));
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().blur(bitmap, BLUR_RADIUS, this));
         }
 
         usernameText.setText("@" + sender);

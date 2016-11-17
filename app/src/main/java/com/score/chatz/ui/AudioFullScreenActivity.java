@@ -168,7 +168,7 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         secretUser = new SenzorsDbSource(this).getSecretUser(sender);
         if (secretUser.getImage() != null) {
             Bitmap bitmap = new ImageUtils().decodeBitmap(secretUser.getImage());
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new PhotoUtils().blur(bitmap, BLUR_RADIUS, this));
+            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().blur(bitmap, BLUR_RADIUS, this));
         }
 
         usernameText.setText("@" + sender);

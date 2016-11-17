@@ -207,7 +207,7 @@ public class SenzorsDbSource {
         return secretUserList;
     }
 
-    public String createPermission(Permission permission) {
+    private String createPermission(Permission permission) {
         Log.d(TAG, "Add new permission with isGiven=" + permission.isGiven());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
@@ -236,7 +236,7 @@ public class SenzorsDbSource {
                 new String[]{id});
     }
 
-    public Permission getPermission(String id) {
+    private Permission getPermission(String id) {
         // get matching user if exists
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.Permission.TABLE_NAME, // table

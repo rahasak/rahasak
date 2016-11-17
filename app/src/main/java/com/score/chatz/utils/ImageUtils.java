@@ -1,10 +1,15 @@
 package com.score.chatz.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Base64;
 import android.util.Log;
 
@@ -241,5 +246,22 @@ public class ImageUtils {
     public Bitmap decodeBitmap(String encodedImage) {
         byte data[] = Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(data, 0, data.length);
+    }
+
+    public Bitmap blur(Bitmap image, float blurRadius, Context con) {
+        if (null == image) return null;
+
+        Bitmap outputBitmap = Bitmap.createBitmap(image);
+        final RenderScript renderScript = RenderScript.create(con);
+        Allocation tmpIn = Allocation.createFromBitmap(renderScript, image);
+        Allocation tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap);
+
+        //Intrinsic Gausian blur filter
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        theIntrinsic.setRadius(blurRadius);
+        theIntrinsic.setInput(tmpIn);
+        theIntrinsic.forEach(tmpOut);
+        tmpOut.copyTo(outputBitmap);
+        return outputBitmap;
     }
 }
