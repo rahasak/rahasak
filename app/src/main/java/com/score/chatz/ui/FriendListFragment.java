@@ -42,9 +42,8 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got new user from Senz service");
 
-            Senz senz = null;
             if (intent.hasExtra("SENZ")) {
-                senz = intent.getExtras().getParcelable("SENZ");
+                Senz senz = intent.getExtras().getParcelable("SENZ");
                 if (senz.getSenzType() == SenzTypeEnum.SHARE) {
                     displayUserList();
                 } else if (senz.getSenzType() == SenzTypeEnum.DATA && senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701")) {
@@ -52,10 +51,9 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                     ActivityUtils.cancelProgressDialog();
                     displayUserList();
                 }
-            } else if (senz == null && intent.hasExtra("UPDATE_UI_ON_NEW_ADDED_USER")) {
+            } else if (intent.hasExtra("UPDATE_UI_ON_NEW_ADDED_USER")) {
                 displayUserList();
             }
-
         }
     };
 

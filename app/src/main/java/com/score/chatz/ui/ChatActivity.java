@@ -100,7 +100,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         onSenzStreamReceived(senz);
                         break;
                     case SHARE:
-                        updatePermissions();
+                        onShareRecived(senz);
                         break;
                     default:
                         break;
@@ -516,6 +516,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent mapIntent = new Intent(this, SenzMapActivity.class);
         mapIntent.putExtra("SENZ", senz);
         startActivity(mapIntent);
+    }
+
+    private void onShareRecived(Senz senz) {
+        secretUser = new SenzorsDbSource(this).getSecretUser(senz.getSender().getUsername());
+        if (senz.getAttributes().containsKey("cam")) {
+            updatePermissions();
+        } else if (senz.getAttributes().containsKey("mic")) {
+            updatePermissions();
+        } else if (senz.getAttributes().containsKey("lat")) {
+            updatePermissions();
+        }
     }
 
     private void updatePermissions() {
