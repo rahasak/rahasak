@@ -4,15 +4,28 @@ package com.score.chatz.enums;
  * Created by eranga on 11/18/16.
  */
 public enum DeliveryState {
-    DESPATCHED,
-    DELIVERED,
-    PENDING;
+    NONE(0),
+    PENDING(1),
+    DISPATCHED(2),
+    DELIVERED(3);
 
-    public int getValue(DeliveryState type) {
-        return type.ordinal();
+    private int state;
+
+    DeliveryState(int state) {
+        this.state = state;
     }
 
-    public DeliveryState getType(int value) {
-        return DeliveryState.valueOf(Integer.toString(value));
+    public int getState() {
+        return state;
+    }
+
+    public static DeliveryState valueOfState(int state) {
+        for (DeliveryState ds : DeliveryState.values()) {
+            if (ds.state == state) {
+                return ds;
+            }
+        }
+
+        return null;
     }
 }

@@ -316,17 +316,17 @@ public class SenzorsDbSource {
     /**
      * Mark message as delivery state
      *
-     * @param state
+     * @param deliveryState
      * @param uid
      */
-    public void updateDeliveryStatus(DeliveryState state, String uid) {
+    public void updateDeliveryStatus(DeliveryState deliveryState, String uid) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         try {
             db.beginTransaction();
 
             // content values to inset
             ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.Secret.DELIVERY_STATE, state.ordinal());
+            values.put(SenzorsDbContract.Secret.DELIVERY_STATE, deliveryState.getState());
 
             // update
             db.update(SenzorsDbContract.Secret.TABLE_NAME,
@@ -384,7 +384,7 @@ public class SenzorsDbSource {
             secret.setMissed(_isMissed == 1);
             secret.setTimeStamp(_secretTimestamp);
             secret.setViewedTimeStamp(_secretViewTimestamp);
-            secret.setDeliveryState(DeliveryState.values()[_deliveryState]);
+            secret.setDeliveryState(DeliveryState.valueOfState(_deliveryState));
 
             // fill secret list
             secretList.add(secret);
@@ -443,7 +443,7 @@ public class SenzorsDbSource {
             secret.setMissed(_isMissed == 1);
             secret.setTimeStamp(_secretTimestamp);
             secret.setViewedTimeStamp(_secretViewTimestamp);
-            secret.setDeliveryState(DeliveryState.values()[_deliveryState]);
+            secret.setDeliveryState(DeliveryState.valueOfState(_deliveryState));
 
             // fill secret list
             secretList.add(secret);
