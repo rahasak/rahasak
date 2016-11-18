@@ -25,18 +25,7 @@ class SenzorsDbContract {
         static final String COLUMN_NAME_VIEWED = "viewed";
         static final String COLUMN_NAME_VIEWED_TIMESTAMP = "view_timestamp";
         static final String COLUMN_NAME_MISSED = "missed";
-        static final String COLUMN_NAME_DELIVERED = "delivered";
-        static final String COLUMN_NAME_DISPATCHED = "dispatched";
-    }
-
-    /* Inner class that defines secret user mapping table */
-    static abstract class LatestChat implements BaseColumns {
-        static final String TABLE_NAME = "latest_chat";
-        static final String COLUMN_USER = "user";
-        static final String COLUMN_BLOB = "blob";
-        static final String COLUMN_TYPE = "type";
-        static final String COLUMN_NAME_IS_SENDER = "is_sender";
-        static final String COLUMN_TIMESTAMP = "timestamp";
+        static final String DELIVERY_STATE = "delivery_state";
     }
 
     /* Inner class that defines the user table contents */

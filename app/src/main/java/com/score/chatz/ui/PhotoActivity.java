@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.AudioUtils;
@@ -272,6 +273,7 @@ public class PhotoActivity extends BaseActivity {
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(true);
+        newSecret.setDeliveryState(DeliveryState.PENDING);
         new SenzorsDbSource(this).createSecret(newSecret);
     }
 
@@ -337,6 +339,7 @@ public class PhotoActivity extends BaseActivity {
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(false);
+        newSecret.setDeliveryState(DeliveryState.PENDING);
         new SenzorsDbSource(context).createSecret(newSecret);
 
         ArrayList<Senz> senzList = new ArrayList<>();

@@ -25,6 +25,7 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
@@ -328,6 +329,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Long timestamp = System.currentTimeMillis() / 1000;
                 secret.setTimeStamp(timestamp);
                 secret.setId(SenzUtils.getUid(this, timestamp.toString()));
+                secret.setDeliveryState(DeliveryState.PENDING);
 
                 // send secret
                 // save secret
@@ -474,6 +476,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
             secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
             secret.setId(senz.getAttributes().get("uid"));
+            secret.setDeliveryState(DeliveryState.PENDING);
 
             secretList.add(secret);
             secretAdapter.notifyDataSetChanged();
@@ -483,11 +486,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void onSenzStatusReceived(Senz senz) {
         // update senz in db
         String uid = senz.getAttributes().get("uid");
-        new SenzorsDbSource(this).markSecretDelivered(uid);
+        new SenzorsDbSource(this).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
 
         for (Secret secret : secretList) {
             if (secret.getId().equalsIgnoreCase(uid)) {
-                secret.setDelivered(true);
+                secret.setDeliveryState(DeliveryState.DELIVERED);
                 secretAdapter.notifyDataSetChanged();
             }
         }
@@ -501,6 +504,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     Secret secret = new Secret(msg, "TEXT", secretUser, true);
                     secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
                     secret.setId(senz.getAttributes().get("uid"));
+                    secret.setDeliveryState(DeliveryState.PENDING);
 
                     secretList.add(secret);
                     secretAdapter.notifyDataSetChanged();

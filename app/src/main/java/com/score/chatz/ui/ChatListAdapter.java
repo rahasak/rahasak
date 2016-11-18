@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
@@ -149,7 +150,7 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatDelivered.setVisibility(View.GONE);
             holder.chatPending.setVisibility(View.GONE);
         } else {
-            if (secret.isDelivered()) {
+            if (secret.getDeliveryState() == DeliveryState.DELIVERED) {
                 holder.chatDelivered.setVisibility(View.VISIBLE);
                 holder.chatPending.setVisibility(View.GONE);
             } else {

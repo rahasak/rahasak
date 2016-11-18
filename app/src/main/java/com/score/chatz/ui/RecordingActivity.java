@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
@@ -289,6 +290,7 @@ public class RecordingActivity extends AppCompatActivity {
         Long timeStamp = System.currentTimeMillis() / 1000;
         newSecret.setTimeStamp(timeStamp);
         newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
+        newSecret.setDeliveryState(DeliveryState.PENDING);
         new SenzorsDbSource(this).createSecret(newSecret);
     }
 
@@ -317,6 +319,7 @@ public class RecordingActivity extends AppCompatActivity {
             secret.setTimeStamp(timeStamp);
             String uid = SenzUtils.getUid(this, timeStamp.toString());
             secret.setId(uid);
+            secret.setDeliveryState(DeliveryState.PENDING);
             dbSource.createSecret(secret);
             sendSound(secret, uid, timeStamp);
 

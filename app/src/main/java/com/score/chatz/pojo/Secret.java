@@ -1,5 +1,7 @@
 package com.score.chatz.pojo;
 
+import com.score.chatz.enums.DeliveryState;
+
 /**
  * Created by Lakmal on 7/31/16.
  */
@@ -10,11 +12,10 @@ public class Secret {
     private String type;
     private boolean isViewed;
     private boolean isMissed;
-    private boolean isDelivered;
-    private boolean isDispatched;
     private Long timeStamp;
     private Long viewedTimeStamp;
     private boolean isSender;
+    private DeliveryState deliveryState;
 
     public Secret(String blob, String type, SecretUser user, boolean isSender) {
         this.blob = blob;
@@ -71,22 +72,6 @@ public class Secret {
         isMissed = missed;
     }
 
-    public boolean isDelivered() {
-        return isDelivered;
-    }
-
-    public void setDelivered(boolean delivered) {
-        isDelivered = delivered;
-    }
-
-    public boolean isDispatched() {
-        return isDispatched;
-    }
-
-    public void setDispatched(boolean dispatched) {
-        isDispatched = dispatched;
-    }
-
     public Long getTimeStamp() {
         return timeStamp;
     }
@@ -109,6 +94,14 @@ public class Secret {
 
     public void setSender(boolean sender) {
         isSender = sender;
+    }
+
+    public DeliveryState getDeliveryState() {
+        return deliveryState;
+    }
+
+    public void setDeliveryState(DeliveryState deliveryState) {
+        this.deliveryState = deliveryState;
     }
 
     @Override

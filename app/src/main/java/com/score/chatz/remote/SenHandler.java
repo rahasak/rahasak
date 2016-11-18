@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.Stream;
@@ -285,7 +286,7 @@ class SenHandler {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    new SenzorsDbSource(context).markSecretDelivered(uid);
+                    new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
                 }
             }).start();
         }
