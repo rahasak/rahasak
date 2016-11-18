@@ -109,7 +109,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
      * Basically setup list adapter if have items to display otherwise display empty view
      */
     private void displayUserList() {
-        allSecretsList = dbSource.getLatestChatMessages();
+        allSecretsList = dbSource.getLatestSecretList();
         adapter = new LastItemChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();

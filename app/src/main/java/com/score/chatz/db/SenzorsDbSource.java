@@ -290,31 +290,6 @@ public class SenzorsDbSource {
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
-
-        insertRecordIntoLatestChat(secret);
-    }
-
-    private void insertRecordIntoLatestChat(Secret secret) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.LatestChat.COLUMN_USER, secret.getUser().getUsername());
-        values.put(SenzorsDbContract.LatestChat.COLUMN_BLOB, secret.getBlob());
-        values.put(SenzorsDbContract.LatestChat.COLUMN_TYPE, secret.getType());
-        values.put(SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER, secret.isSender());
-        values.put(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP, secret.getTimeStamp());
-
-        //First update the table
-        int rowCount = db.update(SenzorsDbContract.LatestChat.TABLE_NAME,
-                values,
-                SenzorsDbContract.LatestChat.COLUMN_USER + " = ?",
-                new String[]{secret.getUser().getUsername()});
-
-        //If not rows were affected!!then insert
-        if (rowCount == 0) {
-            db.insert(SenzorsDbContract.LatestChat.TABLE_NAME, null, values);
-        }
     }
 
     /**
@@ -534,11 +509,6 @@ public class SenzorsDbSource {
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
                 SenzorsDbContract.Secret.COLUMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
-
-        // delete last secret
-        db.delete(SenzorsDbContract.LatestChat.TABLE_NAME,
-                SenzorsDbContract.Secret.COLUMN_NAME_USER + " = ?",
-                new String[]{user.getUsername()});
     }
 
 
@@ -547,19 +517,19 @@ public class SenzorsDbSource {
      *
      * @return
      */
-    public ArrayList<Secret> getLatestChatMessages() {
+    public ArrayList<Secret> getLatestSecretList() {
         ArrayList<Secret> secretList = new ArrayList();
 
         // TODO JOIN with user to get user image
-        //SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        //String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
-        //        "GROUP BY user ORDER BY timestamp DESC";
+//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+//        String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
+//                "GROUP BY user ORDER BY timestamp DESC";
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT * " +
-                "FROM latest_chat " +
+        String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active " +
+                "FROM secret " +
                 "INNER JOIN user " +
-                "ON user.username = latest_chat.user GROUP BY user.username ORDER BY timestamp DESC";
+                "ON user.username = secret.user GROUP BY user.username ORDER BY timestamp DESC";
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -577,10 +547,10 @@ public class SenzorsDbSource {
         while (cursor.moveToNext()) {
             // get secret attributes
             _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_BLOB));
-            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TYPE));
-            _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_USER));
-            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP));
+            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
+            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
+            _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_USER));
+            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
 
             // get user attributes

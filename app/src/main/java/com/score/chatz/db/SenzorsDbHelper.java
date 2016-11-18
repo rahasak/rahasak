@@ -25,16 +25,6 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
 
-    private static final String SQL_CREATE_LATEST_CHAT =
-            "CREATE TABLE " + SenzorsDbContract.LatestChat.TABLE_NAME + " (" +
-                    SenzorsDbContract.LatestChat._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.LatestChat.COLUMN_USER + TEXT_TYPE + " UNIQUE NOT NULL" + "," +
-                    SenzorsDbContract.LatestChat.COLUMN_BLOB + TEXT_TYPE + "," +
-                    SenzorsDbContract.LatestChat.COLUMN_TYPE + TEXT_TYPE + "," +
-                    SenzorsDbContract.LatestChat.COLUMN_NAME_IS_SENDER + INT_TYPE + ", " +
-                    SenzorsDbContract.LatestChat.COLUMN_TIMESTAMP + INT_TYPE +
-                    " )";
-
     private static final String SQL_CREATE_SECRET =
             "CREATE TABLE " + SenzorsDbContract.Secret.TABLE_NAME + " (" +
                     SenzorsDbContract.Secret._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
@@ -78,8 +68,6 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
     private static final String SQL_DELETE_SECRET =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.Secret.TABLE_NAME;
-    private static final String SQL_DELETE_LATEST_CHAT =
-            "DROP TABLE IF EXISTS " + SenzorsDbContract.LatestChat.TABLE_NAME;
     private static final String SQL_DELETE_PERMISSION =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.Permission.TABLE_NAME;
 
@@ -114,10 +102,8 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, SQL_CREATE_USER);
         Log.d(TAG, SQL_CREATE_SECRET);
         Log.d(TAG, SQL_CREATE_PERMISSION);
-        Log.d(TAG, SQL_CREATE_LATEST_CHAT);
 
         db.execSQL(SQL_CREATE_SECRET);
-        db.execSQL(SQL_CREATE_LATEST_CHAT);
         db.execSQL(SQL_CREATE_USER);
         db.execSQL(SQL_CREATE_PERMISSION);
     }
@@ -143,7 +129,6 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_USER);
         db.execSQL(SQL_DELETE_SECRET);
         db.execSQL(SQL_DELETE_PERMISSION);
-        db.execSQL(SQL_DELETE_LATEST_CHAT);
 
         onCreate(db);
     }
