@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.ImageUtils;
@@ -123,13 +124,13 @@ class ChatListAdapter extends BaseAdapter {
     }
 
     private void setupRow(final Secret secret, ViewHolder holder) {
-        if (secret.getType().equalsIgnoreCase("TEXT")) {
+        if (secret.getBlobType() == BlobType.TEXT) {
             holder.chatCamHolder.setVisibility(View.GONE);
             holder.chatMicHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.VISIBLE);
 
             holder.chatMsg.setText(secret.getBlob());
-        } else if (secret.getType().equalsIgnoreCase("IMAGE")) {
+        } else if (secret.getBlobType() == BlobType.IMAGE) {
             holder.chatCamHolder.setVisibility(View.VISIBLE);
             holder.chatMicHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.GONE);
@@ -140,7 +141,7 @@ class ChatListAdapter extends BaseAdapter {
                 //new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
                 holder.chatCam.setImageBitmap(new ImageUtils().decodeBitmap(secret.getBlob()));
             }
-        } else if (secret.getType().equalsIgnoreCase("SOUND")) {
+        } else if (secret.getBlobType() == BlobType.SOUND) {
             holder.chatCamHolder.setVisibility(View.GONE);
             holder.chatMicHolder.setVisibility(View.VISIBLE);
             holder.chatMsgHolder.setVisibility(View.GONE);

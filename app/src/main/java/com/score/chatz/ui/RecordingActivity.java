@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
@@ -286,7 +287,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void saveMissedCall() {
-        Secret newSecret = new Secret("", "MISSED_SOUND", secretUser, true);
+        Secret newSecret = new Secret("", BlobType.SOUND, secretUser, true);
         Long timeStamp = System.currentTimeMillis() / 1000;
         newSecret.setTimeStamp(timeStamp);
         newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
@@ -314,7 +315,7 @@ public class RecordingActivity extends AppCompatActivity {
         audioRecorder.stopRecording();
         if (audioRecorder.getRecording() != null) {
             String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
-            Secret secret = new Secret(sound, "SOUND", secretUser, false);
+            Secret secret = new Secret(sound, BlobType.SOUND, secretUser, false);
             Long timeStamp = System.currentTimeMillis() / 1000;
             secret.setTimeStamp(timeStamp);
             String uid = SenzUtils.getUid(this, timeStamp.toString());

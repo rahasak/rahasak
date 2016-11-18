@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
@@ -269,7 +270,7 @@ public class PhotoActivity extends BaseActivity {
     private void saveMissedSelfie() {
         Long timestamp = (System.currentTimeMillis() / 1000);
         String uid = SenzUtils.getUid(this, timestamp.toString());
-        Secret newSecret = new Secret("", "IMAGE", secretUser, true);
+        Secret newSecret = new Secret("", BlobType.IMAGE, secretUser, true);
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(true);
@@ -335,7 +336,7 @@ public class PhotoActivity extends BaseActivity {
     private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid, Long timestamp) {
         String imageString = new ImageUtils().encodeBitmap(image);
 
-        Secret newSecret = new Secret(imageString, "IMAGE", secretUser, false);
+        Secret newSecret = new Secret(imageString, BlobType.IMAGE, secretUser, false);
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(false);

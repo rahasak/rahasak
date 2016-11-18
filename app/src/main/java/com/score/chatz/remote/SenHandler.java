@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
@@ -168,7 +169,7 @@ class SenHandler {
                 String rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
 
                 Long timestamp = (System.currentTimeMillis() / 1000);
-                saveSecret(timestamp, senz.getAttributes().get("uid"), rahasa, "TEXT", senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), rahasa, BlobType.TEXT, senz.getSender(), senzService.getApplicationContext());
                 senz.getAttributes().put("time", timestamp.toString());
                 broadcastSenz(senz, senzService.getApplicationContext());
 
@@ -212,9 +213,9 @@ class SenHandler {
             // save in db
             // broadcast
             if (senz.getAttributes().containsKey("cam"))
-                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "IMAGE", senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
             else
-                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), "SOUND", senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.SOUND, senz.getSender(), senzService.getApplicationContext());
 
             broadcastSenz(streamSenz, senzService.getApplicationContext());
 
@@ -262,9 +263,9 @@ class SenHandler {
         context.sendBroadcast(intent);
     }
 
-    private void saveSecret(Long timestamp, String uid, String blob, String type, User user, final Context context) {
+    private void saveSecret(Long timestamp, String uid, String blob, BlobType blobType, User user, final Context context) {
         // create secret
-        final Secret secret = new Secret(blob, type, new SecretUser(user.getId(), user.getUsername()), true);
+        final Secret secret = new Secret(blob, blobType, new SecretUser(user.getId(), user.getUsername()), true);
         secret.setId(uid);
         secret.setTimeStamp(timestamp);
         secret.setMissed(false);

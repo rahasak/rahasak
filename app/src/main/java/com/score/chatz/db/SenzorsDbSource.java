@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
@@ -281,7 +282,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, secret.getTimeStamp());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_USER, secret.getUser().getUsername());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER, secret.isSender() ? 1 : 0);
-        values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getType());
+        values.put(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE, secret.getBlobType().getType());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_BLOB, secret.getBlob());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, secret.isViewed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP, 0);
@@ -349,14 +350,14 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
+        String query = "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
                 "FROM secret WHERE user = ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{secretUser.getUsername()});
 
         // secret attr
         String _secretId;
         String _secretBlob;
-        String _secretBlobType;
+        int _secretBlobType;
         int _secretIsSender;
         int _isViewed;
         int _isMissed;
@@ -370,7 +371,7 @@ public class SenzorsDbSource {
             _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
-            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
+            _secretBlobType = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
             _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
@@ -378,7 +379,7 @@ public class SenzorsDbSource {
             _deliveryState = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.DELIVERY_STATE));
 
             // create secret
-            Secret secret = new Secret(_secretBlob, _secretBlobType, secretUser, _secretIsSender == 1);
+            Secret secret = new Secret(_secretBlob, BlobType.valueOfType(_secretBlobType), secretUser, _secretIsSender == 1);
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
             secret.setMissed(_isMissed == 1);
@@ -408,14 +409,14 @@ public class SenzorsDbSource {
         ArrayList secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
+        String query = "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
                 "FROM secret WHERE user = ? AND timestamp > ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{secretUser.getUsername(), timestamp.toString()});
 
         // secret attr
         String _secretId;
         String _secretBlob;
-        String _secretBlobType;
+        int _secretBlobType;
         int _secretIsSender;
         int _isViewed;
         int _isMissed;
@@ -429,7 +430,7 @@ public class SenzorsDbSource {
             _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
-            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
+            _secretBlobType = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
             _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
@@ -437,7 +438,7 @@ public class SenzorsDbSource {
             _deliveryState = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.DELIVERY_STATE));
 
             // create secret
-            Secret secret = new Secret(_secretBlob, _secretBlobType, secretUser, _secretIsSender == 1);
+            Secret secret = new Secret(_secretBlob, BlobType.valueOfType(_secretBlobType), secretUser, _secretIsSender == 1);
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
             secret.setMissed(_isMissed == 1);
@@ -520,7 +521,7 @@ public class SenzorsDbSource {
 //                "GROUP BY user ORDER BY timestamp DESC";
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active " +
+        String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.blob_type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active " +
                 "FROM secret " +
                 "INNER JOIN user " +
                 "ON user.username = secret.user GROUP BY user.username ORDER BY timestamp DESC";
@@ -530,7 +531,7 @@ public class SenzorsDbSource {
         // secret attr
         String _userID;
         String _secretBlob;
-        String _secretBlobType;
+        int _secretBlobType;
         String _secretUser;
         Long _secretTimestamp;
         String _image;
@@ -542,7 +543,7 @@ public class SenzorsDbSource {
             // get secret attributes
             _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
-            _secretBlobType = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
+            _secretBlobType = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
             _secretUser = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_USER));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
@@ -555,7 +556,7 @@ public class SenzorsDbSource {
             secretUser.setImage(_image);
             secretUser.setActive(_isActive == 1);
 
-            Secret secret = new Secret(_secretBlob, _secretBlobType, secretUser, _secretIsSender == 1);
+            Secret secret = new Secret(_secretBlob, BlobType.valueOfType(_secretBlobType), secretUser, _secretIsSender == 1);
             secret.setTimeStamp(_secretTimestamp);
             // fill secret list
             secretList.add(secret);

@@ -25,6 +25,7 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
@@ -325,7 +326,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 txtSecret.setText("");
 
                 // create secret
-                Secret secret = new Secret(secretMsg, "TEXT", secretUser, false);
+                Secret secret = new Secret(secretMsg, BlobType.TEXT, secretUser, false);
                 Long timestamp = System.currentTimeMillis() / 1000;
                 secret.setTimeStamp(timestamp);
                 secret.setId(SenzUtils.getUid(this, timestamp.toString()));
@@ -470,9 +471,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
             Secret secret;
             if (senz.getAttributes().containsKey("cam")) {
-                secret = new Secret(senz.getAttributes().get("cam"), "IMAGE", secretUser, true);
+                secret = new Secret(senz.getAttributes().get("cam"), BlobType.IMAGE, secretUser, true);
             } else {
-                secret = new Secret(senz.getAttributes().get("mic"), "SOUND", secretUser, true);
+                secret = new Secret(senz.getAttributes().get("mic"), BlobType.SOUND, secretUser, true);
             }
             secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
             secret.setId(senz.getAttributes().get("uid"));
@@ -501,7 +502,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 if (senz.getAttributes().containsKey("msg")) {
                     String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
-                    Secret secret = new Secret(msg, "TEXT", secretUser, true);
+                    Secret secret = new Secret(msg, BlobType.TEXT, secretUser, true);
                     secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
                     secret.setId(senz.getAttributes().get("uid"));
                     secret.setDeliveryState(DeliveryState.PENDING);

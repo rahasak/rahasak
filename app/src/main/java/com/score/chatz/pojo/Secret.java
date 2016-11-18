@@ -1,5 +1,6 @@
 package com.score.chatz.pojo;
 
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
 
 /**
@@ -8,8 +9,8 @@ import com.score.chatz.enums.DeliveryState;
 public class Secret {
     private String id;
     private String blob;
+    private BlobType blobType;
     private SecretUser user;
-    private String type;
     private boolean isViewed;
     private boolean isMissed;
     private Long timeStamp;
@@ -17,10 +18,10 @@ public class Secret {
     private boolean isSender;
     private DeliveryState deliveryState;
 
-    public Secret(String blob, String type, SecretUser user, boolean isSender) {
+    public Secret(String blob, BlobType blobType, SecretUser user, boolean isSender) {
         this.blob = blob;
+        this.blobType = blobType;
         this.user = user;
-        this.type = type;
         this.isSender = isSender;
     }
 
@@ -40,20 +41,20 @@ public class Secret {
         this.blob = blob;
     }
 
+    public BlobType getBlobType() {
+        return blobType;
+    }
+
+    public void setBlobType(BlobType blobType) {
+        this.blobType = blobType;
+    }
+
     public SecretUser getUser() {
         return user;
     }
 
     public void setUser(SecretUser user) {
         this.user = user;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public boolean isViewed() {

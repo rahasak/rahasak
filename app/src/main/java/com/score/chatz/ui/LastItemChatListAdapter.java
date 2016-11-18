@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.TimeUtils;
@@ -90,15 +91,15 @@ public class LastItemChatListAdapter extends BaseAdapter {
     private void setUpRow(Secret secret, ViewHolder viewHolder) {
         viewHolder.sender.setText("@" + secret.getUser().getUsername());
 
-        if (secret.getType().equalsIgnoreCase("IMAGE")) {
+        if (secret.getBlobType() == BlobType.IMAGE) {
             if (secret.isMissed()) {
                 viewHolder.message.setText("Missed selfie");
             } else {
                 viewHolder.message.setText("Selfie secret");
             }
-        } else if (secret.getType().equalsIgnoreCase("SOUND")) {
+        } else if (secret.getBlobType() == BlobType.SOUND) {
             viewHolder.message.setText("Audio secret");
-        } else if (secret.getType().equalsIgnoreCase("TEXT")) {
+        } else if (secret.getBlobType() == BlobType.TEXT) {
             viewHolder.message.setText(secret.getBlob());
         }
 

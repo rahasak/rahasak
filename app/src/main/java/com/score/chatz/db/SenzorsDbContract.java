@@ -20,8 +20,8 @@ class SenzorsDbContract {
         static final String COLUMN_NAME_USER = "user";
         // TODO change this to my_secret
         static final String COLUMN_NAME_IS_SENDER = "is_sender";
-        static final String COLUMN_BLOB_TYPE = "type";
         static final String COLUMN_NAME_BLOB = "blob";
+        static final String COLUMN_BLOB_TYPE = "blob_type";
         static final String COLUMN_NAME_VIEWED = "viewed";
         static final String COLUMN_NAME_VIEWED_TIMESTAMP = "view_timestamp";
         static final String COLUMN_NAME_MISSED = "missed";
