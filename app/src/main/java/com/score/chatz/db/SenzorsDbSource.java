@@ -287,7 +287,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, secret.isViewed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_MISSED, secret.isMissed() ? 1 : 0);
-        values.put(SenzorsDbContract.Secret.DELIVERY_STATE, 0);
+        values.put(SenzorsDbContract.Secret.DELIVERY_STATE, secret.getDeliveryState().getState());
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);

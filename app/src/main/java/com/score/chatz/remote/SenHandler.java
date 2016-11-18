@@ -269,6 +269,7 @@ class SenHandler {
         secret.setId(uid);
         secret.setTimeStamp(timestamp);
         secret.setMissed(false);
+        secret.setDeliveryState(DeliveryState.NONE);
 
         // save secret async
         new Thread(new Runnable() {
