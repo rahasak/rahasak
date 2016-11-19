@@ -82,7 +82,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final int pos = position;
         if (friendsList.get(position).isActive()) {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
             intent.putExtra("SENDER", friendsList.get(position).getUsername());
@@ -92,7 +91,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                 @Override
                 public void onClick(View v) {
                     ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                    ((HomeActivity) getActivity()).addUser(friendsList.get(pos).getUsername(), friendsList.get(pos).getPhone(), friendsList.get(pos).getUid());
+                    //((HomeActivity) getActivity()).addUser(friendsList.get(pos).getUsername(), friendsList.get(pos).getPhone(), friendsList.get(pos).getUid());
                 }
             });
         }

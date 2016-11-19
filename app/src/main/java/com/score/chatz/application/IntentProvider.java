@@ -83,10 +83,14 @@ public class IntentProvider {
             case SENZ:
                 return "com.score.chatz.SENZ";
             case TIMEOUT:
-                // Depressing!! That #$%! is not online!! :)
+                // depressing!! That #$%! is not online!! :)
                 return "com.score.chatz.TIMEOUT";
             case ADD_USER:
                 return "com.score.chatz.ADD_USER";
+            case SMS_REQUEST_ACCEPT:
+                return "com.score.chatz.SMS_REQUEST_ACCEPT";
+            case SMS_REQUEST_REJECT:
+                return "com.score.chatz.SMS_REQUEST_REJECT";
             default:
                 throw new InvalidIntentType();
         }
@@ -103,6 +107,6 @@ public class IntentProvider {
     }
 
     public enum INTENT_TYPE {
-        SENZ, TIMEOUT, ADD_USER
+        SENZ, TIMEOUT, ADD_USER, SMS_REQUEST_ACCEPT, SMS_REQUEST_REJECT, SMS_REQUEST_CONFIRM
     }
 }

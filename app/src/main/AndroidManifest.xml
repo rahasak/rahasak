@@ -63,12 +63,12 @@
         <!-- production key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />
+            android:value="AIzaSyDnmMtrhhkeIeNjXQTkSE1cPcwEPfufnVM" />
 
         <!-- debug key -->
         <!-- <meta-data -->
         <!-- android:name="com.google.android.maps.v2.API_KEY" -->
-        <!-- android:value="AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s" /> -->
+        <!-- android:value="AIzaSyDnmMtrhhkeIeNjXQTkSE1cPcwEPfufnVM" /> -->
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -162,8 +162,6 @@
             <intent-filter android:priority="1000">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
-        </receiver>
-        <receiver android:name=".receivers.NotificationActionReceiver">
         </receiver>
     </application>
 

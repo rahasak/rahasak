@@ -10,11 +10,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.score.chatz.R;
-import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzApplication;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
-import com.score.chatz.receivers.NotificationActionReceiver;
 import com.score.chatz.ui.ChatActivity;
 import com.score.chatz.ui.HomeActivity;
 import com.score.chatz.utils.NotificationUtils;
@@ -60,11 +58,15 @@ public class SenzNotificationManager {
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
             }
-        }else if (senzNotification.getNotificationType() == NotificationType.NEW_SMS_ADD_FRIEND) {
-                Notification notification = getSmsNotification(senzNotification);
-                notification.flags |= Notification.FLAG_AUTO_CANCEL;
-                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(NotificationUtils.getNotificationIdForSMS(), notification);
+        } else if (senzNotification.getNotificationType() == NotificationType.SMS_REQUEST) {
+            // SMS request
+            Notification notification = getSmsNotification(senzNotification);
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NotificationUtils.SMS_REQUEST_NOTIFICATION_ID, notification);
+        } else if (senzNotification.getNotificationType() == NotificationType.SMS_CONFIRM) {
+            // SMS confirm
+
         }
     }
 
@@ -75,7 +77,6 @@ public class SenzNotificationManager {
      * @return notification
      */
     private Notification getNotification(SenzNotification senzNotification) {
-
         // set up pending intent
         Intent intent;
         if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
@@ -105,39 +106,22 @@ public class SenzNotificationManager {
     }
 
     private Notification getSmsNotification(SenzNotification senzNotification) {
-
-        // 1. Sending intent to Custom Receiver is aways with an empty bundle, android reuse itents issue
-        // Setup pending intent for accept action
-        /*Intent acceptIntent = new Intent(context, NotificationActionReceiver.class);
-        acceptIntent.putExtra("NOTIFICATION_ACCEPT", "NOTIFICATION_ACCEPT");
-        acceptIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationId());
-        PendingIntent smsAcceptIntent = PendingIntent.getBroadcast(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);*/
-
-        //2. Sending itent striaght to service did't fire when app was killed, thus not reliable
-        /*Intent acceptIntent = IntentProvider.getAddUserIntent();
-        acceptIntent.putExtra("USERNAME_TO_ADD", senzNotification.getSender());
-        acceptIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationId());
-        PendingIntent smsAcceptIntent = PendingIntent.getBroadcast(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);*/
-
-        //3. Most reliable way to send extra is to an activity!!!
-        Intent acceptIntent = new Intent(context, HomeActivity.class);
-        acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        acceptIntent.putExtra("NOTIFICATION_ACCEPT", "NOTIFICATION_ACCEPT");
-        acceptIntent.putExtra("SENDER_PHONE_NUMBER", senzNotification.getSenderPhone());
-        acceptIntent.putExtra("USERNAME_TO_ADD", senzNotification.getSender());
-        acceptIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationIdForSMS());
-        acceptIntent.putExtra("SENDER_UID", senzNotification.getUid());
+        // accept
+        Intent acceptIntent = new Intent();
+        acceptIntent.setAction("com.score.chatz.SMS_REQUEST_ACCEPT");
+        acceptIntent.putExtra("PHONE", senzNotification.getSenderPhone());
+        acceptIntent.putExtra("USERNAME", senzNotification.getSender());
+        acceptIntent.putExtra("UID", senzNotification.getUid());
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent smsAcceptIntent = PendingIntent.getActivity(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Setup pending intent for dismiss action
-        Intent dismissIntent = new Intent(context, NotificationActionReceiver.class);
-        dismissIntent.putExtra("NOTIFICATION_DISMISS", "NOTIFICATION_DISMISS");
-        dismissIntent.putExtra("NOTIFICATION_ID", NotificationUtils.getNotificationIdForSMS());
-        dismissIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        Intent cancelIntent = new Intent();
+        cancelIntent.setAction("com.score.chatz.SMS_REQUEST_REJECT");
+        cancelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent smsDismissIntent = PendingIntent.getBroadcast(context, 0, dismissIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // build notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -147,8 +131,8 @@ public class SenzNotificationManager {
                 .setContentText(senzNotification.getMessage())
                 .setSmallIcon(senzNotification.getIcon())
                 .setWhen(System.currentTimeMillis())
-                .addAction(R.drawable.reject, "Reject", smsDismissIntent)
-                .addAction(R.drawable.accept, "Accept", smsAcceptIntent);
+                .addAction(R.drawable.accept, "Accept", acceptPendingIntent)
+                .addAction(R.drawable.reject, "Reject", cancelPendingIntent);
 
         Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
         builder.setSound(sound);

@@ -9,18 +9,11 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.os.Build;
+import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.os.Bundle;
-
-import com.score.chatz.R;
-import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.utils.ActivityUtils;
-import com.score.chatz.utils.PhoneUtils;
-import com.score.chatz.utils.PreferenceUtils;
-
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.text.Editable;
@@ -28,11 +21,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.provider.ContactsContract;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import com.score.chatz.R;
+import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.PreferenceUtils;
 
 public class ContactsListActivity extends BaseActivity implements
         LoaderManager.LoaderCallbacks<Cursor>,
@@ -217,7 +213,7 @@ public class ContactsListActivity extends BaseActivity implements
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendSMS(finalMobileNumber, "#Rahasak\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username);
+                        sendSMS(finalMobileNumber, "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username);
                     }
                 });
             } catch (NoUserException ex) {
@@ -257,11 +253,8 @@ public class ContactsListActivity extends BaseActivity implements
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
 
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
-                new Intent(SENT), 0);
-
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
-                new Intent(DELIVERED), 0);
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
 
         //---when the SMS has been sent---
         registerReceiver(new BroadcastReceiver() {

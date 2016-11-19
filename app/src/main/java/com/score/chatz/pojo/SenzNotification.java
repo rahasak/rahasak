@@ -4,13 +4,13 @@ import com.score.chatz.enums.NotificationType;
 
 public class SenzNotification {
 
-    int icon;
-    String uid;
-    String title;
-    String message;
-    String sender;
-    String senderPhone;
-    NotificationType notificationType;
+    private int icon;
+    private String uid;
+    private String title;
+    private String message;
+    private String sender;
+    private String senderPhone;
+    private NotificationType notificationType;
 
     public SenzNotification(int icon, String title, String message, String sender, NotificationType notificationType) {
         this.icon = icon;
