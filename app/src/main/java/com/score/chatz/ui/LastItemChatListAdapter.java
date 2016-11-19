@@ -16,6 +16,7 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.enums.BlobType;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class LastItemChatListAdapter extends BaseAdapter {
     }
 
     private void setUpRow(Secret secret, ViewHolder viewHolder) {
-        viewHolder.sender.setText("@" + secret.getUser().getUsername());
+        viewHolder.sender.setText(PhoneUtils.getDisplayNameFromNumber(secret.getUser().getPhone(), context) + "-@" + secret.getUser().getUsername());
 
         if (secret.getBlobType() == BlobType.IMAGE) {
             if (secret.isMissed()) {

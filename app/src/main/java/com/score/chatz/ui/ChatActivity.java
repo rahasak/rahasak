@@ -34,6 +34,7 @@ import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -264,7 +265,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         TextView header = ((TextView) findViewById(R.id.user_name));
         header.setTypeface(typeface, Typeface.BOLD);
-        header.setText("@" + secretUser.getUsername());
+        header.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getBaseContext()) +"-@" + secretUser.getUsername());
 
         btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
         btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_profile_image);
