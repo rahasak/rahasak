@@ -377,60 +377,9 @@ public class SenzService extends Service {
 
     //---sends an SMS message to another device---
     private void sendSMS(String phoneNumber, String message) {
-        String SENT = "SMS_SENT";
-        String DELIVERED = "SMS_DELIVERED";
-
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
-
-        //---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        ActivityUtils.showCustomToastShort("SMS sent", getBaseContext());
-                        break;
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Log.e(TAG, "Generic failure");
-                        break;
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        Log.e(TAG, "No service");
-                        break;
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Log.e(TAG, "Null PDU");
-                        break;
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Log.e(TAG, "Radio off");
-                        break;
-                }
-                ActivityUtils.cancelProgressDialog();
-                unregisterReceiver(this);
-            }
-        }, new IntentFilter(SENT));
-
-        //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode()) {
-                    case Activity.RESULT_OK:
-                        ActivityUtils.showCustomToastShort("SMS delivered",
-                                getBaseContext());
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        ActivityUtils.showCustomToastShort("SMS not delivered",
-                                getBaseContext());
-                        break;
-                }
-                ActivityUtils.cancelProgressDialog();
-                unregisterReceiver(this);
-            }
-        }, new IntentFilter(DELIVERED));
-
         SmsManager sms = SmsManager.getDefault();
         Log.i(TAG, "SMS Body -> " + message);
-        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+        sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
 }

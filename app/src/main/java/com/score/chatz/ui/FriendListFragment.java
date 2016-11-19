@@ -86,12 +86,20 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
             intent.putExtra("SENDER", friendsList.get(position).getUsername());
             startActivity(intent);
-        } else {
-            ActivityUtils.displayConfirmationMessageDialog("Confirm User", "Would you like to add this user(" + new PhoneUtils().getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity()) + ") to your friends list?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
+        } else if (friendsList.get(position).isSMSRequester()) {
+            ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to resend friend request to " + new PhoneUtils().getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity()) + "?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                    //((HomeActivity) getActivity()).addUser(friendsList.get(pos).getUsername(), friendsList.get(pos).getPhone(), friendsList.get(pos).getUid());
+                    // Start sharing again
+
+                }
+            });
+        } else if (!friendsList.get(position).isSMSRequester()) {
+            ActivityUtils.displayConfirmationMessageDialog("Confirm", "Response taking too long? Would you like to retry?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Start getting public key and sending confirmation sms
+
                 }
             });
         }
