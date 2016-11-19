@@ -69,7 +69,7 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private String getUsernameFromSms(String smsMessage) {
-        final Pattern pattern = Pattern.compile("#username\\s(.*)\\s");
+        final Pattern pattern = Pattern.compile("#username\\s(\\S*)\\s");
         final Matcher matcher = pattern.matcher(smsMessage);
         matcher.find();
         return matcher.group(1);

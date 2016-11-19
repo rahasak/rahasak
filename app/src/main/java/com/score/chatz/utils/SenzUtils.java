@@ -41,10 +41,10 @@ public class SenzUtils {
         HashMap<String, String> senzAttributes = new HashMap<>();
 
         Long timestamp = System.currentTimeMillis() / 1000;
-        senzAttributes.put("pubkey", "");
         senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("uid", getUid(context, timestamp.toString()));
-        senzAttributes.put("user", user);
+        senzAttributes.put("pubkey", "");
+        senzAttributes.put("name", user);
 
         // new senz object
         Senz senz = new Senz();
