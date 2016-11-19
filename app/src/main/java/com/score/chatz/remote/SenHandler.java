@@ -12,7 +12,9 @@ import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NotificationUtils;
+import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -21,6 +23,7 @@ import com.score.senzc.pojos.User;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 class SenHandler {
@@ -67,11 +70,17 @@ class SenHandler {
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
             try {
                 // create user
-                SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
-                dbSource.createSecretUser(secretUser);
+                String username = senz.getSender().getUsername();
+                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
+                    String sessionKey = senz.getAttributes().get("skey");
+                    dbSource.updateSecretUser(username, "session_key", sessionKey);
+                } else {
+                    SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
+                    dbSource.createSecretUser(secretUser);
+                }
 
                 // activate user
-                dbSource.activateSecretUser(secretUser.getUsername(), true);
+                dbSource.activateSecretUser(username, true);
 
                 // show notification to current user
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
@@ -189,6 +198,20 @@ class SenHandler {
 
             // update pubkey on db
             dbSource.updateSecretUser(username, "pubkey", pubKey);
+
+            // Check if this user is the requester
+            SecretUser secretUser = dbSource.getSecretUser(username);
+            if (secretUser.isSMSRequester()) {
+                try {
+                    // create session key for this user
+                    String sessionKey = RSAUtils.getSessionKey();
+                    dbSource.updateSecretUser(username, "session_key", sessionKey);
+
+                    senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), senz.getSender().getUsername(), sessionKey));
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -300,5 +323,4 @@ class SenHandler {
             }).start();
         }
     }
-
 }

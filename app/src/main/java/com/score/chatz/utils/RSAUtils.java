@@ -129,7 +129,7 @@ public class RSAUtils {
         return new String(cipher.doFinal(data));
     }
 
-    public static String getEncodedKey() throws NoSuchAlgorithmException {
+    public static String getSessionKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(SESSION_KEY_SIZE);
         SecretKey secretKey = keyGenerator.generateKey();

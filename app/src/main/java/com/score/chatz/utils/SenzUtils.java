@@ -7,6 +7,7 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 /**
@@ -102,4 +103,26 @@ public class SenzUtils {
         return false;
     }
 
+    public static Senz getShareSenz(Context context, String username, String sessionKey) throws NoSuchAlgorithmException {
+        // create senz attributes
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("msg", "");
+        senzAttributes.put("status", "");
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(context, timestamp.toString()));
+
+        // put session key
+        senzAttributes.put("skey", sessionKey);
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+        User receiver = new User("", username);
+        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+        // send to service
+        return senz;
+    }
 }
