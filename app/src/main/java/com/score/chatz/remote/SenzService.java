@@ -1,5 +1,7 @@
 package com.score.chatz.remote;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,10 +12,12 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.telephony.SmsManager;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PreferenceUtils;
@@ -91,13 +95,21 @@ public class SenzService extends Service {
 
             String username = intent.getStringExtra("USERNAME").trim();
             String phone = intent.getStringExtra("PHONE").trim();
-            String uid = intent.getStringExtra("UID").trim();
 
             if (!SenzUtils.isCurrentUser(username, SenzService.this)) {
-                shareWithPhoneNumber(username, uid);
+                // send confirm sms first
+                sendSMS(phone, "#Rahasak #confirm\nHi, I have confirmed your request. #username " + username + " #code 31e3e");
+
+                // get pub key
+                requestPubKey(username);
             }
         }
     };
+
+    private void requestPubKey(String username) {
+        Senz senz = SenzUtils.getPubkeySenz(this, username);
+        writeSenz(senz);
+    }
 
     /**
      * Share current sensor
@@ -377,6 +389,64 @@ public class SenzService extends Service {
                 initSenzComm();
             }
         }
+    }
+
+    //---sends an SMS message to another device---
+    private void sendSMS(String phoneNumber, String message) {
+        String SENT = "SMS_SENT";
+        String DELIVERED = "SMS_DELIVERED";
+
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+
+        //---when the SMS has been sent---
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode()) {
+                    case Activity.RESULT_OK:
+                        ActivityUtils.showCustomToastShort("SMS sent", getBaseContext());
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        Log.e(TAG, "Generic failure");
+                        break;
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                        Log.e(TAG, "No service");
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        Log.e(TAG, "Null PDU");
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        Log.e(TAG, "Radio off");
+                        break;
+                }
+                ActivityUtils.cancelProgressDialog();
+                unregisterReceiver(this);
+            }
+        }, new IntentFilter(SENT));
+
+        //---when the SMS has been delivered---
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode()) {
+                    case Activity.RESULT_OK:
+                        ActivityUtils.showCustomToastShort("SMS delivered",
+                                getBaseContext());
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        ActivityUtils.showCustomToastShort("SMS not delivered",
+                                getBaseContext());
+                        break;
+                }
+                ActivityUtils.cancelProgressDialog();
+                unregisterReceiver(this);
+            }
+        }, new IntentFilter(DELIVERED));
+
+        SmsManager sms = SmsManager.getDefault();
+        Log.i(TAG, "SMS Body -> " + message);
+        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
     }
 
 }

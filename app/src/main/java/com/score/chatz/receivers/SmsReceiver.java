@@ -37,24 +37,17 @@ public class SmsReceiver extends BroadcastReceiver {
                         String format = bundle.getString("format");
                         smsMessage = SmsMessage.createFromPdu((byte[]) pdus[0], format);
                     } else {
-                        //This method was deprecated in API level 23.
+                        // this method was deprecated in API level 23.
                         smsMessage = SmsMessage.createFromPdu((byte[]) pdus[0]);
                     }
 
-                    String msg_phone_number = smsMessage.getOriginatingAddress();
-                    String msg_sender = new PhoneUtils().getDisplayNameFromNumber(msg_phone_number, context);
-                    String msg_body = smsMessage.getMessageBody();
-
-                    if (isMessageFromRahasakApp(msg_body)) {
-                        //Valid message
-                        if (isMessageConfirm(msg_body)) {
-                            initFriendConfirmation();
-                        } else if (isMessageRequest(msg_body)) {
-                            initFriendRequest(getUsernameFromSms(msg_body), msg_sender == null ? msg_phone_number : msg_sender, msg_phone_number, context);
+                    if (isMessageFromRahasakApp(smsMessage.getMessageBody())) {
+                        // valid message
+                        if (isMessageConfirm(smsMessage.getMessageBody())) {
+                            initFriendConfirmation(smsMessage);
+                        } else if (isMessageRequest(smsMessage.getMessageBody())) {
+                            initFriendRequest(smsMessage, context);
                         }
-                    } else {
-                        //Not from rahasak, ignore
-                        return;
                     }
                 } catch (Exception e) {
                     Log.d("Exception caught", e.getMessage());
@@ -82,18 +75,31 @@ public class SmsReceiver extends BroadcastReceiver {
         return matcher.group(1);
     }
 
-    private void initFriendRequest(String username, String contactName, String contactPhone, Context context) {
+    private String getKeyHashFromSms(String smsMessage) {
+        final Pattern pattern = Pattern.compile("#code\\s(.*)$");
+        final Matcher matcher = pattern.matcher(smsMessage);
+        matcher.find();
+        return matcher.group(1);
+    }
+
+    private void initFriendRequest(SmsMessage smsMessage, Context context) {
+        String contactNo = smsMessage.getOriginatingAddress();
+        String contactName = PhoneUtils.getDisplayNameFromNumber(contactNo, context);
+        String username = getUsernameFromSms(smsMessage.getMessageBody());
+        String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
+
         // Generate uid
         Long timestamp = (System.currentTimeMillis() / 1000);
         String uid = SenzUtils.getUid(context, timestamp.toString());
 
         // chow Notification
-        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactPhone, uid, username));
+        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, uid, username));
         SenzorsDbSource dbSource = new SenzorsDbSource(context);
         try {
             // create user
             SecretUser secretUser = new SecretUser("id", username);
-            secretUser.setPhone(contactPhone);
+            secretUser.setPhone(contactNo);
+            secretUser.setPubKeyHash(pubKeyHash);
             secretUser.setUid(uid);
             dbSource.createSecretUser(secretUser);
 
@@ -107,7 +113,13 @@ public class SmsReceiver extends BroadcastReceiver {
         }
     }
 
-    private void initFriendConfirmation() {
+    private void initFriendConfirmation(SmsMessage smsMessage) {
+        String contactNo = smsMessage.getOriginatingAddress();
+        String username = getUsernameFromSms(smsMessage.getMessageBody());
+        String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
+        // TODO update secret user
+
+        // TODO request pub key
     }
 }

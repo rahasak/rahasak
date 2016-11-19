@@ -213,7 +213,8 @@ public class ContactsListActivity extends BaseActivity implements
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendSMS(finalMobileNumber, "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username);
+                        String message = "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username + " #code 41r33";
+                        sendSMS(finalMobileNumber, message);
                     }
                 });
             } catch (NoUserException ex) {

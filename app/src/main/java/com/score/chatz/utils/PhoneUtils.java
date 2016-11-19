@@ -10,8 +10,7 @@ import android.provider.ContactsContract;
  */
 
 public class PhoneUtils {
-
-    public String getDisplayNameFromNumber(String phoneNumber, Context context) {
+    public static String getDisplayNameFromNumber(String phoneNumber, Context context) {
         String displayName = phoneNumber;
         //Resolving the contact name from the contacts.
         Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
@@ -24,6 +23,7 @@ public class PhoneUtils {
         } finally {
             c.close();
         }
+
         return displayName;
     }
 }
