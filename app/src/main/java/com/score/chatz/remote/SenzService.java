@@ -83,7 +83,7 @@ public class SenzService extends Service {
         }
     };
 
-    // broadcst receiver to automatically add user when received
+    // broadcast receiver to automatically add user when received
     private BroadcastReceiver addUserReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

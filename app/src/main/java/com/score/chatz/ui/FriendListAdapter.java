@@ -110,8 +110,10 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         } else {
             viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_deactive, null));
         }
+
         viewHolder.userImageView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.default_user, null));
-        //Extracting user image
+
+        // extracting user image
         if (secretUser.getImage() != null) {
             loadBitmap(secretUser.getImage(), viewHolder.userImageView);
         }

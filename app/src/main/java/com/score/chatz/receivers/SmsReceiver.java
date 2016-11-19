@@ -73,7 +73,6 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private void initAddUserFromSms(String username, String contactName, String contactPhone, Context context) {
-
         // Generate uid
         Long timestamp = (System.currentTimeMillis() / 1000);
         String uid = SenzUtils.getUid(context, timestamp.toString());

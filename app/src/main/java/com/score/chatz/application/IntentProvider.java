@@ -79,22 +79,17 @@ public class IntentProvider {
      * @return
      */
     private static String getIntentType(INTENT_TYPE intentType) throws InvalidIntentType {
-        String intentString = null;
         switch (intentType) {
             case SENZ:
-                intentString = "com.score.chatz.SENZ";
-                break;
+                return "com.score.chatz.SENZ";
             case TIMEOUT:
                 // Depressing!! That #$%! is not online!! :)
-                intentString = "com.score.chatz.TIMEOUT";
-                break;
+                return "com.score.chatz.TIMEOUT";
             case ADD_USER:
-                intentString = "com.score.chatz.ADD_USER";
-                break;
+                return "com.score.chatz.ADD_USER";
             default:
                 throw new InvalidIntentType();
         }
-        return intentString;
     }
 
     /**
