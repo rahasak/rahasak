@@ -111,7 +111,6 @@ public class SenzNotificationManager {
         acceptIntent.setAction("com.score.chatz.SMS_REQUEST_ACCEPT");
         acceptIntent.putExtra("PHONE", senzNotification.getSenderPhone());
         acceptIntent.putExtra("USERNAME", senzNotification.getSender());
-        acceptIntent.putExtra("UID", senzNotification.getUid());
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);

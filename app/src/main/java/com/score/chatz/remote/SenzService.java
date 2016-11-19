@@ -100,9 +100,19 @@ public class SenzService extends Service {
                 // send confirm sms first
                 sendSMS(phone, "#Rahasak #confirm\nHi, I have confirmed your request. #username " + username + " #code 31e3e");
 
-                // get pub key
+                // get pubkey
                 requestPubKey(username);
             }
+        }
+    };
+
+    private BroadcastReceiver smsRequestConfirmReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String username = intent.getStringExtra("USERNAME").trim();
+
+            // get pubkey
+            requestPubKey(username);
         }
     };
 
@@ -205,12 +215,14 @@ public class SenzService extends Service {
         networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, networkFilter);
         registerReceiver(smsRequestAcceptReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_REQUEST_ACCEPT));
+        registerReceiver(smsRequestConfirmReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_REQUEST_CONFIRM));
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
         unregisterReceiver(smsRequestAcceptReceiver);
+        unregisterReceiver(smsRequestConfirmReceiver);
     }
 
     private void initSenzComm() {

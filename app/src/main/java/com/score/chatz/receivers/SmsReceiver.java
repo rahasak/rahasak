@@ -13,7 +13,6 @@ import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.remote.SenzNotificationManager;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PhoneUtils;
-import com.score.chatz.utils.SenzUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +43,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     if (isMessageFromRahasakApp(smsMessage.getMessageBody())) {
                         // valid message
                         if (isMessageConfirm(smsMessage.getMessageBody())) {
-                            initFriendConfirmation(smsMessage);
+                            initFriendConfirmation(smsMessage, context);
                         } else if (isMessageRequest(smsMessage.getMessageBody())) {
                             initFriendRequest(smsMessage, context);
                         }
@@ -88,38 +87,46 @@ public class SmsReceiver extends BroadcastReceiver {
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
-        // Generate uid
-        Long timestamp = (System.currentTimeMillis() / 1000);
-        String uid = SenzUtils.getUid(context, timestamp.toString());
-
         // chow Notification
-        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, uid, username));
+        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, username));
         SenzorsDbSource dbSource = new SenzorsDbSource(context);
         try {
             // create user
             SecretUser secretUser = new SecretUser("id", username);
             secretUser.setPhone(contactNo);
             secretUser.setPubKeyHash(pubKeyHash);
-            secretUser.setUid(uid);
             dbSource.createSecretUser(secretUser);
 
-            // Sent local intent to update view
-            Intent intent = new Intent("com.score.chatz.SENZ");
-            intent.putExtra("UPDATE_UI_ON_NEW_ADDED_USER", "UPDATE_UI_ON_NEW_ADDED_USER");
-            context.sendBroadcast(intent);
+            // TODO broadcast
         } catch (Exception ex) {
             // user exists
             ex.printStackTrace();
         }
     }
 
-    private void initFriendConfirmation(SmsMessage smsMessage) {
+    private void initFriendConfirmation(SmsMessage smsMessage, Context context) {
         String contactNo = smsMessage.getOriginatingAddress();
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
-        // TODO update secret user
+        // create secret user
+        SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        try {
+            // create user
+            SecretUser secretUser = new SecretUser("id", username);
+            secretUser.setPhone(contactNo);
+            secretUser.setPubKeyHash(pubKeyHash);
+            dbSource.createSecretUser(secretUser);
 
-        // TODO request pub key
+            // broadcast
+            Intent intent = new Intent();
+            intent.setAction("com.score.chatz.SMS_REQUEST_CONFIRM");
+            intent.putExtra("PHONE", username);
+            intent.putExtra("USERNAME", contactNo);
+            context.sendBroadcast(intent);
+        } catch (Exception ex) {
+            // user exists
+            ex.printStackTrace();
+        }
     }
 }

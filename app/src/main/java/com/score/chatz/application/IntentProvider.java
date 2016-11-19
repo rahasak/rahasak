@@ -91,6 +91,8 @@ public class IntentProvider {
                 return "com.score.chatz.SMS_REQUEST_ACCEPT";
             case SMS_REQUEST_REJECT:
                 return "com.score.chatz.SMS_REQUEST_REJECT";
+            case SMS_REQUEST_CONFIRM:
+                return "com.score.chatz.SMS_REQUEST_CONFIRM";
             default:
                 throw new InvalidIntentType();
         }

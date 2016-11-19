@@ -49,11 +49,14 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_SECRET);
     }
 
-    public static SenzNotification getSmsNotification(String contactName, String contactPhone, String senderUid, String rahasakUsername) {
+    public static SenzNotification getSmsNotification(String contactName, String contactPhone, String rahasakUsername) {
         String msg = "Would you like share secrets?";
         String title = contactName + " (@" + rahasakUsername + ")";
 
-        return new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, contactPhone, senderUid, NotificationType.SMS_REQUEST);
+        SenzNotification senzNotification = new SenzNotification(R.drawable.notification_icon, title, msg, rahasakUsername, NotificationType.SMS_REQUEST);
+        senzNotification.setSenderPhone(contactPhone);
+
+        return senzNotification;
     }
 
     // Remove notification from tray

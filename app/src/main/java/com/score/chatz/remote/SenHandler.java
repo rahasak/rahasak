@@ -182,6 +182,13 @@ class SenHandler {
         } else if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
             // location, broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
+        } else if (senz.getAttributes().containsKey("pubkey")) {
+            // pubkey from switch
+            String username = senz.getAttributes().get("name");
+            String pubKey = senz.getAttributes().get("pubkey");
+
+            // update pubkey on db
+            dbSource.updateSecretUser(username, "pubkey", pubKey);
         }
     }
 
