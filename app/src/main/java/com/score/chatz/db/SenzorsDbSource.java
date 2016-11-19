@@ -60,6 +60,8 @@ public class SenzorsDbSource {
         // content values to inset
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, secretUser.getUsername());
+        if (secretUser.getSessionKey() != null)
+            values.put(SenzorsDbContract.User.COLUMN_NAME_SESSION_KEY, secretUser.getSessionKey());
         if (secretUser.getPhone() != null)
             values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, secretUser.getPhone());
         if (secretUser.getPubKey() != null && secretUser.getPubKey().isEmpty())
@@ -71,6 +73,7 @@ public class SenzorsDbSource {
         if (secretUser.getUid() != null)
             values.put(SenzorsDbContract.User.COLUMN_UNIQUE_ID, secretUser.getUid());
         values.put(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE, secretUser.isActive() ? 1 : 0);
+        values.put(SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER, secretUser.isSMSRequester() ? 1 : 0);
         values.put(SenzorsDbContract.User.COLUMN_NAME_GIVEN_PERM, givenPermId);
         values.put(SenzorsDbContract.User.COLUMN_NAME_RECV_PERM, recvPermId);
 
@@ -92,6 +95,8 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH, value);
         } else if (key.equalsIgnoreCase("image")) {
             values.put(SenzorsDbContract.User.COLUMN_NAME_IMAGE, value);
+        } else if (key.equalsIgnoreCase("session_key")) {
+            values.put(SenzorsDbContract.User.COLUMN_NAME_SESSION_KEY, value);
         }
 
         // update
@@ -134,10 +139,12 @@ public class SenzorsDbSource {
             String _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             String _pubKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY));
             String _pubKeyHash = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PUBKEY_HASH));
-            int _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
             String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
             String _givenPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_GIVEN_PERM));
             String _recvPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_RECV_PERM));
+            String _sessionKey = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_SESSION_KEY));
+            int _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
+            int _isSmsRequester = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER));
 
             Permission givenPerm = getPermission(_givenPermId);
             Permission recvPerm = getPermission(_recvPermId);
@@ -153,6 +160,8 @@ public class SenzorsDbSource {
             secretUser.setActive(_isActive == 1);
             secretUser.setGivenPermission(givenPerm);
             secretUser.setRecvPermission(recvPerm);
+            secretUser.setSMSRequester(_isSmsRequester == 1);
+            secretUser.setSessionKey(_sessionKey);
 
             return secretUser;
         }
