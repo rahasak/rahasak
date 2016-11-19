@@ -116,13 +116,14 @@ public class SmsReceiver extends BroadcastReceiver {
             SecretUser secretUser = new SecretUser("id", username);
             secretUser.setPhone(contactNo);
             secretUser.setPubKeyHash(pubKeyHash);
+            secretUser.setSMSRequester(true);
             dbSource.createSecretUser(secretUser);
 
             // broadcast
             Intent intent = new Intent();
             intent.setAction("com.score.chatz.SMS_REQUEST_CONFIRM");
-            intent.putExtra("PHONE", username);
-            intent.putExtra("USERNAME", contactNo);
+            intent.putExtra("USERNAME", username);
+            intent.putExtra("PHONE", contactNo);
             context.sendBroadcast(intent);
         } catch (Exception ex) {
             // user exists

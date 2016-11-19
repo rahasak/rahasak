@@ -25,9 +25,7 @@ import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,7 +40,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
 import java.util.List;
 
 public class SenzService extends Service {
@@ -93,15 +90,15 @@ public class SenzService extends Service {
         public void onReceive(Context context, Intent intent) {
             NotificationUtils.cancelNotification(NotificationUtils.SMS_REQUEST_NOTIFICATION_ID, SenzService.this);
 
-            String username = intent.getStringExtra("USERNAME").trim();
             String phone = intent.getStringExtra("PHONE").trim();
-
-            if (!SenzUtils.isCurrentUser(username, SenzService.this)) {
-                // send confirm sms first
-                sendSMS(phone, "#Rahasak #confirm\nHi, I have confirmed your request. #username " + username + " #code 31e3e");
+            String username = intent.getStringExtra("USERNAME").trim();
+            try {
+                sendSMS(phone, "#Rahasak #confirm\nHi, I have confirmed your request. #username " + PreferenceUtils.getUser(SenzService.this).getUsername() + " #code 31e3e");
 
                 // get pubkey
                 requestPubKey(username);
+            } catch (NoUserException e) {
+                e.printStackTrace();
             }
         }
     };
@@ -118,31 +115,6 @@ public class SenzService extends Service {
 
     private void requestPubKey(String username) {
         Senz senz = SenzUtils.getPubkeySenz(this, username);
-        writeSenz(senz);
-    }
-
-    /**
-     * Share current sensor
-     * Need to send share query to server via web socket
-     */
-    private void shareWithPhoneNumber(String username, String uid) {
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("msg", "");
-        senzAttributes.put("status", "");
-
-        Long timestamp = (System.currentTimeMillis() / 1000);
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("uid", uid);
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-        User receiver = new User("", username.trim());
-        Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
-
-        // send to service
         writeSenz(senz);
     }
 

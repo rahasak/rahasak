@@ -12,7 +12,6 @@ import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.pojo.Stream;
 import com.score.chatz.ui.PhotoActivity;
 import com.score.chatz.ui.RecordingActivity;
-import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
@@ -207,7 +206,7 @@ class SenHandler {
                     String sessionKey = RSAUtils.getSessionKey();
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
 
-                    senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), senz.getSender().getUsername(), sessionKey));
+                    senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), username, sessionKey));
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
