@@ -18,6 +18,14 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 /**
  * RSR encryption
  */
@@ -27,13 +35,14 @@ public class RSAUtils {
     public static final String PRIVATE_KEY = "PRIVATE_KEY";
 
     // size of RSA keys
-    public static final int KEY_SIZE = 1024;
+    private static final int RSA_KEY_SIZE = 1024;
+    private static final int SESSION_KEY_SIZE = 128;
 
     public static KeyPair initKeys(Context context) throws NoSuchProviderException, NoSuchAlgorithmException {
         // generate keypair
         KeyPairGenerator keyPairGenerator;
         keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
+        keyPairGenerator.initialize(RSA_KEY_SIZE, new SecureRandom());
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
         // save keys in shared preferences
@@ -102,6 +111,50 @@ public class RSAUtils {
         byte[] signedPayloadContent = Base64.decode(signedPayload, Base64.DEFAULT);
 
         return signature.verify(signedPayloadContent);
+    }
+
+    public static String encrypt(PublicKey publicKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        byte[] data = cipher.doFinal(payload.getBytes());
+        return Base64.encodeToString(data, Base64.DEFAULT);
+    }
+
+    public static String decrypt(PrivateKey privateKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+        byte[] data = Base64.decode(payload, Base64.DEFAULT);
+        return new String(cipher.doFinal(data));
+    }
+
+    public static String getEncodedKey() throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(SESSION_KEY_SIZE);
+        SecretKey secretKey = keyGenerator.generateKey();
+        return Base64.encodeToString(secretKey.getEncoded(), Base64.DEFAULT);
+    }
+
+    public static SecretKey getSecretKey(String encodedKey) {
+        byte[] key = Base64.decode(encodedKey, Base64.DEFAULT);
+        return new SecretKeySpec(key, 0, key.length, "AES");
+    }
+
+    public static String encrypt(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] data = cipher.doFinal(payload.getBytes());
+        return Base64.encodeToString(data, Base64.DEFAULT);
+    }
+
+    public static String decrypt(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        byte[] data = Base64.decode(payload, Base64.DEFAULT);
+        return new String(cipher.doFinal(data));
     }
 
 }

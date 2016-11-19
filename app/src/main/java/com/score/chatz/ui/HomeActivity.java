@@ -19,10 +19,13 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.RSAUtils;
 import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.SecretKey;
 
 /**
  * First Activity after Splash screen!!!
@@ -117,6 +120,34 @@ public class HomeActivity extends AppCompatActivity {
                 // Click action
                 Intent intent = new Intent(HomeActivity.this, AddUserActivity.class);
                 startActivity(intent);
+//                try {
+//                    String e = "eranga";
+//                    String en = RSAUtils.encrypt(RSAUtils.getPublicKey(HomeActivity.this), e).replaceAll("\n", "").replaceAll("\r", "");
+//                    String d = RSAUtils.decrypt(RSAUtils.getPrivateKey(HomeActivity.this), en);
+//
+//                    //System.out.println(en + "  ----");
+//                    //System.out.println(d + "  ----");
+//
+//                    String sessionKey = RSAUtils.getEncodedKey().replaceAll("\n", "".replaceAll("\n", ""));
+//                    String sKey = RSAUtils.encrypt(RSAUtils.getPublicKey(HomeActivity.this), sessionKey).replaceAll("\n", "").replaceAll("\r", "");
+//                    String origiKey = RSAUtils.decrypt(RSAUtils.getPrivateKey(HomeActivity.this), sKey);
+//
+//                    System.out.println(sessionKey + "  ----...");
+//                    System.out.println(sKey + "  ----..");
+//                    System.out.println(origiKey + "  ----..");
+//
+//                    SecretKey secretKey = RSAUtils.getSecretKey(origiKey);
+//                    String aesOrid = "lakmal";
+//                    String aesE = RSAUtils.encrypt(secretKey, aesOrid).replaceAll("\n", "").replaceAll("\r", "");
+//                    String aesOrig = RSAUtils.decrypt(secretKey, aesE).replaceAll("\n", "").replaceAll("\r", "");
+//
+//                    System.out.println("  ---------------- ");
+//                    System.out.println(aesOrid + "  ----..");
+//                    System.out.println(aesE + "  ----..");
+//                    System.out.println(aesOrig + "  ----..");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
         });
         fab.setVisibility(View.INVISIBLE);
