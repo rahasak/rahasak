@@ -44,6 +44,8 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + " UNIQUE NOT NULL" + "," +
+                    SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER + INT_TYPE + "," +
+                    SenzorsDbContract.User.COLUMN_NAME_SESSION_KEY + TEXT_TYPE + ", " +
                     SenzorsDbContract.User.COLUMN_UNIQUE_ID + TEXT_TYPE + ", " +
                     SenzorsDbContract.User.COLUMN_NAME_PHONE + TEXT_TYPE + "," +
                     SenzorsDbContract.User.COLUMN_NAME_PUBKEY + TEXT_TYPE + "," +

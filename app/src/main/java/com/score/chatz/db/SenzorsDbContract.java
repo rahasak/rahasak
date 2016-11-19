@@ -33,6 +33,8 @@ class SenzorsDbContract {
         static final String TABLE_NAME = "user";
         static final String COLUMN_UNIQUE_ID = "uid";
         static final String COLUMN_NAME_USERNAME = "username";
+        static final String COLUMN_NAME_IS_SMS_REQUESTER = "is_sms_requester";
+        static final String COLUMN_NAME_SESSION_KEY = "session_key";
         static final String COLUMN_NAME_PHONE = "phone";
         static final String COLUMN_NAME_PUBKEY = "pubkey";
         static final String COLUMN_NAME_PUBKEY_HASH = "pubkey_hash";

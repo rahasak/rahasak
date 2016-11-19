@@ -14,9 +14,11 @@ public class SecretUser extends User implements Parcelable {
     private String image;
     private String pubKey;
     private String pubKeyHash;
-    private boolean isActive;
+    private String sessionKey;
     private Permission givenPermission;
     private Permission recvPermission;
+    private boolean isSMSRequester;
+    private boolean isActive;
 
     public SecretUser(String id, String username) {
         super(id, username);
@@ -35,7 +37,9 @@ public class SecretUser extends User implements Parcelable {
         this.image = in.readString();
         this.pubKey = in.readString();
         this.pubKeyHash = in.readString();
+        this.sessionKey = in.readString();
         this.isActive = in.readByte() != 0;
+        this.isSMSRequester = in.readByte() != 0;
         this.givenPermission = in.readParcelable(Permission.class.getClassLoader());
         this.recvPermission = in.readParcelable(Permission.class.getClassLoader());
     }
@@ -64,7 +68,9 @@ public class SecretUser extends User implements Parcelable {
         dest.writeString(image);
         dest.writeString(pubKey);
         dest.writeString(pubKeyHash);
+        dest.writeString(sessionKey);
         dest.writeByte((byte) (isActive ? 1 : 0));
+        dest.writeByte((byte) (isSMSRequester ? 1 : 0));
         dest.writeParcelable(givenPermission, flags);
         dest.writeParcelable(recvPermission, flags);
     }
@@ -150,4 +156,19 @@ public class SecretUser extends User implements Parcelable {
         this.recvPermission = recvPermission;
     }
 
+    public boolean isSMSRequester() {
+        return isSMSRequester;
+    }
+
+    public void setSMSRequester(boolean SMSRequester) {
+        isSMSRequester = SMSRequester;
+    }
+
+    public String getSessionKey() {
+        return sessionKey;
+    }
+
+    public void setSessionKey(String sessionKey) {
+        this.sessionKey = sessionKey;
+    }
 }
