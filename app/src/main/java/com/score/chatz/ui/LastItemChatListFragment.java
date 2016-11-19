@@ -53,7 +53,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
             if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 if (senz.getSenzType() == SenzTypeEnum.DATA) {
-                    displayUserList();
+                    displayList();
                 }
             }
         }
@@ -86,7 +86,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
     @Override
     public void onResume() {
         super.onResume();
-        displayUserList();
+        displayList();
 
         getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
     }
@@ -108,7 +108,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
      * Display sensor list
      * Basically setup list adapter if have items to display otherwise display empty view
      */
-    private void displayUserList() {
+    private void displayList() {
         allSecretsList = dbSource.getLatestSecretList();
         adapter = new LastItemChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);

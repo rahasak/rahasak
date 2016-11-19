@@ -200,8 +200,6 @@ public class SenzorsDbSource {
 
             // Add created User to list
             secretUserList.add(secretUser);
-
-            cursor.moveToNext();
         }
 
         cursor.close();
