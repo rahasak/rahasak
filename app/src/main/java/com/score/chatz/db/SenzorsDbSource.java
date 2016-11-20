@@ -516,7 +516,7 @@ public class SenzorsDbSource {
      *
      * @return
      */
-    public ArrayList<Secret> getLatestSecretList() {
+    public ArrayList<Secret> getRecentSecretList() {
         ArrayList<Secret> secretList = new ArrayList();
 
         // TODO JOIN with user to get user image

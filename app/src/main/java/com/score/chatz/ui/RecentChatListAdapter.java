@@ -24,13 +24,13 @@ import java.util.ArrayList;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class LastItemChatListAdapter extends BaseAdapter {
+public class RecentChatListAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<Secret> userSecretList;
     private Typeface typeface;
 
-    public LastItemChatListAdapter(Context _context, ArrayList<Secret> secretList) {
+    public RecentChatListAdapter(Context _context, ArrayList<Secret> secretList) {
         this.context = _context;
         this.userSecretList = secretList;
 

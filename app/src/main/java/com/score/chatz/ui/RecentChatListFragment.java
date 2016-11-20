@@ -34,16 +34,16 @@ import java.util.ArrayList;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class LastItemChatListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class RecentChatListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-    private static final String TAG = LastItemChatListFragment.class.getName();
+    private static final String TAG = RecentChatListFragment.class.getName();
 
     private ActionBar actionBar;
     private ImageView actionBarDelete;
     private TextView actionBarName;
 
     private ArrayList<Secret> allSecretsList;
-    private LastItemChatListAdapter adapter;
+    private RecentChatListAdapter adapter;
     private SenzorsDbSource dbSource;
 
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -110,8 +110,8 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
      * Basically setup list adapter if have items to display otherwise display empty view
      */
     private void displayList() {
-        allSecretsList = dbSource.getLatestSecretList();
-        adapter = new LastItemChatListAdapter(getContext(), allSecretsList);
+        allSecretsList = dbSource.getRecentSecretList();
+        adapter = new RecentChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
