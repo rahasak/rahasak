@@ -1,7 +1,6 @@
 package com.score.chatz.utils;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -18,8 +16,8 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.score.chatz.R;
 
+import com.score.chatz.R;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.senzc.pojos.User;
 
@@ -84,7 +82,7 @@ public class ActivityUtils {
      * @return valid or not
      */
     public static boolean isValidRegistrationFields(User user) throws InvalidInputFieldsException {
-        if (user.getUsername().isEmpty()) {
+        if (user.getUsername().isEmpty() || user.getUsername().contains("@") || user.getUsername().contains("#")) {
             throw new InvalidInputFieldsException();
         }
 
@@ -126,14 +124,15 @@ public class ActivityUtils {
 
     /**
      * Show a toast when required!!!
+     *
      * @param message
      * @param context
      */
-    public static void showToast(String message, Context context){
+    public static void showToast(String message, Context context) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
-    public static void showCustomToast(String message, Context context){
+    public static void showCustomToast(String message, Context context) {
         /*
         Custom layout for Toast
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -151,7 +150,7 @@ public class ActivityUtils {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
-    public static void showCustomToastShort(String message, Context context){
+    public static void showCustomToastShort(String message, Context context) {
         /*LayoutInflater inflater = LayoutInflater.from(context);
         View layout = inflater.inflate(R.layout.custom_toast, null);
         TextView text = (TextView) layout.findViewById(R.id.text);

@@ -7,8 +7,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +32,7 @@ public class RegistrationActivity extends BaseActivity {
 
     private static final String TAG = RegistrationActivity.class.getName();
 
-    //UI controls
+    // ui controls
     private Button registerBtn;
     private EditText editTextUserId;
     private User registeringUser;
@@ -57,12 +55,11 @@ public class RegistrationActivity extends BaseActivity {
         setContentView(R.layout.activity_registration);
 
         setupToolbar();
-        setupUI();
+        setupUi();
         setupRegisterBtn();
-        setupEditTextView();
         setupActionBar();
 
-        //Generate RSA keys
+        // generate RSA keys
         doPreRegistration();
     }
 
@@ -99,33 +96,6 @@ public class RegistrationActivity extends BaseActivity {
         if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
-    private void setupEditTextView() {
-        TextWatcher fieldValidatorTextWatcher = new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                lowerCaseText();
-            }
-
-            private void lowerCaseText() {
-                if (!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
-                    String usernameText = editTextUserId.getText().toString();
-                    usernameText = usernameText.toLowerCase();
-                    editTextUserId.setText(usernameText);
-                    editTextUserId.setSelection(editTextUserId.getText().length());
-                }
-            }
-        };
-        editTextUserId.addTextChangedListener(fieldValidatorTextWatcher);
-    }
-
     private void setupActionBar() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.registration_header, null));
@@ -140,7 +110,7 @@ public class RegistrationActivity extends BaseActivity {
         setSupportActionBar(toolbar);
     }
 
-    private void setupUI() {
+    private void setupUi() {
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
         editTextUserId.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
@@ -163,7 +133,7 @@ public class RegistrationActivity extends BaseActivity {
      */
     private void onClickRegister() {
         // create user
-        String username = editTextUserId.getText().toString().trim();
+        String username = editTextUserId.getText().toString().toLowerCase().trim();
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
@@ -176,7 +146,7 @@ public class RegistrationActivity extends BaseActivity {
                 }
             });
         } catch (InvalidInputFieldsException e) {
-            ActivityUtils.showCustomToast("Invalid username", this);
+            ActivityUtils.showCustomToast("Invalid inputs in username field", this);
             e.printStackTrace();
         }
     }

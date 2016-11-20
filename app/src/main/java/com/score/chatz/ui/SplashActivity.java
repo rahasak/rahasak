@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -33,8 +32,8 @@ public class SplashActivity extends BaseActivity {
         setupSplashText();
     }
 
-    private void setupSplashText(){
-        ((TextView)findViewById(R.id.splash_name)).setTypeface(typefaceThin, Typeface.BOLD);
+    private void setupSplashText() {
+        ((TextView) findViewById(R.id.splash_name)).setTypeface(typefaceThin, Typeface.BOLD);
     }
 
     private void startService() {
