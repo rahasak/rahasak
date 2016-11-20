@@ -21,7 +21,6 @@ import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.PhoneUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Lakmal on 8/6/16.
@@ -82,16 +81,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
     }
 
     private void setUpRow(int i, SecretUser secretUser, View view, ViewHolder viewHolder) {
-        if(!secretUser.isActive()) {
-            if (secretUser.isSMSRequester()) {
-                viewHolder.usernameView.setText("Friend request sent @" + secretUser.getUsername());
-            } else {
-                viewHolder.usernameView.setText("Friend request received @" + secretUser.getUsername());
-            }
-        }else{
-            viewHolder.usernameView.setText("@"+secretUser.getUsername());
-        }
-
         viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
         viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
@@ -122,11 +111,23 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             loadBitmap(secretUser.getImage(), viewHolder.userImageView);
         }
 
-        if (secretUser.getPhone() != null && !secretUser.getPhone().equalsIgnoreCase("") || secretUser.getPhone() != null) {
+        // request text
+        if (!secretUser.isActive()) {
+            if (secretUser.isSMSRequester()) {
+                viewHolder.usernameView.setText("Friend request sent @" + secretUser.getUsername());
+            } else {
+                viewHolder.usernameView.setText("Friend request received @" + secretUser.getUsername());
+            }
+        }
+
+        // username and contact name
+        if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+            viewHolder.usernameView.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), context));
             viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
-            viewHolder.phoneBookNameView.setText(new PhoneUtils().getDisplayNameFromNumber(secretUser.getPhone(), context));
+            viewHolder.phoneBookNameView.setText("@" + secretUser.getUsername());
         } else {
             viewHolder.phoneBookNameView.setVisibility(View.GONE);
+            viewHolder.usernameView.setText("@" + secretUser.getUsername());
         }
 
         if (!secretUser.isActive()) {
@@ -158,14 +159,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         ImageView userCameraPermView;
         ImageView userLocationPermView;
         ImageView userMicPermView;
-    }
-
-    private Permission getPermission(List<Permission> permissionList, boolean isGiven) {
-        for (Permission permission : permissionList) {
-            if (permission.isGiven() == isGiven) return permission;
-        }
-
-        return null;
     }
 
 }

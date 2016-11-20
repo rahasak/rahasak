@@ -265,7 +265,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         TextView header = ((TextView) findViewById(R.id.user_name));
         header.setTypeface(typeface, Typeface.BOLD);
-        header.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getBaseContext()) + "-@" + secretUser.getUsername());
+        if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+            header.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getBaseContext()));
+        } else {
+            header.setText("@" + secretUser.getUsername());
+        }
 
         btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
         btnUserSetting = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.user_profile_image);

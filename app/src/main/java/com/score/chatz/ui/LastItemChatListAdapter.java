@@ -90,7 +90,12 @@ public class LastItemChatListAdapter extends BaseAdapter {
     }
 
     private void setUpRow(Secret secret, ViewHolder viewHolder) {
-        viewHolder.sender.setText(PhoneUtils.getDisplayNameFromNumber(secret.getUser().getPhone(), context) + "-@" + secret.getUser().getUsername());
+        // set username/name
+        if (secret.getUser().getPhone() != null && !secret.getUser().getPhone().isEmpty()) {
+            viewHolder.sender.setText(PhoneUtils.getDisplayNameFromNumber(secret.getUser().getPhone(), context));
+        } else {
+            viewHolder.sender.setText("@" + secret.getUser().getUsername());
+        }
 
         if (secret.getBlobType() == BlobType.IMAGE) {
             if (secret.isMissed()) {
