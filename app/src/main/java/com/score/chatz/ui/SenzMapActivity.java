@@ -148,7 +148,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
 
         // add location marker
         try {
-            marker = map.addMarker(new MarkerOptions().position(this.thisUserLatLng).title("@" + thisSenz.getSender().getUsername()).icon(BitmapDescriptorFactory.fromResource(R.drawable.eyes)));
+            marker = map.addMarker(new MarkerOptions().position(this.thisUserLatLng).title("@" + thisSenz.getSender().getUsername()).icon(BitmapDescriptorFactory.fromResource(R.drawable.location_friend)));
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.thisUserLatLng, 10));
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
