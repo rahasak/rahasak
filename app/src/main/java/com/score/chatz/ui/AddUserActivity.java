@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
@@ -152,7 +153,7 @@ public class AddUserActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        this.registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        this.registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
     @Override

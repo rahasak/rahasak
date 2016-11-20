@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.Secret;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -88,7 +89,7 @@ public class LastItemChatListFragment extends ListFragment implements AdapterVie
         super.onResume();
         displayList();
 
-        getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
     @Override

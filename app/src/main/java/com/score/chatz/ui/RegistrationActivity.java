@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
@@ -90,7 +91,7 @@ public class RegistrationActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
     @Override

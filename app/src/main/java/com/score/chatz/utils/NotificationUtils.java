@@ -16,8 +16,7 @@ public class NotificationUtils {
 
     // notification Id
     public static final int MESSAGE_NOTIFICATION_ID = 1;
-    public static final int SMS_REQUEST_NOTIFICATION_ID = 2;
-    public static final int SMS_CONFIRM_NOTIFICATION_ID = 3;
+    public static final int SMS_NOTIFICATION_ID = 2;
 
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         String msg;

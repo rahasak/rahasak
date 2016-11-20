@@ -14,6 +14,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.NotificationUtils;
@@ -85,7 +86,7 @@ public class SenzService extends Service {
     private BroadcastReceiver smsRequestAcceptReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            NotificationUtils.cancelNotification(NotificationUtils.SMS_REQUEST_NOTIFICATION_ID, SenzService.this);
+            NotificationUtils.cancelNotification(NotificationUtils.SMS_NOTIFICATION_ID, SenzService.this);
 
             String phone = intent.getStringExtra("PHONE").trim();
             String username = intent.getStringExtra("USERNAME").trim();
@@ -103,7 +104,7 @@ public class SenzService extends Service {
     private BroadcastReceiver smsRequestRejectReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            NotificationUtils.cancelNotification(NotificationUtils.SMS_REQUEST_NOTIFICATION_ID, SenzService.this);
+            NotificationUtils.cancelNotification(NotificationUtils.SMS_NOTIFICATION_ID, SenzService.this);
         }
     };
 
@@ -180,7 +181,7 @@ public class SenzService extends Service {
 
         // restart service again
         // its done via broadcast receiver
-        Intent intent = new Intent("senz.action.SENZ_RESTART");
+        Intent intent = new Intent(IntentProvider.ACTION_RESTART);
         sendBroadcast(intent);
     }
 
@@ -189,14 +190,16 @@ public class SenzService extends Service {
         IntentFilter networkFilter = new IntentFilter();
         networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, networkFilter);
-        registerReceiver(smsRequestAcceptReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_REQUEST_ACCEPT));
-        registerReceiver(smsRequestConfirmReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SMS_REQUEST_CONFIRM));
+        registerReceiver(smsRequestAcceptReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_ACCEPT));
+        registerReceiver(smsRequestRejectReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_REJECT));
+        registerReceiver(smsRequestConfirmReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_CONFIRM));
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
         unregisterReceiver(smsRequestAcceptReceiver);
+        unregisterReceiver(smsRequestRejectReceiver);
         unregisterReceiver(smsRequestConfirmReceiver);
     }
 

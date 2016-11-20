@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.remote.SenzNotificationManager;
@@ -121,7 +122,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
             // broadcast
             Intent intent = new Intent();
-            intent.setAction("com.score.chatz.SMS_REQUEST_CONFIRM");
+            intent.setAction(IntentProvider.ACTION_SMS_REQUEST_CONFIRM);
             intent.putExtra("USERNAME", username);
             intent.putExtra("PHONE", contactNo);
             context.sendBroadcast(intent);

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.score.chatz.application.IntentProvider;
 import com.score.senzc.pojos.Senz;
 
 import java.util.HashMap;
@@ -115,7 +114,7 @@ public class SenzTracker {
                 removeSenz(senz);
 
                 // broadcast packet
-                Intent intent = IntentProvider.getTimeoutIntent();
+                Intent intent = new Intent("com.score.chatz.TIMEOUT");
                 intent.putExtra("SENZ", senz);
                 senzContext.sendBroadcast(intent);
             }

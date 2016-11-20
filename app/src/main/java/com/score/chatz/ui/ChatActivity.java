@@ -27,6 +27,7 @@ import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SecretUser;
@@ -165,7 +166,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         SenzApplication.setUserOnChat(secretUser.getUsername());
 
         // bind to senz service
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
 
         // update list
         updateSecretList();

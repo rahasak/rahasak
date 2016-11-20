@@ -154,7 +154,7 @@
         <!-- Receievers -->
         <receiver android:name=".receivers.SenzRestartReceiver">
             <intent-filter>
-                <action android:name="senz.action.SENZ_RESTART" />
+                <action android:name="com.score.chatz.RESTART" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>

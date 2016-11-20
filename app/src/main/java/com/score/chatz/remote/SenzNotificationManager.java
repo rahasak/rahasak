@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.score.chatz.R;
+import com.score.chatz.application.IntentProvider;
 import com.score.chatz.application.SenzApplication;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
@@ -63,7 +64,7 @@ public class SenzNotificationManager {
             Notification notification = getSmsNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtils.SMS_REQUEST_NOTIFICATION_ID, notification);
+            notificationManager.notify(NotificationUtils.SMS_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.SMS_CONFIRM) {
             // SMS confirm
 
@@ -108,7 +109,7 @@ public class SenzNotificationManager {
     private Notification getSmsNotification(SenzNotification senzNotification) {
         // accept
         Intent acceptIntent = new Intent();
-        acceptIntent.setAction("com.score.chatz.SMS_REQUEST_ACCEPT");
+        acceptIntent.setAction(IntentProvider.ACTION_SMS_REQUEST_ACCEPT);
         acceptIntent.putExtra("PHONE", senzNotification.getSenderPhone());
         acceptIntent.putExtra("USERNAME", senzNotification.getSender());
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -117,7 +118,7 @@ public class SenzNotificationManager {
 
         // Setup pending intent for dismiss action
         Intent cancelIntent = new Intent();
-        cancelIntent.setAction("com.score.chatz.SMS_REQUEST_REJECT");
+        acceptIntent.setAction(IntentProvider.ACTION_SMS_REQUEST_REJECT);
         cancelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT);

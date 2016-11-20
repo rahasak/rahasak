@@ -20,6 +20,7 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.SecretUser;
@@ -234,7 +235,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
     @Override

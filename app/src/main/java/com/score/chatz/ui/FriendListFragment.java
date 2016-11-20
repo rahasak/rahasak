@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PhoneUtils;
@@ -110,7 +111,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         super.onResume();
         displayUserList();
 
-        getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
     @Override

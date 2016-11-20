@@ -25,6 +25,7 @@ import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
@@ -131,7 +132,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentProvider.INTENT_TYPE.SENZ));
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
     @Override
