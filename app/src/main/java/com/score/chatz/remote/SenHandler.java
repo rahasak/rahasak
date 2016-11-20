@@ -148,12 +148,21 @@ class SenHandler {
             // broadcast
             updateStatus(senz, senzService.getApplicationContext());
 
-            //Only for case of add user, need to handle here to make more generic as you can now add users via sms also, thus cannot gurantee which activity user will be in, when recevie this status code
             String status = senz.getAttributes().get("status");
             if (status.equalsIgnoreCase("701")) {
                 // user added successfully
                 // save user in db
-                dbSource.activateSecretUser(senz.getSender().getUsername(), true);
+                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
+                    // existing user, activate it
+                    dbSource.activateSecretUser(senz.getSender().getUsername(), true);
+                } else {
+                    // not existing user
+                    // this is when sharing directly by username
+                    // create and activate uer
+                    SecretUser secretUser = new SecretUser("id", senz.getSender().getUsername());
+                    dbSource.createSecretUser(secretUser);
+                    dbSource.activateSecretUser(secretUser.getUsername(), true);
+                }
             }
 
             broadcastSenz(senz, senzService.getApplicationContext());
@@ -299,8 +308,6 @@ class SenHandler {
         secret.setTimeStamp(timestamp);
         secret.setMissed(false);
         secret.setDeliveryState(DeliveryState.NONE);
-
-        // save secret async
         new SenzorsDbSource(context).createSecret(secret);
     }
 
@@ -308,7 +315,6 @@ class SenHandler {
         final String uid = senz.getAttributes().get("uid");
         String status = senz.getAttributes().get("status");
         if (status.equalsIgnoreCase("DELIVERED")) {
-            // update status in db
             new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
         }
     }

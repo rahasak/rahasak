@@ -29,9 +29,9 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
     Context context;
     private Typeface typeface;
 
-    ArrayList<SecretUser> friendsList;
+    private ArrayList<SecretUser> friendsList;
 
-    public FriendListAdapter(Context _context, ArrayList<SecretUser> userPermsList) {
+    FriendListAdapter(Context _context, ArrayList<SecretUser> userPermsList) {
         super(_context, R.layout.single_user_card_row, R.id.user_name, userPermsList);
         context = _context;
         friendsList = userPermsList;

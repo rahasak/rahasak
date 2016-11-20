@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,7 +44,7 @@ public class RegistrationActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
-            if(intent.hasExtra("SENZ")) {
+            if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 handleSenz(senz);
             }
@@ -115,8 +114,8 @@ public class RegistrationActivity extends BaseActivity {
                 lowerCaseText();
             }
 
-            private void lowerCaseText(){
-                if(!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
+            private void lowerCaseText() {
+                if (!editTextUserId.getText().toString().equals(editTextUserId.getText().toString().toLowerCase())) {
                     String usernameText = editTextUserId.getText().toString();
                     usernameText = usernameText.toLowerCase();
                     editTextUserId.setText(usernameText);

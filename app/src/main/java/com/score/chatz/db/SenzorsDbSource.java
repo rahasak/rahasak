@@ -307,7 +307,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_MISSED, secret.isMissed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.DELIVERY_STATE, secret.getDeliveryState().getState());
 
-        // Insert the new row, if fails throw an error
+        // insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
     }
 
@@ -492,27 +492,12 @@ public class SenzorsDbSource {
 
     public void deleteAllSecretsExceptLast(String username) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-        //String sqlDelete = "delete from secret where uid in (select uid from secret where _id not in (select _id from secret where user = '" + username + "' order by _id DESC limit 1) and user = '" + username + "')";
-
-//        String sqlDelete =
-//                "delete from secret where " +
-//                        "uid in " +
-//                        "(select uid from secret where " +
-//                        "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 1) and " +
-//                        "user = '" + username + "' and " +
-//                        "missed = 0)";
-
         String sqlDelete =
                 "uid in " +
                         "(select uid from secret where " +
                         "_id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 7) and " +
                         "user = '" + username + "')";
-
-        // TODO refactor/optimize this
-        //String sqlDelete = "uid in (select uid from secret where _id not in(select _id from secret where user = '" + username + "' order by _id DESC limit 7) and user = '" + username + "')";
-        db.delete(SenzorsDbContract.Secret.TABLE_NAME,
-                sqlDelete,
-                null);
+        db.delete(SenzorsDbContract.Secret.TABLE_NAME, sqlDelete, null);
     }
 
     public void deleteAllSecretsThatBelongToUser(User user) {
@@ -532,11 +517,6 @@ public class SenzorsDbSource {
      */
     public ArrayList<Secret> getRecentSecretList() {
         ArrayList<Secret> secretList = new ArrayList();
-
-        // TODO JOIN with user to get user image
-//        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-//        String query = "SELECT MAX(_id), _id, blob, type, user, is_sender, timestamp FROM secret " +
-//                "GROUP BY user ORDER BY timestamp DESC";
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.blob_type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active, user.is_sms_requester, user.phone  " +
