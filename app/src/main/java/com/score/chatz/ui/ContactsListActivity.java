@@ -166,8 +166,7 @@ public class ContactsListActivity extends BaseActivity implements
     }
 
     @Override
-    public void onItemClick(
-            AdapterView<?> parent, View item, int position, long rowID) {
+    public void onItemClick(AdapterView<?> parent, View item, int position, long rowID) {
 
         Cursor cursor = (Cursor) parent.getItemAtPosition(position);
         int item_ID = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -177,7 +176,6 @@ public class ContactsListActivity extends BaseActivity implements
 
         if (item_HasPhoneNumber > 0) {
             hasPhoneNumber = true;
-
         } else {
             hasPhoneNumber = false;
         }

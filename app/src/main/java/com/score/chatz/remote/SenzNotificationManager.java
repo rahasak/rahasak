@@ -67,7 +67,6 @@ public class SenzNotificationManager {
             notificationManager.notify(NotificationUtils.SMS_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.SMS_CONFIRM) {
             // SMS confirm
-
         }
     }
 

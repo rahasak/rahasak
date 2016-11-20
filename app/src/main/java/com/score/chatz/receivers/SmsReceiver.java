@@ -88,17 +88,16 @@ public class SmsReceiver extends BroadcastReceiver {
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
-        // chow Notification
-        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, username));
-        SenzorsDbSource dbSource = new SenzorsDbSource(context);
         try {
             // create user
+            SenzorsDbSource dbSource = new SenzorsDbSource(context);
             SecretUser secretUser = new SecretUser("id", username);
             secretUser.setPhone(contactNo);
             secretUser.setPubKeyHash(pubKeyHash);
             dbSource.createSecretUser(secretUser);
 
-            // TODO broadcast
+            // show Notification
+            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, username));
         } catch (Exception ex) {
             // user exists
             ex.printStackTrace();
@@ -110,10 +109,9 @@ public class SmsReceiver extends BroadcastReceiver {
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
-        // create secret user
-        SenzorsDbSource dbSource = new SenzorsDbSource(context);
         try {
             // create user
+            SenzorsDbSource dbSource = new SenzorsDbSource(context);
             SecretUser secretUser = new SecretUser("id", username);
             secretUser.setPhone(contactNo);
             secretUser.setPubKeyHash(pubKeyHash);
