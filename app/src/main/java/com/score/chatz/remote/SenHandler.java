@@ -153,18 +153,9 @@ class SenHandler {
             if (status.equalsIgnoreCase("701")) {
                 // user added successfully
                 // save user in db
-                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
-                    // existing user, activate it
-                    dbSource.activateSecretUser(senz.getSender().getUsername(), true);
-                } else {
-                    // TODO verify and remove this logic
-                    // not existing user,
-                    // create and activate user
-                    SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
-                    dbSource.createSecretUser(secretUser);
-                    dbSource.activateSecretUser(secretUser.getUsername(), true);
-                }
+                dbSource.activateSecretUser(senz.getSender().getUsername(), true);
             }
+
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg") || senz.getAttributes().containsKey("$msg")) {
             // rahasa

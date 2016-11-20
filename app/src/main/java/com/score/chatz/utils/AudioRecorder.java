@@ -71,8 +71,6 @@ public class AudioRecorder {
     }
 
     public ByteArrayOutputStream getRecording() {
-        Log.d(TAG, buffer.size() / 1024 + "lennnnn");
-        Log.d(TAG, buffer.toByteArray().length / 1024 + "lennnnn");
         return buffer;
     }
 

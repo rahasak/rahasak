@@ -1,7 +1,5 @@
 package com.score.chatz.remote;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,7 +15,6 @@ import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PreferenceUtils;
@@ -103,6 +100,13 @@ public class SenzService extends Service {
         }
     };
 
+    private BroadcastReceiver smsRequestRejectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            NotificationUtils.cancelNotification(NotificationUtils.SMS_REQUEST_NOTIFICATION_ID, SenzService.this);
+        }
+    };
+
     private BroadcastReceiver smsRequestConfirmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -128,7 +132,6 @@ public class SenzService extends Service {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
-            //SenzTracker.getInstance(SenzService.this).startSenzTrack(senz);
             writeSenz(senz);
         }
 
@@ -375,7 +378,6 @@ public class SenzService extends Service {
         }
     }
 
-    //---sends an SMS message to another device---
     private void sendSMS(String phoneNumber, String message) {
         SmsManager sms = SmsManager.getDefault();
         Log.i(TAG, "SMS Body -> " + message);
