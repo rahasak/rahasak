@@ -154,8 +154,8 @@ public class SenzorsDbSource {
 
             SecretUser secretUser = new SecretUser(_userID, _username);
             secretUser.setPhone(_phone);
-            secretUser.setPhone(_pubKey);
-            secretUser.setPhone(_pubKeyHash);
+            secretUser.setPubKey(_pubKey);
+            secretUser.setPubKeyHash(_pubKeyHash);
             secretUser.setImage(_image);
             secretUser.setActive(_isActive == 1);
             secretUser.setGivenPermission(givenPerm);
@@ -192,6 +192,7 @@ public class SenzorsDbSource {
             String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
             String _givenPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_GIVEN_PERM));
             String _recvPermId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_RECV_PERM));
+            int _isSmsRequester = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER));
 
             // get permission
             Permission givenPerm = getPermission(_givenPermId);
@@ -206,7 +207,7 @@ public class SenzorsDbSource {
             secretUser.setActive(_isActive == 1);
             secretUser.setGivenPermission(givenPerm);
             secretUser.setRecvPermission(recvPerm);
-
+            secretUser.setSMSRequester(_isSmsRequester == 1);
             // Add created User to list
             secretUserList.add(secretUser);
         }
@@ -528,7 +529,7 @@ public class SenzorsDbSource {
 //                "GROUP BY user ORDER BY timestamp DESC";
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.blob_type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active " +
+        String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.blob_type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active, user.is_sms_requester, user.phone  " +
                 "FROM secret " +
                 "INNER JOIN user " +
                 "ON user.username = secret.user GROUP BY user.username ORDER BY timestamp DESC";
@@ -544,6 +545,8 @@ public class SenzorsDbSource {
         String _image;
         int _secretIsSender;
         int _isActive;
+        int _isRequester;
+        String _phone;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -558,10 +561,14 @@ public class SenzorsDbSource {
             // get user attributes
             _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IMAGE));
             _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
+            _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
+            _isRequester = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER));
 
             SecretUser secretUser = new SecretUser(_userID, _secretUser);
             secretUser.setImage(_image);
             secretUser.setActive(_isActive == 1);
+            secretUser.setSMSRequester(_isRequester == 1);
+            secretUser.setPhone(_phone);
 
             Secret secret = new Secret(_secretBlob, BlobType.valueOfType(_secretBlobType), secretUser, _secretIsSender == 1);
             secret.setTimeStamp(_secretTimestamp);

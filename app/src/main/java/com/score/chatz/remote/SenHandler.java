@@ -310,12 +310,7 @@ class SenHandler {
         secret.setDeliveryState(DeliveryState.NONE);
 
         // save secret async
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new SenzorsDbSource(context).createSecret(secret);
-            }
-        }).start();
+        new SenzorsDbSource(context).createSecret(secret);
     }
 
     private void updateStatus(Senz senz, final Context context) {
@@ -323,12 +318,7 @@ class SenHandler {
         String status = senz.getAttributes().get("status");
         if (status.equalsIgnoreCase("DELIVERED")) {
             // update status in db
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
-                }
-            }).start();
+            new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
         }
     }
 }

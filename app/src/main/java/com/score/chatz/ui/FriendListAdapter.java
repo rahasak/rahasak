@@ -82,12 +82,16 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
     }
 
     private void setUpRow(int i, SecretUser secretUser, View view, ViewHolder viewHolder) {
-        // enable share and change color of view
-        if (!secretUser.isActive()) {
-            viewHolder.usernameView.setText("Friend request from @" + secretUser.getUsername());
-        } else {
-            viewHolder.usernameView.setText("@" + secretUser.getUsername());
+        if(!secretUser.isActive()) {
+            if (secretUser.isSMSRequester()) {
+                viewHolder.usernameView.setText("Friend request sent @" + secretUser.getUsername());
+            } else {
+                viewHolder.usernameView.setText("Friend request received @" + secretUser.getUsername());
+            }
+        }else{
+            viewHolder.usernameView.setText("@"+secretUser.getUsername());
         }
+
         viewHolder.usernameView.setTypeface(typeface, Typeface.NORMAL);
         viewHolder.phoneBookNameView.setTypeface(typeface, Typeface.NORMAL);
 
