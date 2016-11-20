@@ -102,24 +102,36 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (friendsList.get(position).isActive()) {
+        final SecretUser secretUser = friendsList.get(position);
+        if (secretUser.isActive()) {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-            intent.putExtra("SENDER", friendsList.get(position).getUsername());
+            intent.putExtra("SENDER", secretUser.getUsername());
             startActivity(intent);
         } else {
-            if (friendsList.get(position).isSMSRequester()) {
-                String contactName = PhoneUtils.getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity());
+            if (secretUser.isSMSRequester()) {
+                String contactName = PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getActivity());
                 ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to resend friend request to " + contactName + "?", getActivity(), typeface, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Start sharing again
+                        // start sharing again
+                        // broadcast
+                        Intent intent = new Intent(IntentProvider.ACTION_SMS_REQUEST_CONFIRM);
+                        intent.putExtra("USERNAME", secretUser.getUsername());
+                        intent.putExtra("PHONE", secretUser.getPhone());
+                        getActivity().sendBroadcast(intent);
                     }
                 });
             } else {
-                ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to accept this request?", getActivity(), typeface, new View.OnClickListener() {
+                String contactName = PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getActivity());
+                ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to accept the request from " + contactName + "?", getActivity(), typeface, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Start getting public key and sending confirmation sms
+                        // start getting public key and sending confirmation sms
+                        // broadcast
+                        Intent intent = new Intent(IntentProvider.ACTION_SMS_REQUEST_ACCEPT);
+                        intent.putExtra("USERNAME", secretUser.getUsername());
+                        intent.putExtra("PHONE", secretUser.getPhone());
+                        getActivity().sendBroadcast(intent);
                     }
                 });
             }
@@ -130,7 +142,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
      * Display sensor list
      * Basically setup list adapter if have items to display otherwise display empty view
      */
-
     private void displayUserList() {
         // get User from db
         friendsList = new SenzorsDbSource(this.getActivity()).getSecretUserList();
