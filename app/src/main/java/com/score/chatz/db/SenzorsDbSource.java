@@ -50,6 +50,20 @@ public class SenzorsDbSource {
         return cursor.moveToFirst();
     }
 
+    public boolean isExistingUserWithPhoneNo(String phoneNo) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+                null, // columns
+                SenzorsDbContract.User.COLUMN_NAME_PHONE + " = ?", // constraint
+                new String[]{phoneNo}, // prams
+                null, // order by
+                null, // group by
+                null); // join
+
+        return cursor.moveToFirst();
+    }
+
     public void createSecretUser(SecretUser secretUser) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 

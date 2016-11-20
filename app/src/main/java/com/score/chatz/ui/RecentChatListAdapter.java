@@ -30,7 +30,7 @@ public class RecentChatListAdapter extends BaseAdapter {
     private ArrayList<Secret> userSecretList;
     private Typeface typeface;
 
-    public RecentChatListAdapter(Context _context, ArrayList<Secret> secretList) {
+    RecentChatListAdapter(Context _context, ArrayList<Secret> secretList) {
         this.context = _context;
         this.userSecretList = secretList;
 
@@ -53,7 +53,7 @@ public class RecentChatListAdapter extends BaseAdapter {
     }
 
     /**
-     * Create list row viewv
+     * Create list row view
      *
      * @param i         index
      * @param view      current list item view

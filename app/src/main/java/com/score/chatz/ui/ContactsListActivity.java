@@ -189,8 +189,8 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
         final String phoneNo = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
         // check existing secret user with given phone no
-        if (!new SenzorsDbSource(this).isExistingUser(phoneNo)) {
-            String confirmationMessage = "<font size=10>Are you sure you want to share your username with </font> <font color=#F88F8C>" + "<b>" + displayName + "</b>" + "</font> (" + phoneNo + "), via sms?";
+        if (!new SenzorsDbSource(this).isExistingUserWithPhoneNo(phoneNo)) {
+            String confirmationMessage = "<font size=10>Are you sure you want to share your rahsak username to </font> <font color=#F88F8C>" + "<b>" + displayName + "</b>" + "</font> (" + phoneNo + "), via sms?";
             try {
                 final String username = PreferenceUtils.getUser(this).getUsername();
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {

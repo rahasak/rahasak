@@ -38,6 +38,8 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     private ArrayList<SecretUser> friendsList;
     private FriendListAdapter adapter;
 
+    private Typeface typeface;
+
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -58,10 +60,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         }
     };
 
-    private void setupEmptyTextFont() {
-        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,32 +76,9 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
         setupEmptyTextFont();
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (friendsList.get(position).isActive()) {
-            Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-            intent.putExtra("SENDER", friendsList.get(position).getUsername());
-            startActivity(intent);
-        } else if (friendsList.get(position).isSMSRequester()) {
-            ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to resend friend request to " + new PhoneUtils().getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity()) + "?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Start sharing again
-
-                }
-            });
-        } else if (!friendsList.get(position).isSMSRequester()) {
-            ActivityUtils.displayConfirmationMessageDialog("Confirm", "Response taking too long? Would you like to retry?", getActivity(), Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"), new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Start getting public key and sending confirmation sms
-
-                }
-            });
-        }
     }
 
     @Override
@@ -121,10 +96,41 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
         getActivity().unregisterReceiver(senzReceiver);
     }
 
+    private void setupEmptyTextFont() {
+        ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(typeface);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (friendsList.get(position).isActive()) {
+            Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+            intent.putExtra("SENDER", friendsList.get(position).getUsername());
+            startActivity(intent);
+        } else {
+            if (friendsList.get(position).isSMSRequester()) {
+                String contactName = PhoneUtils.getDisplayNameFromNumber(friendsList.get(position).getPhone(), getActivity());
+                ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to resend friend request to " + contactName + "?", getActivity(), typeface, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Start sharing again
+                    }
+                });
+            } else {
+                ActivityUtils.displayConfirmationMessageDialog("Confirm", "Response taking too long? Would you like to retry?", getActivity(), typeface, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Start getting public key and sending confirmation sms
+                    }
+                });
+            }
+        }
+    }
+
     /**
      * Display sensor list
      * Basically setup list adapter if have items to display otherwise display empty view
      */
+
     private void displayUserList() {
         // get User from db
         friendsList = new SenzorsDbSource(this.getActivity()).getSecretUserList();
