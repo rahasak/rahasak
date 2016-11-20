@@ -10,7 +10,6 @@ import com.score.senzc.pojos.User;
  */
 public class SecretUser extends User implements Parcelable {
     private String phone;
-    private String uid;
     private String image;
     private String pubKey;
     private String pubKeyHash;
@@ -33,7 +32,6 @@ public class SecretUser extends User implements Parcelable {
     public SecretUser(Parcel in) {
         super(in);
         this.phone = in.readString();
-        this.uid = in.readString();
         this.image = in.readString();
         this.pubKey = in.readString();
         this.pubKeyHash = in.readString();
@@ -64,7 +62,6 @@ public class SecretUser extends User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeString(phone);
-        dest.writeString(uid);
         dest.writeString(image);
         dest.writeString(pubKey);
         dest.writeString(pubKeyHash);
@@ -91,14 +88,6 @@ public class SecretUser extends User implements Parcelable {
             return new SecretUser[size];
         }
     };
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
 
     public String getPhone() {
         return phone;
