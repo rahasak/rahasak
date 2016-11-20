@@ -20,13 +20,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.score.chatz.R;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
 
-public class ContactsListActivity extends BaseActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>,
-        AdapterView.OnItemClickListener {
+public class ContactsListActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
 
     private static final String TAG = ContactsListActivity.class.getName();
 
@@ -44,6 +43,7 @@ public class ContactsListActivity extends BaseActivity implements
     private final static String[] FROM_COLUMNS = {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME
     };
+
     /*
      * Defines an array that contains resource ids for the layout views
      * that get the Cursor column contents. The id is pre-defined in
@@ -67,17 +67,12 @@ public class ContactsListActivity extends BaseActivity implements
     private static final String SORT_ORDER = ContactsContract.Contacts.DISPLAY_NAME + " ASC ";
 
     // Define what you want to get out from provider
-    private static final String[] PROJECTION =
-            {
-                    ContactsContract.Contacts._ID,
-                    ContactsContract.Contacts.LOOKUP_KEY,
-                    Build.VERSION.SDK_INT
-                            >= Build.VERSION_CODES.HONEYCOMB ?
-                            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY :
-                            ContactsContract.Contacts.DISPLAY_NAME,
-                    ContactsContract.Contacts.HAS_PHONE_NUMBER
-
-            };
+    private static final String[] PROJECTION = {
+            ContactsContract.Contacts._ID,
+            ContactsContract.Contacts.LOOKUP_KEY,
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME,
+            ContactsContract.Contacts.HAS_PHONE_NUMBER
+    };
 
 
     @Override
@@ -97,22 +92,12 @@ public class ContactsListActivity extends BaseActivity implements
     }
 
     private void setupContactsList() {
-        // Gets the ListView from the View list of the parent activity
-        mContactsList =
-                (ListView) this.findViewById(R.id.contacts_list);
-        // Set the item click listener to be the current fragment.
+        mContactsList = (ListView) this.findViewById(R.id.contacts_list);
         mContactsList.setOnItemClickListener(this);
     }
 
     private void setupContactsListAdapter() {
-        // Gets a CursorAdapter
-        mCursorAdapter = new ContactsListAdapter(
-                this,
-                R.layout.contacts_list_item,
-                null,
-                FROM_COLUMNS, TO_IDS,
-                0);
-        // Sets the adapter for the ListView
+        mCursorAdapter = new ContactsListAdapter(this, R.layout.contacts_list_item, null, FROM_COLUMNS, TO_IDS, 0);
         mContactsList.setAdapter(mCursorAdapter);
     }
 
@@ -153,8 +138,7 @@ public class ContactsListActivity extends BaseActivity implements
             }
 
             @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
                 // Nothing to do in this case
             }
 
@@ -167,51 +151,13 @@ public class ContactsListActivity extends BaseActivity implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View item, int position, long rowID) {
-
         Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-        int item_ID = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-        String item_DisplayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-        int item_HasPhoneNumber = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-        boolean hasPhoneNumber;
-
-        if (item_HasPhoneNumber > 0) {
-            hasPhoneNumber = true;
-        } else {
-            hasPhoneNumber = false;
-        }
-
-        // Using the item_ID now we will get contact phone number
-        Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
-
-                new String[]{String.valueOf(item_ID)},
-                null);
+        int itemId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+        String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+        boolean hasPhoneNumber = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0;
 
         if (hasPhoneNumber) {
-            String mobileNumber = "";
-            if (cursorPhone.moveToFirst()) {
-                mobileNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            }
-
-            String confirmationMessage = "<font size=10>Are you sure you want to share your username with </font> <font color=#F88F8C>" + "<b>" + item_DisplayName + "</b>" + "</font> (" + mobileNumber + "), via sms?";
-
-            final String finalMobileNumber = mobileNumber;
-            try {
-                final String username = PreferenceUtils.getUser(this).getUsername();
-                displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String message = "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username + " #code 41r33";
-                        sendSMS(finalMobileNumber, message);
-                    }
-                });
-            } catch (NoUserException ex) {
-                ex.printStackTrace();
-            }
+            handleOnClickWithPhone(itemId, displayName);
         } else {
             ActivityUtils.showCustomToastShort("This user has no mobile number", this);
         }
@@ -219,34 +165,53 @@ public class ContactsListActivity extends BaseActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-        // Starts the query
-        return new CursorLoader(
-                this,
-                ContactsContract.Contacts.CONTENT_URI,
-                PROJECTION,
-                SELECTION,
-                mSelectionArgs,
-                SORT_ORDER
-        );
+        return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI, PROJECTION, SELECTION, mSelectionArgs, SORT_ORDER);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        // Put the result Cursor in the adapter for the ListView
         mCursorAdapter.swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        // Delete the reference to the existing Cursor
         mCursorAdapter.swapCursor(null);
     }
 
-    //---sends an SMS message to another device---
+    private void handleOnClickWithPhone(int itemId, String displayName) {
+        // Using the item_ID now we will get contact phone number
+        final Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                new String[]{String.valueOf(itemId)},
+                null);
+
+        cursorPhone.moveToFirst();
+        final String phoneNo = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+        // check existing secret user with given phone no
+        if (!new SenzorsDbSource(this).isExistingUser(phoneNo)) {
+            String confirmationMessage = "<font size=10>Are you sure you want to share your username with </font> <font color=#F88F8C>" + "<b>" + displayName + "</b>" + "</font> (" + phoneNo + "), via sms?";
+            try {
+                final String username = PreferenceUtils.getUser(this).getUsername();
+                displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String message = "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username + " #code 41r33";
+                        sendSMS(phoneNo, message);
+                    }
+                });
+            } catch (NoUserException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            ActivityUtils.showCustomToastShort("This user already added in you secret contact list", this);
+        }
+    }
+
     private void sendSMS(String phoneNumber, String message) {
         SmsManager sms = SmsManager.getDefault();
         Log.i(TAG, "SMS Body -> " + message);
         sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
-
 
 }
