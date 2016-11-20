@@ -116,7 +116,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                     }
                 });
             } else {
-                ActivityUtils.displayConfirmationMessageDialog("Confirm", "Response taking too long? Would you like to retry?", getActivity(), typeface, new View.OnClickListener() {
+                ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to accept this request?", getActivity(), typeface, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // Start getting public key and sending confirmation sms

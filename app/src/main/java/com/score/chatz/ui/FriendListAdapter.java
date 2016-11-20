@@ -112,32 +112,31 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         }
 
         // request text
-        if (!secretUser.isActive()) {
-            if (secretUser.isSMSRequester()) {
-                viewHolder.usernameView.setText("Friend request sent @" + secretUser.getUsername());
+        if (secretUser.isActive()) {
+            if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                viewHolder.usernameView.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), context));
+                viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
+                viewHolder.phoneBookNameView.setText("@" + secretUser.getUsername());
             } else {
-                viewHolder.usernameView.setText("Friend request received @" + secretUser.getUsername());
+                viewHolder.phoneBookNameView.setVisibility(View.GONE);
+                viewHolder.usernameView.setText("@" + secretUser.getUsername());
             }
-        }
 
-        // username and contact name
-        if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-            viewHolder.usernameView.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), context));
-            viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
-            viewHolder.phoneBookNameView.setText("@" + secretUser.getUsername());
-        } else {
-            viewHolder.phoneBookNameView.setVisibility(View.GONE);
-            viewHolder.usernameView.setText("@" + secretUser.getUsername());
-        }
-
-        if (!secretUser.isActive()) {
-            viewHolder.userCameraPermView.setVisibility(View.GONE);
-            viewHolder.userMicPermView.setVisibility(View.GONE);
-            viewHolder.userLocationPermView.setVisibility(View.GONE);
-        } else {
             viewHolder.userCameraPermView.setVisibility(View.VISIBLE);
             viewHolder.userMicPermView.setVisibility(View.VISIBLE);
             viewHolder.userLocationPermView.setVisibility(View.VISIBLE);
+        } else {
+            if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                viewHolder.usernameView.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), context) + " @" + secretUser.getUsername());
+            } else {
+                viewHolder.usernameView.setText("@" + secretUser.getUsername());
+            }
+
+            viewHolder.phoneBookNameView.setText(secretUser.isSMSRequester() ? "Sent friend request" : "Received friend request");
+
+            viewHolder.userCameraPermView.setVisibility(View.GONE);
+            viewHolder.userMicPermView.setVisibility(View.GONE);
+            viewHolder.userLocationPermView.setVisibility(View.GONE);
         }
     }
 

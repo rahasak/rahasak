@@ -117,7 +117,7 @@ public class SenzNotificationManager {
 
         // Setup pending intent for dismiss action
         Intent cancelIntent = new Intent();
-        acceptIntent.setAction(IntentProvider.ACTION_SMS_REQUEST_REJECT);
+        cancelIntent.setAction(IntentProvider.ACTION_SMS_REQUEST_REJECT);
         cancelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT);

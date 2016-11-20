@@ -198,6 +198,8 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
                     public void onClick(View v) {
                         String message = "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username + " #code 41r33";
                         sendSMS(phoneNo, message);
+
+                        ActivityUtils.showCustomToastShort("Request sent via SMS", ContactsListActivity.this);
                     }
                 });
             } catch (NoUserException ex) {
