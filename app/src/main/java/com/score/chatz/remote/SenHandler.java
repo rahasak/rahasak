@@ -20,9 +20,7 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 class SenHandler {
@@ -71,7 +69,8 @@ class SenHandler {
                 // create user
                 String username = senz.getSender().getUsername();
                 if (dbSource.isExistingUser(senz.getSender().getUsername())) {
-                    String sessionKey = senz.getAttributes().get("skey");
+                    String encryptedSessionKey = senz.getAttributes().get("$skey");
+                    String sessionKey = RSAUtils.decrypt(RSAUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
                 } else {
                     SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
@@ -167,24 +166,33 @@ class SenHandler {
                 }
             }
             broadcastSenz(senz, senzService.getApplicationContext());
-        } else if (senz.getAttributes().containsKey("msg")) {
+        } else if (senz.getAttributes().containsKey("msg") || senz.getAttributes().containsKey("$msg")) {
             // rahasa
             // send ack
             senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
 
             try {
                 // save and broadcast
-                String rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
+                String rahasa;
+                if (senz.getAttributes().containsKey("$msg")) {
+                    // encrypted data -> decrypt
+                    String sessionKey = dbSource.getSecretUser(senz.getSender().getUsername()).getSessionKey();
+                    rahasa = RSAUtils.decrypt(RSAUtils.getSecretKey(sessionKey), senz.getAttributes().get("$msg"));
+                } else {
+                    // plain data
+                    rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
+                }
 
                 Long timestamp = (System.currentTimeMillis() / 1000);
                 saveSecret(timestamp, senz.getAttributes().get("uid"), rahasa, BlobType.TEXT, senz.getSender(), senzService.getApplicationContext());
                 senz.getAttributes().put("time", timestamp.toString());
+                senz.getAttributes().put("msg", rahasa);
                 broadcastSenz(senz, senzService.getApplicationContext());
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getSecretNotification(senz.getSender().getUsername(), rahasa));
-            } catch (UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
@@ -206,8 +214,9 @@ class SenHandler {
                     String sessionKey = RSAUtils.getSessionKey();
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
 
-                    senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), username, sessionKey));
-                } catch (NoSuchAlgorithmException e) {
+                    String encryptedSessionKey = RSAUtils.encrypt(RSAUtils.getPublicKey(pubKey), sessionKey);
+                    senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), username, encryptedSessionKey));
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

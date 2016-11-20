@@ -35,14 +35,19 @@ public class SenzParser {
             } else if (token.startsWith("^")) {
                 // ^mysensors, ^0775432015
                 senz.setSender(new User("", token.substring(1)));
+            } else if (token.startsWith("$")) {
+                // $key 5.23
+                senz.getAttributes().put(token, tokens[i + 1]);
+                i++;
             } else if (token.startsWith("#")) {
                 // we remove # from token and store as a key
                 String key = token.substring(1);
                 String nextToken = tokens[i + 1];
 
-                if (nextToken.startsWith("#") | nextToken.startsWith("@")) {
+                if (nextToken.startsWith("#") || nextToken.startsWith("$") || nextToken.startsWith("@")) {
                     // #lat #lon
                     // #lat @user
+                    // #lat $key 3.23
                     senz.getAttributes().put(key, "");
                 } else {
                     // #lat 3.24 #lon 3.23
@@ -71,8 +76,10 @@ public class SenzParser {
                 // GET or SHARE query
                 // param and value equal since no value to store (SHARE #lat #lon)
                 payload = payload.concat(" ").concat("#").concat(key).concat(" ").concat(senz.getAttributes().get(key));
+            } else if (key.startsWith("$")) {
+                // Encrypted DATA query
+                payload = payload.concat(" ").concat(key).concat(" ").concat(senz.getAttributes().get(key));
             } else {
-                // DATA query
                 payload = payload.concat(" ").concat("#").concat(key).concat(" ").concat(senz.getAttributes().get(key));
             }
         }
@@ -93,9 +100,6 @@ public class SenzParser {
     }
 
     public static void main(String args[]) {
-        System.out.println(System.currentTimeMillis()/1000);
-        System.out.println(System.currentTimeMillis());
-
 //        String senzMessage3 = "STREAM " +
 //                "#msg UserCreated " +
 //                "#pubkey sd23453451234sfsdfd==  " +

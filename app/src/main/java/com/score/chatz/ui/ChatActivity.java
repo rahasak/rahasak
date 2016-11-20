@@ -34,14 +34,13 @@ import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -424,7 +423,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("msg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
+
+            // encrypt msg
+            if (secretUser.getSessionKey() != null && !secretUser.getSessionKey().isEmpty()) {
+                senzAttributes.put("$msg", RSAUtils.encrypt(RSAUtils.getSecretKey(secretUser.getSessionKey()), secret.getBlob()));
+            } else {
+                senzAttributes.put("msg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
+            }
+
             String timeStamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
             senzAttributes.put("time", timeStamp);
             senzAttributes.put("uid", secret.getId());
@@ -436,7 +442,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -499,19 +505,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void onSenzMsgReceived(Senz senz) {
         if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
-            try {
-                if (senz.getAttributes().containsKey("msg")) {
-                    String msg = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
-                    Secret secret = new Secret(msg, BlobType.TEXT, secretUser, true);
-                    secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
-                    secret.setId(senz.getAttributes().get("uid"));
-                    secret.setDeliveryState(DeliveryState.PENDING);
+            if (senz.getAttributes().containsKey("msg")) {
+                String msg = senz.getAttributes().get("msg");
+                Secret secret = new Secret(msg, BlobType.TEXT, secretUser, true);
+                secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+                secret.setId(senz.getAttributes().get("uid"));
+                secret.setDeliveryState(DeliveryState.PENDING);
 
-                    secretList.add(secret);
-                    secretAdapter.notifyDataSetChanged();
-                }
-            } catch (UnsupportedEncodingException ex) {
-                ex.printStackTrace();
+                secretList.add(secret);
+                secretAdapter.notifyDataSetChanged();
             }
         }
     }

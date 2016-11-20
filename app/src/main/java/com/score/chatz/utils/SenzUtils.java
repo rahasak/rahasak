@@ -113,7 +113,7 @@ public class SenzUtils {
         senzAttributes.put("uid", SenzUtils.getUid(context, timestamp.toString()));
 
         // put session key
-        senzAttributes.put("skey", sessionKey);
+        senzAttributes.put("$skey", sessionKey);
 
         // new senz
         String id = "_ID";

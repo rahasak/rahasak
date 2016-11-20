@@ -82,6 +82,15 @@ public class RSAUtils {
         return publicKey;
     }
 
+    public static PublicKey getPublicKey(String keyString) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
+        // convert to string key public key
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.decode(keyString, Base64.DEFAULT));
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = kf.generatePublic(spec);
+
+        return publicKey;
+    }
+
     public static PrivateKey getPrivateKey(Context context) throws InvalidKeySpecException, NoSuchAlgorithmException {
         // get key string from shared preference
         String keyString = PreferenceUtils.getRsaKey(context, RSAUtils.PRIVATE_KEY);
