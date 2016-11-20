@@ -1,7 +1,5 @@
 package com.score.chatz.utils;
 
-import android.util.Log;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -33,11 +31,11 @@ public class TimeUtils {
             if (deltaSeconds < 3) {
                 time = "now";
             } else if (deltaSeconds < 5) {
-                time = "less than 5 seconds ago";
+                time = "5 seconds ago";
             } else if (deltaSeconds < 10) {
-                time = "less than 10 seconds ago";
+                time = "10 seconds ago";
             } else if (deltaSeconds < 60) {
-                time = "less than a minute ago";
+                time = "1 minute ago";
             } else if (deltaSeconds < (60 * 60)) {
                 time = deltaSeconds / 60 + " minutes ago";//getSimpleDateFormatForChatMessages().format(past);
             } else if (deltaSeconds < (60 * 60 * 24)) {

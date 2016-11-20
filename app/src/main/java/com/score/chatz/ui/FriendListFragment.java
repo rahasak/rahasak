@@ -119,6 +119,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                         intent.putExtra("USERNAME", secretUser.getUsername());
                         intent.putExtra("PHONE", secretUser.getPhone());
                         getActivity().sendBroadcast(intent);
+                        ActivityUtils.showCustomToast("Request sent", getActivity());
                     }
                 });
             } else {
@@ -132,6 +133,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                         intent.putExtra("USERNAME", secretUser.getUsername());
                         intent.putExtra("PHONE", secretUser.getPhone());
                         getActivity().sendBroadcast(intent);
+                        ActivityUtils.showCustomToast("Confirmation sent", getActivity());
                     }
                 });
             }
