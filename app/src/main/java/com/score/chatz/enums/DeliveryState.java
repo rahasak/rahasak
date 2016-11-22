@@ -6,7 +6,7 @@ package com.score.chatz.enums;
 public enum DeliveryState {
     NONE(0),
     PENDING(1),
-    DISPATCHED(2),
+    RECEIVED(2),
     DELIVERED(3);
 
     private int state;

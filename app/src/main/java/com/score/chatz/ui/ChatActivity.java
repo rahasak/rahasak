@@ -462,7 +462,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (senz.getAttributes().containsKey("status")) {
             // status message
             String msg = senz.getAttributes().get("status");
-            if (msg != null && msg.equalsIgnoreCase("DELIVERED")) {
+            if (msg.equalsIgnoreCase("DELIVERED") || msg.equalsIgnoreCase("RECEIVED")) {
                 // message delivered to user
                 onSenzStatusReceived(senz);
             } else if (msg != null && msg.equalsIgnoreCase("NO_LOCATION")) {
@@ -499,12 +499,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void onSenzStatusReceived(Senz senz) {
         // update senz in db
         String uid = senz.getAttributes().get("uid");
-        new SenzorsDbSource(this).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
 
-        for (Secret secret : secretList) {
-            if (secret.getId().equalsIgnoreCase(uid)) {
-                secret.setDeliveryState(DeliveryState.DELIVERED);
-                secretAdapter.notifyDataSetChanged();
+        if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED") || senz.getAttributes().get("status").equalsIgnoreCase("RECEIVED")) {
+            for (Secret secret : secretList) {
+                if (secret.getId().equalsIgnoreCase(uid)) {
+                    secret.setDeliveryState(DeliveryState.valueOf(senz.getAttributes().get("status")));
+                    secretAdapter.notifyDataSetChanged();
+                }
             }
         }
     }

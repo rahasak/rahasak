@@ -316,6 +316,8 @@ class SenHandler {
         String status = senz.getAttributes().get("status");
         if (status.equalsIgnoreCase("DELIVERED")) {
             new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
+        } else if (status.equalsIgnoreCase("RECEIVED")) {
+            new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.RECEIVED, uid);
         }
     }
 }

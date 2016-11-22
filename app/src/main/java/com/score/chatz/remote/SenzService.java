@@ -253,7 +253,7 @@ public class SenzService extends Service {
 
                 // handle senz
                 if (!senz.equalsIgnoreCase("TAK")) {
-                    //Log.d(TAG, "Senz received " + senz);
+                    Log.d(TAG, "Senz received " + senz);
                     SenHandler.getInstance().handle(senz, SenzService.this);
                 }
             }
