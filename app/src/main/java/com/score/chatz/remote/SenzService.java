@@ -66,6 +66,29 @@ public class SenzService extends Service {
     private static int MAX_RETRY_COUNT = 3;
     private static int RETRY_COUNT = 0;
 
+    // API end point of this service, we expose the endpoints define in ISenzService.aidl
+    private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
+        @Override
+        public String getUser() throws RemoteException {
+            return null;
+        }
+
+        @Override
+        public void send(Senz senz) throws RemoteException {
+            Log.d(TAG, "Senz service call with senz " + senz.getId());
+            writeSenz(senz);
+        }
+
+        @Override
+        public void sendInOrder(List<Senz> senzList) throws RemoteException {
+            writeSenzList(senzList);
+        }
+
+        @Override
+        public void sendFromUri(String uri, Senz senz, String uid) throws RemoteException {
+        }
+    };
+
     // broadcast receiver to check network status changes
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -115,34 +138,6 @@ public class SenzService extends Service {
 
             // get pubkey
             requestPubKey(username);
-        }
-    };
-
-    private void requestPubKey(String username) {
-        Senz senz = SenzUtils.getPubkeySenz(this, username);
-        writeSenz(senz);
-    }
-
-    // API end point of this service, we expose the endpoints define in ISenzService.aidl
-    private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
-        @Override
-        public String getUser() throws RemoteException {
-            return null;
-        }
-
-        @Override
-        public void send(Senz senz) throws RemoteException {
-            Log.d(TAG, "Senz service call with senz " + senz.getId());
-            writeSenz(senz);
-        }
-
-        @Override
-        public void sendInOrder(List<Senz> senzList) throws RemoteException {
-            writeSenzList(senzList);
-        }
-
-        @Override
-        public void sendFromUri(String uri, Senz senz, String uid) throws RemoteException {
         }
     };
 
@@ -252,7 +247,9 @@ public class SenzService extends Service {
                 String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
 
                 // handle senz
-                if (!senz.equalsIgnoreCase("TAK")) {
+                if (senz.equalsIgnoreCase("TAK")) {
+                    write("TIK");
+                } else {
                     Log.d(TAG, "Senz received " + senz);
                     SenHandler.getInstance().handle(senz, SenzService.this);
                 }
@@ -265,9 +262,18 @@ public class SenzService extends Service {
         if (senz != null) writeSenz(senz);
     }
 
-    public void writeSenz(final Senz senz) {
-        Log.d(TAG, "Send PING");
+    private void requestPubKey(String username) {
+        Senz senz = SenzUtils.getPubkeySenz(this, username);
+        writeSenz(senz);
+    }
 
+    private void sendSMS(String phoneNumber, String message) {
+        SmsManager sms = SmsManager.getDefault();
+        Log.i(TAG, "SMS Body -> " + message);
+        sms.sendTextMessage(phoneNumber, null, message, null, null);
+    }
+
+    public void writeSenz(final Senz senz) {
         new Thread(new Runnable() {
             public void run() {
                 // sign and write senz
@@ -285,13 +291,7 @@ public class SenzService extends Service {
                     Log.d(TAG, "Senz to be send: " + message);
 
                     //  sends the message to the server
-                    if (connectedSwitch) {
-                        writer.println(message);
-                        writer.flush();
-                    } else {
-                        Log.e(TAG, "Socket disconnected");
-                        //Toast.makeText(SenzService.this, "No connection", Toast.LENGTH_LONG).show();
-                    }
+                    write(message);
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
                     e.printStackTrace();
                 }
@@ -326,18 +326,23 @@ public class SenzService extends Service {
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
-                        if (connectedSwitch) {
-                            writer.println(message);
-                            writer.flush();
-                        } else {
-                            Log.e(TAG, "Socket disconnected");
-                        }
+                        write(message);
                     }
                 } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+    }
+
+    public synchronized void write(String msg) {
+        //  sends the message to the server
+        if (connectedSwitch) {
+            writer.println(msg);
+            writer.flush();
+        } else {
+            Log.e(TAG, "Socket disconnected");
+        }
     }
 
     class SenzComm extends AsyncTask<String, String, Integer> {
@@ -379,12 +384,6 @@ public class SenzService extends Service {
                 initSenzComm();
             }
         }
-    }
-
-    private void sendSMS(String phoneNumber, String message) {
-        SmsManager sms = SmsManager.getDefault();
-        Log.i(TAG, "SMS Body -> " + message);
-        sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
 }
