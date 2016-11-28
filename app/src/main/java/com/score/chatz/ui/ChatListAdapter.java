@@ -154,22 +154,20 @@ class ChatListAdapter extends BaseAdapter {
             if (secret.getDeliveryState() == DeliveryState.DELIVERED) {
                 holder.chatDelivered.setVisibility(View.VISIBLE);
                 holder.chatPending.setVisibility(View.GONE);
+                holder.chatTime.setVisibility(View.VISIBLE);
             } else if (secret.getDeliveryState() == DeliveryState.RECEIVED) {
                 holder.chatDelivered.setVisibility(View.GONE);
                 holder.chatPending.setVisibility(View.VISIBLE);
+                holder.chatTime.setVisibility(View.VISIBLE);
             } else {
                 holder.chatDelivered.setVisibility(View.GONE);
                 holder.chatPending.setVisibility(View.GONE);
+                holder.chatTime.setVisibility(View.GONE);
             }
         }
 
         if (secret.getTimeStamp() != null) {
-            if (secret.getDeliveryState() == DeliveryState.PENDING) {
-                holder.chatTime.setVisibility(View.GONE);
-            } else {
-                holder.chatTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
-                holder.chatTime.setVisibility(View.VISIBLE);
-            }
+            holder.chatTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
         holder.chatCam.setOnClickListener(new View.OnClickListener() {

@@ -55,6 +55,7 @@ public class SenzService extends Service {
 
     // senz socket
     private Socket socket;
+    private InputStreamReader inReader;
     private BufferedReader reader;
     private PrintWriter writer;
 
@@ -68,11 +69,6 @@ public class SenzService extends Service {
 
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
-        @Override
-        public String getUser() throws RemoteException {
-            return null;
-        }
-
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
@@ -220,6 +216,7 @@ public class SenzService extends Service {
     private void initSoc() throws IOException {
         Log.d(TAG, "Init socket");
         socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
+        inReader = new InputStreamReader(socket.getInputStream());
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
@@ -241,10 +238,14 @@ public class SenzService extends Service {
     private void initReader() throws IOException {
         Log.d(TAG, "Init reader");
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (!line.isEmpty()) {
-                String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
+        StringBuilder builder = new StringBuilder();
+        int z;
+        char c;
+        while ((z = inReader.read()) != -1) {
+            c = (char) z;
+            if (c == ';') {
+                String senz = builder.toString();
+                builder = new StringBuilder();
 
                 // handle senz
                 if (senz.equalsIgnoreCase("TAK")) {
@@ -253,8 +254,33 @@ public class SenzService extends Service {
                     Log.d(TAG, "Senz received " + senz);
                     SenHandler.getInstance().handle(senz, SenzService.this);
                 }
+            } else {
+                //Log.d(TAG, "received " + c);
+                builder.append(c);
             }
         }
+
+//        StringBuilder sb = new StringBuilder();
+//        char[] chars = new char[4*1024];
+//        int len;
+//        while((len = inReader.read(chars))>=0) {
+//            sb.append(chars, 0, len);
+//        }
+//
+//        String line;
+//        while ((line = reader.readLine()) != null) {
+//            if (!line.isEmpty()) {
+//                String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
+//
+//                // handle senz
+//                if (senz.equalsIgnoreCase("TAK")) {
+//                    write("TIK");
+//                } else {
+//                    Log.d(TAG, "Senz received " + senz);
+//                    SenHandler.getInstance().handle(senz, SenzService.this);
+//                }
+//            }
+//        }
     }
 
     private void sendPing() {
@@ -335,10 +361,10 @@ public class SenzService extends Service {
         }).start();
     }
 
-    public synchronized void write(String msg) {
+    public void write(String msg) {
         //  sends the message to the server
         if (connectedSwitch) {
-            writer.println(msg);
+            writer.print(msg + ":");
             writer.flush();
         } else {
             Log.e(TAG, "Socket disconnected");
