@@ -371,7 +371,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     }
 
     private void handleStreamSenz(Senz senz) {
-        if (senz.getAttributes().containsKey("cam")) {
+        if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername()) && senz.getAttributes().containsKey("cam")) {
             ActivityUtils.cancelProgressDialog();
 
             // save profile picture in db

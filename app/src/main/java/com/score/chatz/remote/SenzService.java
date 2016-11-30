@@ -255,32 +255,9 @@ public class SenzService extends Service {
                     SenHandler.getInstance().handle(senz, SenzService.this);
                 }
             } else {
-                //Log.d(TAG, "received " + c);
                 builder.append(c);
             }
         }
-
-//        StringBuilder sb = new StringBuilder();
-//        char[] chars = new char[4*1024];
-//        int len;
-//        while((len = inReader.read(chars))>=0) {
-//            sb.append(chars, 0, len);
-//        }
-//
-//        String line;
-//        while ((line = reader.readLine()) != null) {
-//            if (!line.isEmpty()) {
-//                String senz = line.replaceAll("\n", "").replaceAll("\r", "").trim();
-//
-//                // handle senz
-//                if (senz.equalsIgnoreCase("TAK")) {
-//                    write("TIK");
-//                } else {
-//                    Log.d(TAG, "Senz received " + senz);
-//                    SenHandler.getInstance().handle(senz, SenzService.this);
-//                }
-//            }
-//        }
     }
 
     private void sendPing() {
@@ -332,9 +309,7 @@ public class SenzService extends Service {
                 try {
                     PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
 
-                    //for (Senz senz : senzList) {
-                    for (int i = 0; i < senzList.size(); i++) {
-                        Senz senz = senzList.get(i);
+                    for (Senz senz : senzList) {
                         // if sender not already set find user(sender) and set it to senz first
                         if (senz.getSender() == null || senz.getSender().toString().isEmpty())
                             senz.setSender(PreferenceUtils.getUser(getBaseContext()));
@@ -364,7 +339,7 @@ public class SenzService extends Service {
     public void write(String msg) {
         //  sends the message to the server
         if (connectedSwitch) {
-            writer.print(msg + ":");
+            writer.print(msg + ";");
             writer.flush();
         } else {
             Log.e(TAG, "Socket disconnected");
