@@ -49,7 +49,7 @@ public class SenzNotificationManager {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
-            if (SenzApplication.isOnChat() && SenzApplication.getUserOnChat().equalsIgnoreCase(senzNotification.getSender())) {
+            if (SenzApplication.isOnChat() && SenzApplication.getOnChatUser().equalsIgnoreCase(senzNotification.getSender())) {
                 // message for currently chatting user
                 Log.d(TAG, "Message for chatting user " + senzNotification.getSender());
             } else {

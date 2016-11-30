@@ -20,6 +20,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
@@ -27,6 +28,7 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.BitmapTaskParams;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
@@ -167,15 +169,16 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         if (senz.getAttributes().containsKey("status")) {
             if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED")) {
                 // GET msg delivered
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
                 // user busy
-                displayInformationMessageDialog("info", "user busy");
+                displayInformationMessageDialog("Busy", "User busy at this moment");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {
                 // camera error
                 displayInformationMessageDialog("error", "cam error");
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
-                // camera error
-                displayInformationMessageDialog("Offline", "User offline");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("OFFLINE")) {
+                // offline
+                PhotoFullScreenActivity.this.finish();
+                Toast.makeText(this, "User not available at this moment", Toast.LENGTH_LONG).show();
             }
         }
     }

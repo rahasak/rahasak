@@ -163,7 +163,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // on chat
         SenzApplication.setOnChat(true);
-        SenzApplication.setUserOnChat(secretUser.getUsername());
+        SenzApplication.setOnChatUser(secretUser.getUsername());
 
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
@@ -178,7 +178,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // not on chat
         SenzApplication.setOnChat(false);
-        SenzApplication.setUserOnChat(null);
+        SenzApplication.setOnChatUser(null);
 
         unregisterReceiver(senzReceiver);
     }

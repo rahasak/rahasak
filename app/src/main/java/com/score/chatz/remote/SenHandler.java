@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
@@ -270,23 +271,33 @@ class SenHandler {
     }
 
     private void handleCam(Senz senz, SenzService senzService) {
-        try {
-            Intent intent = new Intent(senzService.getApplicationContext(), PhotoActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("USER", senz.getSender().getUsername());
-            senzService.getApplicationContext().startActivity(intent);
-        } catch (Exception e) {
-            // fail to access camera
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "802"));
+        if (!SenzApplication.isOnCall()) {
+            try {
+                Intent intent = new Intent(senzService.getApplicationContext(), PhotoActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("USER", senz.getSender().getUsername());
+                senzService.getApplicationContext().startActivity(intent);
+            } catch (Exception e) {
+                // fail to access camera
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "802"));
+            }
+        } else {
+            // user in another call
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
         }
     }
 
     private void handleMic(Senz senz, SenzService senzService) {
-        Intent intent = new Intent();
-        intent.setClass(senzService.getApplicationContext(), RecordingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("USER", senz.getSender().getUsername());
-        senzService.getApplicationContext().startActivity(intent);
+        if (!SenzApplication.isOnCall()) {
+            Intent intent = new Intent();
+            intent.setClass(senzService.getApplicationContext(), RecordingActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("USER", senz.getSender().getUsername());
+            senzService.getApplicationContext().startActivity(intent);
+        } else {
+            // user in another call
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
+        }
     }
 
     private void handleLocation(Senz senz, SenzService senzService) {

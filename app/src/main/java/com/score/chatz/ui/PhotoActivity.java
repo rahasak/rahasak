@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.chatz.R;
+import com.score.chatz.application.SenzApplication;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.DeliveryState;
@@ -90,6 +91,9 @@ public class PhotoActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
 
+        // user on call
+        SenzApplication.setOnCall(true);
+
         Log.d(TAG, "Bind to senz service");
         bindToService();
     }
@@ -97,6 +101,9 @@ public class PhotoActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
+
+        // user not on call
+        SenzApplication.setOnCall(false);
 
         // unbind from service
         if (isServiceBound) {
@@ -286,7 +293,7 @@ public class PhotoActivity extends BaseActivity {
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("uid", uid);
-        senzAttributes.put("status", "801");
+        senzAttributes.put("status", "BUSY");
 
         // new senz
         String id = "_ID";

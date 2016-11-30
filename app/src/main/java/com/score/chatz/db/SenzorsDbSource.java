@@ -476,6 +476,60 @@ public class SenzorsDbSource {
         return secretList;
     }
 
+    public ArrayList<Secret> getUnAckedSecrects() {
+        ArrayList<Secret> secretList = new ArrayList();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
+                "FROM secret WHERE delivery_status = ? ORDER BY _id ASC";
+        Cursor cursor = db.rawQuery(query, new String[]{Integer.toString(DeliveryState.PENDING.getState())});
+
+        // secret attr
+        String _secretId;
+        String _username;
+        String _secretBlob;
+        int _secretBlobType;
+        int _secretIsSender;
+        int _isViewed;
+        int _isMissed;
+        Long _secretTimestamp;
+        Long _secretViewTimestamp;
+        int _deliveryState;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            // get secret attributes
+            _secretId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
+            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_USER));
+            _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _secretIsSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER));
+            _secretBlobType = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_BLOB_TYPE));
+            _secretBlob = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_BLOB));
+            _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
+            _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
+            _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
+            _deliveryState = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.DELIVERY_STATE));
+
+            // create secret
+            Secret secret = new Secret(_secretBlob, BlobType.valueOfType(_secretBlobType), new SecretUser("ID", _username), _secretIsSender == 1);
+            secret.setId(_secretId);
+            secret.setViewed(_isViewed == 1);
+            secret.setMissed(_isMissed == 1);
+            secret.setTimeStamp(_secretTimestamp);
+            secret.setViewedTimeStamp(_secretViewTimestamp);
+            secret.setDeliveryState(DeliveryState.valueOfState(_deliveryState));
+
+            // fill secret list
+            secretList.add(secret);
+        }
+
+        // clean
+        cursor.close();
+
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
+    }
+
     /**
      * Delete sec from database,
      *
@@ -508,7 +562,6 @@ public class SenzorsDbSource {
                 SenzorsDbContract.Secret.COLUMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
     }
-
 
     /**
      * GEt list of the lates chat messages!!!!

@@ -20,6 +20,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
@@ -83,15 +84,16 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
 
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
-            if (senz.getAttributes().get("status").equalsIgnoreCase("901")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
                 // user busy
-                displayInformationMessageDialog("info", "user busy");
+                displayInformationMessageDialog("info", "user busy at this moment");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("902")) {
                 // camera error
                 displayInformationMessageDialog("error", "mic error");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
-                // camera error
-                displayInformationMessageDialog("Offline", "User offline");
+                // offline
+                AudioFullScreenActivity.this.finish();
+                Toast.makeText(this, "User not available at this moment", Toast.LENGTH_LONG).show();
             }
         }
     }
