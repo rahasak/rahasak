@@ -86,14 +86,13 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         if (senz.getAttributes().containsKey("status")) {
             if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
                 // user busy
-                displayInformationMessageDialog("info", "user busy at this moment");
+                displayInformationMessageDialog("BUSY", "User busy at this moment");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("902")) {
                 // camera error
-                displayInformationMessageDialog("error", "mic error");
+                displayInformationMessageDialog("ERROR", "mic error");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
                 // offline
-                AudioFullScreenActivity.this.finish();
-                Toast.makeText(this, "User not available at this moment", Toast.LENGTH_LONG).show();
+                displayInformationMessageDialog("OFFLINE", "User not available at this moment");
             }
         }
     }

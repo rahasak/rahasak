@@ -145,7 +145,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
 
     private void loadBitmap(String data, ImageView imageView) {
         BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        //task.execute(new BitmapTaskParams(data, 100, 100));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 1000, 1000)));
         else
@@ -171,14 +170,14 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
                 // GET msg delivered
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
                 // user busy
-                displayInformationMessageDialog("Busy", "User busy at this moment");
+                displayInformationMessageDialog("BUSY", "User busy at this moment");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("802")) {
                 // camera error
-                displayInformationMessageDialog("error", "cam error");
+                displayInformationMessageDialog("ERROR", "cam error");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("OFFLINE")) {
                 // offline
-                PhotoFullScreenActivity.this.finish();
-                Toast.makeText(this, "User not available at this moment", Toast.LENGTH_LONG).show();
+                // offline
+                displayInformationMessageDialog("OFFLINE", "User not available at this moment");
             }
         }
     }
