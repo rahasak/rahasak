@@ -10,22 +10,21 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_weight="0"
-        android:background="@color/white_80"
+        android:background="#00FFFFFF"
         app:contentInsetEnd="0dp"
-        app:contentInsetStart="0dp"
-        app:popupTheme="@style/MyMaterialTheme" />
+        app:contentInsetStart="0dp"/>
+
+    <fragment
+            android:id="@+id/map"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="#e5e5e5">
-
-        <fragment
-            android:id="@+id/map"
-            class="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/map_location"
@@ -77,7 +76,7 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_centerInParent="true"
+                android:layout_centerInParent="true"/>
                 android:background="@drawable/route" />
         </RelativeLayout>
     </RelativeLayout>

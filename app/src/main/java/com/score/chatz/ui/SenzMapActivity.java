@@ -90,7 +90,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     private void initActionBar() {
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setCustomView(getLayoutInflater().inflate(R.layout.add_user_header, null));
+        actionBar.setCustomView(getLayoutInflater().inflate(R.layout.map_header, null));
         actionBar.setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setDisplayShowCustomEnabled(true);
 
