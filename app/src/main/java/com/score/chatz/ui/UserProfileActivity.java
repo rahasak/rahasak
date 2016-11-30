@@ -362,8 +362,9 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
                     resetStateOnSwitch(waitingForResponseSwitch, waitingForResponseSwitch.isChecked() ? true : false);
                     waitingForResponseSwitch = null;
                 }
-                displayInformationMessageDialog("Offline", "User offline");
+
                 ActivityUtils.cancelProgressDialog();
+                Toast.makeText(this, "@" + secretUser.getUsername() + " not available at this moment", Toast.LENGTH_LONG).show();
             } else {
                 //ActivityUtils.cancelProgressDialog();
             }

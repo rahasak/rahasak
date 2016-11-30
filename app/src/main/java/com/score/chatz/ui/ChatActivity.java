@@ -103,7 +103,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         onSenzStreamReceived(senz);
                         break;
                     case SHARE:
-                        onShareRecived(senz);
+                        onShareReceived(senz);
                         break;
                     default:
                         break;
@@ -465,9 +465,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (msg.equalsIgnoreCase("DELIVERED") || msg.equalsIgnoreCase("RECEIVED")) {
                 // message delivered to user
                 onSenzStatusReceived(senz);
-            } else if (msg != null && msg.equalsIgnoreCase("NO_LOCATION")) {
+            } else if (msg.equalsIgnoreCase("NO_LOCATION")) {
                 ActivityUtils.cancelProgressDialog();
                 Toast.makeText(this, "No location available", Toast.LENGTH_LONG).show();
+            } else if (msg.equalsIgnoreCase("OFFLINE")) {
+                // user offline
+                ActivityUtils.cancelProgressDialog();
+                Toast.makeText(this, "@" + secretUser.getUsername() + " not available at this moment", Toast.LENGTH_LONG).show();
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message
@@ -532,7 +536,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(mapIntent);
     }
 
-    private void onShareRecived(Senz senz) {
+    private void onShareReceived(Senz senz) {
         secretUser = new SenzorsDbSource(this).getSecretUser(senz.getSender().getUsername());
         if (senz.getAttributes().containsKey("cam")) {
             updatePermissions();
