@@ -30,13 +30,13 @@
         <ImageView
             android:id="@+id/tabTwoActive"
             android:padding="8dp"
-            android:src="@drawable/friends"
+            android:src="@drawable/owl_eye_red"
             android:layout_width="50dp"
             android:layout_height="50dp" />
         <ImageView
             android:id="@+id/tabTwoDeActive"
             android:padding="8dp"
-            android:src="@drawable/friends_deactive"
+            android:src="@drawable/owl_eye_gray"
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
