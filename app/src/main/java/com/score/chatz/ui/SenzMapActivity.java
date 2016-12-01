@@ -1,7 +1,13 @@
 package com.score.chatz.ui;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +18,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,7 +37,7 @@ import com.score.senzc.pojos.Senz;
 /**
  * Senz map activity
  */
-public class SenzMapActivity extends AppCompatActivity implements View.OnClickListener {
+public class SenzMapActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = SenzMapActivity.class.getName();
 
@@ -43,7 +52,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     private Toolbar toolbar;
     private ActionBar actionBar;
 
-    private LatLng myLatLan;
+    private GoogleApiClient mGoogleApiClient;
     private LatLng thisUserLatLng;
     private Senz thisSenz;
 
@@ -55,6 +64,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.senz_map_layout);
 
+        initLoc();
         initExtra();
         initUi();
         initToolbar();
@@ -62,11 +72,49 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
         initMap();
     }
 
-    private void initUi() {
-        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // no permission
+            Log.e(TAG, "No location permission");
+        } else {
+            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (location != null) {
+                displayMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+            } else {
+                Log.e(TAG, "No location available");
+            }
+        }
+    }
 
-        myLocation = (RelativeLayout) findViewById(R.id.map_location);
-        myLocation.setOnClickListener(this);
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mGoogleApiClient != null) mGoogleApiClient.disconnect();
+    }
+
+    private void initLoc() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+
+            // connect to location service
+            mGoogleApiClient.connect();
+        }
     }
 
     private void initExtra() {
@@ -78,6 +126,13 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
             double lan = Double.parseDouble(thisSenz.getAttributes().get("lon"));
             thisUserLatLng = new LatLng(lat, lan);
         }
+    }
+
+    private void initUi() {
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
+
+        myLocation = (RelativeLayout) findViewById(R.id.map_location);
+        myLocation.setOnClickListener(this);
     }
 
     private void initToolbar() {
@@ -148,7 +203,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
 
         // add location marker
         try {
-            marker = map.addMarker(new MarkerOptions().position(this.thisUserLatLng).title("@" + thisSenz.getSender().getUsername()).icon(BitmapDescriptorFactory.fromResource(R.drawable.location_friend)));
+            marker = map.addMarker(new MarkerOptions().position(this.thisUserLatLng).title("@" + thisSenz.getSender().getUsername()).icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2)));
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.thisUserLatLng, 10));
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
@@ -162,7 +217,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
      * @param latLng
      */
     private void displayMyLocation(LatLng latLng) {
-        marker = map.addMarker(new MarkerOptions().position(latLng).title("@Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_me)));
+        marker = map.addMarker(new MarkerOptions().position(latLng).title("@Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3)));
 
         // set zoom level
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -182,4 +237,5 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
             // get location
         }
     }
+
 }

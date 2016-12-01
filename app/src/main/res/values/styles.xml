@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- File created by the Android Action Bar Style Generator
+<?xml version="1.0" encoding="utf-8"?><!-- File created by the Android Action Bar Style Generator
 
      Copyright (C) 2011 The Android Open Source Project
      Copyright (C) 2012 readyState Software Ltd
@@ -18,33 +17,8 @@
 -->
 
 <resources>
-    <style name="RahasakTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarTabStyle">@style/RahasakTheme.ActionBar.Tab</item>
-        <item name="android:actionBarTabBarStyle">@style/RahasakTheme.ActionBar.Tab</item>
-        <item name="actionBarTabTextStyle">@style/RahasakTheme.ActionBar.TabText</item>
-        <item name="android:actionBarStyle">@style/RahasakTheme.ActionBar</item>
-        <item name="windowActionBarOverlay">false</item>
-    </style>
 
-    <style name="RahasakTheme.ActionBar.Tab" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="windowActionBarOverlay">false</item>
-    </style>
-
-    <style name="RahasakTheme.ActionBar.TabText" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">48sp</item>
-        <item name="windowActionBarOverlay">false</item>
-    </style>
-
-    <style name="RahasakTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/black</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="windowActionBarOverlay">false</item>
-    </style>
-
-    <style name="MyMaterialTheme" parent="MyMaterialTheme.Base">
-
-    </style>
+    <style name="MyMaterialTheme" parent="MyMaterialTheme.Base" />
 
     <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowNoTitle">true</item>
@@ -54,6 +28,15 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBarOverlay">false</item>
         <item name="android:actionBarStyle">@color/android_grey</item>
+    </style>
+
+    <style name="MyMaterialTransparentTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="android:actionBarStyle">@android:color/transparent</item>
     </style>
 
 </resources>
