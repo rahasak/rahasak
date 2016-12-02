@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 6
-        versionName "0.6"
+        versionCode 7
+        versionName "0.7"
         applicationId "com.score.chatz"
 
         renderscriptTargetApi 18
