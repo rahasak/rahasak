@@ -2,7 +2,9 @@ package com.score.chatz.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -148,6 +150,8 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
         actionBar.setCustomView(getLayoutInflater().inflate(R.layout.map_header, null));
         actionBar.setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3300001a")));
+        actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#3300001a")));
 
         TextView header = ((TextView) findViewById(R.id.title));
         header.setTypeface(typeface, Typeface.BOLD);
