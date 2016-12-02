@@ -43,6 +43,6 @@
     <color name="my_chat_message">@color/colorPrimary</color>
     <color name="not_my_chat_message">#75CADC</color>
     <color name="audio_grey">#000000</color>
-    <color name="maps_header_bg">#8ac2c2c2</color>
+    <color name="maps_header_bg">#80FFFFFF</color>
 
 </resources>

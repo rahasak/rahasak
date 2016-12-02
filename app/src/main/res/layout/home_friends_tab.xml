@@ -39,7 +39,5 @@
             android:src="@drawable/owl_eye_gray"
             android:layout_width="50dp"
             android:layout_height="50dp" />
-
-
     </RelativeLayout>
 </LinearLayout>
