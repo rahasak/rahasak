@@ -44,7 +44,6 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     private static final String TAG = SenzMapActivity.class.getName();
 
     private ImageView btnBack;
-    private RelativeLayout myLocation;
 
     private Typeface typeface;
 
@@ -132,9 +131,6 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
 
     private void initUi() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
-
-        myLocation = (RelativeLayout) findViewById(R.id.map_location);
-        myLocation.setOnClickListener(this);
     }
 
     private void initToolbar() {
@@ -150,8 +146,6 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
         actionBar.setCustomView(getLayoutInflater().inflate(R.layout.map_header, null));
         actionBar.setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3300001a")));
-        actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#3300001a")));
 
         TextView header = ((TextView) findViewById(R.id.title));
         header.setTypeface(typeface, Typeface.BOLD);
@@ -237,8 +231,6 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         if (v == btnBack) {
             finish();
-        } else if (v == myLocation) {
-            // get location
         }
     }
 
