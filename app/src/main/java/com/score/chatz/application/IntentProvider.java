@@ -21,6 +21,7 @@ public class IntentProvider {
     public static final String ACTION_SMS_REQUEST_REJECT = "com.score.chatz.SMS_REQUEST_REJECT";
     public static final String ACTION_SMS_REQUEST_CONFIRM = "com.score.chatz.SMS_REQUEST_CONFIRM";
     public static final String ACTION_RESTART = "com.score.chatz.RESTART";
+    public static final String ACTION_CONNECTED = "com.score.chatz.CONNECTED";
 
     /**
      * Return the intent filter for the intent_type.
@@ -57,6 +58,8 @@ public class IntentProvider {
                 return ACTION_SMS_REQUEST_REJECT;
             case SMS_REQUEST_CONFIRM:
                 return ACTION_SMS_REQUEST_CONFIRM;
+            case CONNECTED:
+                return ACTION_CONNECTED;
             default:
                 throw new InvalidIntentType();
         }

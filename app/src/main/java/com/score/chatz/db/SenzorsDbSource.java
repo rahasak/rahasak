@@ -476,7 +476,7 @@ public class SenzorsDbSource {
         return secretList;
     }
 
-    public ArrayList<Secret> getUnAckedSecrects() {
+    public ArrayList<Secret> getUnAckSecrects() {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();

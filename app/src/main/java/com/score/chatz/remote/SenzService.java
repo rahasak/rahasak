@@ -14,8 +14,10 @@ import android.telephony.SmsManager;
 import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.IntentType;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.NetworkUtil;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.PreferenceUtils;
@@ -137,6 +139,13 @@ public class SenzService extends Service {
         }
     };
 
+    private BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            sendUnAckSenzList();
+        }
+    };
+
     @Override
     public IBinder onBind(Intent intent) {
         return apiEndPoints;
@@ -184,6 +193,7 @@ public class SenzService extends Service {
         registerReceiver(smsRequestAcceptReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_ACCEPT));
         registerReceiver(smsRequestRejectReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_REJECT));
         registerReceiver(smsRequestConfirmReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_CONFIRM));
+        registerReceiver(connectedReceiver, IntentProvider.getIntentFilter(IntentType.CONNECTED));
     }
 
     private void unRegisterReceivers() {
@@ -192,6 +202,7 @@ public class SenzService extends Service {
         unregisterReceiver(smsRequestAcceptReceiver);
         unregisterReceiver(smsRequestRejectReceiver);
         unregisterReceiver(smsRequestConfirmReceiver);
+        unregisterReceiver(connectedReceiver);
     }
 
     private void initSenzComm() {
@@ -310,6 +321,43 @@ public class SenzService extends Service {
                     PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
 
                     for (Senz senz : senzList) {
+                        // if sender not already set find user(sender) and set it to senz first
+                        if (senz.getSender() == null || senz.getSender().toString().isEmpty())
+                            senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+
+                        // get digital signature of the senz
+                        String senzPayload = SenzParser.getSenzPayload(senz);
+                        String senzSignature;
+                        if (senz.getAttributes().containsKey("stream")) {
+                            senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        } else {
+                            senzSignature = "SIGNATURE";
+                        }
+                        String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+                        Log.d(TAG, "Senz to be send: " + message);
+
+                        //  sends the message to the server
+                        write(message);
+                    }
+                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void sendUnAckSenzList() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+
+                    for (Secret secret : new SenzorsDbSource(SenzService.this).getUnAckSecrects()) {
+                        // create senz
+                        Senz senz = new Senz();
+
                         // if sender not already set find user(sender) and set it to senz first
                         if (senz.getSender() == null || senz.getSender().toString().isEmpty())
                             senz.setSender(PreferenceUtils.getUser(getBaseContext()));
