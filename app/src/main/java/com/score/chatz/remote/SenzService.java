@@ -260,7 +260,11 @@ public class SenzService extends Service {
 
                 // handle senz
                 if (senz.equalsIgnoreCase("TAK")) {
-                    write("TIK");
+                    // connected
+                    // broadcast connected message
+                } else if (senz.equalsIgnoreCase("TIK")) {
+                    // send tuk
+                    write("TUK");
                 } else {
                     Log.d(TAG, "Senz received " + senz);
                     SenHandler.getInstance().handle(senz, SenzService.this);
