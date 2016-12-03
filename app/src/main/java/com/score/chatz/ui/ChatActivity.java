@@ -167,9 +167,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
-
-        // update list
-        updateSecretList();
     }
 
     @Override

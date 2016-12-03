@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.Secret;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -53,8 +54,8 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
 
             if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
-                if (senz.getSenzType() == SenzTypeEnum.DATA) {
-                    displayList();
+                if (senz.getSenzType() == SenzTypeEnum.DATA || senz.getSenzType() == SenzTypeEnum.STREAM) {
+                    updateList(senz);
                 }
             }
         }
@@ -62,24 +63,16 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        dbSource = new SenzorsDbSource(getContext());
         return inflater.inflate(R.layout.last_item_chat_list_fragment, container, false);
-    }
-
-    private void setupEmptyTextFont() {
-        ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setupEmptyTextFont();
-        initActionBar();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        dbSource = new SenzorsDbSource(getContext());
+        setupEmptyTextFont();
+        initActionBar();
         getListView().setOnItemClickListener(this);
         getListView().setOnItemLongClickListener(this);
     }
@@ -99,6 +92,10 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
         getActivity().unregisterReceiver(senzReceiver);
     }
 
+    private void setupEmptyTextFont() {
+        ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
+    }
+
     private void initActionBar() {
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBarDelete = (ImageView) actionBar.getCustomView().findViewById(R.id.delete);
@@ -114,6 +111,29 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
         adapter = new RecentChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    private void updateList(Senz senz) {
+        for (Secret secret : allSecretsList) {
+            if (senz.getSender().getUsername().equalsIgnoreCase(secret.getUser().getUsername())) {
+                if (senz.getAttributes().containsKey("cam")) {
+                    secret.setBlob(senz.getAttributes().get("cam"));
+                    secret.setBlobType(BlobType.IMAGE);
+                    secret.setTimeStamp((System.currentTimeMillis() / 1000));
+                    adapter.notifyDataSetChanged();
+                } else if (senz.getAttributes().containsKey("mic")) {
+                    secret.setBlob(senz.getAttributes().get("mic"));
+                    secret.setBlobType(BlobType.SOUND);
+                    secret.setTimeStamp((System.currentTimeMillis() / 1000));
+                    adapter.notifyDataSetChanged();
+                } else if (senz.getAttributes().containsKey("msg")) {
+                    secret.setBlob(senz.getAttributes().get("msg"));
+                    secret.setBlobType(BlobType.TEXT);
+                    secret.setTimeStamp((System.currentTimeMillis() / 1000));
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
     }
 
     @Override

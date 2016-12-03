@@ -564,7 +564,7 @@ public class SenzorsDbSource {
     }
 
     /**
-     * GEt list of the lates chat messages!!!!
+     * GEt list of the latest chat messages!!!!
      *
      * @return
      */
