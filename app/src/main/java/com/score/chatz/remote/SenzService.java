@@ -112,7 +112,7 @@ public class SenzService extends Service {
             String phone = intent.getStringExtra("PHONE").trim();
             String username = intent.getStringExtra("USERNAME").trim();
             try {
-                sendSMS(phone, "#Rahasak #confirm\nHi, I have confirmed your request. #username " + PreferenceUtils.getUser(SenzService.this).getUsername() + " #code 31e3e");
+                sendSMS(phone, "#Rahasak #confirm\nI have confirmed your request. #username " + PreferenceUtils.getUser(SenzService.this).getUsername() + " #code 31e3e");
 
                 // get pubkey
                 requestPubKey(username);

@@ -196,7 +196,9 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String message = "#Rahasak #request\nHi, I'm using Rahasak App.I have added you as a friend. #username " + username + " #code 41r33";
+                        String message = "#Rahasak #request\nI'm using Rahasak app(http://play.google.com/store/apps/details?id=com.score.chatz) #username " + username + " #code 41r33";
+                        //String message = "#Rahasak #request\nI'm using Rahasak App(https://goo.gl/KYreLa). #username " + username + " #code 41r33";
+
                         sendSMS(phoneNo, message);
 
                         ActivityUtils.showCustomToastShort("Request sent via SMS", ContactsListActivity.this);

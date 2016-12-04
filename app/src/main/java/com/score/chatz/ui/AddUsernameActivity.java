@@ -259,7 +259,10 @@ public class AddUsernameActivity extends BaseActivity {
             ActivityUtils.cancelProgressDialog();
             String status = senz.getAttributes().get("status");
             if (status != null && status.equalsIgnoreCase("701")) {
+                // added user
                 onPostShare(senz);
+            } else if (status != null && status.equalsIgnoreCase("702")) {
+                // already added user
             } else {
                 String user = editTextUserId.getText().toString().trim();
                 String message = "<font size=10>Seems we couldn't connect you with </font> <font color=#F88F8C>" + "<b>" + user + "</b>" + "</font>";

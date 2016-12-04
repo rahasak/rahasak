@@ -85,12 +85,32 @@ class SenHandler {
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getUserNotification(senz.getSender().getUsername()));
 
-                // broadcast
+                // broadcast send status back
                 broadcastSenz(senz, senzService.getApplicationContext());
-
                 senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
             } catch (Exception ex) {
-                // user exists
+                ex.printStackTrace();
+
+                // send error ack
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
+            }
+        } else if (senz.getAttributes().containsKey("$skey")) {
+            // re sharing session key
+            // broadcast send status back
+            SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
+            try {
+                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
+                    String encryptedSessionKey = senz.getAttributes().get("$skey");
+                    String sessionKey = RSAUtils.decrypt(RSAUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
+                    dbSource.updateSecretUser(senz.getSender().getUsername(), "session_key", sessionKey);
+
+                    broadcastSenz(senz, senzService.getApplicationContext());
+                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+                } else {
+                    // means error
+                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
+                }
+            } catch (Exception ex) {
                 ex.printStackTrace();
 
                 // send error ack
