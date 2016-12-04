@@ -47,15 +47,9 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
             if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
-                if (senz.getSenzType() == SenzTypeEnum.SHARE) {
-                    displayUserList();
-                } else if (senz.getSenzType() == SenzTypeEnum.DATA && senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701")) {
-                    // New user added to list via user action after an sms
-                    ActivityUtils.cancelProgressDialog();
+                if (needToRefreshList(senz)) {
                     displayUserList();
                 }
-            } else if (intent.hasExtra("UPDATE_UI_ON_NEW_ADDED_USER")) {
-                displayUserList();
             }
         }
     };
@@ -156,5 +150,10 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             adapter = new FriendListAdapter(getContext(), friendsList);
             getListView().setAdapter(adapter);
         }
+    }
+
+    private boolean needToRefreshList(Senz senz) {
+        return senz.getSenzType() == SenzTypeEnum.SHARE ||
+                senz.getSenzType() == SenzTypeEnum.DATA && (senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701"));
     }
 }
