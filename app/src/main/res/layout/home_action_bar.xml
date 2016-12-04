@@ -14,7 +14,27 @@
         android:adjustViewBounds="true"
         android:cropToPadding="false"
         android:scaleType="fitCenter"
-        android:src="@drawable/rahaslogo" />
+        android:src="@drawable/rahaslogo"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="7dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="Rahasak"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"

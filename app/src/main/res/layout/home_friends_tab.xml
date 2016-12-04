@@ -1,43 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparent"
     android:orientation="vertical">
+
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/transparent"
-        android:layout_gravity="center_horizontal"
-        android:gravity="bottom"
         android:paddingBottom="0dp">
 
-        <!--<TextView
-            android:id="@+id/friends_text_view"
+        <TextView
+            android:id="@+id/tab_two_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/home_page_tab_two"
-            android:allowUndo="false"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="10dp"
-            android:paddingTop="12dp"
-            android:textSize="15sp"
-            android:layout_alignParentBottom="false"
-            android:textColor="@color/colorPrimary"
+            android:text="@string/home_page_tab_two"
+            android:textColor="@color/android_grey"
+            android:textSize="18sp"
             android:textStyle="normal"
-            android:fontFamily="Helvetica" />-->
+            android:visibility="gone" />
+
+        <!--<TextView-->
+        <!--android:id="@+id/tab_two_text"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:text="Friends"-->
+        <!--android:textColor="@color/android_grey"-->
+        <!--android:textSize="18sp" />-->
 
         <ImageView
             android:id="@+id/tabTwoActive"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
             android:padding="8dp"
             android:src="@drawable/owl_eye_red"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+            android:visibility="visible" />
+
         <ImageView
             android:id="@+id/tabTwoDeActive"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
             android:padding="8dp"
             android:src="@drawable/owl_eye_gray"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+            android:visibility="visible" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"
+            android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>

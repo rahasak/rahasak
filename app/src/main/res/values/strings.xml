@@ -10,7 +10,7 @@
     <string name="action_bar_profile">Profile</string>
     <string name="invite_user_id">User ID</string>
     <string name="invite_button_text">VIA USERNAME</string>
-    <string name="invite_text_part_1">Is there someone who would like to share secrets with you? \n\nInvite him/her via username or phone book</string>
+    <string name="invite_text_part_1">Is there someone who would like to share secrets with you? \n\nInvite via his/her username or phone book contact</string>
     <string name="invite_text_part_2">like to share a</string>
     <string name="invite_text_part_3">secret</string>
     <string name="invite_text_part_4">with you?</string>
