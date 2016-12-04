@@ -1,6 +1,8 @@
 package com.score.chatz.ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -11,7 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -62,7 +66,27 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
     private void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         //drawerLayout.setScrimColor(getResources().getColor(android.R.color.transparent));
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
+
+        final LinearLayout frame = (LinearLayout) findViewById(R.id.content_view);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name) {
+            @SuppressLint("NewApi")
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+                float moveFactor = (drawerListView.getWidth() * slideOffset);
+                float lastTranslate = 0.0f;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    frame.setTranslationX(moveFactor);
+                } else {
+                    TranslateAnimation anim = new TranslateAnimation(lastTranslate, moveFactor, 0.0f, 0.0f);
+                    anim.setDuration(0);
+                    anim.setFillAfter(true);
+                    frame.startAnimation(anim);
+
+                    lastTranslate = moveFactor;
+                }
+            }
+        };
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
         homeUserText = (TextView) findViewById(R.id.home_user_text);
@@ -79,6 +103,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         drawerItemList = new ArrayList();
         drawerItemList.add(new DrawerItem("Rahas", R.drawable.rahaslogo, R.drawable.rahaslogo, true));
         drawerItemList.add(new DrawerItem("Friends", R.drawable.rahaslogo, R.drawable.rahaslogo, false));
+        drawerItemList.add(new DrawerItem("Invite", R.drawable.rahaslogo, R.drawable.rahaslogo, false));
 
         drawerAdapter = new DrawerAdapter(this, drawerItemList);
         drawerListView = (ListView) findViewById(R.id.drawer);
