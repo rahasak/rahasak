@@ -3,10 +3,13 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.provider.ContactsContract;
+import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.R;
 
 /**
  * Created by lakmalcaldera on 11/5/16.
@@ -23,8 +26,21 @@ class ContactsListAdapter extends SimpleCursorAdapter {
     }
 
     @Override
-    public void setViewText(TextView v, String text) {
-        super.setViewText(v, text + " / " + PhoneUtils.getNumberFromName(text, _context));
-        v.setTypeface(typeface);
+    public void bindView(View view, Context context, Cursor cursor) {
+        // Find fields to populate in inflated template
+        TextView contactName = (TextView) view.findViewById(R.id.contact_name);
+        TextView contactNumber = (TextView) view.findViewById(R.id.contact_number);
+
+        // Set up fonts
+        contactName.setTypeface(typeface);
+        contactNumber.setTypeface(typeface);
+
+        // Extract properties from cursor
+        String contactNameValue = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+        String contactNumbervalue = PhoneUtils.getNumberFromName(contactNameValue, _context);
+
+        // Populate fields with extracted properties
+        contactName.setText(contactNameValue);
+        contactNumber.setText(contactNumbervalue);
     }
 }

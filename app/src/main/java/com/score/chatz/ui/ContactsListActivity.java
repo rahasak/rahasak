@@ -43,16 +43,6 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
     private final static String[] FROM_COLUMNS = {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME
     };
-
-    /*
-     * Defines an array that contains resource ids for the layout views
-     * that get the Cursor column contents. The id is pre-defined in
-     * the Android framework, so it is prefaced with "android.R.id"
-     */
-    private final static int[] TO_IDS = {
-            android.R.id.text1
-    };
-
     // Defines the text expression
     private static final String SELECTION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? AND " + ContactsContract.Contacts.HAS_PHONE_NUMBER + " =1" : ContactsContract.Contacts.DISPLAY_NAME + " LIKE ? AND " + ContactsContract.Contacts.HAS_PHONE_NUMBER + " =1";
 
@@ -97,7 +87,7 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
     }
 
     private void setupContactsListAdapter() {
-        mCursorAdapter = new ContactsListAdapter(this, R.layout.contacts_list_item, null, FROM_COLUMNS, TO_IDS, 0);
+        mCursorAdapter = new ContactsListAdapter(this, R.layout.contacts_list_item, null, FROM_COLUMNS, null, 0);
         mContactsList.setAdapter(mCursorAdapter);
     }
 
