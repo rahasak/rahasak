@@ -26,4 +26,17 @@ public class PhoneUtils {
 
         return displayName;
     }
+
+    public static String getNumberFromName(String name, Context context) {
+        String phoneNumber = null;
+        String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" like'%" + name +"%'";
+        String[] projection = new String[] { ContactsContract.CommonDataKinds.Phone.NUMBER};
+        Cursor c = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                projection, selection, null, null);
+        if (c.moveToFirst()) {
+            phoneNumber = c.getString(0);
+        }
+        c.close();
+        return phoneNumber;
+    }
 }
