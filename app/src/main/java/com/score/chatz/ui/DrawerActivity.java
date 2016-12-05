@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
@@ -125,7 +126,11 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setCustomView(getLayoutInflater().inflate(R.layout.home_action_bar_layout, null));
+
+        ActionBar.LayoutParams params = new
+                ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
+                ActionBar.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+        actionBar.setCustomView(getLayoutInflater().inflate(R.layout.home_action_bar_layout, null), params);
         actionBar.setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setDisplayShowCustomEnabled(true);
 
@@ -173,7 +178,8 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
                 loadFriends();
             } else if (position == 2) {
                 drawerItemList.get(2).setSelected(true);
-                //loadShare();
+                titleText.setText("Invite");
+                loadInvite();
             }
 
             drawerAdapter.notifyDataSetChanged();
@@ -200,6 +206,17 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void loadFriends() {
         FriendListFragment fragment = new FriendListFragment();
+
+        // fragment transitions
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, fragment);
+        transaction.commit();
+    }
+
+    private void loadInvite() {
+        InviteFragment fragment = new InviteFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,
