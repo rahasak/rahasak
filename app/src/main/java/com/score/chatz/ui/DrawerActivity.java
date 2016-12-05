@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
@@ -22,7 +23,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.DrawerItem;
+import com.score.chatz.utils.PreferenceUtils;
+import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 
@@ -95,7 +99,12 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
         homeUserText = (TextView) findViewById(R.id.home_user_text);
         homeUserText.setTypeface(typeface);
-        homeUserText.setText("@lambda");
+        try {
+            User user = PreferenceUtils.getUser(this);
+            homeUserText.setText("@" + user.getUsername());
+        } catch (NoUserException ex) {
+            Log.d("TAG", "No Registered User");
+        }
     }
 
     /**
@@ -105,7 +114,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList();
-        drawerItemList.add(new DrawerItem("Rahas", R.drawable.rahaslogo, R.drawable.rahaslogo, true));
+        drawerItemList.add(new DrawerItem("Secrets", R.drawable.rahaslogo, R.drawable.rahaslogo, true));
         drawerItemList.add(new DrawerItem("Friends", R.drawable.rahaslogo, R.drawable.rahaslogo, false));
         drawerItemList.add(new DrawerItem("Invite", R.drawable.rahaslogo, R.drawable.rahaslogo, false));
 
@@ -170,15 +179,12 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
             if (position == 0) {
                 drawerItemList.get(0).setSelected(true);
-                titleText.setText("Rahas");
                 loadRahas();
             } else if (position == 1) {
                 drawerItemList.get(1).setSelected(true);
-                titleText.setText("Friends");
                 loadFriends();
             } else if (position == 2) {
                 drawerItemList.get(2).setSelected(true);
-                titleText.setText("Invite");
                 loadInvite();
             }
 
@@ -191,6 +197,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      * Load my sensor list fragment
      */
     private void loadRahas() {
+        titleText.setText("Secrets");
         RecentChatListFragment fragment = new RecentChatListFragment();
 
         // fragment transitions
@@ -205,6 +212,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      * Load my sensor list fragment
      */
     private void loadFriends() {
+        titleText.setText("Friends");
         FriendListFragment fragment = new FriendListFragment();
 
         // fragment transitions
@@ -216,6 +224,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void loadInvite() {
+        titleText.setText("Invite");
         InviteFragment fragment = new InviteFragment();
 
         // fragment transitions

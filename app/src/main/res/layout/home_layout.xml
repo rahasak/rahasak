@@ -65,11 +65,11 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/contact_image"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:text="eranga"
                     android:textColor="#4a4a4a"
                     android:textSize="20sp"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
             </RelativeLayout>
 
             <!-- divider -->
