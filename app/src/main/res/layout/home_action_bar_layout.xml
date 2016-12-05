@@ -26,7 +26,8 @@
         android:layout_centerVertical="true"
         android:text="Rahas"
         android:textColor="@color/colorPrimary"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/delete"

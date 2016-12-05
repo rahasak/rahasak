@@ -138,7 +138,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         homeView.setOnClickListener(this);
 
         titleText = (TextView) findViewById(R.id.title_text);
-        titleText.setTypeface(typeface);
+        titleText.setTypeface(typeface, Typeface.BOLD);
     }
 
     @Override
