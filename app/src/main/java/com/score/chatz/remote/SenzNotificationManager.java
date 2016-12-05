@@ -15,7 +15,7 @@ import com.score.chatz.application.SenzApplication;
 import com.score.chatz.enums.NotificationType;
 import com.score.chatz.pojo.SenzNotification;
 import com.score.chatz.ui.ChatActivity;
-import com.score.chatz.ui.HomeActivity;
+import com.score.chatz.ui.DrawerActivity;
 import com.score.chatz.utils.NotificationUtils;
 
 public class SenzNotificationManager {
@@ -83,7 +83,7 @@ public class SenzNotificationManager {
             intent = new Intent(context, ChatActivity.class);
             intent.putExtra("SENDER", senzNotification.getSender());
         } else {
-            intent = new Intent(context, HomeActivity.class);
+            intent = new Intent(context, DrawerActivity.class);
         }
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

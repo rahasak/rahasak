@@ -67,7 +67,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="5dp"
                     android:text="eranga"
-                    android:textColor="#4a4a4a"
+                    android:textColor="@color/android_grey"
                     android:textSize="20sp"
                     android:visibility="visible" />
             </RelativeLayout>
