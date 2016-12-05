@@ -11,12 +11,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
@@ -32,6 +33,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    private RelativeLayout drawerContainer;
     private ListView drawerListView;
     private ActionBarDrawerToggle actionBarDrawerToggle;
 
@@ -55,7 +57,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         setupActionBar();
         setupDrawer();
         initDrawerList();
-        loadSensors();
+        loadRahas();
     }
 
     @Override
@@ -65,6 +67,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
     private void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerContainer = (RelativeLayout) findViewById(R.id.drawer_container);
         //drawerLayout.setScrimColor(getResources().getColor(android.R.color.transparent));
 
         final LinearLayout frame = (LinearLayout) findViewById(R.id.content_view);
@@ -111,7 +114,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         if (drawerListView != null)
             drawerListView.setAdapter(drawerAdapter);
 
-        //drawerListView.setOnItemClickListener(new DrawerItemClickListener());
+        drawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 
 
@@ -137,18 +140,66 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         if (v == homeView) {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(Gravity.LEFT); //CLOSE Nav Drawer!
+                drawerLayout.closeDrawer(drawerContainer);
             } else {
-                drawerLayout.openDrawer(Gravity.LEFT);
+                drawerLayout.openDrawer(drawerContainer);
             }
         }
     }
 
     /**
+     * Drawer click event handler
+     */
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Highlight the selected item, update the title, and close the drawer
+            // update selected item and title, then close the drawer
+            drawerLayout.closeDrawer(drawerContainer);
+
+            //  reset content in drawer list
+            for (DrawerItem drawerItem : drawerItemList) {
+                drawerItem.setSelected(false);
+            }
+
+            if (position == 0) {
+                drawerItemList.get(0).setSelected(true);
+                titleText.setText("Rahas");
+                loadRahas();
+            } else if (position == 1) {
+                drawerItemList.get(1).setSelected(true);
+                titleText.setText("Friends");
+                loadFriends();
+            } else if (position == 2) {
+                drawerItemList.get(2).setSelected(true);
+                //loadShare();
+            }
+
+            drawerAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    /**
      * Load my sensor list fragment
      */
-    private void loadSensors() {
+    private void loadRahas() {
         RecentChatListFragment fragment = new RecentChatListFragment();
+
+        // fragment transitions
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, fragment);
+        transaction.commit();
+    }
+
+    /**
+     * Load my sensor list fragment
+     */
+    private void loadFriends() {
+        FriendListFragment fragment = new FriendListFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,

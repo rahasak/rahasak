@@ -41,7 +41,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
 
     private ActionBar actionBar;
     private ImageView actionBarDelete;
-    private TextView actionBarName;
+    //private TextView actionBarName;
 
     private ArrayList<Secret> allSecretsList;
     private RecentChatListAdapter adapter;
@@ -99,7 +99,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
     private void initActionBar() {
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBarDelete = (ImageView) actionBar.getCustomView().findViewById(R.id.delete);
-        actionBarName = (TextView) actionBar.getCustomView().findViewById(R.id.user_name);
+        //actionBarName = (TextView) actionBar.getCustomView().findViewById(R.id.user_name);
     }
 
     /**
@@ -143,7 +143,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
             secret.setViewed(false);
             adapter.notifyDataSetChanged();
             actionBarDelete.setVisibility(View.GONE);
-            actionBarName.setVisibility(View.VISIBLE);
+            //actionBarName.setVisibility(View.VISIBLE);
         } else {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
             intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
@@ -158,7 +158,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
         adapter.notifyDataSetChanged();
 
         actionBarDelete.setVisibility(View.VISIBLE);
-        actionBarName.setVisibility(View.GONE);
+        //actionBarName.setVisibility(View.GONE);
         actionBarDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,7 +212,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
                 new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser(secret.getUser());
 
                 actionBarDelete.setVisibility(View.GONE);
-                actionBarName.setVisibility(View.VISIBLE);
+                //actionBarName.setVisibility(View.VISIBLE);
             }
         });
 
@@ -223,7 +223,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
             public void onClick(View v) {
                 dialog.cancel();
                 actionBarDelete.setVisibility(View.GONE);
-                actionBarName.setVisibility(View.VISIBLE);
+                //actionBarName.setVisibility(View.VISIBLE);
             }
         });
 
