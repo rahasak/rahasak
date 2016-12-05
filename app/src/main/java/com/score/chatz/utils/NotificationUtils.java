@@ -33,6 +33,10 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.notification_icon, "@" + user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
     }
 
+    public static SenzNotification getUserConfirmNotification(String user) {
+        return new SenzNotification(R.drawable.notification_icon, "@" + user, " has been confirmed your secret request", user, NotificationType.NEW_PERMISSION);
+    }
+
     public static SenzNotification getSecretNotification(String user, String message) {
         return new SenzNotification(R.drawable.notification_icon, "@" + user, message, user, NotificationType.NEW_SECRET);
     }

@@ -184,6 +184,10 @@ class SenHandler {
                     dbSource.createSecretUser(secretUser);
                     dbSource.activateSecretUser(secretUser.getUsername(), true);
                 }
+
+                // show notification to current user
+                String username = dbSource.getSecretUser(senz.getSender().getUsername()).getUsername();
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(NotificationUtils.getUserConfirmNotification(username));
             }
 
             broadcastSenz(senz, senzService.getApplicationContext());
