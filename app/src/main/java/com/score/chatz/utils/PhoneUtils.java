@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
+import java.util.ArrayList;
+
 /**
  * Created by Lakmal on 11/14/16.
  */
@@ -27,16 +29,20 @@ public class PhoneUtils {
         return displayName;
     }
 
-    public static String getNumberFromName(String name, Context context) {
-        String phoneNumber = null;
-        String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" like'%" + name +"%'";
-        String[] projection = new String[] { ContactsContract.CommonDataKinds.Phone.NUMBER};
-        Cursor c = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                projection, selection, null, null);
-        if (c.moveToFirst()) {
-            phoneNumber = c.getString(0);
+    public static String getFirstValidPhoneNumberFromContactId(String contactId, Context context) {
+        ArrayList<String> phoneNum = new ArrayList<String>();
+        Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[] { contactId + "" }, null);
+        if (cursor.getCount() >= 1) {
+            while (cursor.moveToNext()) {
+                // store the numbers in an array
+                String str = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                if (str != null && str.trim().length() > 0) {
+                    phoneNum.add(str);
+                }
+            }
         }
-        c.close();
-        return phoneNumber;
+        cursor.close();
+        return phoneNum.get(0);
     }
 }

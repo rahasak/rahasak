@@ -37,7 +37,7 @@ class ContactsListAdapter extends SimpleCursorAdapter {
 
         // Extract properties from cursor
         String contactNameValue = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
-        String contactNumbervalue = PhoneUtils.getNumberFromName(contactNameValue, _context);
+        String contactNumbervalue = PhoneUtils.getFirstValidPhoneNumberFromContactId(cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID)), _context);
 
         // Populate fields with extracted properties
         contactName.setText(contactNameValue);

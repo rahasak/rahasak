@@ -23,6 +23,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.PhoneUtils;
 import com.score.chatz.utils.PreferenceUtils;
 
 public class ContactsListActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
@@ -142,12 +143,12 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
     @Override
     public void onItemClick(AdapterView<?> parent, View item, int position, long rowID) {
         Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-        int itemId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+        String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
         String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
         boolean hasPhoneNumber = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0;
 
         if (hasPhoneNumber) {
-            handleOnClickWithPhone(itemId, displayName);
+            handleOnClickWithPhone(contactId, displayName);
         } else {
             ActivityUtils.showCustomToastShort("This user has no mobile number", this);
         }
@@ -167,16 +168,18 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
         mCursorAdapter.swapCursor(null);
     }
 
-    private void handleOnClickWithPhone(int itemId, String displayName) {
+    private void handleOnClickWithPhone(String contactId, String displayName) {
         // Using the item_ID now we will get contact phone number
-        final Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+        /*final Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                new String[]{String.valueOf(itemId)},
+                new String[]{String.valueOf(contactId)},
                 null);
 
         cursorPhone.moveToFirst();
-        final String phoneNo = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        final String phoneNo = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));*/
+
+        final String phoneNo = PhoneUtils.getFirstValidPhoneNumberFromContactId(contactId, this);
 
         // check existing secret user with given phone no
         if (!new SenzorsDbSource(this).isExistingUserWithPhoneNo(phoneNo)) {
