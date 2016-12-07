@@ -8,6 +8,7 @@
         android:id="@+id/home_view"
         android:layout_width="14dp"
         android:layout_height="14dp"
+        android:layout_marginLeft="5dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"

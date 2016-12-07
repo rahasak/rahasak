@@ -1,6 +1,7 @@
 package com.score.chatz.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -63,6 +64,14 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         setupDrawer();
         initDrawerList();
         loadRahas();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.hasExtra("SENDER")) {
+            loadFriends();
+        }
     }
 
     @Override
@@ -172,23 +181,13 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
             // update selected item and title, then close the drawer
             drawerLayout.closeDrawer(drawerContainer);
 
-            //  reset content in drawer list
-            for (DrawerItem drawerItem : drawerItemList) {
-                drawerItem.setSelected(false);
-            }
-
             if (position == 0) {
-                drawerItemList.get(0).setSelected(true);
                 loadRahas();
             } else if (position == 1) {
-                drawerItemList.get(1).setSelected(true);
                 loadFriends();
             } else if (position == 2) {
-                drawerItemList.get(2).setSelected(true);
                 loadInvite();
             }
-
-            drawerAdapter.notifyDataSetChanged();
         }
     }
 
@@ -198,6 +197,11 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void loadRahas() {
         titleText.setText("Secrets");
+
+        unSelectDrawerItems();
+        drawerItemList.get(0).setSelected(true);
+        drawerAdapter.notifyDataSetChanged();
+
         RecentChatListFragment fragment = new RecentChatListFragment();
 
         // fragment transitions
@@ -213,6 +217,11 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void loadFriends() {
         titleText.setText("Friends");
+
+        unSelectDrawerItems();
+        drawerItemList.get(1).setSelected(true);
+        drawerAdapter.notifyDataSetChanged();
+
         FriendListFragment fragment = new FriendListFragment();
 
         // fragment transitions
@@ -223,8 +232,20 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         transaction.commit();
     }
 
+    private void unSelectDrawerItems() {
+        //  reset content in drawer list
+        for (DrawerItem drawerItem : drawerItemList) {
+            drawerItem.setSelected(false);
+        }
+    }
+
     private void loadInvite() {
         titleText.setText("Invite");
+
+        unSelectDrawerItems();
+        drawerItemList.get(2).setSelected(true);
+        drawerAdapter.notifyDataSetChanged();
+
         InviteFragment fragment = new InviteFragment();
 
         // fragment transitions

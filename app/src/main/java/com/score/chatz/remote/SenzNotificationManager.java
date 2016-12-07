@@ -84,6 +84,7 @@ public class SenzNotificationManager {
             intent.putExtra("SENDER", senzNotification.getSender());
         } else {
             intent = new Intent(context, DrawerActivity.class);
+            intent.putExtra("SENDER", senzNotification.getSender());
         }
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

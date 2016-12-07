@@ -51,7 +51,8 @@ public class SenzService extends Service {
     //public static final String SENZ_HOST = "udp.mysensors.info";
 
     //private static final String SENZ_HOST = "52.77.228.195";
-    private static final String SENZ_HOST = "connect.rahasak.com";
+    //private static final String SENZ_HOST = "connect.rahasak.com";
+    private static final String SENZ_HOST = "senz.rahasak.com";
 
     public static final int SENZ_PORT = 7070;
 

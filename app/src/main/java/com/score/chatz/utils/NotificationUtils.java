@@ -34,7 +34,7 @@ public class NotificationUtils {
     }
 
     public static SenzNotification getUserConfirmNotification(String user) {
-        return new SenzNotification(R.drawable.notification_icon, "@" + user, " has been confirmed your secret request", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon, "@" + user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getSecretNotification(String user, String message) {
