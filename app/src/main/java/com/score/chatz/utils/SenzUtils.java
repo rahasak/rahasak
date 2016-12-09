@@ -3,12 +3,18 @@ package com.score.chatz.utils;
 import android.content.Context;
 
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.pojo.Secret;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  * Created by eranga on 6/27/16.
@@ -123,6 +129,27 @@ public class SenzUtils {
         Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
         // send to service
+        return senz;
+    }
+
+    public static Senz getSenzFromSecret(Secret secret) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+
+        senzAttributes.put("time", secret.getTimeStamp().toString());
+        senzAttributes.put("uid", secret.getTimeStamp().toString());
+        if (secret.getUser().getSessionKey() != null && !secret.getUser().getSessionKey().isEmpty()) {
+            senzAttributes.put("$msg", RSAUtils.encrypt(RSAUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getBlob()));
+        } else {
+            senzAttributes.put("msg", secret.getBlob());
+        }
+
+        // new senz object
+        Senz senz = new Senz();
+        senz.setSenzType(SenzTypeEnum.DATA);
+        senz.setReceiver(new User("", secret.getUser().getUsername()));
+        senz.setAttributes(senzAttributes);
+
         return senz;
     }
 }

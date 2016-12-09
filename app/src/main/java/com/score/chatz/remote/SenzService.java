@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.enums.BlobType;
 import com.score.chatz.enums.IntentType;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
@@ -42,6 +43,10 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class SenzService extends Service {
 
@@ -280,6 +285,8 @@ public class SenzService extends Service {
                 if (senz.equalsIgnoreCase("TAK")) {
                     // connected
                     // broadcast connected message
+                    Intent intent = new Intent(IntentProvider.ACTION_CONNECTED);
+                    sendBroadcast(intent);
                 } else if (senz.equalsIgnoreCase("TIK")) {
                     // send tuk
                     write("TUK");
@@ -383,29 +390,31 @@ public class SenzService extends Service {
                     PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
 
                     for (Secret secret : new SenzorsDbSource(SenzService.this).getUnAckSecrects()) {
-                        // create senz
-                        Senz senz = new Senz();
+                        if (secret.getBlobType() == BlobType.TEXT) {
+                            // create senz
+                            Senz senz = SenzUtils.getSenzFromSecret(secret);
 
-                        // if sender not already set find user(sender) and set it to senz first
-                        if (senz.getSender() == null || senz.getSender().toString().isEmpty())
-                            senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+                            // if sender not already set find user(sender) and set it to senz first
+                            if (senz.getSender() == null || senz.getSender().toString().isEmpty())
+                                senz.setSender(PreferenceUtils.getUser(getBaseContext()));
 
-                        // get digital signature of the senz
-                        String senzPayload = SenzParser.getSenzPayload(senz);
-                        String senzSignature;
-                        if (senz.getAttributes().containsKey("stream")) {
-                            senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                        } else {
-                            senzSignature = "SIGNATURE";
+                            // get digital signature of the senz
+                            String senzPayload = SenzParser.getSenzPayload(senz);
+                            String senzSignature;
+                            if (!senz.getAttributes().containsKey("stream")) {
+                                senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                            } else {
+                                senzSignature = "SIGNATURE";
+                            }
+                            String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+                            Log.d(TAG, "Senz to be send: " + message);
+
+                            //  sends the message to the server
+                            write(message);
                         }
-                        String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-                        Log.d(TAG, "Senz to be send: " + message);
-
-                        //  sends the message to the server
-                        write(message);
                     }
-                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
+                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException e) {
                     e.printStackTrace();
                 }
             }

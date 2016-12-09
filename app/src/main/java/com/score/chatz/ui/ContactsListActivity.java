@@ -65,7 +65,6 @@ public class ContactsListActivity extends BaseActivity implements LoaderManager.
             ContactsContract.Contacts.HAS_PHONE_NUMBER
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

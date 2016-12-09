@@ -154,6 +154,6 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     private boolean needToRefreshList(Senz senz) {
         return senz.getSenzType() == SenzTypeEnum.SHARE ||
-                senz.getSenzType() == SenzTypeEnum.DATA && (senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("701"));
+                senz.getSenzType() == SenzTypeEnum.DATA && (senz.getAttributes().containsKey("status") && senz.getAttributes().get("status").equalsIgnoreCase("USER_SHARED"));
     }
 }
