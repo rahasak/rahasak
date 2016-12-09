@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -69,6 +70,10 @@ public class SenzService extends Service {
     // keep retry count
     private static int MAX_RETRY_COUNT = 3;
     private static int RETRY_COUNT = 0;
+
+    // wake lock to keep
+    PowerManager powerManager;
+    PowerManager.WakeLock senzWakeLock;
 
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
@@ -159,6 +164,7 @@ public class SenzService extends Service {
         Log.d(TAG, "onCreate..");
 
         registerReceivers();
+        initWakeLock();
     }
 
     @Override
@@ -195,6 +201,11 @@ public class SenzService extends Service {
         registerReceiver(smsRequestRejectReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_REJECT));
         registerReceiver(smsRequestConfirmReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_CONFIRM));
         registerReceiver(connectedReceiver, IntentProvider.getIntentFilter(IntentType.CONNECTED));
+    }
+
+    private void initWakeLock() {
+        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        senzWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SenzWakeLock");
     }
 
     private void unRegisterReceivers() {
@@ -254,6 +265,12 @@ public class SenzService extends Service {
         int z;
         char c;
         while ((z = inReader.read()) != -1) {
+            // obtain wake lock
+            if (senzWakeLock != null) {
+                if (!senzWakeLock.isHeld())
+                    senzWakeLock.acquire();
+            }
+
             c = (char) z;
             if (c == ';') {
                 String senz = builder.toString();
@@ -269,6 +286,12 @@ public class SenzService extends Service {
                 } else {
                     Log.d(TAG, "Senz received " + senz);
                     SenHandler.getInstance().handle(senz, SenzService.this);
+                }
+
+                // release wake lock
+                if (senzWakeLock != null) {
+                    if (senzWakeLock.isHeld())
+                        senzWakeLock.release();
                 }
             } else {
                 builder.append(c);
