@@ -345,7 +345,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
             // status response received
             if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED")) {
                 // delivery message
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("701")) {
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("PERMISSION_SHARED")) {
                 ActivityUtils.cancelProgressDialog();
                 waitingForResponseSwitch = null;
 
@@ -353,10 +353,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
                 if (currentSenz.getAttributes().get("uid").equalsIgnoreCase(senz.getAttributes().get("uid"))) {
                     updatePermission(currentSenz);
                 }
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("801")) {
-                // user busy
-                ActivityUtils.cancelProgressDialog();
-                displayInformationMessageDialog("info", "user busy");
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
                 if (waitingForResponseSwitch != null) {
                     resetStateOnSwitch(waitingForResponseSwitch, waitingForResponseSwitch.isChecked() ? true : false);

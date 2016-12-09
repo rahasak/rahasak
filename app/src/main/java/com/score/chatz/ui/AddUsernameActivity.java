@@ -258,7 +258,7 @@ public class AddUsernameActivity extends BaseActivity {
             // status response received
             ActivityUtils.cancelProgressDialog();
             String status = senz.getAttributes().get("status");
-            if (status != null && status.equalsIgnoreCase("701")) {
+            if (status != null && status.equalsIgnoreCase("USER_SHARED")) {
                 // added user
                 onPostShare(senz);
             } else if (status != null && status.equalsIgnoreCase("702")) {

@@ -340,7 +340,7 @@ public class RecordingActivity extends AppCompatActivity {
         HashMap<String, String> senzAttributes = new HashMap<>();
         Long timestamp = System.currentTimeMillis() / 1000;
         senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("status", "BUSY");
+        senzAttributes.put("status", "MIC_BUSY");
         senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
 
         // new senz

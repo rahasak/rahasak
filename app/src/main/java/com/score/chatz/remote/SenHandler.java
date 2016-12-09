@@ -87,12 +87,12 @@ class SenHandler {
 
                 // broadcast send status back
                 broadcastSenz(senz, senzService.getApplicationContext());
-                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "USER_SHARED"));
             } catch (Exception ex) {
                 ex.printStackTrace();
 
                 // send error ack
-                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "USER_SHARE_FAILED"));
             }
         } else if (senz.getAttributes().containsKey("$skey")) {
             // re sharing session key
@@ -105,16 +105,16 @@ class SenHandler {
                     dbSource.updateSecretUser(senz.getSender().getUsername(), "session_key", sessionKey);
 
                     broadcastSenz(senz, senzService.getApplicationContext());
-                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "KEY_SHARED"));
                 } else {
                     // means error
-                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
+                    senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "KEY_SHARE_FAILED"));
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
 
                 // send error ack
-                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "702"));
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "KEY_SHARE_FAILED"));
             }
         } else {
             // #mic #cam #lat #lon permission
@@ -136,7 +136,7 @@ class SenHandler {
 
             // send status
             // broadcast
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "701"));
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "PERMISSION_SHARED"));
             broadcastSenz(senz, senzService.getApplicationContext());
         }
     }
@@ -170,7 +170,7 @@ class SenHandler {
             updateStatus(senz, senzService.getApplicationContext());
 
             String status = senz.getAttributes().get("status");
-            if (status.equalsIgnoreCase("701")) {
+            if (status.equalsIgnoreCase("USER_SHARED")) {
                 // user added successfully
                 // save user in db
                 if (dbSource.isExistingUser(senz.getSender().getUsername())) {
@@ -303,11 +303,11 @@ class SenHandler {
                 senzService.getApplicationContext().startActivity(intent);
             } catch (Exception e) {
                 // fail to access camera
-                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "802"));
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "CAM_ERROR"));
             }
         } else {
             // user in another call
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "CAM_BUSY"));
         }
     }
 
@@ -320,7 +320,7 @@ class SenHandler {
             senzService.getApplicationContext().startActivity(intent);
         } else {
             // user in another call
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "MIC_BUSY"));
         }
     }
 

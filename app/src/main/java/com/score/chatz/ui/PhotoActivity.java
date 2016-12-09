@@ -293,7 +293,7 @@ public class PhotoActivity extends BaseActivity {
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", timestamp.toString());
         senzAttributes.put("uid", uid);
-        senzAttributes.put("status", "BUSY");
+        senzAttributes.put("status", "CAM_BUSY");
 
         // new senz
         String id = "_ID";
