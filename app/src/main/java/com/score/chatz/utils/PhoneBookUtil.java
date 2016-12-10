@@ -93,12 +93,11 @@ public class PhoneBookUtil {
         String ID = ContactsContract.Contacts._ID;
         String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
         String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
-        String SELECTION = Phone.TYPE + "=" + Phone.TYPE_MOBILE + " OR " + Phone.TYPE + "=" + Phone.TYPE_WORK;
 
         Cursor managedCursor = context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{Phone._ID, Phone.DISPLAY_NAME, Phone.NUMBER},
-                SELECTION,
+                null,
                 null,
                 Phone.DISPLAY_NAME + " ASC");
 

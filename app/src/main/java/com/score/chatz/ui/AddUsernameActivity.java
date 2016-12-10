@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.chatz.R;
@@ -132,6 +133,10 @@ public class AddUsernameActivity extends BaseActivity {
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.add_user_header, null));
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        // title
+        TextView titleText = (TextView) findViewById(R.id.title);
+        titleText.setTypeface(typeface, Typeface.BOLD);
     }
 
     private void setupBackBtn() {
