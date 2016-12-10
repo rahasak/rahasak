@@ -2,6 +2,8 @@ package com.score.chatz.ui;
 
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
@@ -16,23 +18,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
+import com.score.chatz.asyncTasks.ContactReader;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.interfaces.IContactReaderListener;
 import com.score.chatz.pojo.Contact;
 import com.score.chatz.utils.ActivityUtils;
-import com.score.chatz.utils.PhoneBookUtil;
 import com.score.chatz.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 
-public class ContactUserListActivity extends BaseActivity {
+public class ContactUserListActivity extends BaseActivity implements IContactReaderListener {
 
     private EditText searchView;
 
     private ListView contactListView;
     private ContactUserListAdapter adapter;
-
-    private ArrayList<Contact> contactList;
 
     private static final String TAG = ContactUserListActivity.class.getName();
 
@@ -45,7 +46,7 @@ public class ContactUserListActivity extends BaseActivity {
         setupToolbar();
         setupActionBar();
         setupSearchView();
-        initContactList();
+        fetchContacts();
     }
 
     private void setupToolbar() {
@@ -97,9 +98,7 @@ public class ContactUserListActivity extends BaseActivity {
         });
     }
 
-    private void initContactList() {
-        contactList = PhoneBookUtil.getContactList(this);
-
+    private void initContactList(ArrayList<Contact> contactList) {
         contactListView = (ListView) findViewById(R.id.contacts_list);
         contactListView.setTextFilterEnabled(true);
         adapter = new ContactUserListAdapter(this, contactList);
@@ -115,13 +114,21 @@ public class ContactUserListActivity extends BaseActivity {
         });
     }
 
+    private void fetchContacts() {
+        ActivityUtils.showProgressDialog(this, "Loading...");
+
+        ContactReader contactReader = new ContactReader(this, this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            contactReader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            contactReader.execute("PLAY");
+        }
+    }
+
     private void onContactItemClick(final Contact contact) {
         // check existing secret user with given phone no
         if (!new SenzorsDbSource(this).isExistingUserWithPhoneNo(contact.getPhoneNo())) {
             String confirmationMessage = "<font size=10>Are you sure you want to share your rahsak username to </font> <font color=#F88F8C>" + "<b>" + contact.getName() + "</b>" + "</font> (" + contact.getPhoneNo() + "), via sms?";
-
-            String contactName = PhoneBookUtil.getContactName(this, contact.getPhoneNo());
-            Log.d(TAG, "-----" + contactName);
             try {
                 final String username = PreferenceUtils.getUser(this).getUsername();
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
@@ -147,4 +154,9 @@ public class ContactUserListActivity extends BaseActivity {
         sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
+    @Override
+    public void onPostRead(ArrayList<Contact> contactList) {
+        ActivityUtils.cancelProgressDialog();
+        initContactList(contactList);
+    }
 }
