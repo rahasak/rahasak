@@ -97,7 +97,7 @@ public class PhoneBookUtil {
         Cursor managedCursor = context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{Phone._ID, Phone.DISPLAY_NAME, Phone.NUMBER},
-                Phone.TYPE + "=" + Phone.TYPE_MOBILE,
+                Phone.TYPE + "=" + Phone.TYPE_MOBILE + " OR " + Phone.TYPE + "=" + Phone.TYPE_WORK,
                 null,
                 Phone.DISPLAY_NAME + " ASC");
 
@@ -113,48 +113,6 @@ public class PhoneBookUtil {
         managedCursor.close();
 
         return contactList;
-    }
-
-    /**
-     * Read all contacts from contact database, we read
-     * 1. name
-     * 2. phone no
-     *
-     * @param context application context
-     * @return contact list
-     */
-    public static ArrayList<Contact> getContactList1(Context context) {
-        ArrayList<Contact> contactList = new ArrayList<>();
-
-        String _ID = ContactsContract.Contacts._ID;
-        String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
-        String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
-        String HAS_PHONE_NO = ContactsContract.Contacts.HAS_PHONE_NUMBER;
-
-        ContentResolver contentResolver = context.getContentResolver();
-        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        while (cursor.moveToNext()) {
-            String id = cursor.getString(cursor.getColumnIndex(_ID));
-            String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
-            int hasPhoneNo = cursor.getInt(cursor.getColumnIndex(HAS_PHONE_NO));
-
-            // check for phone no
-            if (hasPhoneNo > 0) {
-
-            }
-        }
-
-        return contactList;
-    }
-
-    private static void getPhoneNo(ContentResolver contentResolver, String id) {
-        Cursor cursor = contentResolver.query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null,
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                new String[]{id},
-                null);
-        cursor.moveToNext();
     }
 
     /**
