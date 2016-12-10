@@ -6,13 +6,16 @@
 
     <ImageView
         android:id="@+id/home_view"
-        android:layout_width="14dp"
-        android:layout_height="14dp"
-        android:layout_marginLeft="5dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
+        android:paddingBottom="9dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="9dp"
         android:scaleType="fitCenter"
         android:src="@drawable/draw"
         android:visibility="visible" />
@@ -33,7 +36,7 @@
         android:layout_width="32dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="18dp"
+        android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
         android:adjustViewBounds="true"
         android:padding="4dp"
