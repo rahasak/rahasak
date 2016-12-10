@@ -323,30 +323,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onClickSend() {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            String secretMsg = txtSecret.getText().toString().trim();
-            if (!secretMsg.isEmpty()) {
-                // clear text
-                txtSecret.setText("");
-
-                // create secret
-                Secret secret = new Secret(secretMsg, BlobType.TEXT, secretUser, false);
-                Long timestamp = System.currentTimeMillis() / 1000;
-                secret.setTimeStamp(timestamp);
-                secret.setId(SenzUtils.getUid(this, timestamp.toString()));
-                secret.setDeliveryState(DeliveryState.PENDING);
-
-                // send secret
-                // save secret
-                sendSecret(secret);
-                saveSecretInDb(secret);
-
-                // update list view
-                secretList.add(secret);
-                secretAdapter.notifyDataSetChanged();
-            }
-        } else {
+        if (!NetworkUtil.isAvailableNetwork(this)) {
             Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
+        }
+
+        String secretMsg = txtSecret.getText().toString().trim();
+        if (!secretMsg.isEmpty()) {
+            // clear text
+            txtSecret.setText("");
+
+            // create secret
+            Secret secret = new Secret(secretMsg, BlobType.TEXT, secretUser, false);
+            Long timestamp = System.currentTimeMillis() / 1000;
+            secret.setTimeStamp(timestamp);
+            secret.setId(SenzUtils.getUid(this, timestamp.toString()));
+            secret.setDeliveryState(DeliveryState.PENDING);
+
+            // send secret
+            // save secret
+            sendSecret(secret);
+            saveSecretInDb(secret);
+
+            // update list view
+            secretList.add(secret);
+            secretAdapter.notifyDataSetChanged();
         }
     }
 

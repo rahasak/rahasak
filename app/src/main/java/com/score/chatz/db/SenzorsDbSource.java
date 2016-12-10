@@ -481,7 +481,7 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
-                "FROM secret WHERE delivery_status = ? ORDER BY _id ASC";
+                "FROM secret WHERE delivery_state = ? ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{Integer.toString(DeliveryState.PENDING.getState())});
 
         // secret attr

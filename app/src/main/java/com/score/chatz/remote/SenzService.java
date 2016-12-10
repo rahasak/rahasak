@@ -392,7 +392,7 @@ public class SenzService extends Service {
                     for (Secret secret : new SenzorsDbSource(SenzService.this).getUnAckSecrects()) {
                         if (secret.getBlobType() == BlobType.TEXT) {
                             // create senz
-                            Senz senz = SenzUtils.getSenzFromSecret(secret);
+                            Senz senz = SenzUtils.getSenzFromSecret(SenzService.this, secret);
 
                             // if sender not already set find user(sender) and set it to senz first
                             if (senz.getSender() == null || senz.getSender().toString().isEmpty())

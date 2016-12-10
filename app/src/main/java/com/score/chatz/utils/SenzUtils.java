@@ -132,12 +132,17 @@ public class SenzUtils {
         return senz;
     }
 
-    public static Senz getSenzFromSecret(Secret secret) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+    public static Senz getSenzFromSecret(Context context, Secret secret) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
 
+        // TODO set new timestamp and uid
+        // TODO update them in db
+        //Long timestamp = (System.currentTimeMillis() / 1000);
+        //String uid = SenzUtils.getUid(context, timestamp.toString());
         senzAttributes.put("time", secret.getTimeStamp().toString());
-        senzAttributes.put("uid", secret.getTimeStamp().toString());
+        senzAttributes.put("uid", secret.getId());
+        senzAttributes.put("user", secret.getUser().getUsername());
         if (secret.getUser().getSessionKey() != null && !secret.getUser().getSessionKey().isEmpty()) {
             senzAttributes.put("$msg", RSAUtils.encrypt(RSAUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getBlob()));
         } else {
