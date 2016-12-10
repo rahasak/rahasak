@@ -109,7 +109,10 @@ public class PhoneBookUtil {
             String formattedPhoneNo = getFormattedPhoneNo(context, phoneNo);
 
             Contact contact = new Contact(id, name, formattedPhoneNo);
-            contactList.add(contact);
+
+            // prevent duplicate entries
+            if (!contactList.contains(contact))
+                contactList.add(contact);
         }
 
         managedCursor.close();

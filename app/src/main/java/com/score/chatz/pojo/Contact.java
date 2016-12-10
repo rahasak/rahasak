@@ -3,7 +3,6 @@ package com.score.chatz.pojo;
 /**
  * Created by eranga on 12/10/16.
  */
-
 public class Contact {
     private String id;
     private String name;
@@ -37,5 +36,15 @@ public class Contact {
 
     public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Contact)) {
+            return false;
+        }
+
+        Contact that = (Contact) other;
+        return this.name.equalsIgnoreCase(that.name) && this.phoneNo.equalsIgnoreCase(that.phoneNo);
     }
 }
