@@ -16,7 +16,7 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.enums.BlobType;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.utils.PhoneBookUtil;
 import com.score.chatz.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class RecentChatListAdapter extends BaseAdapter {
     private void setUpRow(Secret secret, ViewHolder viewHolder) {
         // set username/name
         if (secret.getUser().getPhone() != null && !secret.getUser().getPhone().isEmpty()) {
-            viewHolder.sender.setText(PhoneUtils.getDisplayNameFromNumber(secret.getUser().getPhone(), context));
+            viewHolder.sender.setText(PhoneBookUtil.getContactName(context, secret.getUser().getPhone()));
         } else {
             viewHolder.sender.setText("@" + secret.getUser().getUsername());
         }

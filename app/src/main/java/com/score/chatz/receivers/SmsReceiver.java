@@ -13,7 +13,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.remote.SenzNotificationManager;
 import com.score.chatz.utils.NotificationUtils;
-import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.utils.PhoneBookUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,7 +84,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
     private void initFriendRequest(SmsMessage smsMessage, Context context) {
         String contactNo = smsMessage.getOriginatingAddress();
-        String contactName = PhoneUtils.getDisplayNameFromNumber(contactNo, context);
+        String contactName = PhoneBookUtil.getContactName(context, contactNo);
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 

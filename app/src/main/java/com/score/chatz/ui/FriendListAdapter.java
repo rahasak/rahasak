@@ -18,7 +18,7 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.SecretUser;
-import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.utils.PhoneBookUtil;
 
 import java.util.ArrayList;
 
@@ -114,7 +114,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         // request text
         if (secretUser.isActive()) {
             if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                viewHolder.usernameView.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), context));
+                viewHolder.usernameView.setText(PhoneBookUtil.getContactName(context, secretUser.getPhone()));
                 viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
                 viewHolder.phoneBookNameView.setText("@" + secretUser.getUsername());
             } else {
@@ -127,7 +127,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             viewHolder.userLocationPermView.setVisibility(View.VISIBLE);
         } else {
             if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                viewHolder.usernameView.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), context) + " @" + secretUser.getUsername());
+                viewHolder.usernameView.setText(PhoneBookUtil.getContactName(context, secretUser.getPhone()) + " @" + secretUser.getUsername());
             } else {
                 viewHolder.usernameView.setText("@" + secretUser.getUsername());
             }

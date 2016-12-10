@@ -119,6 +119,9 @@ public class ContactUserListActivity extends BaseActivity {
         // check existing secret user with given phone no
         if (!new SenzorsDbSource(this).isExistingUserWithPhoneNo(contact.getPhoneNo())) {
             String confirmationMessage = "<font size=10>Are you sure you want to share your rahsak username to </font> <font color=#F88F8C>" + "<b>" + contact.getName() + "</b>" + "</font> (" + contact.getPhoneNo() + "), via sms?";
+
+            String contactName = PhoneBookUtil.getContactName(this, contact.getPhoneNo());
+            Log.d(TAG, "-----" + contactName);
             try {
                 final String username = PreferenceUtils.getUser(this).getUsername();
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {

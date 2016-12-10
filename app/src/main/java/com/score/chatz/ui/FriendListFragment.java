@@ -22,7 +22,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.IntentType;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ActivityUtils;
-import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.utils.PhoneBookUtil;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
@@ -103,7 +103,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             startActivity(intent);
         } else {
             if (secretUser.isSMSRequester()) {
-                String contactName = PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getActivity());
+                String contactName = PhoneBookUtil.getContactName(getActivity(), secretUser.getPhone());
                 ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to resend friend request to " + contactName + "?", getActivity(), typeface, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -117,7 +117,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                     }
                 });
             } else {
-                String contactName = PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getActivity());
+                String contactName = PhoneBookUtil.getContactName(getActivity(), secretUser.getPhone());
                 ActivityUtils.displayConfirmationMessageDialog("Confirm", "Would you like to accept the request from " + contactName + "?", getActivity(), typeface, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

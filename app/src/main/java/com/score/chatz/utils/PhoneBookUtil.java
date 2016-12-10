@@ -44,7 +44,7 @@ public class PhoneBookUtil {
             contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
         }
 
-        if (cursor != null && !cursor.isClosed()) {
+        if (!cursor.isClosed()) {
             cursor.close();
         }
 
@@ -90,23 +90,25 @@ public class PhoneBookUtil {
     public static ArrayList<Contact> getContactList(Context context) {
         ArrayList<Contact> contactList = new ArrayList<>();
 
-        String _ID = ContactsContract.Contacts._ID;
+        String ID = ContactsContract.Contacts._ID;
         String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
         String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
+        String SELECTION = Phone.TYPE + "=" + Phone.TYPE_MOBILE + " OR " + Phone.TYPE + "=" + Phone.TYPE_WORK;
 
         Cursor managedCursor = context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{Phone._ID, Phone.DISPLAY_NAME, Phone.NUMBER},
-                Phone.TYPE + "=" + Phone.TYPE_MOBILE + " OR " + Phone.TYPE + "=" + Phone.TYPE_WORK,
+                SELECTION,
                 null,
                 Phone.DISPLAY_NAME + " ASC");
 
         while (managedCursor.moveToNext()) {
-            String id = managedCursor.getString(managedCursor.getColumnIndex(_ID));
+            String id = managedCursor.getString(managedCursor.getColumnIndex(ID));
             String name = managedCursor.getString(managedCursor.getColumnIndex(DISPLAY_NAME));
             String phoneNo = managedCursor.getString(managedCursor.getColumnIndex(NUMBER)).replaceAll(" ", "");
+            String formattedPhoneNo = getFormattedPhoneNo(context, phoneNo);
 
-            Contact contact = new Contact(id, name, phoneNo);
+            Contact contact = new Contact(id, name, formattedPhoneNo);
             contactList.add(contact);
         }
 

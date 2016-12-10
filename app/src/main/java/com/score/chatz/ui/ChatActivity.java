@@ -35,7 +35,7 @@ import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.LimitedList;
 import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.PhoneUtils;
+import com.score.chatz.utils.PhoneBookUtil;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -265,7 +265,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         TextView header = ((TextView) findViewById(R.id.user_name));
         header.setTypeface(typeface, Typeface.BOLD);
         if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-            header.setText(PhoneUtils.getDisplayNameFromNumber(secretUser.getPhone(), getBaseContext()));
+            header.setText(PhoneBookUtil.getContactName(getApplicationContext(), secretUser.getPhone()));
         } else {
             header.setText("@" + secretUser.getUsername());
         }

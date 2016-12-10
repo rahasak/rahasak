@@ -75,7 +75,7 @@ public class AddUserActivity extends AppCompatActivity {
         openContactsBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Click action
-                Intent intent = new Intent(AddUserActivity.this, ContactsListActivity.class);
+                Intent intent = new Intent(AddUserActivity.this, ContactUserListActivity.class);
                 startActivity(intent);
             }
         });
