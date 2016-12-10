@@ -43,4 +43,5 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.4.4'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
     compile 'org.jetbrains:annotations-java5:15.0'
+    compile 'com.googlecode.libphonenumber:libphonenumber:7.1.1'
 }
