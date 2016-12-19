@@ -55,7 +55,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
             if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 if (senz.getSenzType() == SenzTypeEnum.DATA || senz.getSenzType() == SenzTypeEnum.STREAM) {
-                    updateList(senz);
+                    refreshList();
                 }
             }
         }
@@ -73,6 +73,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
         dbSource = new SenzorsDbSource(getContext());
         setupEmptyTextFont();
         initActionBar();
+        displayList();
         getListView().setOnItemClickListener(this);
         getListView().setOnItemLongClickListener(this);
     }
@@ -80,7 +81,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
     @Override
     public void onResume() {
         super.onResume();
-        displayList();
+        refreshList();
 
         getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
@@ -110,6 +111,12 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
         allSecretsList = dbSource.getRecentSecretList();
         adapter = new RecentChatListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void refreshList() {
+        allSecretsList.clear();
+        allSecretsList.addAll(dbSource.getRecentSecretList());
         adapter.notifyDataSetChanged();
     }
 

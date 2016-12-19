@@ -16,6 +16,7 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.enums.BlobType;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.PhoneBookUtil;
 import com.score.chatz.utils.TimeUtils;
 
@@ -114,7 +115,9 @@ public class RecentChatListAdapter extends BaseAdapter {
         }
 
         if (secret.getUser().getImage() != null) {
-            loadBitmap(secret.getUser().getImage(), viewHolder.userImage);
+            viewHolder.userImage.setImageBitmap(new ImageUtils().decodeBitmap(secret.getUser().getImage()));
+        } else {
+            viewHolder.userImage.setImageResource(R.drawable.default_user);
         }
 
         if (secret.isViewed()) {

@@ -18,6 +18,7 @@ import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.SecretUser;
+import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.PhoneBookUtil;
 
 import java.util.ArrayList;
@@ -104,11 +105,11 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_deactive, null));
         }
 
-        viewHolder.userImageView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.default_user, null));
-
         // extracting user image
         if (secretUser.getImage() != null) {
-            loadBitmap(secretUser.getImage(), viewHolder.userImageView);
+            viewHolder.userImageView.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
+        } else {
+            viewHolder.userImageView.setImageResource(R.drawable.default_user);
         }
 
         // request text

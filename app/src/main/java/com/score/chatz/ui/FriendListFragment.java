@@ -37,6 +37,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     private ArrayList<SecretUser> friendsList;
     private FriendListAdapter adapter;
+    private SenzorsDbSource dbSource;
 
     private Typeface typeface;
 
@@ -48,7 +49,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             if (intent.hasExtra("SENZ")) {
                 Senz senz = intent.getExtras().getParcelable("SENZ");
                 if (needToRefreshList(senz)) {
-                    displayUserList();
+                    refreshList();
                 }
             }
         }
@@ -64,22 +65,19 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getListView().setOnItemClickListener(this);
-    }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+        dbSource = new SenzorsDbSource(getContext());
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
         setupEmptyTextFont();
+        displayUserList();
+        getListView().setOnItemClickListener(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        displayUserList();
 
+        refreshList();
         getActivity().registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
@@ -140,7 +138,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
      */
     private void displayUserList() {
         // get User from db
-        friendsList = new SenzorsDbSource(this.getActivity()).getSecretUserList();
+        friendsList = dbSource.getSecretUserList();
         // construct list adapter
         if (friendsList.size() > 0) {
             adapter = new FriendListAdapter(getContext(), friendsList);
@@ -150,6 +148,12 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
             adapter = new FriendListAdapter(getContext(), friendsList);
             getListView().setAdapter(adapter);
         }
+    }
+
+    private void refreshList() {
+        friendsList.clear();
+        friendsList.addAll(dbSource.getSecretUserList());
+        adapter.notifyDataSetChanged();
     }
 
     private boolean needToRefreshList(Senz senz) {
