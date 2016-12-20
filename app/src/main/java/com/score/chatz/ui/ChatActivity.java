@@ -168,7 +168,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         // bind to senz service
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
 
-        updateSecretList();
+        refreshSecretList();
     }
 
     @Override
@@ -292,15 +292,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         listView.setAdapter(secretAdapter);
     }
 
-    private void updateSecretList() {
-        if (secretAdapter != null && secretList.size() > 0) {
-            Secret lastSecret = secretList.getYongest();
-            if (lastSecret != null) {
-                ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(secretUser, lastSecret.getTimeStamp());
-                secretList.addAll(tmpList);
-                secretAdapter.notifyDataSetChanged();
-            }
-        }
+    private void refreshSecretList() {
+        secretList.clear();
+        secretList.addAll(new SenzorsDbSource(this).getSecrets(secretUser));
+        secretAdapter.notifyDataSetChanged();
     }
 
     private void navigateToProfile() {

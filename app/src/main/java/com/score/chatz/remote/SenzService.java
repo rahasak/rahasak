@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -59,7 +58,6 @@ public class SenzService extends Service {
     //private static final String SENZ_HOST = "52.77.228.195";
     //private static final String SENZ_HOST = "connect.rahasak.com";
     private static final String SENZ_HOST = "senz.rahasak.com";
-
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -77,8 +75,8 @@ public class SenzService extends Service {
     private static int RETRY_COUNT = 0;
 
     // wake lock to keep
-    PowerManager powerManager;
-    PowerManager.WakeLock senzWakeLock;
+    private PowerManager powerManager;
+    private PowerManager.WakeLock senzWakeLock;
 
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
@@ -102,11 +100,7 @@ public class SenzService extends Service {
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
-            //should check null because in air plan mode it will be null
-            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            if (NetworkUtil.isAvailableNetwork(context)) {
                 Log.d(TAG, "Network status changed[online]");
 
                 // init comm
@@ -421,7 +415,7 @@ public class SenzService extends Service {
         }).start();
     }
 
-    public void write(String msg) {
+    private void write(String msg) {
         //  sends the message to the server
         if (connectedSwitch) {
             writer.print(msg + ";");

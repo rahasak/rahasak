@@ -2,8 +2,6 @@ package com.score.chatz.ui;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.support.v4.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +12,6 @@ import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.score.chatz.R;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Permission;
 import com.score.chatz.pojo.SecretUser;
 import com.score.chatz.utils.ImageUtils;
@@ -139,14 +135,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             viewHolder.userMicPermView.setVisibility(View.GONE);
             viewHolder.userLocationPermView.setVisibility(View.GONE);
         }
-    }
-
-    private void loadBitmap(String data, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
-        else
-            task.execute(new BitmapTaskParams(data, 100, 100));
     }
 
     /**
