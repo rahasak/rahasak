@@ -302,34 +302,16 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == cameraSwitch) {
-            if (isChecked) {
-                //Send permCam true to user
-                sharePermission("cam", "on");
-            } else {
-                //Send permCam false to user
-                sharePermission("cam", "off");
-            }
-
+            if (isChecked) sharePermission("cam", "on");
+            else sharePermission("cam", "off");
             selectedPermission = "CAM";
         } else if (buttonView == locationSwitch) {
-            if (isChecked) {
-                //Send permLoc true to user
-                sharePermission("loc", "on");
-            } else {
-                //Send permLoc false to user
-                sharePermission("loc", "off");
-            }
-
+            if (isChecked) sharePermission("loc", "on");
+            else sharePermission("loc", "off");
             selectedPermission = "LOC";
         } else if (buttonView == micSwitch) {
-            if (isChecked) {
-                //Send permMic true to user
-                sharePermission("mic", "on");
-            } else {
-                //Send permMic false to user
-                sharePermission("mic", "off");
-            }
-
+            if (isChecked) sharePermission("mic", "on");
+            else sharePermission("mic", "off");
             selectedPermission = "MIC";
         }
     }
