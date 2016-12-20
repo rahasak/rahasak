@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
@@ -24,11 +23,8 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
 import com.score.chatz.asyncTasks.RahasPlayer;
-import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.IntentType;
 import com.score.chatz.interfaces.IRahasPlayListener;
-import com.score.chatz.pojo.SecretUser;
-import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
 public class AudioFullScreenActivity extends AppCompatActivity implements IRahasPlayListener {
@@ -39,15 +35,10 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
 
     private TextView playingText;
     private TextView usernameText;
-    private TextView micCallingText;
+    private TextView callingText;
     private ImageView waitingIcon;
 
     private Typeface typeface;
-
-    private SecretUser secretUser;
-
-    //Set the radius of the Blur. Supported range 0 < radius <= 25
-    private static final float BLUR_RADIUS = 5f;
 
     // senz message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -101,25 +92,22 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_full_screen);
 
-        setUpFonts();
-        setupUi();
+        initUi();
         initIntent();
     }
 
-    private void setUpFonts() {
+    private void initUi() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
-    }
 
-    private void setupUi() {
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
         loadingView = findViewById(R.id.mic_loading_view);
 
         playingText = (TextView) findViewById(R.id.mic_playingText);
         usernameText = (TextView) findViewById(R.id.mic_username);
-        micCallingText = (TextView) findViewById(R.id.mic_calling_text);
+        callingText = (TextView) findViewById(R.id.mic_calling_text);
 
         usernameText.setTypeface(typeface, Typeface.BOLD);
-        micCallingText.setTypeface(typeface, Typeface.NORMAL);
+        callingText.setTypeface(typeface, Typeface.NORMAL);
         playingText.setTypeface(typeface, Typeface.NORMAL);
     }
 
@@ -144,7 +132,10 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         } else {
             loadingView.setVisibility(View.VISIBLE);
             playingText.setVisibility(View.INVISIBLE);
-            setupUserImage(intent.getStringExtra("SENDER"));
+
+            String user = intent.getStringExtra("SENDER");
+            usernameText.setText("@" + user);
+
             startAnimatingWaitingIcon();
         }
     }
@@ -162,16 +153,6 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
     private void startAnimatingWaitingIcon() {
         AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
         anim.start();
-    }
-
-    private void setupUserImage(String sender) {
-        secretUser = new SenzorsDbSource(this).getSecretUser(sender);
-        if (secretUser.getImage() != null) {
-            Bitmap bitmap = new ImageUtils().decodeBitmap(secretUser.getImage());
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().blur(bitmap, BLUR_RADIUS, this));
-        }
-
-        usernameText.setText("@" + sender);
     }
 
     public void displayInformationMessageDialog(String title, String message) {

@@ -4,11 +4,8 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
@@ -23,10 +20,7 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.application.IntentProvider;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
-import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.enums.IntentType;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
@@ -35,7 +29,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private static final String TAG = PhotoFullScreenActivity.class.getName();
 
     private View loadingView;
-    private TextView selfieCallingText;
+    private TextView callingText;
     private TextView usernameText;
     private ImageView imageView;
     private String imageData;
@@ -43,9 +37,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     private ImageView waitingIcon;
 
     private static final int CLOSE_QUICK_VIEW_TIME = 2000;
-
-    //Set the radius of the Blur. Supported range 0 < radius <= 25
-    private static final float BLUR_RADIUS = 5f;
 
     // senz message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -75,23 +66,20 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_full_screen);
 
-        setUpFonts();
         initUi();
         initIntent();
     }
 
-    private void setUpFonts() {
-        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
-    }
-
     private void initUi() {
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
+
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
         imageView = (ImageView) findViewById(R.id.imageView);
         loadingView = findViewById(R.id.selfie_loading_view);
-        selfieCallingText = (TextView) findViewById(R.id.selfie_calling_text);
+        callingText = (TextView) findViewById(R.id.selfie_calling_text);
         usernameText = (TextView) findViewById(R.id.selfie_username);
 
-        selfieCallingText.setTypeface(typeface, Typeface.NORMAL);
+        callingText.setTypeface(typeface, Typeface.NORMAL);
         usernameText.setTypeface(typeface, Typeface.BOLD);
     }
 
@@ -105,7 +93,10 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         } else {
             loadingView.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
-            setupUserImage(intent.getStringExtra("SENDER"));
+
+            String sender = intent.getStringExtra("SENDER");
+            usernameText.setText("@" + sender);
+
             startAnimatingWaitingIcon();
         }
 
@@ -119,16 +110,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
         anim.start();
     }
 
-    private void setupUserImage(String sender) {
-        String userImage = new SenzorsDbSource(this).getSecretUser(sender).getImage();
-        if (userImage != null) {
-            Bitmap bitmap = new ImageUtils().decodeBitmap(userImage);
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().blur(bitmap, BLUR_RADIUS, this));
-        }
-
-        usernameText.setText("@" + sender);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -139,14 +120,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(senzReceiver);
-    }
-
-    private void loadBitmap(String data, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 1000, 1000)));
-        else
-            task.execute(new BitmapTaskParams(data, 1000, 1000));
     }
 
     private void startCloseViewTimer() {
@@ -185,7 +158,6 @@ public class PhotoFullScreenActivity extends AppCompatActivity {
             // display stream
             loadingView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
-            //imageView.setImageBitmap(CameraUtils.getBitmapFromBytes(senz.getAttributes().get("cam").getBytes()));
             imageView.setImageBitmap(new ImageUtils().decodeBitmap(senz.getAttributes().get("cam")));
             startCloseViewTimer();
         }
