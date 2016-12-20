@@ -20,7 +20,7 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class DrawerAdapter extends BaseAdapter {
+class DrawerAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<DrawerItem> itemList;
@@ -35,7 +35,7 @@ public class DrawerAdapter extends BaseAdapter {
      * @param context  activity context
      * @param itemList sharing user list
      */
-    public DrawerAdapter(Context context, ArrayList<DrawerItem> itemList) {
+    DrawerAdapter(Context context, ArrayList<DrawerItem> itemList) {
         this.context = context;
         this.itemList = itemList;
         //typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");

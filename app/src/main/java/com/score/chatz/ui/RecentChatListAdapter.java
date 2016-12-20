@@ -2,8 +2,6 @@ package com.score.chatz.ui;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.asyncTasks.BitmapWorkerTask;
 import com.score.chatz.enums.BlobType;
-import com.score.chatz.pojo.BitmapTaskParams;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.ImageUtils;
 import com.score.chatz.utils.PhoneBookUtil;
@@ -25,7 +21,7 @@ import java.util.ArrayList;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class RecentChatListAdapter extends BaseAdapter {
+class RecentChatListAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<Secret> userSecretList;
@@ -125,14 +121,6 @@ public class RecentChatListAdapter extends BaseAdapter {
         } else {
             viewHolder.selected.setVisibility(View.GONE);
         }
-    }
-
-    private void loadBitmap(String data, ImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
-        else
-            task.execute(new BitmapTaskParams(data, 100, 100));
     }
 
     /**
