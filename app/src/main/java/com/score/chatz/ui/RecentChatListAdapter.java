@@ -18,9 +18,6 @@ import com.score.chatz.utils.TimeUtils;
 
 import java.util.ArrayList;
 
-/**
- * Created by lakmalcaldera on 8/19/16.
- */
 class RecentChatListAdapter extends BaseAdapter {
 
     private Context context;

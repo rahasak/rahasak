@@ -31,7 +31,6 @@ class ChatListAdapter extends BaseAdapter {
     private SenzorsDbSource dbSource;
 
     private Typeface typeface;
-    private LayoutInflater layoutInflater;
 
     private static final int MY_CHAT_ITEM = 0;
     private static final int FRIEND_CHAT_ITEM = 1;
@@ -43,7 +42,6 @@ class ChatListAdapter extends BaseAdapter {
         this.dbSource = new SenzorsDbSource(context);
 
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -78,6 +76,7 @@ class ChatListAdapter extends BaseAdapter {
         final int type = getItemViewType(position);
 
         if (view == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             holder = new ViewHolder();
 
             switch (type) {
@@ -138,7 +137,6 @@ class ChatListAdapter extends BaseAdapter {
             if (secret.isMissed()) {
                 holder.chatCam.setImageResource(R.drawable.missed_selfie_call);
             } else {
-                //new BitmapWorkerTask(holder.chatCam).execute(new BitmapTaskParams(secret.getBlob(), 400, 400));
                 holder.chatCam.setImageBitmap(new ImageUtils().decodeBitmap(secret.getBlob()));
             }
         } else if (secret.getBlobType() == BlobType.SOUND) {

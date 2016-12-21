@@ -98,18 +98,9 @@
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.HomeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme" />
-        <activity
             android:name=".ui.DrawerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-        <activity
-            android:name=".ui.AddUserActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.AddUsernameActivity"
             android:screenOrientation="portrait"

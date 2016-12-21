@@ -15,9 +15,6 @@ import com.score.chatz.pojo.Contact;
 
 import java.util.ArrayList;
 
-/**
- * Created by eranga on 12/10/16.
- */
 class ContactUserListAdapter extends BaseAdapter implements Filterable {
 
     private Context context;

@@ -25,8 +25,6 @@ class DrawerAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<DrawerItem> itemList;
 
-    //Typeface typefaceThin;
-    //Typeface typefaceBlack;
     Typeface typeface;
 
     /**
@@ -38,8 +36,7 @@ class DrawerAdapter extends BaseAdapter {
     DrawerAdapter(Context context, ArrayList<DrawerItem> itemList) {
         this.context = context;
         this.itemList = itemList;
-        //typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
-        //typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
+
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
