@@ -26,15 +26,15 @@ public class NotificationUtils {
             msg = "Your " + permissionName + " permission has been revoked";
         }
 
-        return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon, user, msg, user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getUserNotification(String user) {
-        return new SenzNotification(R.drawable.notification_icon, "@" + user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon, user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getUserConfirmNotification(String user) {
-        return new SenzNotification(R.drawable.notification_icon, "@" + user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon,  user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getSecretNotification(String user, String message) {

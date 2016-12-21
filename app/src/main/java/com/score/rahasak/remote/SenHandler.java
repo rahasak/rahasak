@@ -14,6 +14,7 @@ import com.score.rahasak.pojo.Stream;
 import com.score.rahasak.ui.PhotoActivity;
 import com.score.rahasak.ui.RecordingActivity;
 import com.score.rahasak.utils.NotificationUtils;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
@@ -69,21 +70,26 @@ class SenHandler {
             try {
                 // create user
                 String username = senz.getSender().getUsername();
-                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
+                SecretUser secretUser = dbSource.getSecretUser(username);
+                if (secretUser != null) {
                     String encryptedSessionKey = senz.getAttributes().get("$skey");
                     String sessionKey = RSAUtils.decrypt(RSAUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
                 } else {
-                    SecretUser secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
+                    secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
                     dbSource.createSecretUser(secretUser);
                 }
 
                 // activate user
                 dbSource.activateSecretUser(username, true);
 
-                // show notification to current user
-                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getUserNotification(senz.getSender().getUsername()));
+                // notification user
+                String notificationUser = username;
+                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
+                    notificationUser = contactName + "(@" + username + ")";
+                }
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(NotificationUtils.getUserNotification(notificationUser));
 
                 // broadcast send status back
                 broadcastSenz(senz, senzService.getApplicationContext());
@@ -120,18 +126,26 @@ class SenHandler {
             // #mic #cam #lat #lon permission
             SenzorsDbSource dbSource = new SenzorsDbSource(senzService.getApplicationContext());
             SecretUser secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
+
+            // notification user
+            String notificationUser = secretUser.getUsername();
+            if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
+                notificationUser = contactName + "(@" + secretUser.getUsername() + ")";
+            }
+
             if (senz.getAttributes().containsKey("cam")) {
                 dbSource.updatePermission(secretUser.getRecvPermission().getId(), "cam", senz.getAttributes().get("cam").equalsIgnoreCase("on"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "camera", senz.getAttributes().get("cam")));
+                        NotificationUtils.getPermissionNotification(notificationUser, "camera", senz.getAttributes().get("cam")));
             } else if (senz.getAttributes().containsKey("mic")) {
                 dbSource.updatePermission(secretUser.getRecvPermission().getId(), "mic", senz.getAttributes().get("mic").equalsIgnoreCase("on"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "mic", senz.getAttributes().get("mic")));
+                        NotificationUtils.getPermissionNotification(notificationUser, "mic", senz.getAttributes().get("mic")));
             } else if (senz.getAttributes().containsKey("lat")) {
                 dbSource.updatePermission(secretUser.getRecvPermission().getId(), "loc", senz.getAttributes().get("lat").equalsIgnoreCase("on"));
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getPermissionNotification(senz.getSender().getUsername(), "location", senz.getAttributes().get("lat")));
+                        NotificationUtils.getPermissionNotification(notificationUser, "location", senz.getAttributes().get("lat")));
             }
 
             // send status
@@ -173,21 +187,27 @@ class SenHandler {
             if (status.equalsIgnoreCase("USER_SHARED")) {
                 // user added successfully
                 // save user in db
-                if (dbSource.isExistingUser(senz.getSender().getUsername())) {
+                String username = senz.getSender().getUsername();
+                SecretUser secretUser = dbSource.getSecretUser(username);
+                if (secretUser != null) {
                     // existing user, activate it
                     dbSource.activateSecretUser(senz.getSender().getUsername(), true);
                 } else {
                     // not existing user
                     // this is when sharing directly by username
                     // create and activate uer
-                    SecretUser secretUser = new SecretUser("id", senz.getSender().getUsername());
+                    secretUser = new SecretUser("id", senz.getSender().getUsername());
                     dbSource.createSecretUser(secretUser);
                     dbSource.activateSecretUser(secretUser.getUsername(), true);
                 }
 
-                // show notification to current user
-                String username = dbSource.getSecretUser(senz.getSender().getUsername()).getUsername();
-                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(NotificationUtils.getUserConfirmNotification(username));
+                // notification user
+                String notificationUser = username;
+                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
+                    notificationUser = contactName + "(@" + username + ")";
+                }
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(NotificationUtils.getUserConfirmNotification(notificationUser));
             }
 
             broadcastSenz(senz, senzService.getApplicationContext());

@@ -33,7 +33,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_height="wrap_content"
-                android:text="Go to 'Invite' to add friends"
+                android:text="No friends yet, 'Invite' friends"
                 android:layout_centerInParent="true"
                 android:textSize="25sp" />
             <FrameLayout

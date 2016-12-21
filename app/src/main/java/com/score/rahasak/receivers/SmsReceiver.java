@@ -116,7 +116,9 @@ public class SmsReceiver extends BroadcastReceiver {
             secretUser.setPhone(contactNo);
             secretUser.setPubKeyHash(pubKeyHash);
             secretUser.setSMSRequester(true);
-            dbSource.createSecretUser(secretUser);
+            if (!dbSource.isExistingUserWithPhoneNo(contactNo)) {
+                dbSource.createSecretUser(secretUser);
+            }
 
             // broadcast
             Intent intent = new Intent();
