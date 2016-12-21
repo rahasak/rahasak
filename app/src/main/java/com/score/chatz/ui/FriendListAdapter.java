@@ -90,9 +90,9 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         }
 
         if (permission != null && permission.isMic()) {
-            viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_active, null));
+            viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.headphone_active, null));
         } else {
-            viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_deactive, null));
+            viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.headphone, null));
         }
 
         if (permission != null && permission.isLoc()) {

@@ -86,34 +86,32 @@
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
-                    android:layout_toLeftOf="@+id/perm_mic"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/perm_locations_active" />
-
-                <ImageView
-                    android:id="@+id/perm_mic"
-                    android:layout_width="20dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10dp"
                     android:layout_toLeftOf="@+id/perm_camera"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/perm_mic_active" />
+                    android:src="@drawable/perm_locations_active" />
 
                 <ImageView
                     android:id="@+id/perm_camera"
                     android:layout_width="20dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
+                    android:layout_toLeftOf="@+id/perm_mic"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/perm_camera_active" />
+
+                <ImageView
+                    android:id="@+id/perm_mic"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentStart="false"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="right|center_vertical"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="5dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/perm_camera_active" />
+                    android:src="@drawable/headphone_active" />
 
             </LinearLayout>
 

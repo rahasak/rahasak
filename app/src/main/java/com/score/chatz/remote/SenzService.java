@@ -316,7 +316,7 @@ public class SenzService extends Service {
         sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
-    public void writeSenz(final Senz senz) {
+    void writeSenz(final Senz senz) {
         new Thread(new Runnable() {
             public void run() {
                 // sign and write senz
@@ -342,7 +342,7 @@ public class SenzService extends Service {
         }).start();
     }
 
-    public void writeSenzList(final List<Senz> senzList) {
+    void writeSenzList(final List<Senz> senzList) {
         new Thread(new Runnable() {
             @Override
             public void run() {

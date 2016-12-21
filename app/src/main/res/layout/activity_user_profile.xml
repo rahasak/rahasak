@@ -205,7 +205,7 @@
                             android:adjustViewBounds="true"
                             android:baselineAlignBottom="false"
                             android:maxWidth="20dp"
-                            android:src="@drawable/perm_mic_active" />
+                            android:src="@drawable/headphone_active" />
 
                         <TextView
                             android:id="@+id/perm_mic_text"
