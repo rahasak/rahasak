@@ -35,7 +35,7 @@ public class PhotoActivity extends BaseActivity {
     protected static final String TAG = PhotoActivity.class.getName();
 
     // camera related variables
-    private android.hardware.Camera mCamera;
+    private Camera mCamera;
     private CameraPreview mCameraPreview;
     private boolean isPhotoTaken;
     private boolean isPhotoCancelled;
@@ -232,6 +232,7 @@ public class PhotoActivity extends BaseActivity {
             preview.addView(mCameraPreview);
         } catch (Exception e) {
             // cannot get camera or does not exist
+            e.printStackTrace();
             Log.e(TAG, "No font cam");
         }
     }
