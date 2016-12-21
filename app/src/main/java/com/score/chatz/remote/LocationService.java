@@ -1,4 +1,4 @@
-package com.score.chatz.services;
+package com.score.chatz.remote;
 
 import android.app.Service;
 import android.content.ComponentName;

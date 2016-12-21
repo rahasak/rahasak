@@ -138,7 +138,7 @@
 
         <!-- Servicves -->
         <service
-            android:name=".services.LocationService"
+            android:name=".remote.LocationService"
             android:enabled="true" />
         <service
             android:name=".remote.LatLonService"
