@@ -81,7 +81,7 @@
                 <ImageView
                     android:id="@+id/perm_locations"
                     android:layout_width="20dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="20dp"
                     android:layout_alignTop="@+id/user_name"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
@@ -93,7 +93,7 @@
                 <ImageView
                     android:id="@+id/perm_camera"
                     android:layout_width="20dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="20dp"
                     android:layout_toLeftOf="@+id/perm_mic"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
@@ -104,7 +104,7 @@
                 <ImageView
                     android:id="@+id/perm_mic"
                     android:layout_width="20dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="20dp"
                     android:layout_gravity="right|center_vertical"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentStart="false"

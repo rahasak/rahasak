@@ -2,6 +2,7 @@ package com.score.chatz.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +48,9 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
     private TextView titleText;
     private TextView homeUserText;
 
+    private RelativeLayout aboutLayout;
+    private TextView aboutText;
+
     // drawer components
     private ArrayList<DrawerItem> drawerItemList;
     private DrawerAdapter drawerAdapter;
@@ -82,7 +86,6 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
     private void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerContainer = (RelativeLayout) findViewById(R.id.drawer_container);
-        //drawerLayout.setScrimColor(getResources().getColor(android.R.color.transparent));
 
         final LinearLayout frame = (LinearLayout) findViewById(R.id.content_view);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name) {
@@ -114,6 +117,12 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         } catch (NoUserException ex) {
             Log.d("TAG", "No Registered User");
         }
+
+        aboutLayout = (RelativeLayout) findViewById(R.id.about_layout);
+        aboutLayout.setOnClickListener(this);
+
+        aboutText = (TextView) findViewById(R.id.about_text);
+        aboutText.setTypeface(typeface);
     }
 
     /**
@@ -167,6 +176,9 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
             } else {
                 drawerLayout.openDrawer(drawerContainer);
             }
+        } else if (v == aboutLayout) {
+            loadAbout();
+
         }
     }
 
@@ -191,12 +203,12 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-
     /**
      * Load my sensor list fragment
      */
     private void loadRahas() {
         titleText.setText("Secrets");
+        clearAboutText();
 
         unSelectDrawerItems();
         drawerItemList.get(0).setSelected(true);
@@ -217,12 +229,49 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void loadFriends() {
         titleText.setText("Friends");
+        clearAboutText();
 
         unSelectDrawerItems();
         drawerItemList.get(1).setSelected(true);
         drawerAdapter.notifyDataSetChanged();
 
         FriendListFragment fragment = new FriendListFragment();
+
+        // fragment transitions
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, fragment);
+        transaction.commit();
+    }
+
+    private void loadInvite() {
+        titleText.setText("Invite");
+        clearAboutText();
+
+        unSelectDrawerItems();
+        drawerItemList.get(2).setSelected(true);
+        drawerAdapter.notifyDataSetChanged();
+
+        InviteFragment fragment = new InviteFragment();
+
+        // fragment transitions
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, fragment);
+        transaction.commit();
+    }
+
+    private void loadAbout() {
+        titleText.setText("Privacy");
+        selectAboutText();
+
+        drawerLayout.closeDrawer(drawerContainer);
+        unSelectDrawerItems();
+        drawerAdapter.notifyDataSetChanged();
+
+        AboutFragment fragment = new AboutFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,
@@ -239,21 +288,14 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void loadInvite() {
-        titleText.setText("Invite");
+    private void selectAboutText() {
+        aboutText.setTextColor(Color.parseColor("#F88F8C"));
+        aboutText.setTypeface(typeface, Typeface.BOLD);
+    }
 
-        unSelectDrawerItems();
-        drawerItemList.get(2).setSelected(true);
-        drawerAdapter.notifyDataSetChanged();
-
-        InviteFragment fragment = new InviteFragment();
-
-        // fragment transitions
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.main, fragment);
-        transaction.commit();
+    private void clearAboutText() {
+        aboutText.setTextColor(Color.parseColor("#636363"));
+        aboutText.setTypeface(typeface, Typeface.NORMAL);
     }
 
 }

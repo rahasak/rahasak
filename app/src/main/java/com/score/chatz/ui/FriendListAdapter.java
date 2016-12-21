@@ -26,12 +26,9 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
     Context context;
     private Typeface typeface;
 
-    private ArrayList<SecretUser> friendsList;
-
-    FriendListAdapter(Context _context, ArrayList<SecretUser> userPermsList) {
-        super(_context, R.layout.single_user_card_row, R.id.user_name, userPermsList);
+    FriendListAdapter(Context _context, ArrayList<SecretUser> userList) {
+        super(_context, R.layout.single_user_card_row, R.id.user_name, userList);
         context = _context;
-        friendsList = userPermsList;
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
