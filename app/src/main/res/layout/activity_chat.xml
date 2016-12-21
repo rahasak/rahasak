@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.score.chatz.ui.ChatActivity">
+    tools:context="com.score.rahasak.ui.ChatActivity">
 
     <LinearLayout
         android:id="@+id/parent_container"
@@ -17,7 +17,7 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical"
         android:tag="chatFragment"
-        tools:context="com.score.chatz.ui.ChatFragment">
+        tools:context="com.score.rahasak.ui.ChatFragment">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"

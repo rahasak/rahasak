@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.score.chatz">
+    package="com.score.rahasak">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -56,7 +56,7 @@
 
     <!-- android:name=".application.SenzApplication" -->
     <application
-        android:name=".application.SenzApplication"
+        android:name="com.score.rahasak.application.SenzApplication"
         android:icon="@drawable/rahaslogo"
         android:label="@string/app_name">
 
@@ -76,7 +76,7 @@
 
         <!-- - activities -->
         <activity
-            android:name=".ui.SplashActivity"
+            android:name="com.score.rahasak.ui.SplashActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
@@ -88,77 +88,77 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SenzMapActivity"
+            android:name="com.score.rahasak.ui.SenzMapActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".ui.ChatActivity"
+            android:name="com.score.rahasak.ui.ChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.DrawerActivity"
+            android:name="com.score.rahasak.ui.DrawerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name=".ui.AddUsernameActivity"
+            android:name="com.score.rahasak.ui.AddUsernameActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.RegistrationActivity"
+            android:name="com.score.rahasak.ui.RegistrationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.PhotoActivity"
+            android:name="com.score.rahasak.ui.PhotoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name=".ui.UserProfileActivity"
+            android:name="com.score.rahasak.ui.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name=".ui.PhotoFullScreenActivity"
+            android:name="com.score.rahasak.ui.PhotoFullScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name=".ui.RecordingActivity"
+            android:name="com.score.rahasak.ui.RecordingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name=".ui.AudioFullScreenActivity"
+            android:name="com.score.rahasak.ui.AudioFullScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name=".ui.ContactUserListActivity"
+            android:name="com.score.rahasak.ui.ContactUserListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
 
         <!-- Servicves -->
         <service
-            android:name=".remote.LocationService"
+            android:name="com.score.rahasak.remote.LocationService"
             android:enabled="true" />
         <service
-            android:name=".remote.LatLonService"
+            android:name="com.score.rahasak.remote.LatLonService"
             android:enabled="true" />
         <service
-            android:name=".remote.SenzService"
+            android:name="com.score.rahasak.remote.SenzService"
             android:enabled="true">
             <intent-filter>
-                <action android:name="com.score.chatz.remote.SenzService" />
+                <action android:name="com.score.rahasak.remote.SenzService" />
             </intent-filter>
         </service>
 
         <!-- Receievers -->
-        <receiver android:name=".receivers.SenzRestartReceiver">
+        <receiver android:name="com.score.rahasak.receivers.SenzRestartReceiver">
             <intent-filter>
-                <action android:name="com.score.chatz.RESTART" />
+                <action android:name="com.score.rahasak.RESTART" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.SmsReceiver">
+        <receiver android:name="com.score.rahasak.receivers.SmsReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
