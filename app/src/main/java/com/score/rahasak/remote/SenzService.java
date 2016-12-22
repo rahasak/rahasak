@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -148,13 +149,6 @@ public class SenzService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             sendUnAckSenzList();
-        }
-    };
-
-    private BroadcastReceiver reconnectReciver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            initSenzComm();
         }
     };
 
@@ -432,6 +426,37 @@ public class SenzService extends Service {
         }
     }
 
+    private void reconnect() {
+        final int delay;
+
+        // retry
+        RETRY_COUNT++;
+        if (RETRY_COUNT <= MAX_RETRY_COUNT) {
+            switch (RETRY_COUNT) {
+                case 1:
+                    delay = 1000;
+                    break;
+                case 2:
+                    delay = 3000;
+                    break;
+                case 3:
+                    delay = 5000;
+                    break;
+                default:
+                    delay = 1000;
+            }
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "Retry after " + delay + " seconds");
+                    initSenzComm();
+                }
+            }, delay);
+        }
+    }
+
     class SenzComm extends AsyncTask<String, String, Integer> {
 
         @Override
@@ -464,12 +489,8 @@ public class SenzService extends Service {
                 e.printStackTrace();
             }
 
-            // retry
-            RETRY_COUNT++;
-            if (RETRY_COUNT < MAX_RETRY_COUNT) {
-                Log.d(TAG, "Retry with " + RETRY_COUNT);
-                initSenzComm();
-            }
+            // reconnect
+            reconnect();
         }
     }
 
