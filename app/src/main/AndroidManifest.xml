@@ -135,6 +135,10 @@
             android:name="com.score.rahasak.ui.ContactUserListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
+        <activity
+            android:name="com.score.rahasak.ui.PrivacyTermsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme" />
 
         <!-- Servicves -->
         <service

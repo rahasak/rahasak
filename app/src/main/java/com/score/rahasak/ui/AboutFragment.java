@@ -1,5 +1,6 @@
 package com.score.rahasak.ui;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,8 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.rahasak.R;
@@ -16,11 +16,12 @@ import com.score.rahasak.R;
 /**
  * Created by eranga on 12/21/16.
  */
-public class AboutFragment extends Fragment {
+public class AboutFragment extends Fragment implements View.OnClickListener {
 
     private Typeface typeface;
 
-    private WebView webView;
+    private RelativeLayout privacyLayout;
+    private RelativeLayout termsLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,33 +32,34 @@ public class AboutFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        initUi();
+    }
+
+    private void initUi() {
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
-        initWebView();
 
         ((TextView) getActivity().findViewById(R.id.about_rahasak)).setTypeface(typeface);
         ((TextView) getActivity().findViewById(R.id.version_text)).setTypeface(typeface, Typeface.NORMAL);
         ((TextView) getActivity().findViewById(R.id.terms_text)).setTypeface(typeface, Typeface.NORMAL);
         ((TextView) getActivity().findViewById(R.id.privacy_text)).setTypeface(typeface, Typeface.NORMAL);
+
+        privacyLayout = (RelativeLayout) getActivity().findViewById(R.id.privacy_layout);
+        termsLayout = (RelativeLayout) getActivity().findViewById(R.id.terms_layout);
+
+        privacyLayout.setOnClickListener(this);
+        termsLayout.setOnClickListener(this);
     }
 
-    private void initWebView() {
-        webView = (WebView) getActivity().findViewById(R.id.about_web_view);
-
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new SenzWebViewClient());
-        webView.loadUrl("http://www.rahasak.com/privacy-policy/");
-    }
-
-    private class SenzWebViewClient extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            return false;
-        }
-
-        @Override
-        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            view.loadUrl("about:blank");
-            super.onReceivedError(view, errorCode, description, failingUrl);
+    @Override
+    public void onClick(View v) {
+        if (v == privacyLayout) {
+            Intent intent = new Intent(getActivity(), PrivacyTermsActivity.class);
+            intent.putExtra("TYPE", "PRIVACY");
+            startActivity(intent);
+        } else if (v == termsLayout) {
+            Intent intent = new Intent(getActivity(), PrivacyTermsActivity.class);
+            intent.putExtra("TYPE", "TERMS");
+            startActivity(intent);
         }
     }
 }
