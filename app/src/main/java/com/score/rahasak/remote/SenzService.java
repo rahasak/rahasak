@@ -151,6 +151,13 @@ public class SenzService extends Service {
         }
     };
 
+    private BroadcastReceiver reconnectReciver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            initSenzComm();
+        }
+    };
+
     @Override
     public IBinder onBind(Intent intent) {
         return apiEndPoints;

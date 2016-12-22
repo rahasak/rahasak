@@ -3,46 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.FriendListFragment"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:background="@color/white">
+    tools:context=".ui.FriendListFragment">
 
 
     <ListView
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="left|top"
         android:layout_marginTop="0dp"
-        android:id="@android:id/list"
         android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:dividerHeight="0dp" />
 
-    <RelativeLayout android:id="@id/android:empty"
+    <RelativeLayout
+        android:id="@id/android:empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true">
+
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"></FrameLayout>
+                android:layout_weight="1" />
+
             <TextView
                 android:id="@+id/empty_view_chat"
                 android:layout_width="0dp"
-                android:layout_weight="2"
                 android:layout_height="wrap_content"
-                android:text="No secrets yet. 'Invite' friends"
                 android:layout_centerInParent="true"
+                android:layout_weight="2"
+                android:text="No one has shared secrets with you yet! 'Invite' friends to share secrets."
                 android:textAlignment="gravity"
-                android:textStyle="italic"
-                android:textSize="25sp" />
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"></FrameLayout>
+                android:layout_weight="1" />
         </LinearLayout>
 
     </RelativeLayout>

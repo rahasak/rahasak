@@ -234,9 +234,18 @@ class SenHandler {
                 senz.getAttributes().put("msg", rahasa);
                 broadcastSenz(senz, senzService.getApplicationContext());
 
+                // notification user
+                String username = senz.getSender().getUsername();
+                SecretUser secretUser = dbSource.getSecretUser(username);
+                String notificationUser = secretUser.getUsername();
+                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
+                    notificationUser = contactName + "(@" + username + ")";
+                }
+
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getSecretNotification(senz.getSender().getUsername(), rahasa));
+                        NotificationUtils.getSecretNotification(notificationUser, username, rahasa));
             } catch (Exception e) {
                 e.printStackTrace();
             }

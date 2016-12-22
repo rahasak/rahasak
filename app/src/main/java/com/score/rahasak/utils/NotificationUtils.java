@@ -37,8 +37,8 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.notification_icon,  user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
     }
 
-    public static SenzNotification getSecretNotification(String user, String message) {
-        return new SenzNotification(R.drawable.notification_icon, "@" + user, message, user, NotificationType.NEW_SECRET);
+    public static SenzNotification getSecretNotification(String title, String user, String message) {
+        return new SenzNotification(R.drawable.notification_icon, title, message, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getStreamNotification(String user, boolean isCam) {

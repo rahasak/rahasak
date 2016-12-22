@@ -7,7 +7,7 @@ import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.InvalidIntentType;
 
 /**
- * This class is resposible to distrubute specific or general itents.
+ * This class is responsible to distribute specific or general itents.
  * Please use this wrapper to send out intents inside the app
  */
 public class IntentProvider {
@@ -22,6 +22,7 @@ public class IntentProvider {
     public static final String ACTION_SMS_REQUEST_CONFIRM = "com.score.rahasak.SMS_REQUEST_CONFIRM";
     public static final String ACTION_RESTART = "com.score.rahasak.RESTART";
     public static final String ACTION_CONNECTED = "com.score.rahasak.CONNECTED";
+    public static final String ACTION_RECONNECT = "com.score.rahasak.RECONNECT";
 
     /**
      * Return the intent filter for the intent_type.
@@ -60,6 +61,8 @@ public class IntentProvider {
                 return ACTION_SMS_REQUEST_CONFIRM;
             case CONNECTED:
                 return ACTION_CONNECTED;
+            case RECONNECT:
+                return ACTION_RECONNECT;
             default:
                 throw new InvalidIntentType();
         }
