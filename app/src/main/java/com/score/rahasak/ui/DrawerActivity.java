@@ -264,7 +264,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void loadAbout() {
-        titleText.setText("Privacy");
+        titleText.setText("About");
         selectAboutText();
 
         drawerLayout.closeDrawer(drawerContainer);

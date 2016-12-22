@@ -29,24 +29,13 @@ import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 public class SenzService extends Service {
 
@@ -63,9 +52,8 @@ public class SenzService extends Service {
 
     // senz socket
     private Socket socket;
-    private InputStreamReader inReader;
-    private BufferedReader reader;
-    private PrintWriter writer;
+    private DataInputStream inStream;
+    private DataOutputStream outStream;
 
     // status of the online/offline
     private boolean senzCommRunning;
@@ -203,11 +191,6 @@ public class SenzService extends Service {
         registerReceiver(connectedReceiver, IntentProvider.getIntentFilter(IntentType.CONNECTED));
     }
 
-    private void initWakeLock() {
-        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        senzWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SenzWakeLock");
-    }
-
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
@@ -215,6 +198,11 @@ public class SenzService extends Service {
         unregisterReceiver(smsRequestRejectReceiver);
         unregisterReceiver(smsRequestConfirmReceiver);
         unregisterReceiver(connectedReceiver);
+    }
+
+    private void initWakeLock() {
+        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        senzWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SenzWakeLock");
     }
 
     private void initSenzComm() {
@@ -239,9 +227,9 @@ public class SenzService extends Service {
     private void initSoc() throws IOException {
         Log.d(TAG, "Init socket");
         socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
-        inReader = new InputStreamReader(socket.getInputStream());
-        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+
+        inStream = new DataInputStream(socket.getInputStream());
+        outStream = new DataOutputStream(socket.getOutputStream());
 
         connectedSwitch = true;
         RETRY_COUNT = 0;
@@ -253,8 +241,8 @@ public class SenzService extends Service {
 
         if (socket != null) {
             socket.close();
-            reader.close();
-            writer.close();
+            inStream.close();
+            outStream.close();
         }
     }
 
@@ -264,7 +252,7 @@ public class SenzService extends Service {
         StringBuilder builder = new StringBuilder();
         int z;
         char c;
-        while ((z = inReader.read()) != -1) {
+        while ((z = inStream.read()) != -1) {
             // obtain wake lock
             if (senzWakeLock != null) {
                 if (!senzWakeLock.isHeld())
@@ -298,6 +286,47 @@ public class SenzService extends Service {
             } else {
                 builder.append(c);
             }
+        }
+    }
+
+    private void reconnect() {
+        final int delay;
+
+        // retry
+        RETRY_COUNT++;
+        if (RETRY_COUNT <= MAX_RETRY_COUNT) {
+            switch (RETRY_COUNT) {
+                case 1:
+                    delay = 1000;
+                    break;
+                case 2:
+                    delay = 3000;
+                    break;
+                case 3:
+                    delay = 5000;
+                    break;
+                default:
+                    delay = 1000;
+            }
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "Retry after " + delay + " seconds");
+                    initSenzComm();
+                }
+            }, delay);
+        }
+    }
+
+    private void write(String msg) throws IOException {
+        //  sends the message to the server
+        if (connectedSwitch) {
+            outStream.writeBytes(msg + ";");
+            outStream.flush();
+        } else {
+            Log.e(TAG, "Socket disconnected");
         }
     }
 
@@ -336,7 +365,7 @@ public class SenzService extends Service {
 
                     //  sends the message to the server
                     write(message);
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -370,7 +399,7 @@ public class SenzService extends Service {
                         //  sends the message to the server
                         write(message);
                     }
-                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -409,56 +438,14 @@ public class SenzService extends Service {
                             write(message);
                         }
                     }
-                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
     }
 
-    private void write(String msg) {
-        //  sends the message to the server
-        if (connectedSwitch) {
-            writer.print(msg + ";");
-            writer.flush();
-        } else {
-            Log.e(TAG, "Socket disconnected");
-        }
-    }
-
-    private void reconnect() {
-        final int delay;
-
-        // retry
-        RETRY_COUNT++;
-        if (RETRY_COUNT <= MAX_RETRY_COUNT) {
-            switch (RETRY_COUNT) {
-                case 1:
-                    delay = 1000;
-                    break;
-                case 2:
-                    delay = 3000;
-                    break;
-                case 3:
-                    delay = 5000;
-                    break;
-                default:
-                    delay = 1000;
-            }
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "Retry after " + delay + " seconds");
-                    initSenzComm();
-                }
-            }, delay);
-        }
-    }
-
     class SenzComm extends AsyncTask<String, String, Integer> {
-
         @Override
         protected Integer doInBackground(String[] params) {
             if (!connectedSwitch) {

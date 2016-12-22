@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import com.score.rahasak.R;
 
@@ -32,6 +33,11 @@ public class AboutFragment extends Fragment {
 
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
         initWebView();
+
+        ((TextView) getActivity().findViewById(R.id.about_rahasak)).setTypeface(typeface);
+        ((TextView) getActivity().findViewById(R.id.version_text)).setTypeface(typeface, Typeface.NORMAL);
+        ((TextView) getActivity().findViewById(R.id.terms_text)).setTypeface(typeface, Typeface.NORMAL);
+        ((TextView) getActivity().findViewById(R.id.privacy_text)).setTypeface(typeface, Typeface.NORMAL);
     }
 
     private void initWebView() {

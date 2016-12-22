@@ -47,6 +47,7 @@ public class InviteFragment extends Fragment {
 
     private void setupOpenContactsBtn() {
         openContactsBtn = (Button) getActivity().findViewById(R.id.add_from_contacts_btn);
+        openContactsBtn.setTypeface(typeface, Typeface.BOLD);
         openContactsBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Click action
@@ -58,6 +59,7 @@ public class InviteFragment extends Fragment {
 
     private void setupAddUsersBtn() {
         addFriendBtn = (Button) getActivity().findViewById(R.id.add_friend_btn);
+        addFriendBtn.setTypeface(typeface, Typeface.BOLD);
         addFriendBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AddUsernameActivity.class);

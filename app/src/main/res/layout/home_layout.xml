@@ -124,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="Privacy"
+                    android:text="About"
                     android:textColor="#4a4a4a"
                     android:textSize="20sp" />
 
