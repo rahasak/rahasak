@@ -33,7 +33,7 @@ public class ContactListActivity extends BaseActivity implements IContactReaderL
     private EditText searchView;
 
     private ListView contactListView;
-    private ContactUserListAdapter adapter;
+    private ContactListAdapter adapter;
 
     private static final String TAG = ContactListActivity.class.getName();
 
@@ -101,7 +101,7 @@ public class ContactListActivity extends BaseActivity implements IContactReaderL
     private void initContactList(ArrayList<Contact> contactList) {
         contactListView = (ListView) findViewById(R.id.contacts_list);
         contactListView.setTextFilterEnabled(true);
-        adapter = new ContactUserListAdapter(this, contactList);
+        adapter = new ContactListAdapter(this, contactList);
         contactListView.setAdapter(adapter);
 
         // click listener

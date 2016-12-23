@@ -51,7 +51,7 @@ public class InviteFragment extends Fragment {
         openContactsBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Click action
-                Intent intent = new Intent(getActivity(), ContactUserListActivity.class);
+                Intent intent = new Intent(getActivity(), ContactListActivity.class);
                 startActivity(intent);
             }
         });

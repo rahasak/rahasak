@@ -174,7 +174,7 @@ class ChatListAdapter extends BaseAdapter {
                 if (secret.isMissed()) {
                     // missed
                     // start photo activity
-                    Intent intent = new Intent(context, PhotoCaptureActivity.class);
+                    Intent intent = new Intent(context, SelfieCaptureActivity.class);
                     intent.putExtra("USER", secret.getUser().getUsername());
                     intent.putExtra("CAM_MIS", true);
                     context.startActivity(intent);
@@ -184,7 +184,7 @@ class ChatListAdapter extends BaseAdapter {
                     dbSource.deleteSecret(secret);
                     notifyDataSetChanged();
                 } else {
-                    Intent intent = new Intent(context, PhotoFullScreenActivity.class);
+                    Intent intent = new Intent(context, SelfieCallActivity.class);
                     intent.putExtra("IMAGE", secret.getBlob());
                     context.startActivity(intent);
                 }
@@ -194,7 +194,7 @@ class ChatListAdapter extends BaseAdapter {
         holder.chatMic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, AudioFullScreenActivity.class);
+                Intent intent = new Intent(context, SecretCallActivity.class);
                 intent.putExtra("SOUND", secret.getBlob());
                 context.startActivity(intent);
             }

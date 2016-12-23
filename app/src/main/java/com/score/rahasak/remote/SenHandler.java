@@ -11,7 +11,7 @@ import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.pojo.Stream;
-import com.score.rahasak.ui.PhotoCaptureActivity;
+import com.score.rahasak.ui.SelfieCaptureActivity;
 import com.score.rahasak.ui.SecretRecordingActivity;
 import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PhoneBookUtil;
@@ -326,7 +326,7 @@ class SenHandler {
     private void handleCam(Senz senz, SenzService senzService) {
         if (!SenzApplication.isOnCall()) {
             try {
-                Intent intent = new Intent(senzService.getApplicationContext(), PhotoCaptureActivity.class);
+                Intent intent = new Intent(senzService.getApplicationContext(), SelfieCaptureActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("USER", senz.getSender().getUsername());
                 senzService.getApplicationContext().startActivity(intent);

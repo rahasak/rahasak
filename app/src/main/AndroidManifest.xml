@@ -112,7 +112,7 @@
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="com.score.rahasak.ui.PhotoCaptureActivity"
+            android:name="com.score.rahasak.ui.SelfieCaptureActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
@@ -120,7 +120,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name="com.score.rahasak.ui.PhotoFullScreenActivity"
+            android:name="com.score.rahasak.ui.SelfieCallActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
@@ -128,11 +128,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name="com.score.rahasak.ui.AudioFullScreenActivity"
+            android:name="com.score.rahasak.ui.SecretCallActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name="com.score.rahasak.ui.ContactUserListActivity"
+            android:name="com.score.rahasak.ui.ContactListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
