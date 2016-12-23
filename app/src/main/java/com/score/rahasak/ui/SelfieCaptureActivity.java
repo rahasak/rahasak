@@ -22,6 +22,7 @@ import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.ImageUtils;
+import com.score.rahasak.utils.ImgUtil;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -244,6 +245,8 @@ public class SelfieCaptureActivity extends BaseActivity {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 byte[] resizedImage = new ImageUtils().compressImage(bytes);
+                Log.d(TAG, "Compressed size: " + resizedImage.length / 1024);
+
                 sendPhotoSenz(resizedImage, SelfieCaptureActivity.this);
                 finish();
             }
