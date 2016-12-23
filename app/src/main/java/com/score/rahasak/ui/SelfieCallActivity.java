@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,23 +20,23 @@ import android.widget.TextView;
 
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
-import com.score.rahasak.asyncTasks.RahasPlayer;
 import com.score.rahasak.enums.IntentType;
-import com.score.rahasak.interfaces.IRahasPlayListener;
+import com.score.rahasak.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
 
-public class AudioFullScreenActivity extends AppCompatActivity implements IRahasPlayListener {
+public class SelfieCallActivity extends AppCompatActivity {
 
-    private static final String TAG = AudioFullScreenActivity.class.getName();
+    private static final String TAG = SelfieCallActivity.class.getName();
 
     private View loadingView;
-
-    private TextView playingText;
-    private TextView usernameText;
     private TextView callingText;
+    private TextView usernameText;
+    private ImageView imageView;
+    private String imageData;
+    private Typeface typeface;
     private ImageView waitingIcon;
 
-    private Typeface typeface;
+    private static final int CLOSE_QUICK_VIEW_TIME = 2000;
 
     // senz message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -63,34 +61,10 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         }
     };
 
-    private void onSenzStreamReceived(Senz senz) {
-        if (senz.getAttributes().containsKey("mic")) {
-            // display stream
-            loadingView.setVisibility(View.INVISIBLE);
-            playingText.setVisibility(View.VISIBLE);
-            playSecret(Base64.decode(senz.getAttributes().get("mic"), 0));
-        }
-    }
-
-    private void onSenzReceived(Senz senz) {
-        if (senz.getAttributes().containsKey("status")) {
-            if (senz.getAttributes().get("status").equalsIgnoreCase("MIC_BUSY")) {
-                // user busy
-                displayInformationMessageDialog("BUSY", "User busy at this moment");
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("MIC_ERROR")) {
-                // camera error
-                displayInformationMessageDialog("ERROR", "mic error");
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
-                // offline
-                displayInformationMessageDialog("OFFLINE", "User not available at this moment");
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_audio_full_screen);
+        setContentView(R.layout.activity_photo_full_screen);
 
         initUi();
         initIntent();
@@ -100,15 +74,40 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
 
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
-        loadingView = findViewById(R.id.mic_loading_view);
+        imageView = (ImageView) findViewById(R.id.imageView);
+        loadingView = findViewById(R.id.selfie_loading_view);
+        callingText = (TextView) findViewById(R.id.selfie_calling_text);
+        usernameText = (TextView) findViewById(R.id.selfie_username);
 
-        playingText = (TextView) findViewById(R.id.mic_playingText);
-        usernameText = (TextView) findViewById(R.id.mic_username);
-        callingText = (TextView) findViewById(R.id.mic_calling_text);
-
-        usernameText.setTypeface(typeface, Typeface.BOLD);
         callingText.setTypeface(typeface, Typeface.NORMAL);
-        playingText.setTypeface(typeface, Typeface.NORMAL);
+        usernameText.setTypeface(typeface, Typeface.BOLD);
+    }
+
+    private void initIntent() {
+        Intent intent = getIntent();
+        if (intent.hasExtra("IMAGE")) {
+            loadingView.setVisibility(View.INVISIBLE);
+            imageView.setVisibility(View.VISIBLE);
+            imageData = intent.getStringExtra("IMAGE");
+            imageView.setImageBitmap(new ImageUtils().decodeBitmap(imageData));
+        } else {
+            loadingView.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.INVISIBLE);
+
+            String sender = intent.getStringExtra("SENDER");
+            usernameText.setText("@" + sender);
+
+            startAnimatingWaitingIcon();
+        }
+
+        if (intent.hasExtra("QUICK_PREVIEW")) {
+            startCloseViewTimer();
+        }
+    }
+
+    private void startAnimatingWaitingIcon() {
+        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
+        anim.start();
     }
 
     @Override
@@ -123,36 +122,45 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         unregisterReceiver(senzReceiver);
     }
 
-    private void initIntent() {
-        Intent intent = getIntent();
-        if (intent.hasExtra("SOUND")) {
+    private void startCloseViewTimer() {
+        new CountDownTimer(CLOSE_QUICK_VIEW_TIME, CLOSE_QUICK_VIEW_TIME) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                SelfieCallActivity.this.finish();
+            }
+        }.start();
+    }
+
+    private void onSenzReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("status")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED")) {
+                // GET msg delivered
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_BUSY")) {
+                // user busy
+                displayInformationMessageDialog("BUSY", "User busy at this moment");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_ERROR")) {
+                // camera error
+                displayInformationMessageDialog("ERROR", "Cam error");
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("OFFLINE")) {
+                // offline
+                // offline
+                displayInformationMessageDialog("OFFLINE", "User not available at this moment");
+            }
+        }
+    }
+
+    private void onSenzStreamReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("cam")) {
+            // display stream
             loadingView.setVisibility(View.INVISIBLE);
-            playingText.setVisibility(View.VISIBLE);
-            playSecret(Base64.decode(intent.getStringExtra("SOUND"), 0));
-        } else {
-            loadingView.setVisibility(View.VISIBLE);
-            playingText.setVisibility(View.INVISIBLE);
-
-            String user = intent.getStringExtra("SENDER");
-            usernameText.setText("@" + user);
-
-            startAnimatingWaitingIcon();
+            imageView.setVisibility(View.VISIBLE);
+            imageView.setImageBitmap(new ImageUtils().decodeBitmap(senz.getAttributes().get("cam")));
+            startCloseViewTimer();
         }
-    }
-
-    private void playSecret(byte[] rahasa) {
-        RahasPlayer rahasPlayer = new RahasPlayer(rahasa, getApplicationContext(), this);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            rahasPlayer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } else {
-            rahasPlayer.execute("PLAY");
-        }
-    }
-
-    private void startAnimatingWaitingIcon() {
-        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
-        anim.start();
     }
 
     public void displayInformationMessageDialog(String title, String message) {
@@ -181,15 +189,10 @@ public class AudioFullScreenActivity extends AppCompatActivity implements IRahas
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
-                AudioFullScreenActivity.this.finish();
+                SelfieCallActivity.this.finish();
             }
         });
 
         dialog.show();
-    }
-
-    @Override
-    public void onFinishPlay() {
-        this.finish();
     }
 }

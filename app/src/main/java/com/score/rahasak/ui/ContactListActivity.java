@@ -28,14 +28,14 @@ import com.score.rahasak.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 
-public class ContactUserListActivity extends BaseActivity implements IContactReaderListener {
+public class ContactListActivity extends BaseActivity implements IContactReaderListener {
 
     private EditText searchView;
 
     private ListView contactListView;
     private ContactUserListAdapter adapter;
 
-    private static final String TAG = ContactUserListActivity.class.getName();
+    private static final String TAG = ContactListActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +137,7 @@ public class ContactUserListActivity extends BaseActivity implements IContactRea
                         String message = "#Rahasak #request\nI'm using Rahasak app(http://play.google.com/store/apps/details?id=com.score.rahasak) #username " + username + " #code 41r33";
                         sendSMS(contact.getPhoneNo(), message);
 
-                        ActivityUtils.showCustomToastShort("Request sent via SMS", ContactUserListActivity.this);
+                        ActivityUtils.showCustomToastShort("Request sent via SMS", ContactListActivity.this);
                     }
                 });
             } catch (NoUserException ex) {

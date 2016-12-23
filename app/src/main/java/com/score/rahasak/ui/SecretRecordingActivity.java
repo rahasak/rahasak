@@ -42,9 +42,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class RecordingActivity extends AppCompatActivity {
+public class SecretRecordingActivity extends AppCompatActivity {
 
-    private static final String TAG = RecordingActivity.class.getName();
+    private static final String TAG = SecretRecordingActivity.class.getName();
 
     private View moving_layout;
     private Button doneBtn;
@@ -90,7 +90,7 @@ public class RecordingActivity extends AppCompatActivity {
         public void onFinish() {
             sendBusySenz();
             //saveMissedCall();
-            RecordingActivity.this.finish();
+            SecretRecordingActivity.this.finish();
         }
 
         @Override
@@ -215,7 +215,7 @@ public class RecordingActivity extends AppCompatActivity {
                     cancelTimerToServe();
                     sendBusySenz();
                     //saveMissedCall();
-                    RecordingActivity.this.finish();
+                    SecretRecordingActivity.this.finish();
                 }
             }
         });

@@ -31,8 +31,8 @@ import com.score.senzc.pojos.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PhotoActivity extends BaseActivity {
-    protected static final String TAG = PhotoActivity.class.getName();
+public class SelfieCaptureActivity extends BaseActivity {
+    protected static final String TAG = SelfieCaptureActivity.class.getName();
 
     // camera related variables
     private Camera mCamera;
@@ -153,7 +153,7 @@ public class PhotoActivity extends BaseActivity {
                     sendBusySenz();
                     stopVibrations();
                     saveMissedSelfie();
-                    PhotoActivity.this.finish();
+                    SelfieCaptureActivity.this.finish();
                 }
             }
         });
@@ -244,7 +244,7 @@ public class PhotoActivity extends BaseActivity {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
                 byte[] resizedImage = new ImageUtils().compressImage(bytes);
-                sendPhotoSenz(resizedImage, PhotoActivity.this);
+                sendPhotoSenz(resizedImage, SelfieCaptureActivity.this);
                 finish();
             }
         });
@@ -265,7 +265,7 @@ public class PhotoActivity extends BaseActivity {
             public void onFinish() {
                 sendBusySenz();
                 saveMissedSelfie();
-                PhotoActivity.this.finish();
+                SelfieCaptureActivity.this.finish();
             }
 
             @Override

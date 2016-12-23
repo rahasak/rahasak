@@ -174,7 +174,7 @@ class ChatListAdapter extends BaseAdapter {
                 if (secret.isMissed()) {
                     // missed
                     // start photo activity
-                    Intent intent = new Intent(context, PhotoActivity.class);
+                    Intent intent = new Intent(context, PhotoCaptureActivity.class);
                     intent.putExtra("USER", secret.getUser().getUsername());
                     intent.putExtra("CAM_MIS", true);
                     context.startActivity(intent);

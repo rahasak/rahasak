@@ -112,7 +112,7 @@
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="com.score.rahasak.ui.PhotoActivity"
+            android:name="com.score.rahasak.ui.PhotoCaptureActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
@@ -124,7 +124,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name="com.score.rahasak.ui.RecordingActivity"
+            android:name="com.score.rahasak.ui.SecretRecordingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity

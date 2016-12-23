@@ -15,7 +15,7 @@ import com.score.rahasak.pojo.Contact;
 
 import java.util.ArrayList;
 
-class ContactUserListAdapter extends BaseAdapter implements Filterable {
+class ContactListAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
     private ContactFilter contactFilter;
@@ -24,7 +24,7 @@ class ContactUserListAdapter extends BaseAdapter implements Filterable {
 
     private Typeface typeface;
 
-    ContactUserListAdapter(Context context, ArrayList<Contact> contactList) {
+    ContactListAdapter(Context context, ArrayList<Contact> contactList) {
         this.context = context;
         this.contactList = contactList;
         this.filteredList = contactList;
