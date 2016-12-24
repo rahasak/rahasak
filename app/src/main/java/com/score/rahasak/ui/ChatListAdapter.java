@@ -2,10 +2,8 @@ package com.score.rahasak.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Environment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,17 +18,11 @@ import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Secret;
-import com.score.rahasak.utils.Blur;
 import com.score.rahasak.utils.LimitedList;
 import com.score.rahasak.utils.TimeUtils;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Created by eranga on 9/28/16
@@ -148,46 +140,13 @@ class ChatListAdapter extends BaseAdapter {
             if (secret.isMissed()) {
                 holder.chatCam.setImageResource(R.drawable.missed_selfie_call);
             } else {
-                //holder.chatCam.setImageBitmap(new ImageUtils().decodeBitmap(secret.getBlob()));
-                Transformation blurTransformation = new Transformation() {
-                    @Override
-                    public Bitmap transform(Bitmap source) {
-                        Bitmap blurred = Blur.fastblur(context, source, 10);
-                        source.recycle();
-                        return blurred;
-                    }
-
-                    @Override
-                    public String key() {
-                        return "blur()";
-                    }
-                };
-
-                try {
-                    File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak");
-                    if (!dir.exists()) {
-                        dir.mkdir();
-                    }
-
-                    File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak/" + secret.getId() + ".jpg");
-                    file.createNewFile();
-
-                    OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-                    byte data[] = Base64.decode(secret.getBlob(), Base64.DEFAULT);
-                    os.write(data);
-                    os.flush();
-                    os.close();
-
-                    Picasso.
-                            with(context).
-                            load(file).
-                            resize(150, 150).
-                            centerCrop().
-                            error(R.drawable.rahaslogo).
-                            into(holder.chatCam);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak/" + secret.getId() + ".jpg");
+                Picasso.with(context)
+                        .load(file)
+                        .resize(150, 150)
+                        .centerCrop()
+                        .error(R.drawable.rahaslogo_3)
+                        .into(holder.chatCam);
             }
         } else if (secret.getBlobType() == BlobType.SOUND) {
             holder.chatCamHolder.setVisibility(View.GONE);

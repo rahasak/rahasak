@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.Environment;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -14,6 +15,9 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by eranga on 10/1/16.
@@ -263,5 +267,31 @@ public class ImageUtils {
         theIntrinsic.forEach(tmpOut);
         tmpOut.copyTo(outputBitmap);
         return outputBitmap;
+    }
+
+    public static void saveImg(String name, String image) {
+        byte data[] = Base64.decode(image, Base64.DEFAULT);
+        saveImg(name, data);
+    }
+
+    public static String saveImg(String name, byte[] image) {
+        // create root
+        File rahasakRootDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak");
+        if (!rahasakRootDir.exists()) {
+            rahasakRootDir.mkdirs();
+        }
+
+        // save selfi
+        File selfi = new File(rahasakRootDir, name);
+        try {
+            FileOutputStream fos = new FileOutputStream(selfi, false);
+            fos.write(image);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return selfi.getAbsolutePath();
     }
 }

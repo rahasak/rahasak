@@ -22,7 +22,6 @@ import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.ImageUtils;
-import com.score.rahasak.utils.ImgUtil;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -353,6 +352,9 @@ public class SelfieCaptureActivity extends BaseActivity {
         newSecret.setMissed(false);
         newSecret.setDeliveryState(DeliveryState.PENDING);
         new SenzorsDbSource(context).createSecret(newSecret);
+
+        String imgName = uid + ".jpg";
+        ImageUtils.saveImg(imgName, image);
 
         ArrayList<Senz> senzList = new ArrayList<>();
         String[] packets = split(imageString, 1024);

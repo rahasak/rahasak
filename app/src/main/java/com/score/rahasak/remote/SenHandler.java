@@ -11,8 +11,9 @@ import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.pojo.Stream;
-import com.score.rahasak.ui.SelfieCaptureActivity;
 import com.score.rahasak.ui.SecretRecordingActivity;
+import com.score.rahasak.ui.SelfieCaptureActivity;
+import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.RSAUtils;
@@ -304,11 +305,14 @@ class SenHandler {
 
             // save in db
             // broadcast
-            if (senz.getAttributes().containsKey("cam"))
+            if (senz.getAttributes().containsKey("cam")) {
                 saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
-            else
-                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.SOUND, senz.getSender(), senzService.getApplicationContext());
 
+                String imgName = senz.getAttributes().get("uid") + ".jpg";
+                ImageUtils.saveImg(imgName, stream.getStream());
+            } else {
+                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.SOUND, senz.getSender(), senzService.getApplicationContext());
+            }
             broadcastSenz(streamSenz, senzService.getApplicationContext());
 
             // show notification

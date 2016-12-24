@@ -61,6 +61,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView btnBack;
     private ImageView btnUserSetting;
 
+    private Typeface typeface;
+
     // secret list
     private ListView listView;
     private ChatListAdapter secretAdapter;
@@ -69,10 +71,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LimitedList<Secret> secretList;
 
     // service interface
-    protected ISenzService senzService = null;
-    protected boolean isServiceBound = false;
+    private ISenzService senzService = null;
+    private boolean isServiceBound = false;
 
-    private Typeface typeface;
+    private SenzorsDbSource dbSource;
 
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -116,6 +118,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        dbSource = new SenzorsDbSource(this);
 
         initUi();
         initUser();
@@ -187,7 +191,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
 
         // keep only last message
-        new SenzorsDbSource(this).deleteAllSecretsExceptLast(secretUser.getUsername());
+        dbSource.deleteAllSecretsExceptLast(secretUser.getUsername());
     }
 
     protected void bindToService() {
@@ -241,12 +245,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initUser() {
         String username = getIntent().getExtras().getString("SENDER");
-        secretUser = new SenzorsDbSource(this).getSecretUser(username);
+        secretUser = dbSource.getSecretUser(username);
     }
 
     private void initUser(Intent intent) {
         String username = intent.getStringExtra("SENDER");
-        secretUser = new SenzorsDbSource(this).getSecretUser(username);
+        secretUser = dbSource.getSecretUser(username);
     }
 
     private void setupToolbar() {
@@ -282,7 +286,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initSecretList() {
-        ArrayList<Secret> tmpList = new SenzorsDbSource(this).getSecrets(secretUser);
+        ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser);
         secretList = new LimitedList<>(tmpList.size());
         for (Secret secret : tmpList) {
             secretList.add(secret);
@@ -294,7 +298,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void refreshSecretList() {
         secretList.clear();
-        secretList.addAll(new SenzorsDbSource(this).getSecrets(secretUser));
+        secretList.addAll(dbSource.getSecrets(secretUser));
         secretAdapter.notifyDataSetChanged();
     }
 
@@ -337,7 +341,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             // send secret
             // save secret
             sendSecret(secret);
-            saveSecretInDb(secret);
+            dbSource.createSecret(secret);
 
             // update list view
             secretList.add(secret);
@@ -447,11 +451,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void saveSecretInDb(Secret secret) {
-        SenzorsDbSource dbSource = new SenzorsDbSource(this);
-        dbSource.createSecret(secret);
-    }
-
     public void onDataReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
             // status message
@@ -531,7 +530,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void onShareReceived(Senz senz) {
-        secretUser = new SenzorsDbSource(this).getSecretUser(senz.getSender().getUsername());
+        secretUser = dbSource.getSecretUser(senz.getSender().getUsername());
         if (senz.getAttributes().containsKey("cam")) {
             updatePermissions();
         } else if (senz.getAttributes().containsKey("mic")) {
