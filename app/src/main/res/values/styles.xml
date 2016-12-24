@@ -28,6 +28,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBarOverlay">false</item>
         <item name="android:actionBarStyle">@color/android_grey</item>
+        <item name="android:windowTitleBackgroundStyle">@color/white</item>
     </style>
 
     <style name="MyMaterialTransparentTheme" parent="Theme.AppCompat.Light.DarkActionBar">

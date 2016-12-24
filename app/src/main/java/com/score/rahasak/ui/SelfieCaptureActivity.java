@@ -346,7 +346,7 @@ public class SelfieCaptureActivity extends BaseActivity {
     private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid, Long timestamp) {
         String imageString = new ImageUtils().encodeBitmap(image);
 
-        Secret newSecret = new Secret(imageString, BlobType.IMAGE, secretUser, false);
+        Secret newSecret = new Secret("", BlobType.IMAGE, secretUser, false);
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(false);

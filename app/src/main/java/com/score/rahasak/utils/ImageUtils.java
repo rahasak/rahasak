@@ -294,4 +294,11 @@ public class ImageUtils {
 
         return selfi.getAbsolutePath();
     }
+
+    public static void deleteImg(String name) {
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak/" + name);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
 }

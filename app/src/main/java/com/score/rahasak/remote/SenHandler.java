@@ -306,7 +306,7 @@ class SenHandler {
             // save in db
             // broadcast
             if (senz.getAttributes().containsKey("cam")) {
-                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
 
                 String imgName = senz.getAttributes().get("uid") + ".jpg";
                 ImageUtils.saveImg(imgName, stream.getStream());

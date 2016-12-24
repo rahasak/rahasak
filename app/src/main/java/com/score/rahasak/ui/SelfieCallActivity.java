@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -21,8 +22,10 @@ import android.widget.TextView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
-import com.score.rahasak.utils.ImageUtils;
 import com.score.senzc.pojos.Senz;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 public class SelfieCallActivity extends AppCompatActivity {
 
@@ -85,11 +88,12 @@ public class SelfieCallActivity extends AppCompatActivity {
 
     private void initIntent() {
         Intent intent = getIntent();
-        if (intent.hasExtra("IMAGE")) {
+        if (intent.hasExtra("UID")) {
             loadingView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
-            imageData = intent.getStringExtra("IMAGE");
-            imageView.setImageBitmap(new ImageUtils().decodeBitmap(imageData));
+
+            String uid = intent.getStringExtra("UID");
+            loadBitmap(imageView, uid);
         } else {
             loadingView.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
@@ -158,9 +162,19 @@ public class SelfieCallActivity extends AppCompatActivity {
             // display stream
             loadingView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
-            imageView.setImageBitmap(new ImageUtils().decodeBitmap(senz.getAttributes().get("cam")));
+            loadBitmap(imageView, senz.getAttributes().get("uid"));
+
             startCloseViewTimer();
         }
+    }
+
+    private void loadBitmap(ImageView view, String uid) {
+        // load image via picasso
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak/" + uid + ".jpg");
+        Picasso.with(this)
+                .load(file)
+                .error(R.drawable.rahaslogo_3)
+                .into(view);
     }
 
     public void displayInformationMessageDialog(String title, String message) {

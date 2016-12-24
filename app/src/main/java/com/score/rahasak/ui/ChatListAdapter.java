@@ -194,7 +194,7 @@ class ChatListAdapter extends BaseAdapter {
                     notifyDataSetChanged();
                 } else {
                     Intent intent = new Intent(context, SelfieCallActivity.class);
-                    intent.putExtra("IMAGE", secret.getBlob());
+                    intent.putExtra("UID", secret.getId());
                     context.startActivity(intent);
                 }
             }
