@@ -22,7 +22,7 @@ public class LimitedList<K> extends ArrayList<K> {
     public boolean add(K k) {
         boolean r = super.add(k);
         if (size() > maxSize) {
-            remove(0);
+            //remove(0);
         }
         return r;
     }

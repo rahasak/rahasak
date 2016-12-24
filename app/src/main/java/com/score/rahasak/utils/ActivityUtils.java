@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -211,6 +212,30 @@ public class ActivityUtils {
         });
 
         dialog.show();
+    }
+
+    public static View getViewByPosition(int pos, ListView listView) {
+        try {
+            final int firstListItemPosition = listView.getFirstVisiblePosition();
+            final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+            if (pos < firstListItemPosition || pos > lastListItemPosition) {
+                return listView.getAdapter().getView(pos, null, listView);
+            } else {
+                final int childIndex = pos - firstListItemPosition;
+                return listView.getChildAt(childIndex);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static boolean isVisible(int itemId, ListView listView) {
+        int last = listView.getLastVisiblePosition();
+        int first = listView.getFirstVisiblePosition();
+
+        return (itemId >= first && itemId <= last);
     }
 
 }

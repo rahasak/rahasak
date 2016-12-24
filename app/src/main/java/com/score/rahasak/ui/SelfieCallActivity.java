@@ -35,7 +35,6 @@ public class SelfieCallActivity extends AppCompatActivity {
     private TextView callingText;
     private TextView usernameText;
     private ImageView imageView;
-    private String imageData;
     private Typeface typeface;
     private ImageView waitingIcon;
 

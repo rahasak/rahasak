@@ -9,12 +9,13 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -289,18 +290,71 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void initSecretList() {
         ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser);
         secretList = new LimitedList<>(tmpList.size());
-        for (Secret secret : tmpList) {
-            secretList.add(secret);
-        }
+        secretList.addAll(tmpList);
 
         secretAdapter = new ChatListAdapter(this, secretList);
         listView.setAdapter(secretAdapter);
     }
 
     private void refreshSecretList() {
-        secretList.clear();
-        secretList.addAll(dbSource.getSecrets(secretUser));
+        ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser, secretList.getYongest().getTimeStamp());
+        if (tmpList.size() > 0) {
+            secretList.addAll(tmpList);
+            secretAdapter.notifyDataSetChanged();
+
+            listView.post(new Runnable() {
+                public void run() {
+                    listView.smoothScrollToPosition(listView.getCount() - 1);
+                }
+            });
+        }
+    }
+
+    private void addSecret(Secret secret) {
+        // update list view
+        secretList.add(secret);
         secretAdapter.notifyDataSetChanged();
+        listView.post(new Runnable() {
+            public void run() {
+                listView.smoothScrollToPosition(listView.getCount() - 1);
+            }
+        });
+    }
+
+    private void deleteSecret(final int id, Secret secret) {
+        final Animation animation = AnimationUtils.loadAnimation(ChatActivity.this, android.R.anim.fade_out);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                secretList.remove(id);
+                secretAdapter.notifyDataSetChanged();
+            }
+        });
+
+        if (ActivityUtils.isVisible(id, listView)) {
+            View wantedView = ActivityUtils.getViewByPosition(id, listView);
+            wantedView.startAnimation(animation);
+        } else {
+            secretList.remove(id);
+            secretAdapter.notifyDataSetChanged();
+        }
+
+        // delete from db
+        dbSource.deleteSecret(secret);
+
+        // delete from sdcard
+        if (secret.getBlobType() == BlobType.IMAGE) {
+            String name = secret.getId() + ".jpg";
+            ImageUtils.deleteImg(name);
+        }
     }
 
     private void navigateToProfile() {
@@ -344,9 +398,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             sendSecret(secret);
             dbSource.createSecret(secret);
 
-            // update list view
-            secretList.add(secret);
-            secretAdapter.notifyDataSetChanged();
+            // add secret
+            addSecret(secret);
+
+            // delete top most items if list contains more than 7
+            int count = secretList.size();
+            if (count > 7) {
+                for (int i = 0; i < count - 7; i++) {
+                    deleteSecret(i, secretList.get(i));
+                }
+            }
         }
     }
 
@@ -489,8 +550,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             secret.setId(senz.getAttributes().get("uid"));
             secret.setDeliveryState(DeliveryState.PENDING);
 
-            secretList.add(secret);
-            secretAdapter.notifyDataSetChanged();
+            // add and delete
+            addSecret(secret);
+            deleteSecret(0, secretList.get(0));
         }
     }
 
@@ -517,8 +579,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 secret.setId(senz.getAttributes().get("uid"));
                 secret.setDeliveryState(DeliveryState.PENDING);
 
-                secretList.add(secret);
-                secretAdapter.notifyDataSetChanged();
+                // add and delete
+                addSecret(secret);
+                deleteSecret(0, secretList.get(0));
             }
         }
     }

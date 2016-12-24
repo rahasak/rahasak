@@ -36,8 +36,8 @@
         android:id="@+id/chat_mic_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <RelativeLayout
@@ -49,13 +49,13 @@
 
             <ImageView
                 android:id="@+id/chat_mic"
-                android:layout_margin="30dp"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
-                android:src="@drawable/play_recording"
                 android:layout_centerInParent="true"
+                android:layout_margin="30dp"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/play_recording" />
         </RelativeLayout>
 
     </RelativeLayout>
@@ -86,7 +86,7 @@
         android:id="@+id/chat_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp">
+        android:paddingBottom="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"

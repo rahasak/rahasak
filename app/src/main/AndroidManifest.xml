@@ -99,7 +99,7 @@
             android:name="com.score.rahasak.ui.ChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name="com.score.rahasak.ui.DrawerActivity"
             android:screenOrientation="portrait"
