@@ -27,6 +27,7 @@ import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 
 import java.io.DataInputStream;
@@ -359,8 +360,13 @@ public class SenzService extends Service {
 
                     // get digital signature of the senz
                     String senzPayload = SenzParser.getSenzPayload(senz);
-                    String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                    String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+                    String signature;
+                    if (senz.getSenzType() == SenzTypeEnum.STREAM) {
+                        signature = "SIG";
+                    } else {
+                        signature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                    }
+                    String message = SenzParser.getSenzMessage(senzPayload, signature);
                     Log.d(TAG, "Senz to be send: " + message);
 
                     //  sends the message to the server

@@ -10,7 +10,6 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,9 +20,11 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.SenzApplication;
+import com.score.rahasak.async.StreamRecorder;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
+import com.score.rahasak.interfaces.IStreamListener;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.ActivityUtils;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class SecretRecordingActivity extends AppCompatActivity {
+public class SecretRecordingActivity extends AppCompatActivity implements IStreamListener {
 
     private static final String TAG = SecretRecordingActivity.class.getName();
 
@@ -69,6 +70,8 @@ public class SecretRecordingActivity extends AppCompatActivity {
     // service interface
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
+
+    private StreamRecorder streamRecorder;
 
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -118,6 +121,8 @@ public class SecretRecordingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         dbSource = new SenzorsDbSource(this);
         audioRecorder = new AudioRecorder();
+
+        streamRecorder = new StreamRecorder(this, this);
 
         username = intent.getStringExtra("USER");
         secretUser = dbSource.getSecretUser(username);
@@ -196,7 +201,6 @@ public class SecretRecordingActivity extends AppCompatActivity {
         countDownTextView.setText(START_TIME + "");
         briefIntroTextView = (TextView) findViewById(R.id.share_secret_brief);
         moving_layout = findViewById(R.id.moving_layout);
-
 
         countDownTextView.setTypeface(typeface, Typeface.BOLD);
         briefIntroTextView.setTypeface(typeface, Typeface.NORMAL);
@@ -303,8 +307,10 @@ public class SecretRecordingActivity extends AppCompatActivity {
     }
 
     private void startRecording() {
-        audioRecorder.startRecording();
-        recordTimer.start();
+//        audioRecorder.startRecording();
+//        recordTimer.start();
+
+        streamRecorder.start();
     }
 
     private void updateQuickCountTimer(final int count) {
@@ -319,20 +325,23 @@ public class SecretRecordingActivity extends AppCompatActivity {
     private void stopRecording() {
         Log.d(TAG, "Stop recording ---");
         // stops the recording activity
-        audioRecorder.stopRecording();
-        if (audioRecorder.getRecording() != null) {
-            String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
-            Secret secret = new Secret(sound, BlobType.SOUND, secretUser, false);
-            Long timeStamp = System.currentTimeMillis() / 1000;
-            secret.setTimeStamp(timeStamp);
-            String uid = SenzUtils.getUid(this, timeStamp.toString());
-            secret.setId(uid);
-            secret.setDeliveryState(DeliveryState.PENDING);
-            dbSource.createSecret(secret);
-            sendSound(secret, uid, timeStamp);
+//        audioRecorder.stopRecording();
+//        if (audioRecorder.getRecording() != null) {
+//            String sound = Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0);
+//            Secret secret = new Secret(sound, BlobType.SOUND, secretUser, false);
+//            Long timeStamp = System.currentTimeMillis() / 1000;
+//            secret.setTimeStamp(timeStamp);
+//            String uid = SenzUtils.getUid(this, timeStamp.toString());
+//            secret.setId(uid);
+//            secret.setDeliveryState(DeliveryState.PENDING);
+//            dbSource.createSecret(secret);
+//            sendSound(secret, uid, timeStamp);
+//
+//            this.finish();
+//        }
 
-            this.finish();
-        }
+        streamRecorder.stop();
+        this.finish();
     }
 
     private void sendBusySenz() {
@@ -460,6 +469,25 @@ public class SecretRecordingActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onStream(String stream) {
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+
+        Long timeStamp = System.currentTimeMillis() / 1000;
+        String uid = SenzUtils.getUid(this, timeStamp.toString());
+
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", timeStamp.toString());
+        senzAttributes.put("mic", stream);
+        senzAttributes.put("uid", uid);
+
+        Senz _senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
+        send(_senz);
+    }
 }
 
 

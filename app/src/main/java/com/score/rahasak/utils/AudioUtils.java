@@ -10,7 +10,7 @@ import android.net.Uri;
  */
 public class AudioUtils {
 
-    public static final int RECORDER_SAMPLE_RATE = 8000;
+    public static final int RECORDER_SAMPLE_RATE = 16000;
 
     public static void disableSpeaker(Context context) {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);

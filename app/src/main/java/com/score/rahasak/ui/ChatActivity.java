@@ -382,8 +382,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void navigateMicWait() {
-        Intent intent = new Intent(this, SecretCallActivity.class);
-        intent.putExtra("SENDER", secretUser.getUsername());
+        Intent intent = new Intent(this, SecretRecordingActivity.class);
+        intent.putExtra("USER", secretUser.getUsername());
         startActivity(intent);
     }
 
@@ -474,8 +474,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void onClickMic() {
         if (NetworkUtil.isAvailableNetwork(this)) {
-            navigateMicWait();
-
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("mic", "");
@@ -491,6 +489,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
+
+            navigateMicWait();
         } else {
             Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }

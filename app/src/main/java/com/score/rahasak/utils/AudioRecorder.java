@@ -14,19 +14,25 @@ import java.io.IOException;
 public class AudioRecorder {
     private static final String TAG = AudioRecorder.class.getName();
     private static final int BufferElements2Rec = 1024;
-    private static final int BytesPerElement = 2;
+    private static final int BytesPerElement = 10;
+
+    private int sampleRate = 16000;
+    private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
 
     private AudioRecord recorder = null;
     private boolean isRecording = false;
 
-    private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     public void startRecording() {
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                AudioUtils.RECORDER_SAMPLE_RATE,
-                AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
-                BufferElements2Rec * BytesPerElement);
+//        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+//                AudioUtils.RECORDER_SAMPLE_RATE,
+//                AudioFormat.CHANNEL_IN_MONO,
+//                AudioFormat.ENCODING_PCM_16BIT,
+//                BufferElements2Rec * BytesPerElement);
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize * 10);
         recorder.startRecording();
         isRecording = true;
 
@@ -39,16 +45,13 @@ public class AudioRecorder {
     }
 
     private void writeAudioToBuffer() {
-        short sData[] = new short[BufferElements2Rec];
+        byte[] buffer = new byte[minBufSize];
 
         while (isRecording) {
-            recorder.read(sData, 0, BufferElements2Rec);
+            recorder.read(buffer, 0, buffer.length);
             try {
-                // writes the data to file from buffer
-                // stores the voice buffer
-                byte bData[] = short2byte(sData);
-                buffer.write(bData);
-                buffer.close();
+                baos.write(buffer);
+                baos.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -70,7 +73,7 @@ public class AudioRecorder {
     }
 
     public ByteArrayOutputStream getRecording() {
-        return buffer;
+        return baos;
     }
 
     private static byte[] short2byte(short[] sData) {
