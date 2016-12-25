@@ -382,8 +382,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void navigateMicWait() {
-        Intent intent = new Intent(this, SecretRecordingActivity.class);
-        intent.putExtra("USER", secretUser.getUsername());
+        Intent intent = new Intent(this, SecretCallActivity.class);
+        intent.putExtra("USER", secretUser);
         startActivity(intent);
     }
 

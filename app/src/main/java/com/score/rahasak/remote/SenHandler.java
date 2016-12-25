@@ -287,56 +287,52 @@ class SenHandler {
             Log.d(TAG, "stream ON from " + senz.getSender().getUsername());
             stream = new Stream(senz.getSender().getUsername());
 
+            // start call
+            if (senz.getAttributes().containsKey("mic")) {
+                if (streamPlayer == null) {
+                    streamPlayer = new StreamPlayer(senzService.getApplicationContext());
+                    streamPlayer.play();
+                }
+
+                // broadcast for mic on
+                broadcastSenz(senz, senzService.getApplicationContext());
+            }
         } else if (SenzUtils.isStreamOff(senz)) {
             // stream off, last stream
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
 
-            // send status back first
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
-
-            // new stream senz
-            HashMap<String, String> attributes = new HashMap<>();
-            if (senz.getAttributes().containsKey("cam"))
-                attributes.put("cam", stream.getStream());
-            else
-                attributes.put("mic", stream.getStream());
-
-            Long timestamp = (System.currentTimeMillis() / 1000);
-            attributes.put("uid", senz.getAttributes().get("uid"));
-            attributes.put("time", timestamp.toString());
-
-            Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
-
-            // save in db
-            // broadcast
+            // handle for cam
             if (senz.getAttributes().containsKey("cam")) {
-                saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
+                // send status back first
+                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
 
+                // new stream
+                HashMap<String, String> attributes = new HashMap<>();
+                Long timestamp = (System.currentTimeMillis() / 1000);
+                attributes.put("cam", stream.getStream());
+                attributes.put("uid", senz.getAttributes().get("uid"));
+                attributes.put("time", timestamp.toString());
+
+                // save
+                saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
                 String imgName = senz.getAttributes().get("uid") + ".jpg";
                 ImageUtils.saveImg(imgName, stream.getStream());
+
+                Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
+                broadcastSenz(streamSenz, senzService.getApplicationContext());
+
+                // show notification
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getStreamNotification(senz.getSender().getUsername(), senz.getAttributes().containsKey("cam")));
             } else {
-                saveSecret(timestamp, senz.getAttributes().get("uid"), stream.getStream(), BlobType.SOUND, senz.getSender(), senzService.getApplicationContext());
+                streamPlayer.stop();
             }
-            //broadcastSenz(streamSenz, senzService.getApplicationContext());
-
-            streamPlayer.stop();
-
-            // show notification
-            SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                    NotificationUtils.getStreamNotification(senz.getSender().getUsername(), senz.getAttributes().containsKey("cam")));
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam")) {
                 stream.appendStream(senz.getAttributes().get("cam"));
             } else {
                 String micStream = senz.getAttributes().get("mic");
-                //stream.appendStream(micStream);
-
-                if (streamPlayer == null) {
-                    streamPlayer = new StreamPlayer(senzService.getApplicationContext());
-                    streamPlayer.play();
-                }
-
                 streamPlayer.onStream(micStream);
             }
         }
@@ -368,7 +364,7 @@ class SenHandler {
             senzService.getApplicationContext().startActivity(intent);
         } else {
             // user in another call
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "MIC_BUSY"));
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
         }
     }
 
