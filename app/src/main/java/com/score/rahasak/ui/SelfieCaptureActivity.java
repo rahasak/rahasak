@@ -39,6 +39,7 @@ public class SelfieCaptureActivity extends BaseActivity {
     private CameraPreview mCameraPreview;
     private boolean isPhotoTaken;
     private boolean isPhotoCancelled;
+    private boolean isFrontCam;
 
     // UI elements
     private View callingUserInfo;
@@ -46,6 +47,7 @@ public class SelfieCaptureActivity extends BaseActivity {
     private TextView quickCountdownText;
     private CircularImageView cancelBtn;
     private ImageView startBtn;
+    private ImageView rotateCamera;
 
     // selfie request user
     private String username;
@@ -66,7 +68,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
 
         //init camera
-        initCameraPreview();
+        initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
         initFlags();
 
         // init activity
@@ -169,6 +171,18 @@ public class SelfieCaptureActivity extends BaseActivity {
                 }
             }
         });
+
+        rotateCamera = (ImageView) findViewById(R.id.rotate_camera);
+        rotateCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Click to rotate --------------- ");
+                if (isFrontCam)
+                    initCameraPreview(Camera.CameraInfo.CAMERA_FACING_BACK);
+                else
+                    initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            }
+        });
     }
 
     private void setupTitle() {
@@ -223,9 +237,27 @@ public class SelfieCaptureActivity extends BaseActivity {
      *
      * @return
      */
-    private void initCameraPreview() {
+    private void initCameraPreview(int camFace) {
+        if (mCameraPreview != null) {
+            mCameraPreview.surfaceDestroyed(mCameraPreview.getHolder());
+            mCameraPreview.getHolder().removeCallback(mCameraPreview);
+            mCameraPreview.destroyDrawingCache();
+            FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
+            preview.removeView(mCameraPreview);
+            mCameraPreview.mCamera = null;
+            mCameraPreview = null;
+
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+
+        // cam face
+        isFrontCam = camFace == Camera.CameraInfo.CAMERA_FACING_FRONT;
+
+        // render new preview
         try {
-            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            mCamera = Camera.open(camFace);
             mCameraPreview = new CameraPreview(this, mCamera);
 
             FrameLayout preview = (FrameLayout) findViewById(R.id.photo);

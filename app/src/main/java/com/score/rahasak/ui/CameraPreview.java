@@ -13,8 +13,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private static final String TAG = CameraPreview.class.getName();
 
-    private SurfaceHolder mSurfaceHolder;
-    private Camera mCamera;
+    SurfaceHolder mSurfaceHolder;
+    Camera mCamera;
     private static boolean isCameraBusy;
 
     //Constructor that obtains context and camera
