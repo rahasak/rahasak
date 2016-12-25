@@ -22,8 +22,7 @@ public class AudioRecorder {
     private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
     public void startRecording() {
-        recorder = new AudioRecord(
-                MediaRecorder.AudioSource.MIC,
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 AudioUtils.RECORDER_SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,

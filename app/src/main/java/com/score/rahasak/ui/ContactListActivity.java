@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.score.rahasak.R;
-import com.score.rahasak.asyncTasks.ContactReader;
+import com.score.rahasak.async.ContactReader;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IContactReaderListener;

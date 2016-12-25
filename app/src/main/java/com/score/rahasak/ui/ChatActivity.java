@@ -192,8 +192,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public void onDestroy() {
         super.onDestroy();
 
-        // keep only last message
-        dbSource.deleteAllSecretsExceptLast(secretUser.getUsername());
+        // delete top most items if list contains more than 7
+        int count = secretList.size();
+        if (count > 7) {
+            for (int i = 0; i < count - 7; i++) {
+                deleteSecret(0, secretList.get(0));
+            }
+        }
     }
 
     protected void bindToService() {

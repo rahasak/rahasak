@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
-import com.score.rahasak.asyncTasks.RahasPlayer;
+import com.score.rahasak.async.RahasPlayer;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.interfaces.IRahasPlayListener;
 import com.score.senzc.pojos.Senz;

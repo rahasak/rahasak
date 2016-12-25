@@ -1,4 +1,4 @@
-package com.score.rahasak.asyncTasks;
+package com.score.rahasak.async;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
