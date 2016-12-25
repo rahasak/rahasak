@@ -258,7 +258,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void setupToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setCollapsible(false);
-        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
+        //toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
         setSupportActionBar(toolbar);
     }
 
@@ -302,6 +302,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             secretList.addAll(tmpList);
             secretAdapter.notifyDataSetChanged();
 
+            // delete secrets from top
+            for (Secret secret : tmpList) {
+                deleteSecret(0, secretList.get(0));
+            }
+
+            // move to bottom
             listView.post(new Runnable() {
                 public void run() {
                     listView.smoothScrollToPosition(listView.getCount() - 1);
@@ -405,7 +411,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             int count = secretList.size();
             if (count > 7) {
                 for (int i = 0; i < count - 7; i++) {
-                    deleteSecret(i, secretList.get(i));
+                    deleteSecret(0, secretList.get(0));
                 }
             }
         }

@@ -49,7 +49,8 @@
                     android:layout_gravity="right"
                     android:padding="0dp"
                     android:scrollbars="none"
-                    android:stackFromBottom="true" />
+                    android:stackFromBottom="true"
+                    android:transcriptMode="normal" />
             </FrameLayout>
 
             <FrameLayout
