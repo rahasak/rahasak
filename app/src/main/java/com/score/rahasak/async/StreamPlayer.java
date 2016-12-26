@@ -43,6 +43,7 @@ public class StreamPlayer {
     public void stop() {
         listener.shutDown();
         streamTrack.stop();
+        streamTrack.release();
     }
 
     private class StreamListener extends Thread {

@@ -29,6 +29,11 @@ public class AudioUtils {
         audioManager.setMode(AudioManager.MODE_NORMAL);
     }
 
+    public static void removeNoice(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setParameters("noise_suppression=auto");
+    }
+
     public static void shootSound(Context context) {
         AudioManager meng = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int volume = meng.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
