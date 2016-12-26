@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -103,6 +105,7 @@ public class SecretCallActivity extends AppCompatActivity implements IStreamList
         setContentView(R.layout.activity_audio_full_screen);
 
         initUi();
+        changeStatusBarColor();
         initUser();
         startWaiting();
     }
@@ -170,9 +173,16 @@ public class SecretCallActivity extends AppCompatActivity implements IStreamList
         playingText.setTypeface(typeface, Typeface.NORMAL);
     }
 
+    private void changeStatusBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+        }
+    }
+
     private void initUser() {
         secretUser = getIntent().getParcelableExtra("USER");
-        usernameText.setText(secretUser.getUsername());
+        usernameText.setText("@" + secretUser.getUsername());
     }
 
     private void onSenzReceived(Senz senz) {

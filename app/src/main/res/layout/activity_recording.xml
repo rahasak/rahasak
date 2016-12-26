@@ -6,8 +6,15 @@
     android:background="@color/audio_grey">
 
     <FrameLayout
+        android:id="@+id/calling_user"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/default_user" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B3000000">
 
         <TextView
             android:id="@+id/calling_text"
@@ -18,108 +25,91 @@
             android:textColor="@color/colorPrimary"
             android:textSize="25sp"
             android:visibility="gone" />
-    </FrameLayout>
 
-    <RelativeLayout
-        android:id="@+id/moving_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/sender_info"
+        <RelativeLayout
+            android:id="@+id/moving_layout"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_centerVertical="false"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="20dp"
-            android:background="@color/transparent"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_centerVertical="false"
-                android:layout_weight="20"
-                android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/selfie_image"
+                    android:layout_width="80dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/eyes_moving" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/loading_info_box"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/photo_request_user_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:text="Eranga"
+                        android:id="@+id/mic_calling_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Secret calling..."
                         android:textColor="@color/colorPrimary"
-                        android:textSize="50dp" />
-
-                    <TextView
-                        android:id="@+id/photo_request_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="15dp"
-                        android:layout_weight="1"
-                        android:text="Secret calling"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="20dp" />
+                        android:textSize="45sp" />
                 </LinearLayout>
 
-                <com.github.siyamed.shapeimageview.RoundedImageView
-                    android:id="@+id/user_profile_image"
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
-                    android:layout_gravity="top|center"
-                    android:layout_margin="5dp"
-                    android:adjustViewBounds="true"
-                    android:cropToPadding="true"
-                    android:src="@drawable/default_user"
-                    app:siBorderAlpha="0.0"
-                    app:siBorderWidth="0dp"
-                    app:siRadius="12dp" />
+
+                <TextView
+                    android:id="@+id/mic_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:gravity="center"
+                    android:text="Eranga"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="35sp" />
+
             </LinearLayout>
-        </LinearLayout>
 
-        <com.github.siyamed.shapeimageview.CircularImageView
-            android:id="@+id/start"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:layout_marginBottom="60dp"
-            android:layout_marginRight="30dp"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            android:src="@drawable/answer_call"
-            app:siBorderAlpha="0.0"
-            app:siBorderWidth="0dp"
-            app:siSquare="true" />
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:id="@+id/start"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="60dp"
+                android:layout_marginRight="55dp"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                android:src="@drawable/answer_call"
+                app:siBorderAlpha="0.0"
+                app:siBorderWidth="0dp"
+                app:siSquare="true" />
 
-        <com.github.siyamed.shapeimageview.CircularImageView
-            android:id="@+id/cancel"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:layout_marginBottom="60dp"
-            android:layout_marginLeft="30dp"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            android:foregroundGravity="center"
-            android:scaleType="fitXY"
-            android:src="@drawable/cancel_call"
-            app:siBorderAlpha="0.0"
-            app:siBorderWidth="0dp"
-            app:siSquare="true" />
-    </RelativeLayout>
-
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:id="@+id/cancel"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="60dp"
+                android:layout_marginLeft="55dp"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                android:foregroundGravity="center"
+                android:scaleType="fitXY"
+                android:src="@drawable/cancel_call"
+                app:siBorderAlpha="0.0"
+                app:siBorderWidth="0dp"
+                app:siSquare="true" />
+        </RelativeLayout>
+    </FrameLayout>
 </RelativeLayout>

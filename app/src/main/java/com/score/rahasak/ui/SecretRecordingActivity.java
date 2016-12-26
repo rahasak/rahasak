@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -13,11 +16,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
-import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.SenzApplication;
 import com.score.rahasak.async.StreamRecorder;
@@ -44,12 +48,15 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
     private static final String TAG = SecretRecordingActivity.class.getName();
 
     private RelativeLayout rootView;
+
+    private FrameLayout callingUser;
     private TextView callingText;
+    private TextView callingHeaderText;
+    private TextView callingUsernameText;
+    private ImageView waitingIcon;
+
     private CircularImageView cancelBtn;
     private CircularImageView startBtn;
-    private RoundedImageView userImage;
-    private TextView usernameTextView;
-    private TextView headerTextView;
 
     private SecretUser secretUser;
 
@@ -96,6 +103,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         setContentView(R.layout.activity_recording);
 
         initUi();
+        changeStatusBarColor();
         initUser();
         setupWakeLock();
         startVibrations();
@@ -145,13 +153,17 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
 
         rootView = (RelativeLayout) findViewById(R.id.moving_layout);
+        callingUser = (FrameLayout) findViewById(R.id.calling_user);
+        callingHeaderText = (TextView) findViewById(R.id.mic_calling_text);
+        callingUsernameText = (TextView) findViewById(R.id.mic_username);
         callingText = (TextView) findViewById(R.id.calling_text);
-        userImage = (RoundedImageView) findViewById(R.id.user_profile_image);
-        usernameTextView = ((TextView) findViewById(R.id.photo_request_user_name));
-        headerTextView = (TextView) findViewById(R.id.photo_request_header);
+
+        callingHeaderText.setTypeface(typeface);
+        callingUsernameText.setTypeface(typeface);
         callingText.setTypeface(typeface);
-        usernameTextView.setTypeface(typeface);
-        headerTextView.setTypeface(typeface);
+
+        waitingIcon = (ImageView) findViewById(R.id.selfie_image);
+        startWaiting();
 
         cancelBtn = (CircularImageView) findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -177,13 +189,28 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         });
     }
 
+    private void changeStatusBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+        }
+    }
+
+    private void startWaiting() {
+        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
+        anim.start();
+    }
+
     private void initUser() {
         String username = getIntent().getStringExtra("USER");
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
 
-        usernameTextView.setText(" @" + secretUser.getUsername());
+        callingUsernameText.setText(" @" + secretUser.getUsername());
         if (secretUser.getImage() != null) {
-            userImage.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
+            BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
+            callingUser.setBackground(drawable);
+        } else {
+            callingUser.setVisibility(View.GONE);
         }
     }
 
