@@ -4,7 +4,9 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Build;
 import android.util.Base64;
+import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
 
@@ -12,28 +14,16 @@ public class StreamPlayer {
 
     private Context context;
     private StringBuffer buffer;
-    private StreamListener listener;
-
-    private AudioTrack streamTrack;
+    private Player player;
 
     public StreamPlayer(Context context) {
         this.context = context;
         buffer = new StringBuffer();
-        listener = new StreamListener();
-
-        int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
-                AudioUtils.RECORDER_SAMPLE_RATE,
-                AudioFormat.CHANNEL_OUT_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
-                minBufSize,
-                AudioTrack.MODE_STREAM);
+        player = new Player();
     }
 
     public void play() {
-        listener.start();
-        enableEarpiece();
-        streamTrack.play();
+        player.start();
     }
 
     public void onStream(String stream) {
@@ -41,33 +31,54 @@ public class StreamPlayer {
     }
 
     public void stop() {
-        listener.shutDown();
-        streamTrack.flush();
-        streamTrack.stop();
-        streamTrack.release();
+        player.shutDown();
     }
 
-    private class StreamListener extends Thread {
-        boolean listening = true;
-
-        void shutDown() {
-            listening = false;
-        }
+    private class Player extends Thread {
+        private AudioTrack streamTrack;
+        private boolean playing = true;
 
         @Override
         public void run() {
-            if (listening) listen();
+            if (playing) {
+                startPlay();
+                play();
+            }
         }
 
-        private void listen() {
-            while (listening) {
+        private void startPlay() {
+            int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
+                    AudioUtils.RECORDER_SAMPLE_RATE,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufSize,
+                    AudioTrack.MODE_STREAM);
+
+            enableEarpiece();
+            streamTrack.play();
+        }
+
+        private void play() {
+            while (playing) {
                 String stream = buffer.toString();
                 if (!stream.isEmpty()) {
+                    Log.d("PLAY", stream.length() + "------------");
                     byte[] data = Base64.decode(stream, Base64.DEFAULT);
                     streamTrack.write(data, 0, data.length);
-
                     buffer.setLength(0);
                 }
+            }
+        }
+
+        void shutDown() {
+            playing = false;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                streamTrack.pause();
+                streamTrack.flush();
+            } else {
+                streamTrack.stop();
             }
         }
     }
