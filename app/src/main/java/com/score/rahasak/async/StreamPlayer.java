@@ -42,6 +42,7 @@ public class StreamPlayer {
 
     public void stop() {
         listener.shutDown();
+        streamTrack.flush();
         streamTrack.stop();
         streamTrack.release();
     }
