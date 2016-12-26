@@ -302,22 +302,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void refreshSecretList() {
-        ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser, secretList.getYongest().getTimeStamp());
-        if (tmpList.size() > 0) {
-            secretList.addAll(tmpList);
-            secretAdapter.notifyDataSetChanged();
+        if (!secretList.isEmpty()) {
+            ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser, secretList.getYongest().getTimeStamp());
+            if (tmpList.size() > 0) {
+                secretList.addAll(tmpList);
+                secretAdapter.notifyDataSetChanged();
 
-            // delete secrets from top
-            for (Secret secret : tmpList) {
-                deleteSecret(0, secretList.get(0));
-            }
-
-            // move to bottom
-            listView.post(new Runnable() {
-                public void run() {
-                    listView.smoothScrollToPosition(listView.getCount() - 1);
+                // delete secrets from top
+                for (Secret secret : tmpList) {
+                    deleteSecret(0, secretList.get(0));
                 }
-            });
+
+                // move to bottom
+                listView.post(new Runnable() {
+                    public void run() {
+                        listView.smoothScrollToPosition(listView.getCount() - 1);
+                    }
+                });
+            }
         }
     }
 
