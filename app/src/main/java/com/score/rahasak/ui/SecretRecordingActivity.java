@@ -209,8 +209,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         if (secretUser.getImage() != null) {
             BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
-        } else {
-            callingUser.setVisibility(View.GONE);
         }
     }
 
