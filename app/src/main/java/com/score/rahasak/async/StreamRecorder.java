@@ -7,13 +7,23 @@ import android.media.MediaRecorder;
 import android.util.Base64;
 import android.util.Log;
 
-import com.score.rahasak.interfaces.IStreamListener;
+import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
+import com.score.rahasak.utils.SenzUtils;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 public class StreamRecorder {
 
     private Context context;
-    private IStreamListener streamListener;
+    private String from;
+    private String to;
+
+    private DatagramSocket socket;
+    private InetAddress address;
 
     private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
@@ -21,9 +31,11 @@ public class StreamRecorder {
 
     private Recorder recorder;
 
-    public StreamRecorder(Context context, IStreamListener listener) {
+    public StreamRecorder(Context context, DatagramSocket socket, String from, String to) {
         this.context = context;
-        this.streamListener = listener;
+        this.socket = socket;
+        this.from = from;
+        this.to = to;
 
         recorder = new Recorder();
     }
@@ -62,9 +74,11 @@ public class StreamRecorder {
             while (recording) {
                 Log.d("RECORD", minBufSize + "+++++++++");
                 audioRecorder.read(buffer, 0, buffer.length);
-
                 String stream = Base64.encodeToString(buffer, Base64.DEFAULT);
-                streamListener.onStream(stream);
+
+                // create datagram packet and send
+                String datagram = SenzUtils.getSenzStream(stream, from, to);
+                sendDatagram(datagram);
             }
         }
 
@@ -88,6 +102,16 @@ public class StreamRecorder {
             }
 
             return bytes;
+        }
+
+        private void sendDatagram(String datagram) {
+            try {
+                if (address == null) address = InetAddress.getByName(SenzService.STREAM_HOST);
+                DatagramPacket sendPacket = new DatagramPacket(datagram.getBytes(), datagram.length(), address, SenzService.STREAM_PORT);
+                socket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

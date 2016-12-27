@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.score.rahasak.application.SenzApplication;
-import com.score.rahasak.async.StreamPlayer;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
@@ -33,8 +32,6 @@ class SenHandler {
     private static SenHandler instance;
 
     private Stream stream;
-
-    private StreamPlayer streamPlayer;
 
     static SenHandler getInstance() {
         if (instance == null) {
@@ -278,6 +275,8 @@ class SenHandler {
                     e.printStackTrace();
                 }
             }
+        } else if (senz.getAttributes().containsKey("mic")) {
+            broadcastSenz(senz, senzService.getApplicationContext());
         }
     }
 
@@ -286,17 +285,6 @@ class SenHandler {
             // stream on, first stream
             Log.d(TAG, "stream ON from " + senz.getSender().getUsername());
             stream = new Stream(senz.getSender().getUsername());
-
-            // start call
-            if (senz.getAttributes().containsKey("mic")) {
-                if (streamPlayer == null) {
-                    streamPlayer = new StreamPlayer(senzService.getApplicationContext());
-                    streamPlayer.play();
-                }
-
-                // broadcast for mic on
-                broadcastSenz(senz, senzService.getApplicationContext());
-            }
         } else if (SenzUtils.isStreamOff(senz)) {
             // stream off, last stream
             Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
@@ -324,16 +312,11 @@ class SenHandler {
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getStreamNotification(senz.getSender().getUsername(), senz.getAttributes().containsKey("cam")));
-            } else {
-                streamPlayer.stop();
             }
         } else {
             // middle stream
             if (senz.getAttributes().containsKey("cam")) {
                 stream.appendStream(senz.getAttributes().get("cam"));
-            } else {
-                String micStream = senz.getAttributes().get("mic");
-                streamPlayer.onStream(micStream);
             }
         }
     }

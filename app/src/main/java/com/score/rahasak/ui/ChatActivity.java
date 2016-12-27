@@ -216,7 +216,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == btnPhoto) {
             onClickPhoto();
         } else if (v == btnMic) {
-            onClickMic();
+            // request call (DATA #mic on)
+            navigateMicWait();
+            Senz senz = SenzUtils.getInitMicSenz(this, secretUser);
+            send(senz);
         } else if (v == btnBack) {
             finish();
         } else if (v == btnUserSetting) {
@@ -469,30 +472,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
             send(senz);
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void onClickMic() {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("mic", "");
-
-            Long timestamp = System.currentTimeMillis() / 1000;
-            senzAttributes.put("time", timestamp.toString());
-            senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
-
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-
-            send(senz);
-
-            navigateMicWait();
         } else {
             Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }

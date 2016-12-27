@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.Secret;
+import com.score.rahasak.pojo.SecretUser;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -156,5 +157,68 @@ public class SenzUtils {
         senz.setAttributes(senzAttributes);
 
         return senz;
+    }
+
+    public static String getStartStreamMsg(Context context, String sender, String receiver) {
+        return "DATA #STREAM ON" + " @" + receiver + " ^" + sender + " SIG";
+    }
+
+    public static Senz getInitMicSenz(Context context, SecretUser secretUser) {
+        Long timeStamp = System.currentTimeMillis() / 1000;
+        String uid = SenzUtils.getUid(context, timeStamp.toString());
+
+        //senz is the original senz
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", timeStamp.toString());
+        senzAttributes.put("mic", "");
+        senzAttributes.put("uid", uid);
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
+    }
+
+    public static Senz getMicOnSenz(Context context, SecretUser secretUser) {
+        Long timeStamp = System.currentTimeMillis() / 1000;
+        String uid = SenzUtils.getUid(context, timeStamp.toString());
+
+        //senz is the original senz
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", timeStamp.toString());
+        senzAttributes.put("mic", "on");
+        senzAttributes.put("uid", uid);
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
+    }
+
+    public static String getSenzStream(String data, String sender, String receiver) {
+        String msg = "STREAM #mic " + data + " @" + receiver + " ^" + sender + " SIG";
+        return msg.replaceAll("\n", "").replaceAll("\r", "");
+    }
+
+    public static Senz getMicBusySenz(Context context, SecretUser secretUser) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("status", "BUSY");
+        senzAttributes.put("uid", SenzUtils.getUid(context, timestamp.toString()));
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
     }
 }

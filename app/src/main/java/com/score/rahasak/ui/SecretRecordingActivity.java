@@ -24,51 +24,63 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.SenzApplication;
+import com.score.rahasak.async.StreamPlayer;
 import com.score.rahasak.async.StreamRecorder;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
+import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IStreamListener;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
+import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
+import com.score.rahasak.utils.PreferenceUtils;
+import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 
 public class SecretRecordingActivity extends AppCompatActivity implements IStreamListener {
 
     private static final String TAG = SecretRecordingActivity.class.getName();
 
-    private RelativeLayout rootView;
+    private static final int TIME_TO_SERVE_REQUEST = 15000;
 
+    protected Typeface typeface;
+
+    private RelativeLayout rootView;
     private FrameLayout callingUser;
     private TextView callingText;
     private TextView callingHeaderText;
     private TextView callingUsernameText;
     private ImageView waitingIcon;
-
     private CircularImageView cancelBtn;
     private CircularImageView startBtn;
 
+    private User appUser;
     private SecretUser secretUser;
-
-    private static final int TIME_TO_SERVE_REQUEST = 15000;
-
-    protected Typeface typeface;
 
     // service interface
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
 
+    // we are listing for UDP socket
+    private DatagramSocket socket;
+    private InetAddress address;
+
     private StreamRecorder streamRecorder;
+    private StreamPlayer streamPlayer;
 
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -88,7 +100,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
     private CountDownTimer requestTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
         @Override
         public void onFinish() {
-            sendBusySenz();
+            sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
             SecretRecordingActivity.this.finish();
         }
 
@@ -103,11 +115,12 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         setContentView(R.layout.activity_recording);
 
         initUi();
-        changeStatusBarColor();
+        initStatusBar();
         initUser();
         setupWakeLock();
         startVibrations();
         startTimerToEndRequest();
+        initCall();
     }
 
     @Override
@@ -146,7 +159,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         stopVibrations();
         clearFlags();
         endCall();
-        sendEndStream();
     }
 
     private void initUi() {
@@ -163,7 +175,8 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         callingText.setTypeface(typeface);
 
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
-        startWaiting();
+        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
+        anim.start();
 
         cancelBtn = (CircularImageView) findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -171,7 +184,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
             public void onClick(View v) {
                 stopVibrations();
                 cancelTimerToServe();
-                sendBusySenz();
+                sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
                 endCall();
                 SecretRecordingActivity.this.finish();
             }
@@ -183,25 +196,27 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
             public void onClick(View v) {
                 stopVibrations();
                 cancelTimerToServe();
-                sendStartSenz();
                 startCall();
             }
         });
     }
 
-    private void changeStatusBarColor() {
+    private void initStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(getResources().getColor(R.color.black));
         }
     }
 
-    private void startWaiting() {
-        AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
-        anim.start();
-    }
-
     private void initUser() {
+        // app user
+        try {
+            appUser = PreferenceUtils.getUser(this);
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
+
+        // secret user
         String username = getIntent().getStringExtra("USER");
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
 
@@ -210,6 +225,83 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
             BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
         }
+    }
+
+    private void initCall() {
+        // connect to UDP
+        initUdpSoc();
+        initUdpConn();
+        initUdpLsn();
+    }
+
+    private void initUdpSoc() {
+        if (socket == null || socket.isClosed()) {
+            try {
+                socket = new DatagramSocket();
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.e(TAG, "Socket already initialized");
+        }
+    }
+
+    /**
+     * Initialize/Create UDP socket
+     */
+    private void initUdpConn() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    // connect
+                    if (address == null)
+                        address = InetAddress.getByName(SenzService.STREAM_HOST);
+
+                    // send init message
+                    String msg = SenzUtils.getStartStreamMsg(SecretRecordingActivity.this, appUser.getUsername(), "streamswitch");
+                    if (msg != null) {
+                        DatagramPacket sendPacket = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
+                        socket.send(sendPacket);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * Start thread for listen to UDP socket, all the incoming messages receives from
+     * here, when message receives it should be broadcast or delegate to appropriate message
+     * handler
+     */
+    private void initUdpLsn() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    byte[] message = new byte[512];
+
+                    while (true) {
+                        // listen for senz
+                        DatagramPacket receivePacket = new DatagramPacket(message, message.length);
+                        socket.receive(receivePacket);
+                        String msg = new String(message, 0, receivePacket.getLength());
+
+                        Log.d(TAG, "Stream received: " + msg);
+
+                        // parser and obtain audio data
+                        // play it
+                        if (!msg.isEmpty()) {
+                            Senz streamSenz = SenzParser.parse(msg);
+                            if (streamPlayer != null)
+                                streamPlayer.onStream(streamSenz.getAttributes().get("mic"));
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void setupWakeLock() {
@@ -243,107 +335,42 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         VibrationUtils.stopVibration(this);
     }
 
-    private void saveMissedCall() {
-        Secret newSecret = new Secret("", BlobType.SOUND, secretUser, true);
-        Long timeStamp = System.currentTimeMillis() / 1000;
-        newSecret.setTimeStamp(timeStamp);
-        newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
-        newSecret.setDeliveryState(DeliveryState.PENDING);
-        new SenzorsDbSource(this).createSecret(newSecret);
-    }
-
     private void startCall() {
+        // set up ui
         rootView.setVisibility(View.GONE);
         callingText.setVisibility(View.VISIBLE);
 
+        // send mic on senz back
+        Senz senz = SenzUtils.getMicOnSenz(this, secretUser);
+        sendSenz(senz);
+
+        // start recorder
         if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, this);
+            streamRecorder = new StreamRecorder(this, socket, appUser.getUsername(), secretUser.getUsername());
         streamRecorder.start();
+
+        // start player
+        if (streamPlayer == null)
+            streamPlayer = new StreamPlayer(this);
+        streamPlayer.play();
     }
 
     private void endCall() {
         if (streamRecorder != null)
             streamRecorder.stop();
-    }
 
-    private void sendBusySenz() {
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        Long timestamp = System.currentTimeMillis() / 1000;
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("status", "BUSY");
-        senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.DATA;
-
-        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-        send(senz);
-    }
-
-    private void sendStartSenz() {
-        Long timeStamp = System.currentTimeMillis() / 1000;
-        String uid = SenzUtils.getUid(this, timeStamp.toString());
-
-        //senz is the original senz
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", timeStamp.toString());
-        senzAttributes.put("mic", "on");
-        senzAttributes.put("uid", uid);
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-        send(senz);
-    }
-
-    private void sendEndStream() {
-        Long timeStamp = System.currentTimeMillis() / 1000;
-        String uid = SenzUtils.getUid(this, timeStamp.toString());
-
-        // create senz attributes
-        //senz is the original senz
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", timeStamp.toString());
-        senzAttributes.put("mic", "off");
-        senzAttributes.put("uid", uid);
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-        send(senz);
+        if (streamPlayer != null)
+            streamPlayer.stop();
     }
 
     @Override
     public void onStream(String stream) {
         // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-        Long timeStamp = System.currentTimeMillis() / 1000;
-        String uid = SenzUtils.getUid(this, timeStamp.toString());
-
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", timeStamp.toString());
-        senzAttributes.put("mic", stream);
-        senzAttributes.put("uid", uid);
-
-        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-        send(senz);
+        String senzStream = SenzUtils.getSenzStream(stream, appUser.getUsername(), secretUser.getUsername());
+        sendStream(senzStream);
     }
 
-    private void send(Senz senz) {
+    private void sendSenz(Senz senz) {
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
@@ -355,6 +382,35 @@ public class SecretRecordingActivity extends AppCompatActivity implements IStrea
         } else {
             ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
+    }
+
+    private void sendStream(final String stream) {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        // send message
+                        if (address == null)
+                            address = InetAddress.getByName(SenzService.STREAM_HOST);
+                        DatagramPacket sendPacket = new DatagramPacket(stream.getBytes(), stream.length(), address, SenzService.STREAM_PORT);
+                        socket.send(sendPacket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            Log.e(TAG, "Cannot send senz, No connection available");
+        }
+    }
+
+    private void saveMissedCall() {
+        Secret newSecret = new Secret("", BlobType.SOUND, secretUser, true);
+        Long timeStamp = System.currentTimeMillis() / 1000;
+        newSecret.setTimeStamp(timeStamp);
+        newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
+        newSecret.setDeliveryState(DeliveryState.PENDING);
+        new SenzorsDbSource(this).createSecret(newSecret);
     }
 
 }
