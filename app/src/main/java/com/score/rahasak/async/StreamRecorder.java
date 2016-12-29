@@ -5,10 +5,10 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Base64;
-import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
+import com.score.rahasak.utils.SenzBuffer;
 import com.score.rahasak.utils.SenzUtils;
 
 import java.io.IOException;
@@ -30,22 +30,27 @@ public class StreamRecorder {
     private int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
 
     private Recorder recorder;
+    private Writer writer;
+    private SenzBuffer senzBuffer;
 
-    public StreamRecorder(Context context, DatagramSocket socket, String from, String to) {
+    public StreamRecorder(Context context, String from, String to) {
         this.context = context;
-        this.socket = socket;
         this.from = from;
         this.to = to;
 
         recorder = new Recorder();
+        writer = new Writer();
+        senzBuffer = new SenzBuffer();
     }
 
     public void start() {
         recorder.start();
+        writer.start();
     }
 
     public void stop() {
         recorder.shutDown();
+        writer.shutDown();
     }
 
     private class Recorder extends Thread {
@@ -70,15 +75,12 @@ public class StreamRecorder {
         }
 
         private void record() {
-            byte[] buffer = new byte[minBufSize];
+            byte[] buf = new byte[minBufSize];
             while (recording) {
-                Log.d("RECORD", minBufSize + "+++++++++");
-                audioRecorder.read(buffer, 0, buffer.length);
-                String stream = Base64.encodeToString(buffer, Base64.DEFAULT);
+                audioRecorder.read(buf, 0, buf.length);
 
-                // create datagram packet and send
-                String datagram = SenzUtils.getSenzStream(stream, from, to);
-                sendDatagram(datagram);
+                // add byte data directly
+                senzBuffer.put(buf);
             }
         }
 
@@ -92,22 +94,43 @@ public class StreamRecorder {
                 audioRecorder = null;
             }
         }
+    }
 
-        private byte[] short2byte(short[] sData) {
-            byte[] bytes = new byte[sData.length * 2];
-            for (int i = 0; i < sData.length; i++) {
-                bytes[i * 2] = (byte) (sData[i] & 0x00FF);
-                bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
-                sData[i] = 0;
+    private class Writer extends Thread {
+        boolean writing = true;
+
+        @Override
+        public void run() {
+            if (writing) {
+                write();
             }
-
-            return bytes;
         }
 
-        private void sendDatagram(String datagram) {
+        private void write() {
+            while (writing) {
+                if (senzBuffer.size() > 500) {
+                    //byte[] stream = AudioUtils.compress(senzBuffer.get(0, 500));
+                    byte[] stream = senzBuffer.get(0, 500);
+
+                    String encodedStream = Base64.encodeToString(stream, Base64.DEFAULT);
+                    String senz = SenzUtils.getSenzStream(encodedStream, from, to);
+
+                    sendDatagram(senz);
+                }
+            }
+        }
+
+        void shutDown() {
+            writing = false;
+        }
+
+        private void sendDatagram(String senz) {
             try {
-                if (address == null) address = InetAddress.getByName(SenzService.STREAM_HOST);
-                DatagramPacket sendPacket = new DatagramPacket(datagram.getBytes(), datagram.length(), address, SenzService.STREAM_PORT);
+                if (address == null)
+                    address = InetAddress.getByName(SenzService.STREAM_HOST);
+                if (socket == null)
+                    socket = new DatagramSocket();
+                DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
                 socket.send(sendPacket);
             } catch (IOException e) {
                 e.printStackTrace();

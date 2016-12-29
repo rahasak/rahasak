@@ -11,9 +11,9 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,11 +30,8 @@ import com.score.rahasak.async.StreamPlayer;
 import com.score.rahasak.async.StreamRecorder;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
-import com.score.rahasak.interfaces.IStreamListener;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.remote.SenzService;
-import com.score.rahasak.utils.ActivityUtils;
-import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
@@ -48,7 +45,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-public class SecretCallActivity extends AppCompatActivity implements IStreamListener {
+public class SecretCallActivity extends AppCompatActivity {
 
     private static final String TAG = SecretCallActivity.class.getName();
 
@@ -254,7 +251,7 @@ public class SecretCallActivity extends AppCompatActivity implements IStreamList
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    byte[] message = new byte[512];
+                    byte[] message = new byte[2048];
 
                     while (true) {
                         // listen for senz
@@ -267,9 +264,13 @@ public class SecretCallActivity extends AppCompatActivity implements IStreamList
                         // parser and obtain audio data
                         // play it
                         if (!msg.isEmpty()) {
-                            Senz streamSenz = SenzParser.parse(msg);
-                            if (streamPlayer != null)
-                                streamPlayer.onStream(streamSenz.getAttributes().get("mic"));
+                            if (streamPlayer != null) {
+                                Senz senz = SenzParser.parse(msg);
+                                if (senz.getAttributes().containsKey("mic")) {
+                                    String data = senz.getAttributes().get("mic");
+                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
+                                }
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -301,7 +302,7 @@ public class SecretCallActivity extends AppCompatActivity implements IStreamList
 
         // start recorder
         if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, socket, appUser.getUsername(), secretUser.getUsername());
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername());
         streamRecorder.start();
 
         // start player
@@ -316,47 +317,6 @@ public class SecretCallActivity extends AppCompatActivity implements IStreamList
 
         if (streamPlayer != null)
             streamPlayer.stop();
-    }
-
-    @Override
-    public void onStream(String stream) {
-        // new senz
-        String senzStream = SenzUtils.getSenzStream(stream, appUser.getUsername(), secretUser.getUsername());
-        sendStream(senzStream);
-    }
-
-    private void sendSenz(Senz senz) {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            try {
-                if (isServiceBound) {
-                    senzService.send(senz);
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } else {
-            ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
-        }
-    }
-
-    private void sendStream(final String stream) {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        // send message
-                        if (address == null)
-                            address = InetAddress.getByName(SenzService.STREAM_HOST);
-                        DatagramPacket sendPacket = new DatagramPacket(stream.getBytes(), stream.length(), address, SenzService.STREAM_PORT);
-                        socket.send(sendPacket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        } else {
-            Log.e(TAG, "Cannot send senz, No connection available");
-        }
     }
 
     public void displayInformationMessageDialog(String title, String message) {

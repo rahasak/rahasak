@@ -5,20 +5,21 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
-import android.util.Base64;
-import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
+import com.score.rahasak.utils.SenzBuffer;
 
 public class StreamPlayer {
 
     private Context context;
-    private StringBuffer buffer;
+    private SenzBuffer senzBuffer;
     private Player player;
+
+    int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
     public StreamPlayer(Context context) {
         this.context = context;
-        buffer = new StringBuffer();
+        senzBuffer = new SenzBuffer();
         player = new Player();
     }
 
@@ -26,8 +27,8 @@ public class StreamPlayer {
         player.start();
     }
 
-    public void onStream(String stream) {
-        buffer.append(stream);
+    public void onStream(byte[] stream) {
+        senzBuffer.put(stream);
     }
 
     public void stop() {
@@ -47,7 +48,6 @@ public class StreamPlayer {
         }
 
         private void startPlay() {
-            int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
@@ -61,12 +61,10 @@ public class StreamPlayer {
 
         private void play() {
             while (playing) {
-                String stream = buffer.toString();
-                if (!stream.isEmpty()) {
-                    Log.d("PLAY", stream.length() + "------------");
-                    byte[] data = Base64.decode(stream, Base64.DEFAULT);
+                if (senzBuffer.size() > minBufSize) {
+                    byte[] data = senzBuffer.get(0, minBufSize);
+
                     streamTrack.write(data, 0, data.length);
-                    buffer.setLength(0);
                 }
             }
         }

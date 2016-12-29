@@ -43,4 +43,5 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.4.4'
     compile 'com.googlecode.libphonenumber:libphonenumber:7.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
 }
