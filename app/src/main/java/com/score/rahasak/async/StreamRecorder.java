@@ -4,10 +4,10 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.util.Base64;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
+import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzBuffer;
 import com.score.rahasak.utils.SenzUtils;
 
@@ -16,11 +16,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import javax.crypto.SecretKey;
+
 public class StreamRecorder {
 
     private Context context;
     private String from;
     private String to;
+    private SecretKey key;
 
     private DatagramSocket socket;
     private InetAddress address;
@@ -33,10 +36,11 @@ public class StreamRecorder {
     private Writer writer;
     private SenzBuffer senzBuffer;
 
-    public StreamRecorder(Context context, String from, String to) {
+    public StreamRecorder(Context context, String from, String to, SecretKey key) {
         this.context = context;
         this.from = from;
         this.to = to;
+        this.key = key;
 
         recorder = new Recorder();
         writer = new Writer();
@@ -112,10 +116,16 @@ public class StreamRecorder {
                     //byte[] stream = AudioUtils.compress(senzBuffer.get(0, 500));
                     byte[] stream = senzBuffer.get(0, 500);
 
-                    String encodedStream = Base64.encodeToString(stream, Base64.DEFAULT);
-                    String senz = SenzUtils.getSenzStream(encodedStream, from, to);
+                    // encrypt first
+                    // then encode
+                    try {
+                        String encodedStream = RSAUtils.encryptStream(key, stream);
+                        String senz = SenzUtils.getSenzStream(encodedStream, from, to);
 
-                    sendDatagram(senz);
+                        sendDatagram(senz);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

@@ -13,7 +13,6 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -38,6 +37,7 @@ import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
+import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
@@ -50,6 +50,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+
+import javax.crypto.SecretKey;
 
 public class SecretRecordingActivity extends AppCompatActivity {
 
@@ -70,6 +72,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
     private User appUser;
     private SecretUser secretUser;
+    private SecretKey key;
 
     // service interface
     protected ISenzService senzService = null;
@@ -219,6 +222,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
         // secret user
         String username = getIntent().getStringExtra("USER");
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
+        key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
         callingUsernameText.setText(" @" + secretUser.getUsername());
         if (secretUser.getImage() != null) {
@@ -296,12 +300,12 @@ public class SecretRecordingActivity extends AppCompatActivity {
                                 Senz senz = SenzParser.parse(msg);
                                 if (senz.getAttributes().containsKey("mic")) {
                                     String data = senz.getAttributes().get("mic");
-                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
+                                    streamPlayer.onStream(RSAUtils.decryptStream(key, data));
                                 }
                             }
                         }
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -350,7 +354,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
         // start recorder
         if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername());
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key);
         streamRecorder.start();
 
         // start player

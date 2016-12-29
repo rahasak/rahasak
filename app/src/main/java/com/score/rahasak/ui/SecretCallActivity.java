@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +32,7 @@ import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.PreferenceUtils;
+import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -44,6 +44,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+
+import javax.crypto.SecretKey;
 
 public class SecretCallActivity extends AppCompatActivity {
 
@@ -63,6 +65,7 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private User appUser;
     private SecretUser secretUser;
+    private SecretKey key;
 
     private StreamRecorder streamRecorder;
     private StreamPlayer streamPlayer;
@@ -191,6 +194,8 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private void initUser() {
         secretUser = getIntent().getParcelableExtra("USER");
+        key = RSAUtils.getSecretKey(secretUser.getSessionKey());
+
         usernameText.setText("@" + secretUser.getUsername());
         try {
             appUser = PreferenceUtils.getUser(this);
@@ -268,12 +273,12 @@ public class SecretCallActivity extends AppCompatActivity {
                                 Senz senz = SenzParser.parse(msg);
                                 if (senz.getAttributes().containsKey("mic")) {
                                     String data = senz.getAttributes().get("mic");
-                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
+                                    streamPlayer.onStream(RSAUtils.decryptStream(key, data));
                                 }
                             }
                         }
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -302,7 +307,7 @@ public class SecretCallActivity extends AppCompatActivity {
 
         // start recorder
         if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername());
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key);
         streamRecorder.start();
 
         // start player

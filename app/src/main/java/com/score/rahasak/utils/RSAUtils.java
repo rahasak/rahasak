@@ -166,4 +166,19 @@ public class RSAUtils {
         return new String(cipher.doFinal(data));
     }
 
+    public static String encryptStream(SecretKey secretKey, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        return Base64.encodeToString(payload, Base64.DEFAULT);
+    }
+
+    public static byte[] decryptStream(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        byte[] data = Base64.decode(payload, Base64.DEFAULT);
+        return cipher.doFinal(data);
+    }
+
 }
