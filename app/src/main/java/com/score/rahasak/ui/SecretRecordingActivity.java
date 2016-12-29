@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -222,7 +223,8 @@ public class SecretRecordingActivity extends AppCompatActivity {
         // secret user
         String username = getIntent().getStringExtra("USER");
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
-        key = RSAUtils.getSecretKey(secretUser.getSessionKey());
+        if (secretUser.getSessionKey() != null)
+            key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
         callingUsernameText.setText(" @" + secretUser.getUsername());
         if (secretUser.getImage() != null) {
@@ -300,12 +302,12 @@ public class SecretRecordingActivity extends AppCompatActivity {
                                 Senz senz = SenzParser.parse(msg);
                                 if (senz.getAttributes().containsKey("mic")) {
                                     String data = senz.getAttributes().get("mic");
-                                    streamPlayer.onStream(RSAUtils.decryptStream(key, data));
+                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
                                 }
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

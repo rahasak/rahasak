@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,7 +195,8 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private void initUser() {
         secretUser = getIntent().getParcelableExtra("USER");
-        key = RSAUtils.getSecretKey(secretUser.getSessionKey());
+        if (secretUser.getSessionKey() != null)
+            key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
         usernameText.setText("@" + secretUser.getUsername());
         try {
@@ -273,12 +275,12 @@ public class SecretCallActivity extends AppCompatActivity {
                                 Senz senz = SenzParser.parse(msg);
                                 if (senz.getAttributes().containsKey("mic")) {
                                     String data = senz.getAttributes().get("mic");
-                                    streamPlayer.onStream(RSAUtils.decryptStream(key, data));
+                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
                                 }
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
