@@ -26,9 +26,9 @@ public class StreamPlayer {
     private SecretKey key;
 
     // audio setting
-    int audioMode;
-    int ringMode;
-    boolean isSpeakerPhoneOn;
+    private int audioMode;
+    private int ringMode;
+    private boolean isSpeakerPhoneOn;
 
     private DatagramSocket socket;
 
@@ -41,11 +41,14 @@ public class StreamPlayer {
     }
 
     public void play() {
+        getAudioSettings();
+        enableEarpiece();
         player.start();
     }
 
     public void stop() {
         player.shutDown();
+        resetAudioSettings();
     }
 
     private class Player extends Thread {
@@ -71,8 +74,6 @@ public class StreamPlayer {
                     minBufSize,
                     AudioTrack.MODE_STREAM);
 
-            getAudioSettings();
-            enableEarpiece();
             streamTrack.play();
         }
 
@@ -86,7 +87,7 @@ public class StreamPlayer {
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-                    Log.d("TAG", "Stream received: " + msg);
+                    //Log.d("TAG", "Stream received: " + msg);
 
                     // parser and obtain audio data
                     // play it
@@ -119,8 +120,6 @@ public class StreamPlayer {
             } else {
                 streamTrack.stop();
             }
-
-            resetAudioSettings();
         }
     }
 
