@@ -26,8 +26,6 @@ public class StreamPlayer {
 
     private DatagramSocket socket;
 
-    int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-
     public StreamPlayer(Context context, DatagramSocket socket) {
         this.context = context;
         this.socket = socket;
@@ -42,10 +40,6 @@ public class StreamPlayer {
         player.start();
     }
 
-    public void onStream(byte[] stream) {
-        senzBuffer.put(stream);
-    }
-
     public void stop() {
         reader.shutDown();
         player.shutDown();
@@ -53,6 +47,8 @@ public class StreamPlayer {
 
     private class Player extends Thread {
         private AudioTrack streamTrack;
+        private int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
         private boolean playing = true;
 
         @Override
@@ -77,8 +73,8 @@ public class StreamPlayer {
 
         private void play() {
             while (playing) {
-                if (senzBuffer.size() > 1024) {
-                    byte[] data = senzBuffer.get(0, 1024);
+                if (senzBuffer.size() > minBufSize) {
+                    byte[] data = senzBuffer.get(0, minBufSize);
 
                     streamTrack.write(data, 0, data.length);
                 }
@@ -98,13 +94,29 @@ public class StreamPlayer {
     }
 
     private class Reader extends Thread {
+        private AudioTrack streamTrack;
+        private int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
         private boolean reading = true;
 
         @Override
         public void run() {
             if (reading) {
+                startPlay();
                 read();
             }
+        }
+
+        private void startPlay() {
+            streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
+                    AudioUtils.RECORDER_SAMPLE_RATE,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufSize,
+                    AudioTrack.MODE_STREAM);
+
+            enableEarpiece();
+            streamTrack.play();
         }
 
         void read() {
@@ -136,6 +148,13 @@ public class StreamPlayer {
 
         void shutDown() {
             reading = false;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                streamTrack.pause();
+                streamTrack.flush();
+            } else {
+                streamTrack.stop();
+            }
 
             // close cons
             if (socket != null) {

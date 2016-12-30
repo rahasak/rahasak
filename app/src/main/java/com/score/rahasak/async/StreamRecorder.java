@@ -29,10 +29,6 @@ public class StreamRecorder {
     private DatagramSocket socket;
     private InetAddress address;
 
-    private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
-    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    private int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
-
     private Recorder recorder;
     private Writer writer;
     private SenzBuffer senzBuffer;
@@ -59,7 +55,12 @@ public class StreamRecorder {
     }
 
     private class Recorder extends Thread {
+        private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+        private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+
         private AudioRecord audioRecorder;
+        private int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
+
         boolean recording = true;
 
         @Override

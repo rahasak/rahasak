@@ -210,7 +210,6 @@ public class SecretCallActivity extends AppCompatActivity {
         // connect to UDP
         initUdpSoc();
         initUdpConn();
-        initUdpLsn();
     }
 
     private void initUdpSoc() {
@@ -249,44 +248,6 @@ public class SecretCallActivity extends AppCompatActivity {
         }).start();
     }
 
-    /**
-     * Start thread for listen to UDP socket, all the incoming messages receives from
-     * here, when message receives it should be broadcast or delegate to appropriate message
-     * handler
-     */
-    private void initUdpLsn() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    byte[] message = new byte[1024];
-
-                    while (true) {
-                        // listen for senz
-                        DatagramPacket receivePacket = new DatagramPacket(message, message.length);
-                        socket.receive(receivePacket);
-                        String msg = new String(message, 0, receivePacket.getLength());
-
-                        Log.d(TAG, "Stream received: " + msg);
-
-                        // parser and obtain audio data
-                        // play it
-                        if (!msg.isEmpty()) {
-                            if (streamPlayer != null) {
-                                Senz senz = SenzParser.parse(msg);
-                                if (senz.getAttributes().containsKey("mic")) {
-                                    String data = senz.getAttributes().get("mic");
-                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
-                                }
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
             if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
@@ -314,7 +275,7 @@ public class SecretCallActivity extends AppCompatActivity {
 
         // start player
         if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this);
+            streamPlayer = new StreamPlayer(this, socket);
         streamPlayer.play();
     }
 

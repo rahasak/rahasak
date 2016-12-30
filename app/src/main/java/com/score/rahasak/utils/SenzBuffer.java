@@ -12,51 +12,45 @@ public class SenzBuffer {
         buffer = Collections.synchronizedList(new LinkedList<Byte>());
     }
 
-    public synchronized void put(byte[] data) {
-        synchronized (buffer) {
-            for (byte i : data)
-                buffer.add(i);
-        }
+    public void put(byte[] data) {
+        for (byte i : data)
+            buffer.add(i);
     }
 
-    public synchronized byte[] getAll() {
+    public byte[] getAll() {
         byte[] data = new byte[buffer.size()];
-        synchronized (buffer) {
-            int index = 0;
-            for (int i = 0; i < buffer.size(); i++) {
-                // add to data
-                data[index] = buffer.get(i);
-                index++;
-            }
+        int index = 0;
+        for (int i = 0; i < buffer.size(); i++) {
+            // add to data
+            data[index] = buffer.get(i);
+            index++;
         }
 
         return data;
     }
 
-    public synchronized byte[] get(int from, int to) {
+    public byte[] get(int from, int to) {
         byte[] data = new byte[to - from];
-        synchronized (buffer) {
-            int index = 0;
-            for (int i = from; i < to; i++) {
-                // add to data
-                data[index] = buffer.get(from);
-                index++;
+        int index = 0;
+        for (int i = from; i < to; i++) {
+            // add to data
+            data[index] = buffer.get(from);
+            index++;
 
-                // remove element
-                buffer.remove(from);
-            }
+            // remove element
+            buffer.remove(from);
         }
 
         return data;
     }
 
-    public synchronized void delete(int from, int to) {
+    public void delete(int from, int to) {
         for (int i = to - 1; i >= from; i--) {
             buffer.remove(i);
         }
     }
 
-    public synchronized int size() {
+    public int size() {
         return buffer.size();
     }
 

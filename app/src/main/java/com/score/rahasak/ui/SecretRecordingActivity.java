@@ -13,7 +13,6 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,7 +38,6 @@ import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
-import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
@@ -237,7 +235,6 @@ public class SecretRecordingActivity extends AppCompatActivity {
         // connect to UDP
         initUdpSoc();
         initUdpConn();
-        initUdpLsn();
     }
 
     private void initUdpSoc() {
@@ -268,44 +265,6 @@ public class SecretRecordingActivity extends AppCompatActivity {
                     if (msg != null) {
                         DatagramPacket sendPacket = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
                         socket.send(sendPacket);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    /**
-     * Start thread for listen to UDP socket, all the incoming messages receives from
-     * here, when message receives it should be broadcast or delegate to appropriate message
-     * handler
-     */
-    private void initUdpLsn() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    byte[] message = new byte[1024];
-
-                    while (true) {
-                        // listen for senz
-                        DatagramPacket receivePacket = new DatagramPacket(message, message.length);
-                        socket.receive(receivePacket);
-                        String msg = new String(message, 0, receivePacket.getLength());
-
-                        Log.d(TAG, "Stream received: " + msg);
-
-                        // parser and obtain audio data
-                        // play it
-                        if (!msg.isEmpty()) {
-                            if (streamPlayer != null) {
-                                Senz senz = SenzParser.parse(msg);
-                                if (senz.getAttributes().containsKey("mic")) {
-                                    String data = senz.getAttributes().get("mic");
-                                    streamPlayer.onStream(Base64.decode(data, Base64.DEFAULT));
-                                }
-                            }
-                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -361,7 +320,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
         // start player
         if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this);
+            streamPlayer = new StreamPlayer(this, socket);
         streamPlayer.play();
     }
 
