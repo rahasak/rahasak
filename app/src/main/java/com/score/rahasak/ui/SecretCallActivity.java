@@ -258,7 +258,7 @@ public class SecretCallActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    byte[] message = new byte[2048];
+                    byte[] message = new byte[1024];
 
                     while (true) {
                         // listen for senz

@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Base64;
+import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
@@ -76,6 +77,7 @@ public class StreamRecorder {
                     audioFormat,
                     minBufSize * 10);
             audioRecorder.startRecording();
+            Log.d("TAG", minBufSize + " --------------");
         }
 
         private void record() {
