@@ -9,6 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
+import com.score.rahasak.utils.CMG711;
 import com.score.rahasak.utils.SenzParser;
 import com.score.senzc.pojos.Senz;
 
@@ -39,6 +40,7 @@ public class StreamPlayer {
     }
 
     private class Player extends Thread {
+        private CMG711 decoder = new CMG711();
         private AudioTrack streamTrack;
         private int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
@@ -67,6 +69,7 @@ public class StreamPlayer {
         private void play() {
             try {
                 byte[] message = new byte[1024];
+                byte[] inBuffer = new byte[1024];
 
                 while (true) {
                     // listen for senz
@@ -84,7 +87,10 @@ public class StreamPlayer {
                             String data = senz.getAttributes().get("mic");
 
                             byte[] stream = Base64.decode(data, Base64.DEFAULT);
-                            streamTrack.write(stream, 0, stream.length);
+
+                            // decode
+                            decoder.decode(stream, 0, stream.length, inBuffer);
+                            streamTrack.write(inBuffer, 0, inBuffer.length);
                         }
                     }
                 }
@@ -107,7 +113,7 @@ public class StreamPlayer {
 
     private void enableEarpiece() {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.STREAM_VOICE_CALL);
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioManager.setSpeakerphoneOn(false);
     }
 

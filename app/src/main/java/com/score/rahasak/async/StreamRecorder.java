@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
-import com.score.rahasak.utils.SenzBuffer;
+import com.score.rahasak.utils.CMG711;
 import com.score.rahasak.utils.SenzUtils;
 
 import java.io.IOException;
@@ -30,8 +30,6 @@ public class StreamRecorder {
     private InetAddress address;
 
     private Recorder recorder;
-    private Writer writer;
-    private SenzBuffer senzBuffer;
 
     public StreamRecorder(Context context, String from, String to, SecretKey key) {
         this.context = context;
@@ -40,21 +38,19 @@ public class StreamRecorder {
         this.key = key;
 
         recorder = new Recorder();
-        writer = new Writer();
-        senzBuffer = new SenzBuffer();
     }
 
     public void start() {
         recorder.start();
-        writer.start();
     }
 
     public void stop() {
         recorder.shutDown();
-        writer.shutDown();
     }
 
     private class Recorder extends Thread {
+        private CMG711 encoder = new CMG711();
+
         private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -78,16 +74,24 @@ public class StreamRecorder {
                     audioFormat,
                     minBufSize * 10);
             audioRecorder.startRecording();
-            Log.d("TAG", minBufSize + " --------------");
         }
 
         private void record() {
-            byte[] buf = new byte[minBufSize];
+            byte[] outBuffer = new byte[1024];
+            int read, encoded;
+
+            byte[] buf = new byte[1024];
             while (recording) {
-                audioRecorder.read(buf, 0, buf.length);
+                read = audioRecorder.read(buf, 0, buf.length);
 
                 // add byte data directly
-                senzBuffer.put(buf);
+                encoded = encoder.encode(buf, 0, read, outBuffer);
+                String encodedStream = Base64.encodeToString(outBuffer, 0, encoded, Base64.DEFAULT);
+
+                Log.d("TAG", encoded + " -----");
+
+                String senz = SenzUtils.getSenzStream(encodedStream, from, to);
+                sendDatagram(senz);
             }
         }
 
@@ -103,45 +107,16 @@ public class StreamRecorder {
         }
     }
 
-    private class Writer extends Thread {
-        boolean writing = true;
-
-        @Override
-        public void run() {
-            if (writing) {
-                write();
-            }
-        }
-
-        private void write() {
-            while (writing) {
-                if (senzBuffer.size() > 500) {
-                    //byte[] stream = AudioUtils.compress(senzBuffer.get(0, 500));
-                    byte[] stream = senzBuffer.get(0, 500);
-
-                    String encodedStream = Base64.encodeToString(stream, Base64.DEFAULT);
-                    String senz = SenzUtils.getSenzStream(encodedStream, from, to);
-
-                    sendDatagram(senz);
-                }
-            }
-        }
-
-        void shutDown() {
-            writing = false;
-        }
-
-        private void sendDatagram(String senz) {
-            try {
-                if (address == null)
-                    address = InetAddress.getByName(SenzService.STREAM_HOST);
-                if (socket == null)
-                    socket = new DatagramSocket();
-                DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-                socket.send(sendPacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void sendDatagram(String senz) {
+        try {
+            if (address == null)
+                address = InetAddress.getByName(SenzService.STREAM_HOST);
+            if (socket == null)
+                socket = new DatagramSocket();
+            DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
+            socket.send(sendPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
