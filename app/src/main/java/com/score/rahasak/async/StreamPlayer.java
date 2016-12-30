@@ -10,23 +10,32 @@ import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CMG711;
+import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.senzc.pojos.Senz;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+
+import javax.crypto.SecretKey;
 
 public class StreamPlayer {
 
     private Context context;
     private Player player;
+    private SecretKey key;
+
+    // audio setting
+    int audioMode;
+    int ringMode;
+    boolean isSpeakerPhoneOn;
 
     private DatagramSocket socket;
 
-    public StreamPlayer(Context context, DatagramSocket socket) {
+    public StreamPlayer(Context context, DatagramSocket socket, SecretKey key) {
         this.context = context;
         this.socket = socket;
+        this.key = key;
 
         player = new Player();
     }
@@ -62,6 +71,7 @@ public class StreamPlayer {
                     minBufSize,
                     AudioTrack.MODE_STREAM);
 
+            getAudioSettings();
             enableEarpiece();
             streamTrack.play();
         }
@@ -76,7 +86,6 @@ public class StreamPlayer {
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-
                     Log.d("TAG", "Stream received: " + msg);
 
                     // parser and obtain audio data
@@ -86,15 +95,17 @@ public class StreamPlayer {
                         if (senz.getAttributes().containsKey("mic")) {
                             String data = senz.getAttributes().get("mic");
 
-                            byte[] stream = Base64.decode(data, Base64.DEFAULT);
+                            // base64 decode
+                            // decrypt
+                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(data, Base64.DEFAULT));
 
-                            // decode
+                            // decode codec
                             decoder.decode(stream, 0, stream.length, inBuffer);
                             streamTrack.write(inBuffer, 0, inBuffer.length);
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -108,6 +119,8 @@ public class StreamPlayer {
             } else {
                 streamTrack.stop();
             }
+
+            resetAudioSettings();
         }
     }
 
@@ -115,6 +128,20 @@ public class StreamPlayer {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioManager.setSpeakerphoneOn(false);
+    }
+
+    private void getAudioSettings() {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioMode = audioManager.getMode();
+        ringMode = audioManager.getRingerMode();
+        isSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
+    }
+
+    private void resetAudioSettings() {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(audioMode);
+        audioManager.setRingerMode(ringMode);
+        audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
     }
 
 }

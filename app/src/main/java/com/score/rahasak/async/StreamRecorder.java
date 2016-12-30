@@ -10,6 +10,7 @@ import android.util.Log;
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CMG711;
+import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzUtils;
 
 import java.io.IOException;
@@ -84,14 +85,21 @@ public class StreamRecorder {
             while (recording) {
                 read = audioRecorder.read(buf, 0, buf.length);
 
-                // add byte data directly
+                // encode with codec
                 encoded = encoder.encode(buf, 0, read, outBuffer);
-                String encodedStream = Base64.encodeToString(outBuffer, 0, encoded, Base64.DEFAULT);
-
                 Log.d("TAG", encoded + " -----");
 
-                String senz = SenzUtils.getSenzStream(encodedStream, from, to);
-                sendDatagram(senz);
+                try {
+                    // encrypt
+                    // base 64 encoded senz
+                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuffer, 0, encoded), Base64.DEFAULT);
+                    String senz = SenzUtils.getSenzStream(encodedStream, from, to);
+
+                    sendDatagram(senz);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         }
 

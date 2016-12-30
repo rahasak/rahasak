@@ -320,7 +320,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
         // start player
         if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this, socket);
+            streamPlayer = new StreamPlayer(this, socket, key);
         streamPlayer.play();
     }
 
