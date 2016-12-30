@@ -9,7 +9,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
-import com.score.rahasak.utils.SenzBuffer;
 import com.score.rahasak.utils.SenzParser;
 import com.score.senzc.pojos.Senz;
 
@@ -20,8 +19,6 @@ import java.net.DatagramSocket;
 public class StreamPlayer {
 
     private Context context;
-    private SenzBuffer senzBuffer;
-    private Reader reader;
     private Player player;
 
     private DatagramSocket socket;
@@ -30,18 +27,14 @@ public class StreamPlayer {
         this.context = context;
         this.socket = socket;
 
-        senzBuffer = new SenzBuffer();
-        reader = new Reader();
         player = new Player();
     }
 
     public void play() {
-        reader.start();
         player.start();
     }
 
     public void stop() {
-        reader.shutDown();
         player.shutDown();
     }
 
@@ -72,54 +65,6 @@ public class StreamPlayer {
         }
 
         private void play() {
-            while (playing) {
-                if (senzBuffer.size() > minBufSize) {
-                    byte[] data = senzBuffer.get(0, minBufSize);
-
-                    streamTrack.write(data, 0, data.length);
-                }
-            }
-        }
-
-        void shutDown() {
-            playing = false;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                streamTrack.pause();
-                streamTrack.flush();
-            } else {
-                streamTrack.stop();
-            }
-        }
-    }
-
-    private class Reader extends Thread {
-        private AudioTrack streamTrack;
-        private int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-
-        private boolean reading = true;
-
-        @Override
-        public void run() {
-            if (reading) {
-                startPlay();
-                read();
-            }
-        }
-
-        private void startPlay() {
-            streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
-                    AudioUtils.RECORDER_SAMPLE_RATE,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    minBufSize,
-                    AudioTrack.MODE_STREAM);
-
-            enableEarpiece();
-            streamTrack.play();
-        }
-
-        void read() {
             try {
                 byte[] message = new byte[1024];
 
@@ -137,7 +82,9 @@ public class StreamPlayer {
                         Senz senz = SenzParser.parse(msg);
                         if (senz.getAttributes().containsKey("mic")) {
                             String data = senz.getAttributes().get("mic");
-                            senzBuffer.put(Base64.decode(data, Base64.DEFAULT));
+
+                            byte[] stream = Base64.decode(data, Base64.DEFAULT);
+                            streamTrack.write(stream, 0, stream.length);
                         }
                     }
                 }
@@ -147,18 +94,13 @@ public class StreamPlayer {
         }
 
         void shutDown() {
-            reading = false;
+            playing = false;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 streamTrack.pause();
                 streamTrack.flush();
             } else {
                 streamTrack.stop();
-            }
-
-            // close cons
-            if (socket != null) {
-                socket.close();
             }
         }
     }

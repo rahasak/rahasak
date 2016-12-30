@@ -5,64 +5,54 @@
     android:background="@color/black"
     android:gravity="center">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/user_profile_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop" />
-
-        <TextView
-            android:id="@+id/mic_playingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Secret calling..."
-            android:textColor="@color/colorPrimary"
-            android:textSize="25sp"
-            android:visibility="gone" />
-    </RelativeLayout>
-
-
-    <LinearLayout
-        android:id="@+id/mic_loading_view"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="@color/translucent_black"
-        android:orientation="vertical">
+        android:id="@+id/calling_user">
+    </FrameLayout>
 
-        <FrameLayout
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B3000000">
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/user_profile_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/mic_playingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Secret calling..."
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/mic_loading_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical">
-
-
-                <!--<com.github.siyamed.shapeimageview.CircularImageView
-                    android:id="@+id/user_profile_image"
-                    android:layout_width="130dp"
-                    android:layout_height="130dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center"
-                    android:adjustViewBounds="true"
-                    android:cropToPadding="true"
-                    android:src="@drawable/rahaslogo"
-                    app:siBorderAlpha="0.0"
-                    android:padding="10dp"
-                    app:siSquare="true" />-->
 
                 <ImageView
                     android:id="@+id/selfie_image"
@@ -97,11 +87,8 @@
                     android:text="Eranga"
                     android:textColor="@color/colorPrimary"
                     android:textSize="35sp" />
-
             </LinearLayout>
-
-        </FrameLayout>
-
-    </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 
 </RelativeLayout>

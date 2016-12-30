@@ -8,18 +8,19 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,9 +33,9 @@ import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.remote.SenzService;
+import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
-import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
@@ -54,6 +55,7 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private Typeface typeface;
 
+    private FrameLayout callingUser;
     private View loadingView;
     private TextView playingText;
     private TextView usernameText;
@@ -171,11 +173,12 @@ public class SecretCallActivity extends AppCompatActivity {
     private void initUi() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
 
+        loadingView = findViewById(R.id.mic_loading_view);
+        callingUser = (FrameLayout) findViewById(R.id.calling_user);
+
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
         AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
         anim.start();
-
-        loadingView = findViewById(R.id.mic_loading_view);
 
         playingText = (TextView) findViewById(R.id.mic_playingText);
         usernameText = (TextView) findViewById(R.id.mic_username);
@@ -195,10 +198,16 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private void initUser() {
         secretUser = getIntent().getParcelableExtra("USER");
+        usernameText.setText("@" + secretUser.getUsername());
+
         if (secretUser.getSessionKey() != null)
             key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
-        usernameText.setText("@" + secretUser.getUsername());
+        if (secretUser.getImage() != null) {
+            BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
+            callingUser.setBackground(drawable);
+        }
+
         try {
             appUser = PreferenceUtils.getUser(this);
         } catch (NoUserException e) {
