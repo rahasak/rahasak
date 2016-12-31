@@ -6,15 +6,20 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
 import android.util.Base64;
+import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CMG711;
 import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.SenzParser;
+import com.score.senzc.pojos.Senz;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 import javax.crypto.SecretKey;
+
+import io.kvh.media.amr.AmrDecoder;
 
 public class StreamPlayer {
 
@@ -76,44 +81,46 @@ public class StreamPlayer {
 
         private void play() {
             try {
-                byte[] message = new byte[minBufSize];
-                byte[] inBuffer = new byte[minBufSize];
-
+                long state = AmrDecoder.init();
+                short[] pcmframs = new short[160];
+                byte[] message = new byte[128];
                 while (true) {
                     // listen for senz
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-                    //Log.d("TAG", "Stream received: " + msg);
+                    Log.d("TAG", "Stream received: " + msg);
 
                     // parser and obtain audio data
                     // play it
                     if (!msg.isEmpty()) {
-                        // base64 decode
-                        // decrypt
-                        byte[] stream = RSAUtils.decrypt(key, Base64.decode(msg, Base64.DEFAULT));
+                        Senz senz = SenzParser.parse(msg);
+                        if (senz.getAttributes().containsKey("mic")) {
+                            String data = senz.getAttributes().get("mic");
 
-                        // decode codec
-                        decoder.decode(stream, 0, stream.length, inBuffer);
-                        streamTrack.write(inBuffer, 0, inBuffer.length);
+                            // base64 decode
+                            // decrypt
+                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(data, Base64.DEFAULT));
 
-//                        Senz senz = SenzParser.parse(msg);
-//                        if (senz.getAttributes().containsKey("mic")) {
-//                            String data = senz.getAttributes().get("mic");
-//
-//                            // base64 decode
-//                            // decrypt
-//                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(data, Base64.DEFAULT));
-//
-//                            // decode codec
-//                            decoder.decode(stream, 0, stream.length, inBuffer);
-//                            streamTrack.write(inBuffer, 0, inBuffer.length);
-//                        }
+                            // decode codec
+                            AmrDecoder.decode(state, stream, pcmframs);
+                            streamTrack.write(pcmframs, 0, pcmframs.length);
+                        }
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private short[] byte2short(byte[] byteArray) {
+            int size = byteArray.length;
+            short[] shortArray = new short[size];
+
+            for (int index = 0; index < size; index++)
+                shortArray[index] = (short) byteArray[index];
+
+            return shortArray;
         }
 
         void shutDown() {

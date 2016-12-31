@@ -160,7 +160,7 @@ public class SenzUtils {
     }
 
     public static String getStartStreamMsg(Context context, String sender, String receiver) {
-        return "DATA #STREAM ON" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+        return "DATA #STREAM ON" + " @" + receiver + " ^" + sender + " SIG;";
     }
 
     public static Senz getInitMicSenz(Context context, SecretUser secretUser) {

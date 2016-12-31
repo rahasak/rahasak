@@ -291,7 +291,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean setEncoder(int rate) {
-        encoder = MediaCodec.createEncoderByType("audio/mp4a-latm");
+        //encoder = MediaCodec.createEncoderByType("audio/mp4a-latm");
         MediaFormat format = new MediaFormat();
         format.setString(MediaFormat.KEY_MIME, "audio/mp4a-latm");
         format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
@@ -303,7 +303,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean setDecoder(int rate) {
-        decoder = MediaCodec.createDecoderByType("audio/mp4a-latm");
+        //decoder = MediaCodec.createDecoderByType("audio/mp4a-latm");
         MediaFormat format = new MediaFormat();
         format.setString(MediaFormat.KEY_MIME, "audio/mp4a-latm");
         format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
