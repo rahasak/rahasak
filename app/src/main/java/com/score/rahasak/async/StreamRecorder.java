@@ -11,7 +11,6 @@ import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CMG711;
 import com.score.rahasak.utils.RSAUtils;
-import com.score.rahasak.utils.SenzUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -19,6 +18,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import javax.crypto.SecretKey;
+
+import io.kvh.media.amr.AmrEncoder;
 
 public class StreamRecorder {
 
@@ -78,25 +79,36 @@ public class StreamRecorder {
         }
 
         private void record() {
-            byte[] outBuffer = new byte[768];
+            byte[] outBuffer = new byte[minBufSize];
             int read, encoded;
 
-            byte[] buf = new byte[768];
+            AmrEncoder.init(0);
+            int mode = AmrEncoder.Mode.MR122.ordinal();
+
+            short[] in = new short[160];
+            byte[] out = new byte[32];
+            int byteEncoded = AmrEncoder.encode(mode, in, out);
+
+            AmrEncoder.exit();
+
+            byte[] buf = new byte[minBufSize];
             while (recording) {
                 read = audioRecorder.read(buf, 0, buf.length);
 
                 // encode with codec
                 encoded = encoder.encode(buf, 0, read, outBuffer);
                 Log.d("TAG", encoded + " -----");
-                Log.d("TAG", minBufSize + " -------");
+                Log.d("TAG", minBufSize + " ////");
 
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuffer, 0, encoded), Base64.DEFAULT);
-                    String senz = SenzUtils.getSenzStream(encodedStream, from, to);
-                    Log.d("TAG", senz.length() + " ---");
-                    sendDatagram(senz);
+                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuffer, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    //String senz = SenzUtils.getSenzStream(encodedStream, from, to);
+                    //Log.d("TAG", senz.length() + " ---");
+
+                    Log.d("TAG", encodedStream.length() + " ++++");
+                    sendDatagram(encodedStream);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

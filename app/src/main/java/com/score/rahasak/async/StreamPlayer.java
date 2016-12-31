@@ -6,13 +6,10 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
 import android.util.Base64;
-import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CMG711;
 import com.score.rahasak.utils.RSAUtils;
-import com.score.rahasak.utils.SenzParser;
-import com.score.senzc.pojos.Senz;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -79,8 +76,8 @@ public class StreamPlayer {
 
         private void play() {
             try {
-                byte[] message = new byte[1024];
-                byte[] inBuffer = new byte[1024];
+                byte[] message = new byte[minBufSize];
+                byte[] inBuffer = new byte[minBufSize];
 
                 while (true) {
                     // listen for senz
@@ -92,18 +89,26 @@ public class StreamPlayer {
                     // parser and obtain audio data
                     // play it
                     if (!msg.isEmpty()) {
-                        Senz senz = SenzParser.parse(msg);
-                        if (senz.getAttributes().containsKey("mic")) {
-                            String data = senz.getAttributes().get("mic");
+                        // base64 decode
+                        // decrypt
+                        byte[] stream = RSAUtils.decrypt(key, Base64.decode(msg, Base64.DEFAULT));
 
-                            // base64 decode
-                            // decrypt
-                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(data, Base64.DEFAULT));
+                        // decode codec
+                        decoder.decode(stream, 0, stream.length, inBuffer);
+                        streamTrack.write(inBuffer, 0, inBuffer.length);
 
-                            // decode codec
-                            decoder.decode(stream, 0, stream.length, inBuffer);
-                            streamTrack.write(inBuffer, 0, inBuffer.length);
-                        }
+//                        Senz senz = SenzParser.parse(msg);
+//                        if (senz.getAttributes().containsKey("mic")) {
+//                            String data = senz.getAttributes().get("mic");
+//
+//                            // base64 decode
+//                            // decrypt
+//                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(data, Base64.DEFAULT));
+//
+//                            // decode codec
+//                            decoder.decode(stream, 0, stream.length, inBuffer);
+//                            streamTrack.write(inBuffer, 0, inBuffer.length);
+//                        }
                     }
                 }
             } catch (Exception e) {

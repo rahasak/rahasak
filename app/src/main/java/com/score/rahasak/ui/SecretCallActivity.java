@@ -245,7 +245,7 @@ public class SecretCallActivity extends AppCompatActivity {
                         address = InetAddress.getByName(SenzService.STREAM_HOST);
 
                     // send init message
-                    String msg = SenzUtils.getStartStreamMsg(SecretCallActivity.this, appUser.getUsername(), "streamswitch");
+                    String msg = SenzUtils.getStartStreamMsg(SecretCallActivity.this, appUser.getUsername(), secretUser.getUsername());
                     if (msg != null) {
                         DatagramPacket sendPacket = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
                         socket.send(sendPacket);
