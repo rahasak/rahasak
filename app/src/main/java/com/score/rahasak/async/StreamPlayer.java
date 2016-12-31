@@ -83,29 +83,29 @@ public class StreamPlayer {
             try {
                 long state = AmrDecoder.init();
                 short[] pcmframs = new short[160];
-                byte[] message = new byte[128];
+                byte[] message = new byte[64];
                 while (true) {
                     // listen for senz
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-                    Log.d("TAG", "Stream received: " + msg);
+                    //Log.d("TAG", "Stream received: " + msg);
 
                     // parser and obtain audio data
                     // play it
                     if (!msg.isEmpty()) {
-                        Senz senz = SenzParser.parse(msg);
-                        if (senz.getAttributes().containsKey("mic")) {
-                            String data = senz.getAttributes().get("mic");
+                        //Senz senz = SenzParser.parse(msg);
+                        //if (senz.getAttributes().containsKey("mic")) {
+                        //    String data = senz.getAttributes().get("mic");
 
                             // base64 decode
                             // decrypt
-                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(data, Base64.DEFAULT));
+                            byte[] stream = RSAUtils.decrypt(key, Base64.decode(msg, Base64.DEFAULT));
 
                             // decode codec
                             AmrDecoder.decode(state, stream, pcmframs);
                             streamTrack.write(pcmframs, 0, pcmframs.length);
-                        }
+                       //}
                     }
                 }
             } catch (Exception e) {

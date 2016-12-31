@@ -11,7 +11,6 @@ import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CMG711;
 import com.score.rahasak.utils.RSAUtils;
-import com.score.rahasak.utils.SenzUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -92,18 +91,18 @@ public class StreamRecorder {
                 // encode with codec
                 encoded = AmrEncoder.encode(mode, inBuf, outBuf);
 
-                Log.d("TAG", encoded + " -----");
-                Log.d("TAG", minBufSize + " ////");
+                //Log.d("TAG", encoded + " -----");
+                //Log.d("TAG", minBufSize + " ////");
 
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuf, 0, encoded), Base64.DEFAULT);
-                    String senz = SenzUtils.getSenzStream(encodedStream, from, to);
+                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    //String senz = SenzUtils.getSenzStream(encodedStream, from, to);
                     //Log.d("TAG", senz.length() + " ---");
 
-                    Log.d("TAG", senz.length() + " ++++");
-                    sendDatagram(senz);
+                    //Log.d("TAG", senz.length() + " ++++");
+                    sendDatagram(encodedStream);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
