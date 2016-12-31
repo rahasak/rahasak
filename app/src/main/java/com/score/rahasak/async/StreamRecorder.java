@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Base64;
+import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
@@ -77,28 +78,28 @@ public class StreamRecorder {
         }
 
         private void record() {
-            byte[] outBuffer = new byte[1024];
+            byte[] outBuffer = new byte[768];
             int read, encoded;
 
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[768];
             while (recording) {
                 read = audioRecorder.read(buf, 0, buf.length);
 
                 // encode with codec
                 encoded = encoder.encode(buf, 0, read, outBuffer);
-                //Log.d("TAG", encoded + " -----");
+                Log.d("TAG", encoded + " -----");
+                Log.d("TAG", minBufSize + " -------");
 
                 try {
                     // encrypt
                     // base 64 encoded senz
                     String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuffer, 0, encoded), Base64.DEFAULT);
                     String senz = SenzUtils.getSenzStream(encodedStream, from, to);
-
+                    Log.d("TAG", senz.length() + " ---");
                     sendDatagram(senz);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
