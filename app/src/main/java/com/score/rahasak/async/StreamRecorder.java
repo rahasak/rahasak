@@ -33,11 +33,12 @@ public class StreamRecorder {
 
     private Recorder recorder;
 
-    public StreamRecorder(Context context, String from, String to, SecretKey key) {
+    public StreamRecorder(Context context, String from, String to, SecretKey key, DatagramSocket socket) {
         this.context = context;
         this.from = from;
         this.to = to;
         this.key = key;
+        this.socket = socket;
 
         recorder = new Recorder();
     }
@@ -51,8 +52,6 @@ public class StreamRecorder {
     }
 
     private class Recorder extends Thread {
-        private CMG711 encoder = new CMG711();
-
         private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -82,13 +81,13 @@ public class StreamRecorder {
             AmrEncoder.init(0);
             int mode = AmrEncoder.Mode.MR122.ordinal();
 
-            int read, encoded;
+            int encoded;
             short[] inBuf = new short[160];
             byte[] outBuf = new byte[32];
             while (recording) {
-                read = audioRecorder.read(inBuf, 0, inBuf.length);
-
+                // read to buffer
                 // encode with codec
+                audioRecorder.read(inBuf, 0, inBuf.length);
                 encoded = AmrEncoder.encode(mode, inBuf, outBuf);
 
                 //Log.d("TAG", encoded + " -----");
@@ -107,6 +106,8 @@ public class StreamRecorder {
                     e.printStackTrace();
                 }
             }
+
+            AmrEncoder.exit();
         }
 
         void shutDown() {
@@ -118,8 +119,6 @@ public class StreamRecorder {
                 audioRecorder.release();
                 audioRecorder = null;
             }
-
-            AmrEncoder.exit();
         }
     }
 
