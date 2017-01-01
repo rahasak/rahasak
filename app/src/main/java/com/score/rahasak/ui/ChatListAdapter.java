@@ -86,11 +86,9 @@ class ChatListAdapter extends BaseAdapter {
                 case MY_CHAT_ITEM:
                     view = layoutInflater.inflate(R.layout.my_chat_view_row_layout, parent, false);
                     holder.chatCamHolder = (RelativeLayout) view.findViewById(R.id.chat_cam_holder);
-                    holder.chatMicHolder = (RelativeLayout) view.findViewById(R.id.chat_mic_holder);
                     holder.chatMsgHolder = (LinearLayout) view.findViewById(R.id.chat_msg_holder);
 
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
-                    holder.chatMic = (ImageView) view.findViewById(R.id.chat_mic);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
                     holder.chatTime = (TextView) view.findViewById(R.id.chat_time);
                     holder.chatDelivered = (ImageView) view.findViewById(R.id.chat_delivered);
@@ -100,11 +98,9 @@ class ChatListAdapter extends BaseAdapter {
                 case FRIEND_CHAT_ITEM:
                     view = layoutInflater.inflate(R.layout.friend_chat_view_row_layout, parent, false);
                     holder.chatCamHolder = (RelativeLayout) view.findViewById(R.id.chat_cam_holder);
-                    holder.chatMicHolder = (RelativeLayout) view.findViewById(R.id.chat_mic_holder);
                     holder.chatMsgHolder = (LinearLayout) view.findViewById(R.id.chat_msg_holder);
 
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
-                    holder.chatMic = (ImageView) view.findViewById(R.id.chat_mic);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
                     holder.chatTime = (TextView) view.findViewById(R.id.chat_time);
                     holder.chatDelivered = (ImageView) view.findViewById(R.id.chat_delivered);
@@ -128,13 +124,11 @@ class ChatListAdapter extends BaseAdapter {
     private void setupRow(final Secret secret, ViewHolder holder) {
         if (secret.getBlobType() == BlobType.TEXT) {
             holder.chatCamHolder.setVisibility(View.GONE);
-            holder.chatMicHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.VISIBLE);
 
             holder.chatMsg.setText(secret.getBlob());
         } else if (secret.getBlobType() == BlobType.IMAGE) {
             holder.chatCamHolder.setVisibility(View.VISIBLE);
-            holder.chatMicHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
             if (secret.isMissed()) {
@@ -145,13 +139,8 @@ class ChatListAdapter extends BaseAdapter {
                         .load(file)
                         .resize(150, 150)
                         .centerCrop()
-                        .error(R.drawable.rahaslogo_3)
                         .into(holder.chatCam);
             }
-        } else if (secret.getBlobType() == BlobType.SOUND) {
-            holder.chatCamHolder.setVisibility(View.GONE);
-            holder.chatMicHolder.setVisibility(View.VISIBLE);
-            holder.chatMsgHolder.setVisibility(View.GONE);
         }
 
         if (secret.isSender()) {
@@ -167,9 +156,9 @@ class ChatListAdapter extends BaseAdapter {
                 holder.chatPending.setVisibility(View.VISIBLE);
                 holder.chatTime.setVisibility(View.VISIBLE);
             } else {
-                holder.chatDelivered.setVisibility(View.GONE);
-                holder.chatPending.setVisibility(View.GONE);
-                holder.chatTime.setVisibility(View.GONE);
+                holder.chatDelivered.setVisibility(View.INVISIBLE);
+                holder.chatPending.setVisibility(View.INVISIBLE);
+                holder.chatTime.setVisibility(View.INVISIBLE);
             }
         }
 
@@ -199,15 +188,6 @@ class ChatListAdapter extends BaseAdapter {
                 }
             }
         });
-
-        holder.chatMic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, SecretCallActivity.class);
-                intent.putExtra("SOUND", secret.getBlob());
-                context.startActivity(intent);
-            }
-        });
     }
 
     /**
@@ -215,11 +195,9 @@ class ChatListAdapter extends BaseAdapter {
      */
     private static class ViewHolder {
         RelativeLayout chatCamHolder;
-        RelativeLayout chatMicHolder;
         LinearLayout chatMsgHolder;
 
         ImageView chatCam;
-        ImageView chatMic;
         TextView chatMsg;
 
         TextView chatTime;
