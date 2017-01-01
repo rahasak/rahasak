@@ -15,15 +15,36 @@
         android:layout_height="match_parent"
         android:background="#B3000000">
 
-        <TextView
-            android:id="@+id/calling_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Secret calling..."
-            android:textColor="@color/colorPrimary"
-            android:textSize="25sp"
-            android:visibility="gone" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/calling_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Secret calling..."
+                android:textColor="@color/colorPrimary"
+                android:textSize="25sp"
+                android:visibility="gone" />
+
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:id="@+id/cut"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="60dp"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                android:foregroundGravity="center"
+                android:scaleType="fitXY"
+                android:visibility="visible"
+                android:src="@drawable/cancel_call"
+                />
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/moving_layout"

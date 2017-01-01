@@ -1,5 +1,6 @@
 package com.score.rahasak.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,12 +24,14 @@ import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
+import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.application.SenzApplication;
 import com.score.rahasak.async.StreamPlayer;
 import com.score.rahasak.async.StreamRecorder;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
+import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
@@ -99,6 +102,26 @@ public class SecretRecordingActivity extends AppCompatActivity {
         }
     };
 
+    // senz message
+    private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+
+            // extract senz
+            if (intent.hasExtra("SENZ")) {
+                Senz senz = intent.getExtras().getParcelable("SENZ");
+                switch (senz.getSenzType()) {
+                    case DATA:
+                        onSenzReceived(senz);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    };
+
     private CountDownTimer requestTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
         @Override
         public void onFinish() {
@@ -155,12 +178,34 @@ public class SecretRecordingActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(senzReceiver);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
         stopVibrations();
         clearFlags();
         endCall();
+    }
+
+    private void onSenzReceived(Senz senz) {
+        if (senz.getAttributes().containsKey("status")) {
+            // TODO
+        } else if (senz.getAttributes().containsKey("mic")) {
+            if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
+                SecretRecordingActivity.this.finish();
+            }
+        }
     }
 
     private void initUi() {
@@ -330,6 +375,11 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
         if (streamPlayer != null)
             streamPlayer.stop();
+
+        // send mic off senz
+        // send stream off
+        sendSenz(SenzUtils.getMicOffSenz(this, secretUser));
+        sendDatagram(SenzUtils.getEndStreamMsg(this, appUser.getUsername(), secretUser.getUsername()));
     }
 
     private void sendSenz(Senz senz) {
@@ -353,6 +403,23 @@ public class SecretRecordingActivity extends AppCompatActivity {
         newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
         newSecret.setDeliveryState(DeliveryState.PENDING);
         new SenzorsDbSource(this).createSecret(newSecret);
+    }
+
+    private void sendDatagram(final String senz) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (address == null)
+                        address = InetAddress.getByName(SenzService.STREAM_HOST);
+                    if (socket == null)
+                        socket = new DatagramSocket();
+                    DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
+                    socket.send(sendPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
 }

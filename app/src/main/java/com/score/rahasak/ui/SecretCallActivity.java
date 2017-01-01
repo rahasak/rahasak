@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -33,7 +34,9 @@ import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.remote.SenzService;
+import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
+import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzUtils;
@@ -269,6 +272,9 @@ public class SecretCallActivity extends AppCompatActivity {
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
                 startCall();
+            } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
+                //endCall();
+                SecretCallActivity.this.finish();
             }
         }
     }
@@ -294,6 +300,11 @@ public class SecretCallActivity extends AppCompatActivity {
 
         if (streamPlayer != null)
             streamPlayer.stop();
+
+        // send mic off senz
+        // send stream off
+        sendSenz(SenzUtils.getMicOffSenz(this, secretUser));
+        sendDatagram(SenzUtils.getEndStreamMsg(this, appUser.getUsername(), secretUser.getUsername()));
     }
 
     public void displayInformationMessageDialog(String title, String message) {
@@ -327,6 +338,37 @@ public class SecretCallActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private void sendDatagram(final String senz) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (address == null)
+                        address = InetAddress.getByName(SenzService.STREAM_HOST);
+                    if (socket == null)
+                        socket = new DatagramSocket();
+                    DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
+                    socket.send(sendPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void sendSenz(Senz senz) {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            try {
+                if (isServiceBound) {
+                    senzService.send(senz);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
+        }
     }
 
 }

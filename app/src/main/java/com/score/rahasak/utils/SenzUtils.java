@@ -163,6 +163,10 @@ public class SenzUtils {
         return "DATA #STREAM ON" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
     }
 
+    public static String getEndStreamMsg(Context context, String sender, String receiver) {
+        return "DATA #STREAM OFF" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+    }
+
     public static Senz getInitMicSenz(Context context, SecretUser secretUser) {
         Long timeStamp = System.currentTimeMillis() / 1000;
         String uid = SenzUtils.getUid(context, timeStamp.toString());
@@ -191,6 +195,25 @@ public class SenzUtils {
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", timeStamp.toString());
         senzAttributes.put("mic", "on");
+        senzAttributes.put("uid", uid);
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
+    }
+
+    public static Senz getMicOffSenz(Context context, SecretUser secretUser) {
+        Long timeStamp = System.currentTimeMillis() / 1000;
+        String uid = SenzUtils.getUid(context, timeStamp.toString());
+
+        //senz is the original senz
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", timeStamp.toString());
+        senzAttributes.put("mic", "off");
         senzAttributes.put("uid", uid);
 
         // new senz
