@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.application.SenzApplication;
@@ -64,6 +65,7 @@ public class SecretCallActivity extends AppCompatActivity {
     private TextView usernameText;
     private TextView callingText;
     private ImageView waitingIcon;
+    private ImageView endBtn;
 
     // service interface
     protected ISenzService senzService = null;
@@ -167,10 +169,8 @@ public class SecretCallActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        endCall();
+    public void onBackPressed() {
+        // disable back button
     }
 
     private void initUi() {
@@ -190,6 +190,15 @@ public class SecretCallActivity extends AppCompatActivity {
         usernameText.setTypeface(typeface, Typeface.BOLD);
         callingText.setTypeface(typeface, Typeface.NORMAL);
         playingText.setTypeface(typeface, Typeface.NORMAL);
+
+        endBtn = (CircularImageView) findViewById(R.id.end_call);
+        endBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endCall();
+                SecretCallActivity.this.finish();
+            }
+        });
     }
 
     private void initStatusBar() {
@@ -273,7 +282,7 @@ public class SecretCallActivity extends AppCompatActivity {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
                 startCall();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
-                //endCall();
+                endCall();
                 SecretCallActivity.this.finish();
             }
         }

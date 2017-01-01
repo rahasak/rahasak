@@ -8,7 +8,7 @@
     <FrameLayout
         android:id="@+id/calling_user"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></FrameLayout>
+        android:layout_height="match_parent" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                 android:visibility="gone" />
 
             <com.github.siyamed.shapeimageview.CircularImageView
-                android:id="@+id/cancel"
+                android:id="@+id/end_call"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_alignParentBottom="true"

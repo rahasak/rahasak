@@ -71,6 +71,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
     private ImageView waitingIcon;
     private CircularImageView cancelBtn;
     private CircularImageView startBtn;
+    private CircularImageView endBtn;
 
     private User appUser;
     private SecretUser secretUser;
@@ -193,9 +194,12 @@ public class SecretRecordingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        stopVibrations();
         clearFlags();
-        endCall();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // disable back button
     }
 
     private void onSenzReceived(Senz senz) {
@@ -244,6 +248,15 @@ public class SecretRecordingActivity extends AppCompatActivity {
                 stopVibrations();
                 cancelTimerToServe();
                 startCall();
+            }
+        });
+
+        endBtn = (CircularImageView) findViewById(R.id.end_call);
+        endBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endCall();
+                SecretRecordingActivity.this.finish();
             }
         });
     }
@@ -353,6 +366,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
         // set up ui
         rootView.setVisibility(View.GONE);
         callingText.setVisibility(View.VISIBLE);
+        endBtn.setVisibility(View.VISIBLE);
 
         // send mic on senz back
         Senz senz = SenzUtils.getMicOnSenz(this, secretUser);

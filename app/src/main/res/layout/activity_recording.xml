@@ -30,7 +30,7 @@
                 android:visibility="gone" />
 
             <com.github.siyamed.shapeimageview.CircularImageView
-                android:id="@+id/cut"
+                android:id="@+id/end_call"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_alignParentBottom="true"
@@ -41,7 +41,7 @@
                 android:cropToPadding="true"
                 android:foregroundGravity="center"
                 android:scaleType="fitXY"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:src="@drawable/cancel_call"
                 />
         </RelativeLayout>
