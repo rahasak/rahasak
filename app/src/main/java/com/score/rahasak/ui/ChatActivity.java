@@ -307,7 +307,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void refreshSecretList() {
         if (!secretList.isEmpty()) {
             ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser, secretList.getYongest().getTimeStamp());
-            if (tmpList.size() > 0) {
+            if (tmpList.size() > 0 && secretList.size() >= 7) {
                 secretList.addAll(tmpList);
                 secretAdapter.notifyDataSetChanged();
 
