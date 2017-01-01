@@ -235,7 +235,6 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
-        values.put(SenzorsDbContract.Permission.COLUMN_NAME_MIC, 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN, permission.isGiven() ? 1 : 0);
 
         // Insert the new row, if fails throw an error
@@ -270,7 +269,6 @@ public class SenzorsDbSource {
         if (cursor.moveToFirst()) {
             boolean _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1;
             boolean _cam = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA)) == 1;
-            boolean _mic = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_MIC)) == 1;
             boolean _isGiven = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN)) == 1;
 
             // clear
@@ -279,7 +277,6 @@ public class SenzorsDbSource {
             Permission permission = new Permission(id, _isGiven);
             permission.setLoc(_location);
             permission.setCam(_cam);
-            permission.setMic(_mic);
 
             return permission;
         }

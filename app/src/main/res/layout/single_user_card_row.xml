@@ -97,21 +97,9 @@
                     android:layout_toLeftOf="@+id/perm_mic"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="15dp"
                     android:adjustViewBounds="true"
                     android:src="@drawable/perm_camera_active" />
-
-                <ImageView
-                    android:id="@+id/perm_mic"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="false"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="5dp"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/headphone_active" />
 
             </LinearLayout>
 

@@ -49,7 +49,6 @@ class SenzorsDbContract {
         static final String TABLE_NAME = "permission";
         static final String COLUMN_NAME_LOCATION = "loc";
         static final String COLUMN_NAME_CAMERA = "cam";
-        static final String COLUMN_NAME_MIC = "mic";
         // is_given = true -> I have given this permission to other party
         // is_given = false -> Other party has given this permission to me
         // TODO change this to my_perm

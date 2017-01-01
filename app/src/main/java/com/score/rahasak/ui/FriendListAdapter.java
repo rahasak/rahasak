@@ -61,7 +61,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             holder.phoneBookNameView = (TextView) view.findViewById(R.id.user_name_from_contacts);
             holder.userLocationPermView = (ImageView) view.findViewById(R.id.perm_locations);
             holder.userCameraPermView = (ImageView) view.findViewById(R.id.perm_camera);
-            holder.userMicPermView = (ImageView) view.findViewById(R.id.perm_mic);
 
             view.setTag(holder);
         } else {
@@ -84,12 +83,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
         } else {
             viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_deactive, null));
-        }
-
-        if (permission != null && permission.isMic()) {
-            viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.headphone_active, null));
-        } else {
-            viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.headphone, null));
         }
 
         if (permission != null && permission.isLoc()) {
@@ -117,7 +110,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             }
 
             viewHolder.userCameraPermView.setVisibility(View.VISIBLE);
-            viewHolder.userMicPermView.setVisibility(View.VISIBLE);
             viewHolder.userLocationPermView.setVisibility(View.VISIBLE);
         } else {
             if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
@@ -129,7 +121,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             viewHolder.phoneBookNameView.setText(secretUser.isSMSRequester() ? "Sent friend request" : "Received friend request");
 
             viewHolder.userCameraPermView.setVisibility(View.GONE);
-            viewHolder.userMicPermView.setVisibility(View.GONE);
             viewHolder.userLocationPermView.setVisibility(View.GONE);
         }
     }
@@ -143,7 +134,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         TextView phoneBookNameView;
         ImageView userCameraPermView;
         ImageView userLocationPermView;
-        ImageView userMicPermView;
     }
 
 }

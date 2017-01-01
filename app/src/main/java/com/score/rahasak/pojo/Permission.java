@@ -10,7 +10,6 @@ public class Permission implements Parcelable {
     private String id;
     private boolean loc;
     private boolean cam;
-    private boolean mic;
     private boolean isGiven;
 
     public Permission(String id, boolean isGiven) {
@@ -22,7 +21,6 @@ public class Permission implements Parcelable {
         id = in.readString();
         loc = in.readByte() != 0;
         cam = in.readByte() != 0;
-        mic = in.readByte() != 0;
         isGiven = in.readByte() != 0;
     }
 
@@ -31,7 +29,6 @@ public class Permission implements Parcelable {
         dest.writeString(id);
         dest.writeByte((byte) (loc ? 1 : 0));
         dest.writeByte((byte) (cam ? 1 : 0));
-        dest.writeByte((byte) (mic ? 1 : 0));
         dest.writeByte((byte) (isGiven ? 1 : 0));
     }
 
@@ -74,14 +71,6 @@ public class Permission implements Parcelable {
 
     public void setCam(boolean cam) {
         this.cam = cam;
-    }
-
-    public boolean isMic() {
-        return mic;
-    }
-
-    public void setMic(boolean mic) {
-        this.mic = mic;
     }
 
     public boolean isGiven() {

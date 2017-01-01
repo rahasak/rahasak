@@ -110,6 +110,22 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1">
 
+                                <ImageButton
+                                    android:id="@+id/getMicBtn"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="top"
+                                    android:paddingTop="3dp"
+                                    android:background="@color/transparent"
+                                    android:scaleType="centerInside"
+                                    android:src="@drawable/secret_call" />
+                            </FrameLayout>
+
+                            <FrameLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/left_border"
+                                android:layout_weight="1">
 
                                 <ImageButton
                                     android:id="@+id/getLocBtn"
@@ -138,26 +154,6 @@
                                     android:scaleType="centerInside"
                                     android:src="@drawable/perm_camera_deactive" />
                             </FrameLayout>
-
-                            <FrameLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:background="@drawable/left_border">
-
-
-                                <ImageButton
-                                    android:id="@+id/getMicBtn"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="top"
-                                    android:background="@color/transparent"
-                                    android:scaleType="centerInside"
-                                    android:src="@drawable/perm_mic_deactive" />
-
-
-                            </FrameLayout>
-
 
                         </LinearLayout>
 

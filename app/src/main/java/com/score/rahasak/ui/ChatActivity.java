@@ -616,15 +616,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 btnPhoto.setImageResource(R.drawable.perm_camera_deactive);
                 btnPhoto.setEnabled(false);
             }
-
-            // mic
-            if (permission.isMic()) {
-                btnMic.setImageResource(R.drawable.headphone_active);
-                btnMic.setEnabled(true);
-            } else {
-                btnMic.setImageResource(R.drawable.headphone);
-                btnMic.setEnabled(false);
-            }
         }
     }
 

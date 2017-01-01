@@ -36,7 +36,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     private Switch cameraSwitch;
     private Switch locationSwitch;
-    private Switch micSwitch;
 
     private ImageView backImageView;
     private ImageView userImageView;
@@ -44,7 +43,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     private TextView camText;
     private TextView locText;
-    private TextView micText;
 
     private SecretUser secretUser;
     private String selectedPermission;
@@ -140,15 +138,12 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     private void initUi() {
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
-        micSwitch = (Switch) findViewById(R.id.perm_mic_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
         camText = (TextView) findViewById(R.id.perm_cam_text);
-        micText = (TextView) findViewById(R.id.perm_mic_text);
         locText = (TextView) findViewById(R.id.perm_loc_text);
 
         camText.setTypeface(typeface);
-        micText.setTypeface(typeface);
         locText.setTypeface(typeface);
 
         userImageView = (ImageView) findViewById(R.id.clickable_image);
@@ -162,12 +157,10 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private void initPermissions() {
         Permission permission = secretUser.getGivenPermission();
         cameraSwitch.setChecked(permission.isCam());
-        micSwitch.setChecked(permission.isLoc());
-        locationSwitch.setChecked(permission.isMic());
+        locationSwitch.setChecked(permission.isLoc());
 
         cameraSwitch.setOnCheckedChangeListener(this);
         locationSwitch.setOnCheckedChangeListener(this);
-        micSwitch.setOnCheckedChangeListener(this);
     }
 
     private void initToolbar() {
@@ -278,10 +271,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
             boolean updateTo = !secretUser.getGivenPermission().isCam();
             secretUser.getGivenPermission().setCam(updateTo);
             dbSource.updatePermission(secretUser.getGivenPermission().getId(), "cam", updateTo);
-        } else if (selectedPermission.equalsIgnoreCase("MIC")) {
-            boolean updateTo = !secretUser.getGivenPermission().isMic();
-            secretUser.getGivenPermission().setMic(updateTo);
-            dbSource.updatePermission(secretUser.getGivenPermission().getId(), "mic", updateTo);
         } else if (selectedPermission.equalsIgnoreCase("LOC")) {
             boolean updateTo = !secretUser.getGivenPermission().isLoc();
             secretUser.getGivenPermission().setLoc(updateTo);
@@ -292,8 +281,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private void resetPermission() {
         if (selectedPermission.equalsIgnoreCase("CAM")) {
             cameraSwitch.setChecked(secretUser.getGivenPermission().isCam());
-        } else if (selectedPermission.equalsIgnoreCase("MIC")) {
-            micSwitch.setChecked(secretUser.getGivenPermission().isMic());
         } else if (selectedPermission.equalsIgnoreCase("LOC")) {
             locationSwitch.setChecked(secretUser.getGivenPermission().isLoc());
         }
@@ -309,10 +296,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
             if (isChecked) sharePermission("loc", "on");
             else sharePermission("loc", "off");
             selectedPermission = "LOC";
-        } else if (buttonView == micSwitch) {
-            if (isChecked) sharePermission("mic", "on");
-            else sharePermission("mic", "off");
-            selectedPermission = "MIC";
         }
     }
 
