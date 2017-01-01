@@ -9,8 +9,7 @@ import android.os.Vibrator;
 public class VibrationUtils {
 
     public static long[] getVibratorPatterIncomingPhotoRequest() {
-        long[] pattern = {0, 100, 1000, 300, 200, 100, 500, 200, 100};
-        return pattern;
+        return new long[]{0, 100, 1000, 300, 200, 100, 500, 200, 100};
     }
 
     public static void startVibrationForPhoto(long[] pattern, Context context){
@@ -21,6 +20,11 @@ public class VibrationUtils {
     public static void stopVibration(Context context){
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         v.cancel();
+    }
+
+    public static void vibrate(Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(200);
     }
 
 }

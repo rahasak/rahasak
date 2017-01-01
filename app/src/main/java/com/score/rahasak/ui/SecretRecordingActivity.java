@@ -207,6 +207,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
             // TODO
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
+                endCall();
                 SecretRecordingActivity.this.finish();
             }
         }

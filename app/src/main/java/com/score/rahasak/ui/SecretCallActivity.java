@@ -41,6 +41,7 @@ import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzUtils;
+import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -280,6 +281,7 @@ public class SecretCallActivity extends AppCompatActivity {
             }
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
+                VibrationUtils.vibrate(this);
                 startCall();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
                 endCall();
