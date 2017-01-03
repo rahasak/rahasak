@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
 import android.util.Base64;
+import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.RSAUtils;
@@ -84,7 +85,7 @@ public class StreamPlayer {
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-                    //Log.d("TAG", "Stream received: " + msg);
+                    Log.d("TAG", "Stream received: " + msg);
 
                     // parser and obtain audio data
                     // play it

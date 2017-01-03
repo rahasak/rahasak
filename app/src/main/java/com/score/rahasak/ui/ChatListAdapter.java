@@ -166,9 +166,9 @@ class ChatListAdapter extends BaseAdapter {
                 holder.chatPending.setVisibility(View.VISIBLE);
                 holder.chatTime.setVisibility(View.VISIBLE);
             } else {
-                holder.chatDelivered.setVisibility(View.INVISIBLE);
-                holder.chatPending.setVisibility(View.INVISIBLE);
-                holder.chatTime.setVisibility(View.INVISIBLE);
+                holder.chatDelivered.setVisibility(View.GONE);
+                holder.chatPending.setVisibility(View.GONE);
+                holder.chatTime.setVisibility(View.VISIBLE);
             }
         }
 

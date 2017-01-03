@@ -377,7 +377,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
         // start recorder
         if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key, socket);
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key);
         streamRecorder.start();
 
         // start player
