@@ -19,9 +19,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * Created by eranga on 10/1/16.
- */
 public class ImageUtils {
 
     public static byte[] compressImage(byte[] data) {
@@ -96,21 +93,17 @@ public class ImageUtils {
         canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
 
         // rotate
-        int orientation = Exif.getOrientation(data);
         Matrix matrix = new Matrix();
-        if (orientation == 6) {
-            matrix.postRotate(90);
-        } else if (orientation == 3) {
-            matrix.postRotate(180);
-        } else if (orientation == 8) {
-            matrix.postRotate(270);
-        } else if (orientation == 0) {
+        int orientation = Exif.getOrientation(data);
+        if (orientation == 0) {
             matrix.postRotate(-90);
+        } else {
+            matrix.postRotate(orientation);
         }
         scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out);
 
         byte[] scaledData = out.toByteArray();
         Log.d("TAG", scaledData.length / 1024 + "hoooooo");
