@@ -290,7 +290,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                byte[] resizedImage = new ImageUtils().compressImage(bytes);
+                byte[] resizedImage = ImageUtils.compressImage(bytes);
                 Log.d(TAG, "Compressed size: " + resizedImage.length / 1024);
 
                 sendPhotoSenz(resizedImage, SelfieCaptureActivity.this);
@@ -391,7 +391,7 @@ public class SelfieCaptureActivity extends BaseActivity {
      * @return list of decomposed senz's
      */
     private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid, Long timestamp) {
-        String imageString = new ImageUtils().encodeBitmap(image);
+        String imageString = ImageUtils.encodeBitmap(image);
 
         Secret newSecret = new Secret("", BlobType.IMAGE, secretUser, false);
         newSecret.setTimeStamp(timestamp);

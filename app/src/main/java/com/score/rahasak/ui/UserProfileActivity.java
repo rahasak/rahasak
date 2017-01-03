@@ -148,7 +148,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
         userImageView = (ImageView) findViewById(R.id.clickable_image);
         if (secretUser.getImage() != null)
-            userImageView.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
+            userImageView.setImageBitmap(ImageUtils.decodeBitmap(secretUser.getImage()));
 
         getPicImageView = (ImageView) findViewById(R.id.profile_camera_icon);
         getPicImageView.setOnClickListener(this);
@@ -262,7 +262,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
             dbSource.updateSecretUser(secretUser.getUsername(), "image", encodedImage);
 
             // display image
-            userImageView.setImageBitmap(new ImageUtils().decodeBitmap(encodedImage));
+            userImageView.setImageBitmap(ImageUtils.decodeBitmap(encodedImage));
         }
     }
 

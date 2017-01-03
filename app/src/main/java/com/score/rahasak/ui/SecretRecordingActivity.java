@@ -287,7 +287,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
         callingUsernameText.setText(PhoneBookUtil.getContactName(this, secretUser.getPhone()));
         if (secretUser.getImage() != null) {
-            BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
+            BitmapDrawable drawable = new BitmapDrawable(getResources(), ImageUtils.decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
         }
     }

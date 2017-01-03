@@ -93,7 +93,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
 
         // extracting user image
         if (secretUser.getImage() != null) {
-            viewHolder.userImageView.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
+            viewHolder.userImageView.setImageBitmap(ImageUtils.decodeBitmap(secretUser.getImage()));
         } else {
             viewHolder.userImageView.setImageResource(R.drawable.default_user);
         }

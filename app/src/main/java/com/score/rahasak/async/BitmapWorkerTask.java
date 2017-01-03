@@ -24,7 +24,7 @@ public class BitmapWorkerTask extends AsyncTask<BitmapTaskParams, Void, Bitmap> 
     @Override
     protected Bitmap doInBackground(BitmapTaskParams... params) {
         String encodedBitmap = params[0].getData();
-        return new ImageUtils().decodeBitmap(encodedBitmap);
+        return ImageUtils.decodeBitmap(encodedBitmap);
     }
 
     @Override

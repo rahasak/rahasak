@@ -218,7 +218,7 @@ public class SecretCallActivity extends AppCompatActivity {
             key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
         if (secretUser.getImage() != null) {
-            BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
+            BitmapDrawable drawable = new BitmapDrawable(getResources(), ImageUtils.decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
         }
 

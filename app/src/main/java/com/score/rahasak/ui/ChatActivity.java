@@ -292,7 +292,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setupUserImage() {
         if (secretUser.getImage() != null)
-            btnUserSetting.setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
+            btnUserSetting.setImageBitmap(ImageUtils.decodeBitmap(secretUser.getImage()));
     }
 
     private void initSecretList() {

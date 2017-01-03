@@ -108,7 +108,7 @@ class RecentChatListAdapter extends BaseAdapter {
         }
 
         if (secret.getUser().getImage() != null) {
-            viewHolder.userImage.setImageBitmap(new ImageUtils().decodeBitmap(secret.getUser().getImage()));
+            viewHolder.userImage.setImageBitmap(ImageUtils.decodeBitmap(secret.getUser().getImage()));
         } else {
             viewHolder.userImage.setImageResource(R.drawable.default_user);
         }
