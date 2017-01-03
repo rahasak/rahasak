@@ -176,7 +176,6 @@ public class SelfieCaptureActivity extends BaseActivity {
         rotateCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Click to rotate --------------- ");
                 if (isFrontCam)
                     initCameraPreview(Camera.CameraInfo.CAMERA_FACING_BACK);
                 else

@@ -18,14 +18,14 @@
 
         <com.github.siyamed.shapeimageview.CircularImageView
             android:id="@+id/start"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:layout_marginBottom="60dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="55dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:src="@drawable/answer_call"
@@ -35,25 +35,24 @@
 
         <ImageView
             android:id="@+id/rotate_camera"
-            android:layout_width="30dp"
+            android:layout_width="25dp"
             android:layout_height="30dp"
             android:layout_above="@+id/start"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="40dp"
-            android:layout_marginRight="55dp"
+            android:layout_marginRight="75dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:src="@drawable/rotate_camera" />
 
         <com.github.siyamed.shapeimageview.CircularImageView
             android:id="@+id/cancel"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_alignParentStart="true"
             android:layout_alignTop="@+id/start"
             android:layout_gravity="center"
-            android:layout_marginEnd="31dp"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="55dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:foregroundGravity="center"
@@ -135,6 +134,6 @@
         android:layout_marginBottom="50dp"
         android:text="3"
         android:textColor="@color/colorPrimary"
-        android:textSize="120sp" />
+        android:textSize="100sp" />
 
 </RelativeLayout>

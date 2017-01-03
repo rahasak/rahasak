@@ -381,7 +381,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void navigateToPhotoWait() {
         Intent intent = new Intent(this, SelfieCallActivity.class);
-        intent.putExtra("SENDER", secretUser.getUsername());
+        intent.putExtra("SENDER", PhoneBookUtil.getContactName(this, secretUser.getPhone()));
         startActivity(intent);
     }
 

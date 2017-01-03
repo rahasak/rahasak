@@ -212,7 +212,7 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private void initUser() {
         secretUser = getIntent().getParcelableExtra("USER");
-        usernameText.setText("@" + PhoneBookUtil.getContactName(this, secretUser.getPhone()));
+        usernameText.setText(PhoneBookUtil.getContactName(this, secretUser.getPhone()));
 
         if (secretUser.getSessionKey() != null)
             key = RSAUtils.getSecretKey(secretUser.getSessionKey());

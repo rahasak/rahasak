@@ -128,6 +128,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
         @Override
         public void onFinish() {
             sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
+            stopVibrations();
             SecretRecordingActivity.this.finish();
         }
 
@@ -208,7 +209,6 @@ public class SecretRecordingActivity extends AppCompatActivity {
             // TODO
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
-                stopVibrations();
                 cancelTimerToServe();
                 endCall();
                 SecretRecordingActivity.this.finish();
@@ -237,7 +237,6 @@ public class SecretRecordingActivity extends AppCompatActivity {
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopVibrations();
                 cancelTimerToServe();
                 sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
                 endCall();
@@ -286,7 +285,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
         if (secretUser.getSessionKey() != null)
             key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
-        callingUsernameText.setText("@" + PhoneBookUtil.getContactName(this, secretUser.getPhone()));
+        callingUsernameText.setText(PhoneBookUtil.getContactName(this, secretUser.getPhone()));
         if (secretUser.getImage() != null) {
             BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
@@ -388,6 +387,8 @@ public class SecretRecordingActivity extends AppCompatActivity {
     }
 
     private void endCall() {
+        stopVibrations();
+
         if (streamRecorder != null)
             streamRecorder.stop();
 

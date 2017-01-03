@@ -98,7 +98,7 @@ public class SelfieCallActivity extends AppCompatActivity {
             imageView.setVisibility(View.INVISIBLE);
 
             String sender = intent.getStringExtra("SENDER");
-            usernameText.setText("@" + sender);
+            usernameText.setText(sender);
 
             startAnimatingWaitingIcon();
         }
