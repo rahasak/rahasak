@@ -90,12 +90,16 @@ public class SmsReceiver extends BroadcastReceiver {
 
         // create user
         SenzorsDbSource dbSource = new SenzorsDbSource(context);
-        if (!dbSource.isExistingUserWithPhoneNo(contactNo)) {
-            SecretUser secretUser = new SecretUser("id", username);
-            secretUser.setPhone(contactNo);
-            secretUser.setPubKeyHash(pubKeyHash);
-            dbSource.createSecretUser(secretUser);
+        if (dbSource.isExistingUserWithPhoneNo(contactNo)) {
+            // delete existing user
+            dbSource.deleteSecretUser(username);
         }
+
+        // create user
+        SecretUser secretUser = new SecretUser("id", username);
+        secretUser.setPhone(contactNo);
+        secretUser.setPubKeyHash(pubKeyHash);
+        dbSource.createSecretUser(secretUser);
 
         // show Notification
         SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, username));

@@ -132,6 +132,20 @@ public class SenzorsDbSource {
                 new String[]{username});
     }
 
+    /**
+     * Delete user from database,
+     *
+     * @param
+     */
+    public void deleteSecretUser(String username) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // delete senz of given user
+        db.delete(SenzorsDbContract.User.TABLE_NAME,
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+                new String[]{username});
+    }
+
     public SecretUser getSecretUser(String username) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table

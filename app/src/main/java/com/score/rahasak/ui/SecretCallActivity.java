@@ -38,6 +38,7 @@ import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzUtils;
@@ -211,7 +212,7 @@ public class SecretCallActivity extends AppCompatActivity {
 
     private void initUser() {
         secretUser = getIntent().getParcelableExtra("USER");
-        usernameText.setText("@" + secretUser.getUsername());
+        usernameText.setText("@" + PhoneBookUtil.getContactName(this, secretUser.getPhone()));
 
         if (secretUser.getSessionKey() != null)
             key = RSAUtils.getSecretKey(secretUser.getSessionKey());

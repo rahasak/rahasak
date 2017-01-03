@@ -39,6 +39,7 @@ import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzUtils;
@@ -285,7 +286,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
         if (secretUser.getSessionKey() != null)
             key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
-        callingUsernameText.setText(" @" + secretUser.getUsername());
+        callingUsernameText.setText("@" + PhoneBookUtil.getContactName(this, secretUser.getPhone()));
         if (secretUser.getImage() != null) {
             BitmapDrawable drawable = new BitmapDrawable(getResources(), new ImageUtils().decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
