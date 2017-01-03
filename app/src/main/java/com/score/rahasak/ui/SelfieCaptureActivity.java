@@ -1,7 +1,6 @@
 package com.score.rahasak.ui;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
