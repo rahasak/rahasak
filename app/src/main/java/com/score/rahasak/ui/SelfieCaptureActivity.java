@@ -2,6 +2,7 @@ package com.score.rahasak.ui;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -22,6 +23,7 @@ import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.ImageUtils;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -33,6 +35,13 @@ import java.util.HashMap;
 
 public class SelfieCaptureActivity extends BaseActivity {
     protected static final String TAG = SelfieCaptureActivity.class.getName();
+
+    // call details
+    private FrameLayout callDeatilsLayout;
+    private TextView selfiCallText;
+    private TextView callerNameText;
+    private TextView callerUsername;
+    private ImageView selfieImage;
 
     // camera related variables
     private Camera mCamera;
@@ -50,7 +59,6 @@ public class SelfieCaptureActivity extends BaseActivity {
     private ImageView rotateCamera;
 
     // selfie request user
-    private String username;
     private SecretUser secretUser;
 
     private CountDownTimer cancelTimer;
@@ -63,18 +71,13 @@ public class SelfieCaptureActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
 
-        // user
-        username = getIntent().getStringExtra("USER");
-        secretUser = new SenzorsDbSource(this).getSecretUser(username);
-
         //init camera
         initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
         initFlags();
 
         // init activity
         initUi();
-        setupTitle();
-        setupUserImage();
+        initUser();
         startVibrations();
         startTimerToEndRequest();
         startCameraIfMissedCall();
@@ -182,20 +185,33 @@ public class SelfieCaptureActivity extends BaseActivity {
                     initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
             }
         });
+
+        callDeatilsLayout = (FrameLayout) findViewById(R.id.call_details_layout);
+        selfiCallText = (TextView) findViewById(R.id.selfie_calling_text);
+        callerNameText = (TextView) findViewById(R.id.caller_username);
+        callerUsername = (TextView) findViewById(R.id.photo_request_user_name);
+
+        selfiCallText.setTypeface(typeface);
+        callerNameText.setTypeface(typeface);
+        callerUsername.setTypeface(typeface);
+
+        selfieImage = (ImageView) findViewById(R.id.selfie_image);
+        AnimationDrawable anim = (AnimationDrawable) selfieImage.getBackground();
+        anim.start();
     }
 
-    private void setupTitle() {
-        ((TextView) findViewById(R.id.photo_request_header)).setTypeface(typeface, Typeface.NORMAL);
-        ((TextView) findViewById(R.id.photo_request_user_name)).setText(" @" + secretUser.getUsername());
-        ((TextView) findViewById(R.id.photo_request_user_name)).setTypeface(typeface, Typeface.NORMAL);
-    }
+    private void initUser() {
+        // secret user
+        String username = getIntent().getStringExtra("USER");
+        secretUser = new SenzorsDbSource(this).getSecretUser(username);
+        String contactName = PhoneBookUtil.getContactName(this, secretUser.getPhone());
 
-    private void setupUserImage() {
-        if (secretUser.getImage() != null)
-            ((ImageView) findViewById(R.id.user_profile_image)).setImageBitmap(new ImageUtils().decodeBitmap(secretUser.getImage()));
+        callerNameText.setText(contactName);
+        callerUsername.setText(contactName);
     }
 
     private void hideUiControls() {
+        callDeatilsLayout.setVisibility(View.GONE);
         callingUserInfo.setVisibility(View.INVISIBLE);
         buttonControls.setVisibility(View.INVISIBLE);
     }
