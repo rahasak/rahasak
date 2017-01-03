@@ -308,13 +308,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (!secretList.isEmpty()) {
             ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser, secretList.getYongest().getTimeStamp());
             if (tmpList.size() > 0 && secretList.size() >= 7) {
-                secretList.addAll(tmpList);
-                secretAdapter.notifyDataSetChanged();
-
                 // delete secrets from top
                 for (Secret secret : tmpList) {
+                    secretList.add(secret);
                     deleteSecret(0, secretList.get(0));
                 }
+                secretAdapter.notifyDataSetChanged();
 
                 // move to bottom
                 listView.post(new Runnable() {

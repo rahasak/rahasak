@@ -88,20 +88,17 @@ public class SmsReceiver extends BroadcastReceiver {
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
-        try {
-            // create user
-            SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        // create user
+        SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        if (!dbSource.isExistingUserWithPhoneNo(contactNo)) {
             SecretUser secretUser = new SecretUser("id", username);
             secretUser.setPhone(contactNo);
             secretUser.setPubKeyHash(pubKeyHash);
             dbSource.createSecretUser(secretUser);
-
-            // show Notification
-            SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, username));
-        } catch (Exception ex) {
-            // user exists
-            ex.printStackTrace();
         }
+
+        // show Notification
+        SenzNotificationManager.getInstance(context.getApplicationContext()).showNotification(NotificationUtils.getSmsNotification(contactName, contactNo, username));
     }
 
     private void initFriendConfirmation(SmsMessage smsMessage, Context context) {
