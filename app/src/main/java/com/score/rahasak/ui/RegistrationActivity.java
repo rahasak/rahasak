@@ -137,7 +137,7 @@ public class RegistrationActivity extends BaseActivity {
         registeringUser = new User("0", username);
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font size=10>Are you sure you want to register with Rahask using </font> <font color=#F88F8C>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font size=10>Are you sure you want to register with Rahasak using </font> <font color=#F88F8C>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
             displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -198,13 +198,13 @@ public class RegistrationActivity extends BaseActivity {
             // msg response received
             ActivityUtils.cancelProgressDialog();
             String msg = senz.getAttributes().get("status");
-            if (msg != null && msg.equalsIgnoreCase("600")) {
+            if (msg != null && (msg.equalsIgnoreCase("REG_DONE") || msg.equalsIgnoreCase("REG_ALR"))) {
                 ActivityUtils.showCustomToast("Successfully registered", this);
                 // save user
                 // navigate home
                 PreferenceUtils.saveUser(this, registeringUser);
                 navigateToHome();
-            } else if (msg != null && msg.equalsIgnoreCase("602")) {
+            } else if (msg != null && msg.equalsIgnoreCase("REG_FAIL")) {
                 String informationMessage = "<font size=10>Seems username </font> <font color=#F88F8C>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font> already obtained by some other user, try a different username</font>";
                 displayInformationMessageDialog("Registration fail", informationMessage);
             }

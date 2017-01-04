@@ -77,7 +77,7 @@ public class StreamRecorder {
 
         private void record() {
             AmrEncoder.init(0);
-            int mode = AmrEncoder.Mode.MR122.ordinal();
+            int mode = AmrEncoder.Mode.MR74.ordinal();
 
             int encoded;
             short[] inBuf = new short[160];
