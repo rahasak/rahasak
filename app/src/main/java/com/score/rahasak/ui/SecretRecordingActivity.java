@@ -220,16 +220,16 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         WindowManager.LayoutParams params = this.getWindow().getAttributes();
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             if (event.values[0] == 0) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 params.screenBrightness = 0;
                 getWindow().setAttributes(params);
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 screenOff.setVisibility(View.VISIBLE);
             } else {
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 params.screenBrightness = -1f;
                 getWindow().setAttributes(params);
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 screenOff.setVisibility(View.GONE);
             }
         }

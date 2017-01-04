@@ -191,11 +191,13 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         WindowManager.LayoutParams params = this.getWindow().getAttributes();
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             if (event.values[0] == 0) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 params.screenBrightness = 0;
                 getWindow().setAttributes(params);
                 screenOff.setVisibility(View.VISIBLE);
             } else {
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
                 params.screenBrightness = -1f;
                 getWindow().setAttributes(params);
