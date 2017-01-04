@@ -130,7 +130,7 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.secret_call_activity);
+        setContentView(R.layout.secret_call_activity_layout);
 
         initUi();
         initStatusBar();

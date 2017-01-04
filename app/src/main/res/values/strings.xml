@@ -15,6 +15,7 @@
     <string name="invite_text_part_3">secret</string>
     <string name="invite_text_part_4">with you?</string>
     <string name="about_rahasak">"Rahasak is a secure way to share your smartphone sensors such as keyboard, microphone, GPS and camera with your trusted friends.\n\nThen they can get your location, Selfies, and Secrets without revealing it to the rest of the world"</string>
+    <string name="about_rahasak1">"Rahasak is an innovative application that helps you to share your secrets such as voice calls, texts, location information, and selfies without revealing it to the rest of the world.\n\nIt never saves your secrets in its’ servers. Rahasak encrypts your confidential information between you and your trusted friends and therefore no one sees it."</string>
     <string name="perm_allowed_Text">Allowed Permissions: </string>
     <string name="perm_location">Location </string>
     <string name="perm_camera">Camera </string>

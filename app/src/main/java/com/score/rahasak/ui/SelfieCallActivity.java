@@ -66,7 +66,7 @@ public class SelfieCallActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo_full_screen);
+        setContentView(R.layout.selfie_call_activity_layout);
 
         initUi();
         initIntent();

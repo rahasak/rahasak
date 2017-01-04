@@ -148,7 +148,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.secret_recording_activity);
+        setContentView(R.layout.secret_recording_activity_layout);
 
         initUi();
         initStatusBar();

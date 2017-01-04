@@ -68,7 +68,7 @@ public class SelfieCaptureActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
+        setContentView(R.layout.selfie_capture_activity_layout);
 
         //init camera
         initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
