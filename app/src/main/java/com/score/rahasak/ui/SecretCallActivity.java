@@ -9,6 +9,10 @@ import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -55,12 +59,13 @@ import java.net.SocketException;
 
 import javax.crypto.SecretKey;
 
-public class SecretCallActivity extends AppCompatActivity {
+public class SecretCallActivity extends AppCompatActivity implements SensorEventListener {
 
     private static final String TAG = SecretCallActivity.class.getName();
 
     private Typeface typeface;
 
+    private FrameLayout screenOff;
     private FrameLayout callingUser;
     private View loadingView;
     private TextView playingText;
@@ -76,6 +81,9 @@ public class SecretCallActivity extends AppCompatActivity {
     private User appUser;
     private SecretUser secretUser;
     private SecretKey key;
+
+    private SensorManager sensorManager;
+    private Sensor proximitySensor;
 
     private StreamRecorder streamRecorder;
     private StreamPlayer streamPlayer;
@@ -122,11 +130,12 @@ public class SecretCallActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_audio_full_screen);
+        setContentView(R.layout.secret_call_activity);
 
         initUi();
         initStatusBar();
         initUser();
+        initSensor();
         initCall();
     }
 
@@ -162,12 +171,14 @@ public class SecretCallActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
+        sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(senzReceiver);
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -175,11 +186,35 @@ public class SecretCallActivity extends AppCompatActivity {
         // disable back button
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        WindowManager.LayoutParams params = this.getWindow().getAttributes();
+        if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+            if (event.values[0] == 0) {
+                params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                params.screenBrightness = 0;
+                getWindow().setAttributes(params);
+                screenOff.setVisibility(View.VISIBLE);
+            } else {
+                params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                params.screenBrightness = -1f;
+                getWindow().setAttributes(params);
+                screenOff.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     private void initUi() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
 
-        loadingView = findViewById(R.id.mic_loading_view);
+        screenOff = (FrameLayout) findViewById(R.id.screen_off);
         callingUser = (FrameLayout) findViewById(R.id.calling_user);
+        loadingView = findViewById(R.id.mic_loading_view);
 
         waitingIcon = (ImageView) findViewById(R.id.selfie_image);
         AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
@@ -227,6 +262,11 @@ public class SecretCallActivity extends AppCompatActivity {
         } catch (NoUserException e) {
             e.printStackTrace();
         }
+    }
+
+    private void initSensor() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
     }
 
     private void initCall() {
@@ -382,5 +422,4 @@ public class SecretCallActivity extends AppCompatActivity {
             ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
     }
-
 }

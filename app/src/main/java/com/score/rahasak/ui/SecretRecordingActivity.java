@@ -8,6 +8,10 @@ import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -56,7 +60,7 @@ import java.net.SocketException;
 
 import javax.crypto.SecretKey;
 
-public class SecretRecordingActivity extends AppCompatActivity {
+public class SecretRecordingActivity extends AppCompatActivity implements SensorEventListener {
 
     private static final String TAG = SecretRecordingActivity.class.getName();
 
@@ -64,8 +68,9 @@ public class SecretRecordingActivity extends AppCompatActivity {
 
     protected Typeface typeface;
 
-    private RelativeLayout rootView;
+    private FrameLayout screenOff;
     private FrameLayout callingUser;
+    private RelativeLayout rootView;
     private TextView callingText;
     private TextView callingHeaderText;
     private TextView callingUsernameText;
@@ -77,6 +82,9 @@ public class SecretRecordingActivity extends AppCompatActivity {
     private User appUser;
     private SecretUser secretUser;
     private SecretKey key;
+
+    private SensorManager sensorManager;
+    private Sensor proximitySensor;
 
     // service interface
     protected ISenzService senzService = null;
@@ -140,11 +148,12 @@ public class SecretRecordingActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recording);
+        setContentView(R.layout.secret_recording_activity);
 
         initUi();
         initStatusBar();
         initUser();
+        initSensor();
         setupWakeLock();
         startVibrations();
         startTimerToEndRequest();
@@ -184,12 +193,14 @@ public class SecretRecordingActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
+        sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(senzReceiver);
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -202,6 +213,31 @@ public class SecretRecordingActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // disable back button
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        WindowManager.LayoutParams params = this.getWindow().getAttributes();
+        if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+            if (event.values[0] == 0) {
+                params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                params.screenBrightness = 0;
+                getWindow().setAttributes(params);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                screenOff.setVisibility(View.VISIBLE);
+            } else {
+                params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                params.screenBrightness = -1f;
+                getWindow().setAttributes(params);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                screenOff.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     private void onSenzReceived(Senz senz) {
@@ -219,6 +255,7 @@ public class SecretRecordingActivity extends AppCompatActivity {
     private void initUi() {
         typeface = Typeface.createFromAsset(getAssets(), "fonts/GeosansLight.ttf");
 
+        screenOff = (FrameLayout) findViewById(R.id.screen_off);
         rootView = (RelativeLayout) findViewById(R.id.moving_layout);
         callingUser = (FrameLayout) findViewById(R.id.calling_user);
         callingHeaderText = (TextView) findViewById(R.id.mic_calling_text);
@@ -290,6 +327,11 @@ public class SecretRecordingActivity extends AppCompatActivity {
             BitmapDrawable drawable = new BitmapDrawable(getResources(), ImageUtils.decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
         }
+    }
+
+    private void initSensor() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
     }
 
     private void initCall() {
