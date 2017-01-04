@@ -216,10 +216,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == btnPhoto) {
             onClickPhoto();
         } else if (v == btnMic) {
-            // request call (DATA #mic on)
-            navigateMicWait();
-            Senz senz = SenzUtils.getInitMicSenz(this, secretUser);
-            send(senz);
+            onClickCall();
         } else if (v == btnBack) {
             finish();
         } else if (v == btnUserSetting) {
@@ -470,6 +467,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             SenzTypeEnum senzType = SenzTypeEnum.GET;
             Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
+            send(senz);
+        } else {
+            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void onClickCall() {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            // request call (DATA #mic on)
+            navigateMicWait();
+            Senz senz = SenzUtils.getInitMicSenz(this, secretUser);
             send(senz);
         } else {
             Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
