@@ -18,13 +18,13 @@ import com.score.rahasak.utils.TimeUtils;
 
 import java.util.ArrayList;
 
-class RecentChatListAdapter extends BaseAdapter {
+class SecretListAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<Secret> userSecretList;
     private Typeface typeface;
 
-    RecentChatListAdapter(Context _context, ArrayList<Secret> secretList) {
+    SecretListAdapter(Context _context, ArrayList<Secret> secretList) {
         this.context = _context;
         this.userSecretList = secretList;
 
@@ -61,7 +61,7 @@ class RecentChatListAdapter extends BaseAdapter {
 
         if (view == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = layoutInflater.inflate(R.layout.rahas_row_layout, viewGroup, false);
+            view = layoutInflater.inflate(R.layout.secret_list_row_layout, viewGroup, false);
 
             holder = new ViewHolder();
             holder.message = (TextView) view.findViewById(R.id.message);

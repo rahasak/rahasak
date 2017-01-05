@@ -33,16 +33,16 @@ import com.score.senzc.pojos.Senz;
 import java.util.ArrayList;
 
 
-public class RecentChatListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class SecretListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-    private static final String TAG = RecentChatListFragment.class.getName();
+    private static final String TAG = SecretListFragment.class.getName();
 
     private ActionBar actionBar;
     private ImageView actionBarDelete;
     //private TextView actionBarName;
 
     private ArrayList<Secret> allSecretsList;
-    private RecentChatListAdapter adapter;
+    private SecretListAdapter adapter;
     private SenzorsDbSource dbSource;
 
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -107,7 +107,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
      */
     private void displayList() {
         allSecretsList = dbSource.getRecentSecretList();
-        adapter = new RecentChatListAdapter(getContext(), allSecretsList);
+        adapter = new SecretListAdapter(getContext(), allSecretsList);
         getListView().setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

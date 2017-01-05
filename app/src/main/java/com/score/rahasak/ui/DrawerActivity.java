@@ -214,7 +214,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         drawerItemList.get(0).setSelected(true);
         drawerAdapter.notifyDataSetChanged();
 
-        RecentChatListFragment fragment = new RecentChatListFragment();
+        SecretListFragment fragment = new SecretListFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,

@@ -66,7 +66,7 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.recent_friend_list_fragment, container, false);
+        return inflater.inflate(R.layout.friend_list_fragment_layout, container, false);
     }
 
     @Override

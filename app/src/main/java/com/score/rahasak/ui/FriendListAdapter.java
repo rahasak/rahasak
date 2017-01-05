@@ -25,7 +25,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
     private Typeface typeface;
 
     FriendListAdapter(Context _context, ArrayList<SecretUser> userList) {
-        super(_context, R.layout.single_user_card_row, R.id.user_name, userList);
+        super(_context, R.layout.friend_list_row_layout, R.id.user_name, userList);
         context = _context;
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
@@ -50,7 +50,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         if (view == null) {
             //inflate sensor list row layout
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = layoutInflater.inflate(R.layout.single_user_card_row, viewGroup, false);
+            view = layoutInflater.inflate(R.layout.friend_list_row_layout, viewGroup, false);
 
             //create view holder to store reference to child views
             holder = new ViewHolder();

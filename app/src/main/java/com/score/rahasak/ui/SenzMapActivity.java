@@ -60,7 +60,7 @@ public class SenzMapActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.senz_map_layout);
+        setContentView(R.layout.secret_list_fragment_layout);
 
         initLoc();
         initExtra();
