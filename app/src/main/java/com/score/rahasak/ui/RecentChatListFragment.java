@@ -32,9 +32,7 @@ import com.score.senzc.pojos.Senz;
 
 import java.util.ArrayList;
 
-/**
- * Created by lakmalcaldera on 8/19/16.
- */
+
 public class RecentChatListFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final String TAG = RecentChatListFragment.class.getName();
@@ -216,7 +214,7 @@ public class RecentChatListFragment extends ListFragment implements AdapterView.
                 adapter.notifyDataSetChanged();
 
                 // delete from db
-                new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser(secret.getUser());
+                new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser(secret.getUser().getUsername());
 
                 actionBarDelete.setVisibility(View.GONE);
                 //actionBarName.setVisibility(View.VISIBLE);

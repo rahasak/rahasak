@@ -18,6 +18,7 @@ public class SecretUser extends User implements Parcelable {
     private Permission recvPermission;
     private boolean isSMSRequester;
     private boolean isActive;
+    private boolean selected;
 
     public SecretUser(String id, String username) {
         super(id, username);
@@ -159,5 +160,13 @@ public class SecretUser extends User implements Parcelable {
 
     public void setSessionKey(String sessionKey) {
         this.sessionKey = sessionKey;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

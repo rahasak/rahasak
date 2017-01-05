@@ -11,7 +11,6 @@ import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Permission;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
-import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 
@@ -144,6 +143,9 @@ public class SenzorsDbSource {
         db.delete(SenzorsDbContract.User.TABLE_NAME,
                 SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
                 new String[]{username});
+
+        // delete all secrets belongs to user
+        deleteAllSecretsThatBelongToUser(username);
     }
 
     public SecretUser getSecretUser(String username) {
@@ -565,13 +567,13 @@ public class SenzorsDbSource {
         db.delete(SenzorsDbContract.Secret.TABLE_NAME, sqlDelete, null);
     }
 
-    public void deleteAllSecretsThatBelongToUser(User user) {
+    public void deleteAllSecretsThatBelongToUser(String username) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // delete senz of given user
         db.delete(SenzorsDbContract.Secret.TABLE_NAME,
                 SenzorsDbContract.Secret.COLUMN_NAME_USER + " = ?",
-                new String[]{user.getUsername()});
+                new String[]{username});
     }
 
     /**

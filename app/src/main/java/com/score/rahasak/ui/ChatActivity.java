@@ -304,11 +304,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void refreshSecretList() {
         if (!secretList.isEmpty()) {
             ArrayList<Secret> tmpList = dbSource.getSecrets(secretUser, secretList.getYongest().getTimeStamp());
-            if (tmpList.size() > 0 && secretList.size() >= 7) {
+            if (tmpList.size() > 0) {
                 // delete secrets from top
                 for (Secret secret : tmpList) {
                     secretList.add(secret);
-                    deleteSecret(0, secretList.get(0));
+                    if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
                 }
                 secretAdapter.notifyDataSetChanged();
 
@@ -551,7 +551,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             // add and delete
             addSecret(secret);
-            deleteSecret(0, secretList.get(0));
+            if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
         }
     }
 
@@ -580,7 +580,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 // add and delete
                 addSecret(secret);
-                deleteSecret(0, secretList.get(0));
+                if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
             }
         }
     }

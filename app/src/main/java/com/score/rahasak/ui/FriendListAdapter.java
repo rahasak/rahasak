@@ -19,9 +19,7 @@ import com.score.rahasak.utils.PhoneBookUtil;
 
 import java.util.ArrayList;
 
-/**
- * Created by Lakmal on 8/6/16.
- */
+
 class FriendListAdapter extends ArrayAdapter<SecretUser> {
     Context context;
     private Typeface typeface;
@@ -57,6 +55,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             //create view holder to store reference to child views
             holder = new ViewHolder();
             holder.userImageView = (RoundedImageView) view.findViewById(R.id.user_image);
+            holder.selected = (ImageView) view.findViewById(R.id.selected);
             holder.usernameView = (TextView) view.findViewById(R.id.user_name);
             holder.phoneBookNameView = (TextView) view.findViewById(R.id.user_name_from_contacts);
             holder.userLocationPermView = (ImageView) view.findViewById(R.id.perm_locations);
@@ -123,6 +122,13 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
             viewHolder.userCameraPermView.setVisibility(View.GONE);
             viewHolder.userLocationPermView.setVisibility(View.GONE);
         }
+
+        // selected
+        if (secretUser.isSelected()) {
+            viewHolder.selected.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.selected.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -130,6 +136,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
      */
     static class ViewHolder {
         RoundedImageView userImageView;
+        ImageView selected;
         TextView usernameView;
         TextView phoneBookNameView;
         ImageView userCameraPermView;

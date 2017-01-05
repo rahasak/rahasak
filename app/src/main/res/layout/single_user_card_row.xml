@@ -7,9 +7,10 @@
     android:baselineAligned="false"
     android:orientation="horizontal">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="80dp"
-        android:layout_height="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="center_vertical"
         android:padding="10dp">
 
         <com.github.siyamed.shapeimageview.RoundedImageView
@@ -25,7 +26,16 @@
             app:siRadius="8dp"
             app:siSquare="true" />
 
-    </FrameLayout>
+        <ImageView
+            android:id="@+id/selected"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="7dp"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/check_c" />
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="0dp"
@@ -94,10 +104,10 @@
                     android:id="@+id/perm_camera"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:layout_toLeftOf="@+id/perm_mic"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
+                    android:layout_toLeftOf="@+id/perm_mic"
                     android:adjustViewBounds="true"
                     android:src="@drawable/perm_camera_active" />
 
@@ -106,7 +116,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@drawable/bottom_border"></FrameLayout>
+                android:background="@drawable/bottom_border" />
 
         </LinearLayout>
     </FrameLayout>

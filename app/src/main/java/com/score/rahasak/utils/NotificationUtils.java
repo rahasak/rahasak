@@ -34,22 +34,16 @@ public class NotificationUtils {
     }
 
     public static SenzNotification getUserConfirmNotification(String user) {
-        return new SenzNotification(R.drawable.notification_icon,  user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.notification_icon, user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getSecretNotification(String title, String user, String message) {
         return new SenzNotification(R.drawable.notification_icon, title, message, user, NotificationType.NEW_SECRET);
     }
 
-    public static SenzNotification getStreamNotification(String user, boolean isCam) {
-        String msg;
-        if (isCam) {
-            msg = "New selfie secret received";
-        } else {
-            msg = "New voice secret received";
-        }
-
-        return new SenzNotification(R.drawable.notification_icon, "@" + user, msg, user, NotificationType.NEW_SECRET);
+    public static SenzNotification getStreamNotification(String title, String user) {
+        String msg = "New selfie secret received";
+        return new SenzNotification(R.drawable.notification_icon, title, msg, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getSmsNotification(String contactName, String contactPhone, String rahasakUsername) {

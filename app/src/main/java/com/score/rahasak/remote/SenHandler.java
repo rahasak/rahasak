@@ -309,9 +309,18 @@ class SenHandler {
                 Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
                 broadcastSenz(streamSenz, senzService.getApplicationContext());
 
+                // notification user
+                String username = senz.getSender().getUsername();
+                SecretUser secretUser = new SenzorsDbSource(senzService.getApplicationContext()).getSecretUser(username);
+                String notificationUser = secretUser.getUsername();
+                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
+                    notificationUser = contactName + "(@" + username + ")";
+                }
+
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getStreamNotification(senz.getSender().getUsername(), senz.getAttributes().containsKey("cam")));
+                        NotificationUtils.getStreamNotification(notificationUser, username));
             }
         } else {
             // middle stream
