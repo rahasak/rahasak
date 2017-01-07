@@ -41,9 +41,8 @@ public class NotificationUtils {
         return new SenzNotification(R.drawable.notification_icon, title, message, user, NotificationType.NEW_SECRET);
     }
 
-    public static SenzNotification getStreamNotification(String title, String user) {
-        String msg = "New selfie secret received";
-        return new SenzNotification(R.drawable.notification_icon, title, msg, user, NotificationType.NEW_SECRET);
+    public static SenzNotification getStreamNotification(String title, String message, String user) {
+        return new SenzNotification(R.drawable.notification_icon, title, message, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getSmsNotification(String contactName, String contactPhone, String rahasakUsername) {

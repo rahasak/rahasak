@@ -36,9 +36,9 @@ import com.score.senzc.pojos.Senz;
 /**
  * Senz map activity
  */
-public class SenzMapActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = SenzMapActivity.class.getName();
+    private static final String TAG = MapActivity.class.getName();
 
     private ImageView btnBack;
 

@@ -587,7 +587,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void onLocationReceived(Senz senz) {
         // start map activity
-        Intent mapIntent = new Intent(this, SenzMapActivity.class);
+        Intent mapIntent = new Intent(this, MapActivity.class);
         mapIntent.putExtra("SENZ", senz);
         startActivity(mapIntent);
     }

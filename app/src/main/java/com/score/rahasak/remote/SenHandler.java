@@ -2,6 +2,7 @@ package com.score.rahasak.remote;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Base64;
 import android.util.Log;
 
 import com.score.rahasak.application.SenzApplication;
@@ -230,7 +231,7 @@ class SenHandler {
                 }
 
                 Long timestamp = (System.currentTimeMillis() / 1000);
-                saveSecret(timestamp, senz.getAttributes().get("uid"), rahasa, BlobType.TEXT, senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), rahasa, BlobType.TEXT, senz.getSender(), false, senzService.getApplicationContext());
                 senz.getAttributes().put("time", timestamp.toString());
                 senz.getAttributes().put("msg", rahasa);
                 broadcastSenz(senz, senzService.getApplicationContext());
@@ -277,6 +278,29 @@ class SenHandler {
             }
         } else if (senz.getAttributes().containsKey("mic")) {
             broadcastSenz(senz, senzService.getApplicationContext());
+        } else if (senz.getAttributes().containsKey("senz")) {
+            String senzMsg = new String(Base64.decode(senz.getAttributes().get("senz"), Base64.DEFAULT));
+            Senz innerSenz = SenzParser.parse(senzMsg);
+
+            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), innerSenz.getAttributes().get("uid"), "DELIVERED"));
+            if (innerSenz.getAttributes().containsKey("cam")) {
+                // selfie mis
+                Long timestamp = (System.currentTimeMillis() / 1000);
+                saveSecret(timestamp, innerSenz.getAttributes().get("uid"), "", BlobType.IMAGE, innerSenz.getSender(), true, senzService.getApplicationContext());
+
+                // notification user
+                String username = innerSenz.getSender().getUsername();
+                SecretUser secretUser = dbSource.getSecretUser(username);
+                String notificationUser = secretUser.getUsername();
+                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
+                    notificationUser = contactName + "(@" + username + ")";
+                }
+
+                // show notification
+                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                        NotificationUtils.getStreamNotification(notificationUser, "Missed selfie call", username));
+            }
         }
     }
 
@@ -302,7 +326,7 @@ class SenHandler {
                 attributes.put("time", timestamp.toString());
 
                 // save
-                saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), senzService.getApplicationContext());
+                saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), false, senzService.getApplicationContext());
                 String imgName = senz.getAttributes().get("uid") + ".jpg";
                 ImageUtils.saveImg(imgName, stream.getStream());
 
@@ -320,7 +344,7 @@ class SenHandler {
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getStreamNotification(notificationUser, username));
+                        NotificationUtils.getStreamNotification(notificationUser, "Received new selfie", username));
             }
         } else {
             // middle stream
@@ -372,23 +396,31 @@ class SenHandler {
         context.sendBroadcast(intent);
     }
 
-    private void saveSecret(Long timestamp, String uid, String blob, BlobType blobType, User user, final Context context) {
+    private void saveSecret(Long timestamp, String uid, String blob, BlobType blobType, User user, boolean missed, final Context context) {
         // create secret
-        final Secret secret = new Secret(blob, blobType, new SecretUser(user.getId(), user.getUsername()), true);
-        secret.setId(uid);
-        secret.setTimeStamp(timestamp);
-        secret.setMissed(false);
-        secret.setDeliveryState(DeliveryState.NONE);
-        new SenzorsDbSource(context).createSecret(secret);
+        try {
+            final Secret secret = new Secret(blob, blobType, new SecretUser(user.getId(), user.getUsername()), true);
+            secret.setId(uid);
+            secret.setTimeStamp(timestamp);
+            secret.setMissed(missed);
+            secret.setDeliveryState(DeliveryState.NONE);
+            new SenzorsDbSource(context).createSecret(secret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateStatus(Senz senz, final Context context) {
-        final String uid = senz.getAttributes().get("uid");
-        String status = senz.getAttributes().get("status");
-        if (status.equalsIgnoreCase("DELIVERED")) {
-            new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
-        } else if (status.equalsIgnoreCase("RECEIVED")) {
-            new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.RECEIVED, uid);
+        try {
+            final String uid = senz.getAttributes().get("uid");
+            String status = senz.getAttributes().get("status");
+            if (status.equalsIgnoreCase("DELIVERED")) {
+                new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
+            } else if (status.equalsIgnoreCase("RECEIVED")) {
+                new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.RECEIVED, uid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

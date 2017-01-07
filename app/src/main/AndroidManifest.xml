@@ -90,7 +90,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.score.rahasak.ui.SenzMapActivity"
+            android:name="com.score.rahasak.ui.MapActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="stateHidden" />
