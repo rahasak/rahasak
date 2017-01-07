@@ -41,6 +41,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private ImageView userImageView;
     private ImageView getPicImageView;
 
+    private TextView info;
     private TextView camText;
     private TextView locText;
 
@@ -140,9 +141,11 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
+        info = (TextView) findViewById(R.id.info);
         camText = (TextView) findViewById(R.id.perm_cam_text);
         locText = (TextView) findViewById(R.id.perm_loc_text);
 
+        info.setTypeface(typeface);
         camText.setTypeface(typeface);
         locText.setTypeface(typeface);
 

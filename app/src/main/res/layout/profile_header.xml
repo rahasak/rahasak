@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/back_btn"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="?android:attr/actionBarSize"
+        android:layout_height="?android:attr/actionBarSize"
         android:padding="15dp"
         android:src="@drawable/back" />
 
