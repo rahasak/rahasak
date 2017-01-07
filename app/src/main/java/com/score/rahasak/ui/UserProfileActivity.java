@@ -282,9 +282,9 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     }
 
     private void resetPermission() {
-        if (selectedPermission.equalsIgnoreCase("CAM")) {
+        if (selectedPermission != null && selectedPermission.equalsIgnoreCase("CAM")) {
             cameraSwitch.setChecked(secretUser.getGivenPermission().isCam());
-        } else if (selectedPermission.equalsIgnoreCase("LOC")) {
+        } else if (selectedPermission != null && selectedPermission.equalsIgnoreCase("LOC")) {
             locationSwitch.setChecked(secretUser.getGivenPermission().isLoc());
         }
     }

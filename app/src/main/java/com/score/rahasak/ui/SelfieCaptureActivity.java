@@ -77,14 +77,14 @@ public class SelfieCaptureActivity extends BaseActivity {
         // init activity
         initUi();
         initUser();
-        startVibrations();
+        VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
         startTimerToEndRequest();
         startCameraIfMissedCall();
     }
 
     private void startCameraIfMissedCall() {
         if (getIntent().hasExtra("CAM_MIS")) {
-            stopVibrations();
+            VibrationUtils.stopVibration(this);
             cancelTimerToServe();
             startQuickCountdownToPhoto();
             isPhotoTaken = true;
@@ -123,7 +123,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         super.onDestroy();
 
         clearFlags();
-        stopVibrations();
+        VibrationUtils.stopVibration(this);
         releaseCamera();
     }
 
@@ -155,7 +155,7 @@ public class SelfieCaptureActivity extends BaseActivity {
                     isPhotoCancelled = true;
                     cancelTimerToServe();
                     sendBusySenz();
-                    stopVibrations();
+                    VibrationUtils.stopVibration(SelfieCaptureActivity.this);
                     saveMissedSelfie();
                     SelfieCaptureActivity.this.finish();
                 }
@@ -165,7 +165,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopVibrations();
+                VibrationUtils.stopVibration(SelfieCaptureActivity.this);
                 if (!isPhotoTaken) {
                     cancelTimerToServe();
                     startQuickCountdownToPhoto();
@@ -220,14 +220,6 @@ public class SelfieCaptureActivity extends BaseActivity {
             Log.d(TAG, "Stopping preview in SurfaceDestroyed().");
             mCamera.release();
         }
-    }
-
-    private void startVibrations() {
-        VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
-    }
-
-    private void stopVibrations() {
-        VibrationUtils.stopVibration(this);
     }
 
     private void startQuickCountdownToPhoto() {
