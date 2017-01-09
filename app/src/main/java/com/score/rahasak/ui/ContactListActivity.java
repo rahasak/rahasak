@@ -24,6 +24,7 @@ import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IContactReaderListener;
 import com.score.rahasak.pojo.Contact;
 import com.score.rahasak.utils.ActivityUtils;
+import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 
 import java.util.ArrayList;
@@ -134,10 +135,14 @@ public class ContactListActivity extends BaseActivity implements IContactReaderL
                 displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String message = "#Rahasak #request\nI'm using Rahasak app(http://play.google.com/store/apps/details?id=com.score.rahasak) #username " + username + " #code 41r33";
-                        sendSMS(contact.getPhoneNo(), message);
+                        if(NetworkUtil.isAvailableNetwork(ContactListActivity.this)) {
+                            String message = "#Rahasak #request\nI'm using Rahasak app(http://play.google.com/store/apps/details?id=com.score.rahasak) #username " + username + " #code 41r33";
+                            sendSMS(contact.getPhoneNo(), message);
 
-                        ActivityUtils.showCustomToastShort("Request sent via SMS", ContactListActivity.this);
+                            ActivityUtils.showCustomToastShort("Request sent via SMS", ContactListActivity.this);
+                        } else {
+                            ActivityUtils.showCustomToastShort("No network connection", ContactListActivity.this);
+                        }
                     }
                 });
             } catch (NoUserException ex) {

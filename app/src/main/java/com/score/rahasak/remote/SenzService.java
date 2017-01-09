@@ -13,6 +13,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.db.SenzorsDbSource;
@@ -107,15 +108,19 @@ public class SenzService extends Service {
         public void onReceive(Context context, Intent intent) {
             NotificationUtils.cancelNotification(NotificationUtils.SMS_NOTIFICATION_ID, SenzService.this);
 
-            String phone = intent.getStringExtra("PHONE").trim();
-            String username = intent.getStringExtra("USERNAME").trim();
-            try {
-                sendSMS(phone, "#Rahasak #confirm\nI have confirmed your request. #username " + PreferenceUtils.getUser(SenzService.this).getUsername() + " #code 31e3e");
+            if (NetworkUtil.isAvailableNetwork(context)) {
+                String phone = intent.getStringExtra("PHONE").trim();
+                String username = intent.getStringExtra("USERNAME").trim();
+                try {
+                    sendSMS(phone, "#Rahasak #confirm\nI have confirmed your request. #username " + PreferenceUtils.getUser(SenzService.this).getUsername() + " #code 31e3e");
 
-                // get pubkey
-                requestPubKey(username);
-            } catch (NoUserException e) {
-                e.printStackTrace();
+                    // get pubkey
+                    requestPubKey(username);
+                } catch (NoUserException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(context, "No network connection", Toast.LENGTH_LONG).show();
             }
         }
     };
