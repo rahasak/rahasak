@@ -2,7 +2,7 @@ package com.score.rahasak.utils;
 
 import android.util.Log;
 
-public class Exif {
+class Exif {
     private static final String TAG = "CameraExif";
 
     // Returns the degrees in clockwise. Values are 0, 90, 180, or 270.
