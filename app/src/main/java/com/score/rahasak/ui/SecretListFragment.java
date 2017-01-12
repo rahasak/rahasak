@@ -61,7 +61,7 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.last_item_chat_list_fragment, container, false);
+        return inflater.inflate(R.layout.secret_list_fragment_layout, container, false);
     }
 
     @Override

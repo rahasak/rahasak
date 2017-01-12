@@ -60,7 +60,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.secret_list_fragment_layout);
+        setContentView(R.layout.map_avtivity_layout);
 
         initLoc();
         initExtra();
