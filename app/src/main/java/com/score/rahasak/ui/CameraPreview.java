@@ -1,8 +1,9 @@
 package com.score.rahasak.ui;
 
-import android.content.Context;
+import android.app.Activity;
 import android.hardware.Camera;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -13,19 +14,77 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private static final String TAG = CameraPreview.class.getName();
 
-    SurfaceHolder mSurfaceHolder;
-    Camera mCamera;
-    private static boolean isCameraBusy;
+    private Activity activity;
+    private Camera camera;
+    private int camId;
 
-    //Constructor that obtains context and camera
-    public CameraPreview(Context context, Camera camera) {
-        super(context);
+    private SurfaceHolder surfaceHolder;
 
-        this.mCamera = camera;
-        this.mSurfaceHolder = this.getHolder();
-        this.mSurfaceHolder.addCallback(this);
-        this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        isCameraBusy = true;
+    public CameraPreview(Activity activity, Camera camera, int camId) {
+        super(activity);
+
+        this.activity = activity;
+        this.camera = camera;
+        this.camId = camId;
+
+        this.surfaceHolder = this.getHolder();
+        this.surfaceHolder.addCallback(this);
+        this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        try {
+            camera.setPreviewDisplay(surfaceHolder);
+            setCameraDisplayOrientation(activity, camId, camera);
+
+            camera.startPreview();
+        } catch (IOException e) {
+            // left blank for now
+            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+    }
+
+    public static void setCameraDisplayOrientation(Activity activity, int camId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(camId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            // front facing
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;
+        } else {
+            // back facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+
+        camera.setDisplayOrientation(result);
     }
 
     /**
@@ -67,33 +126,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 
         return optimalSize;
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        Camera.Parameters parameters = mCamera.getParameters();
-        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-        parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
-        mCamera.setParameters(parameters);
-        try {
-            mCamera.setPreviewDisplay(surfaceHolder);
-            mCamera.setDisplayOrientation(90);
-
-            mCamera.startPreview();
-        } catch (IOException e) {
-            // left blank for now
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        isCameraBusy = false;
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int format,
-                               int width, int height) {
     }
 
 }

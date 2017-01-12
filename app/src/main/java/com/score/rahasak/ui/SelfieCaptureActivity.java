@@ -43,11 +43,11 @@ public class SelfieCaptureActivity extends BaseActivity {
     private ImageView selfieImage;
 
     // camera related variables
-    private Camera mCamera;
-    private CameraPreview mCameraPreview;
+    private Camera camera;
+    private CameraPreview cameraPreview;
     private boolean isPhotoTaken;
     private boolean isPhotoCancelled;
-    private boolean isFrontCam;
+    private int camId;
 
     // UI elements
     private View callingUserInfo;
@@ -70,11 +70,11 @@ public class SelfieCaptureActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.selfie_capture_activity_layout);
 
-        //init camera
+        // init camera with front
         initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        initFlags();
 
         // init activity
+        initFlags();
         initUi();
         initUser();
         VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
@@ -178,7 +178,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         rotateCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFrontCam)
+                if (camId == Camera.CameraInfo.CAMERA_FACING_FRONT)
                     initCameraPreview(Camera.CameraInfo.CAMERA_FACING_BACK);
                 else
                     initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
@@ -216,9 +216,9 @@ public class SelfieCaptureActivity extends BaseActivity {
     }
 
     private void releaseCamera() {
-        if (mCamera != null) {
+        if (camera != null) {
             Log.d(TAG, "Stopping preview in SurfaceDestroyed().");
-            mCamera.release();
+            camera.release();
         }
     }
 
@@ -244,30 +244,26 @@ public class SelfieCaptureActivity extends BaseActivity {
      * @return
      */
     private void initCameraPreview(int camFace) {
-        if (mCameraPreview != null) {
-            mCameraPreview.surfaceDestroyed(mCameraPreview.getHolder());
-            mCameraPreview.getHolder().removeCallback(mCameraPreview);
-            mCameraPreview.destroyDrawingCache();
+        camId = camFace;
+        if (cameraPreview != null) {
+            cameraPreview.surfaceDestroyed(cameraPreview.getHolder());
+            cameraPreview.getHolder().removeCallback(cameraPreview);
+            cameraPreview.destroyDrawingCache();
+
             FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
-            preview.removeView(mCameraPreview);
-            mCameraPreview.mCamera = null;
-            mCameraPreview = null;
+            preview.removeView(cameraPreview);
 
-            mCamera.stopPreview();
-            mCamera.release();
-            mCamera = null;
+            camera.stopPreview();
+            camera.release();
         }
-
-        // cam face
-        isFrontCam = camFace == Camera.CameraInfo.CAMERA_FACING_FRONT;
 
         // render new preview
         try {
-            mCamera = Camera.open(camFace);
-            mCameraPreview = new CameraPreview(this, mCamera);
+            camera = Camera.open(camFace);
+            cameraPreview = new CameraPreview(this, camera, camFace);
 
             FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
-            preview.addView(mCameraPreview);
+            preview.addView(cameraPreview);
         } catch (Exception e) {
             // cannot get camera or does not exist
             e.printStackTrace();
@@ -278,10 +274,10 @@ public class SelfieCaptureActivity extends BaseActivity {
     private void takePhoto() {
         quickCountdownText.setVisibility(View.INVISIBLE);
         AudioUtils.shootSound(this);
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
+        camera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                byte[] resizedImage = ImageUtils.compressImage(bytes);
+                byte[] resizedImage = ImageUtils.compressImage(bytes, camId);
                 Log.d(TAG, "Compressed size: " + resizedImage.length / 1024);
 
                 sendPhotoSenz(resizedImage, SelfieCaptureActivity.this);

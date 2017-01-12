@@ -21,7 +21,7 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    public static byte[] compressImage(byte[] data) {
+    public static byte[] compressImage(byte[] data, int camId) {
         Bitmap scaledBitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
 
@@ -95,7 +95,9 @@ public class ImageUtils {
         Matrix matrix = new Matrix();
         int orientation = Exif.getOrientation(data);
         if (orientation == 0) {
-            matrix.postRotate(-90);
+            // rotate based on camera id(front/back)
+            if (camId == 0) matrix.postRotate(90);
+            else matrix.postRotate(-90);
         } else {
             matrix.postRotate(orientation);
         }
