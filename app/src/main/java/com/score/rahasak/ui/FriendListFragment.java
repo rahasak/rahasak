@@ -28,6 +28,7 @@ import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.ActivityUtils;
+import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -143,11 +144,15 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
                         public void onClick(View v) {
                             // start getting public key and sending confirmation sms
                             // broadcast
-                            Intent intent = new Intent(IntentProvider.ACTION_SMS_REQUEST_ACCEPT);
-                            intent.putExtra("USERNAME", secretUser.getUsername());
-                            intent.putExtra("PHONE", secretUser.getPhone());
-                            getActivity().sendBroadcast(intent);
-                            ActivityUtils.showCustomToast("Confirmation sent", getActivity());
+                            if (NetworkUtil.isAvailableNetwork(getActivity())) {
+                                Intent intent = new Intent(IntentProvider.ACTION_SMS_REQUEST_ACCEPT);
+                                intent.putExtra("USERNAME", secretUser.getUsername());
+                                intent.putExtra("PHONE", secretUser.getPhone());
+                                getActivity().sendBroadcast(intent);
+                                ActivityUtils.showCustomToast("Confirmation sent", getActivity());
+                            } else {
+                                ActivityUtils.showCustomToastShort("No network connection", getActivity());
+                            }
                         }
                     });
                 }
