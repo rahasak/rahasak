@@ -88,11 +88,12 @@ public class SmsReceiver extends BroadcastReceiver {
         String username = getUsernameFromSms(smsMessage.getMessageBody());
         String pubKeyHash = getKeyHashFromSms(smsMessage.getMessageBody());
 
-        // create user
         SenzorsDbSource dbSource = new SenzorsDbSource(context);
-        if (dbSource.isExistingUserWithPhoneNo(contactNo)) {
-            // delete existing user
-            dbSource.deleteSecretUser(username);
+
+        // delete existing user
+        SecretUser existingUser = dbSource.getExistingUserWithPhoneNo(contactNo);
+        if (existingUser != null) {
+            dbSource.deleteSecretUser(existingUser.getUsername());
         }
 
         // create user

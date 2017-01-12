@@ -63,6 +63,36 @@ public class SenzorsDbSource {
         return cursor.moveToFirst();
     }
 
+    public SecretUser getExistingUserWithPhoneNo(String phoneNo) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+                null, // columns
+                SenzorsDbContract.User.COLUMN_NAME_PHONE + " = ?", // constraint
+                new String[]{phoneNo}, // prams
+                null, // order by
+                null, // group by
+                null); // join
+
+        if (cursor.moveToFirst()) {
+            // have matching user
+            // so get user data
+            // we return id as password since we no storing users password in database
+            String _userID = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+
+            // clear
+            cursor.close();
+
+            SecretUser secretUser = new SecretUser(_userID, _username);
+            secretUser.setPhone(phoneNo);
+
+            return secretUser;
+        }
+
+        return null;
+    }
+
     public void createSecretUser(SecretUser secretUser) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
