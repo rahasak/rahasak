@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
+import com.score.rahasak.utils.OpusEncoder;
 import com.score.rahasak.utils.RSAUtils;
 
 import java.io.IOException;
@@ -17,8 +18,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import javax.crypto.SecretKey;
-
-import io.kvh.media.amr.AmrEncoder;
 
 public class StreamRecorder {
 
@@ -54,7 +53,8 @@ public class StreamRecorder {
         private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
         private AudioRecord audioRecorder;
-        private int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
+        private int bufSize = 320 * (Short.SIZE / Byte.SIZE);
+        private int minBufSize = 2 * AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
 
         boolean recording = true;
 
@@ -76,17 +76,21 @@ public class StreamRecorder {
         }
 
         private void record() {
-            AmrEncoder.init(0);
-            int mode = AmrEncoder.Mode.MR67.ordinal();
+            //AmrEncoder.init(0);
+            //int mode = AmrEncoder.Mode.MR67.ordinal();
+
+            OpusEncoder encoder = new OpusEncoder();
+            encoder.init(AudioUtils.RECORDER_SAMPLE_RATE, 1, 320);
 
             int encoded;
-            short[] inBuf = new short[160];
-            byte[] outBuf = new byte[32];
+            short[] inBuf = new short[bufSize];
+            byte[] outBuf = new byte[64];
             while (recording) {
                 // read to buffer
                 // encode with codec
                 audioRecorder.read(inBuf, 0, inBuf.length);
-                encoded = AmrEncoder.encode(mode, inBuf, outBuf);
+                //encoded = AmrEncoder.encode(mode, inBuf, outBuf);
+                encoded = encoder.encode(inBuf, outBuf);
 
                 try {
                     // encrypt
@@ -101,7 +105,7 @@ public class StreamRecorder {
                 }
             }
 
-            AmrEncoder.exit();
+            //AmrEncoder.exit();
         }
 
         void shutDown() {
