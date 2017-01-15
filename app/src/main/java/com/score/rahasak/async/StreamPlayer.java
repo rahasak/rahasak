@@ -9,13 +9,14 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
-import com.score.rahasak.utils.OpusDecoder;
 import com.score.rahasak.utils.RSAUtils;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 import javax.crypto.SecretKey;
+
+import io.kvh.media.amr.AmrDecoder;
 
 public class StreamPlayer {
 
@@ -51,7 +52,7 @@ public class StreamPlayer {
 
     private class Player extends Thread {
         private AudioTrack streamTrack;
-        private int minBufSize = 320 * AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        private int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         private boolean playing = true;
 
@@ -74,14 +75,11 @@ public class StreamPlayer {
         }
 
         private void play() {
-            //long state = AmrDecoder.init();
-            OpusDecoder decoder = new OpusDecoder();
-            decoder.init(AudioUtils.RECORDER_SAMPLE_RATE, 1, 320);
+            long state = AmrDecoder.init();
 
             try {
-                short[] pcmframs = new short[512];
-                byte[] message = new byte[512];
-                int decoded;
+                short[] pcmframs = new short[160];
+                byte[] message = new byte[64];
                 while (true) {
                     // listen for senz
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
@@ -92,26 +90,20 @@ public class StreamPlayer {
                     // parser and obtain audio data
                     // play it
                     if (!msg.isEmpty()) {
-                        //Senz senz = SenzParser.parse(msg);
-                        //if (senz.getAttributes().containsKey("mic")) {
-                        //    String data = senz.getAttributes().get("mic");
-
                         // base64 decode
                         // decrypt
                         byte[] stream = RSAUtils.decrypt(key, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
-                        //AmrDecoder.decode(state, stream, pcmframs);
-                        decoded = decoder.decode(stream, pcmframs);
-                        streamTrack.write(pcmframs, 0, decoded);
-                        //}
+                        AmrDecoder.decode(state, stream, pcmframs);
+                        streamTrack.write(pcmframs, 0, pcmframs.length);
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            //AmrDecoder.exit(state);
+            AmrDecoder.exit(state);
         }
 
         void shutDown() {

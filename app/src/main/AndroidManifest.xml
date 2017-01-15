@@ -114,7 +114,7 @@
             android:name="com.score.rahasak.ui.RegistrationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name="com.score.rahasak.ui.SelfieCaptureActivity"
             android:launchMode="singleTask"

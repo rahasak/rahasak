@@ -12,12 +12,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.InvalidInputFieldsException;
 import com.score.rahasak.utils.ActivityUtils;
+import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.RSAUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -122,7 +124,11 @@ public class RegistrationActivity extends BaseActivity {
         registerBtn.setTypeface(typefaceThin, Typeface.BOLD);
         registerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                onClickRegister();
+                if (NetworkUtil.isAvailableNetwork(RegistrationActivity.this)) {
+                    onClickRegister();
+                } else {
+                    Toast.makeText(RegistrationActivity.this, "No internet connection", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
