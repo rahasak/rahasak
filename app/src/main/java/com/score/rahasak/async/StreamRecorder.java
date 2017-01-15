@@ -54,7 +54,6 @@ public class StreamRecorder {
         private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
         private AudioRecord audioRecorder;
-        //private int bufSize = 320 * (Short.SIZE / Byte.SIZE);
         private int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
 
         boolean recording = true;
