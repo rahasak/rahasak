@@ -22,6 +22,7 @@ public class IntentProvider {
     public static final String ACTION_SMS_REQUEST_CONFIRM = "com.score.rahasak.SMS_REQUEST_CONFIRM";
     public static final String ACTION_RESTART = "com.score.rahasak.RESTART";
     public static final String ACTION_CONNECTED = "com.score.rahasak.CONNECTED";
+    private static final String ACTION_PHONE_STATE = "android.intent.action.PHONE_STATE";
 
     /**
      * Return the intent filter for the intent_type.
@@ -60,6 +61,8 @@ public class IntentProvider {
                 return ACTION_SMS_REQUEST_CONFIRM;
             case CONNECTED:
                 return ACTION_CONNECTED;
+            case PHONE_STATE:
+                return ACTION_PHONE_STATE;
             default:
                 throw new InvalidIntentType();
         }

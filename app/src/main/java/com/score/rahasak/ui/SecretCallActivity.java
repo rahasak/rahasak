@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -127,6 +128,21 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         }
     };
 
+    private BroadcastReceiver callReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+
+            if (state.equalsIgnoreCase(TelephonyManager.EXTRA_STATE_RINGING)) {
+                // incoming call
+                // stop call here
+                Log.d(TAG, "Incoming call----");
+                endCall();
+                SecretCallActivity.this.finish();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,6 +187,8 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     protected void onResume() {
         super.onResume();
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
+        registerReceiver(callReceiver, IntentProvider.getIntentFilter(IntentType.PHONE_STATE));
+
         sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -178,13 +196,9 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     protected void onPause() {
         super.onPause();
         unregisterReceiver(senzReceiver);
+        unregisterReceiver(callReceiver);
+
         sensorManager.unregisterListener(this);
-
-        if (streamRecorder != null)
-            streamRecorder.stop();
-
-        if (streamPlayer != null)
-            streamPlayer.stop();
     }
 
     @Override
