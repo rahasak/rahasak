@@ -201,6 +201,12 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         super.onPause();
         unregisterReceiver(senzReceiver);
         sensorManager.unregisterListener(this);
+
+        if (streamRecorder != null)
+            streamRecorder.stop();
+
+        if (streamPlayer != null)
+            streamPlayer.stop();
     }
 
     @Override

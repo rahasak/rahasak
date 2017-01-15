@@ -109,11 +109,15 @@ public class StreamPlayer {
         void shutDown() {
             playing = false;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                streamTrack.pause();
-                streamTrack.flush();
-            } else {
-                streamTrack.stop();
+            if (streamTrack != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    streamTrack.pause();
+                    streamTrack.flush();
+                } else {
+                    streamTrack.stop();
+                }
+
+                streamTrack = null;
             }
         }
     }

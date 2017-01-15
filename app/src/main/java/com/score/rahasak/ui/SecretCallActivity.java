@@ -179,6 +179,12 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         super.onPause();
         unregisterReceiver(senzReceiver);
         sensorManager.unregisterListener(this);
+
+        if (streamRecorder != null)
+            streamRecorder.stop();
+
+        if (streamPlayer != null)
+            streamPlayer.stop();
     }
 
     @Override
