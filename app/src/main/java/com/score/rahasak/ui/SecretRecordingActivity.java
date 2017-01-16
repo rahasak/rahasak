@@ -202,9 +202,9 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         unregisterReceiver(senzReceiver);
         sensorManager.unregisterListener(this);
 
-        // stop recorder and player
         if (streamRecorder != null)
             streamRecorder.stop();
+
         if (streamPlayer != null)
             streamPlayer.stop();
     }
@@ -344,12 +344,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         // connect to UDP
         initUdpSoc();
         initUdpConn();
-
-        // create recorder and player
-        if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key);
-        if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this, socket, key);
     }
 
     private void initUdpSoc() {
@@ -430,8 +424,13 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         sendSenz(senz);
 
         // start recorder
-        // start player
+        if (streamRecorder == null)
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key);
         streamRecorder.start();
+
+        // start player
+        if (streamPlayer == null)
+            streamPlayer = new StreamPlayer(this, socket, key);
         streamPlayer.play();
     }
 

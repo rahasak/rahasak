@@ -56,25 +56,25 @@ public class StreamPlayer {
 
         private boolean playing = true;
 
-        Player() {
+        @Override
+        public void run() {
+            if (playing) {
+                startPlay();
+                play();
+            }
+        }
+
+        private void startPlay() {
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize,
                     AudioTrack.MODE_STREAM);
-        }
-
-        @Override
-        public void run() {
-            if (playing) {
-                play();
-            }
+            streamTrack.play();
         }
 
         private void play() {
-            streamTrack.play();
-
             long state = AmrDecoder.init();
 
             try {

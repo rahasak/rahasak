@@ -58,25 +58,26 @@ public class StreamRecorder {
 
         boolean recording = true;
 
-        Recorder() {
+        @Override
+        public void run() {
+            if (recording) {
+                startRecord();
+                record();
+            }
+        }
+
+        private void startRecord() {
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     channelConfig,
                     audioFormat,
                     minBufSize * 10);
-        }
-
-        @Override
-        public void run() {
-            if (recording) {
-                record();
-            }
+            audioRecorder.startRecording();
         }
 
         private void record() {
-            audioRecorder.startRecording();
             AmrEncoder.init(0);
-            int mode = AmrEncoder.Mode.MR67.ordinal();
+            int mode = AmrEncoder.Mode.MR795.ordinal();
 
             int encoded;
             short[] inBuf = new short[160];
