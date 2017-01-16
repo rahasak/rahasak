@@ -12,6 +12,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -97,6 +100,9 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     private StreamRecorder streamRecorder;
     private StreamPlayer streamPlayer;
 
+    // current tone
+    private Ringtone currentRingtone;
+
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -157,6 +163,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         setupWakeLock();
         startVibrations();
         startTimerToEndRequest();
+        initRinging();
         initCall();
     }
 
@@ -283,6 +290,11 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
                 cancelTimerToServe();
                 sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
                 endCall();
+
+                // stop ringing
+                if (currentRingtone != null)
+                    currentRingtone.stop();
+
                 SecretRecordingActivity.this.finish();
             }
         });
@@ -339,6 +351,14 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
     }
+
+    private void initRinging() {
+        Uri uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
+        currentRingtone = RingtoneManager.getRingtone(this, uri);
+
+        currentRingtone.play();
+    }
+
 
     private void initCall() {
         // connect to UDP
@@ -418,6 +438,10 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         rootView.setVisibility(View.GONE);
         callingText.setVisibility(View.VISIBLE);
         endBtn.setVisibility(View.VISIBLE);
+
+        // stop ringing
+        if (currentRingtone != null)
+            currentRingtone.stop();
 
         // send mic on senz back
         Senz senz = SenzUtils.getMicOnSenz(this, secretUser);
