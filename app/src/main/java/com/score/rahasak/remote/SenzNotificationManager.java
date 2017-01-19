@@ -113,15 +113,19 @@ public class SenzNotificationManager {
         acceptIntent.putExtra("PHONE", senzNotification.getSenderPhone());
         acceptIntent.putExtra("USERNAME", senzNotification.getSender());
         acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
         PendingIntent acceptPendingIntent = PendingIntent.getBroadcast(context, 0, acceptIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Setup pending intent for dismiss action
         Intent cancelIntent = new Intent();
         cancelIntent.setAction(IntentProvider.ACTION_SMS_REQUEST_REJECT);
         cancelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
         PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // content intent
+        Intent contentIntent = new Intent(context, DrawerActivity.class);
+        contentIntent.putExtra("SENDER", senzNotification.getSender());
+        contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent contentPendingIntent = PendingIntent.getActivity(context, 0, contentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // build notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -132,7 +136,8 @@ public class SenzNotificationManager {
                 .setSmallIcon(senzNotification.getIcon())
                 .setWhen(System.currentTimeMillis())
                 .addAction(R.drawable.accept, "Accept", acceptPendingIntent)
-                .addAction(R.drawable.reject, "Reject", cancelPendingIntent);
+                .addAction(R.drawable.reject, "Reject", cancelPendingIntent)
+                .setContentIntent(contentPendingIntent);
 
         Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
         builder.setSound(sound);

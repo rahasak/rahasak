@@ -97,8 +97,16 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // create two empty permissions
-        String givenPermId = createPermission(new Permission("id", true));
-        String recvPermId = createPermission(new Permission("id", false));
+        Permission givenPerm = new Permission("id", true);
+        givenPerm.setCam(true);
+        givenPerm.setLoc(true);
+        String givenPermId = createPermission(givenPerm);
+
+        // create recev permission
+        Permission recevPerm = new Permission("id", false);
+        recevPerm.setCam(true);
+        recevPerm.setLoc(true);
+        String recvPermId = createPermission(recevPerm);
 
         // content values to inset
         ContentValues values = new ContentValues();
@@ -279,8 +287,8 @@ public class SenzorsDbSource {
 
         // content values to inset
         ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, 0);
-        values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, permission.isCam() ? 1 : 0);
+        values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, permission.isLoc() ? 1 : 0);
         values.put(SenzorsDbContract.Permission.COLUMN_NAME_IS_GIVEN, permission.isGiven() ? 1 : 0);
 
         // Insert the new row, if fails throw an error
