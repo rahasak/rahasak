@@ -218,33 +218,6 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      * Load my sensor list fragment
      */
     private void loadRahas() {
-        try {
-            String skey = RSAUtils.getSessionKey();
-            SecretKey key = RSAUtils.getSecretKey(skey);
-            String enc = RSAUtils.encrypt(key, skey, "eranga bandara herath");
-            System.out.println(enc + " -------");
-
-            String ori = RSAUtils.decrypt(key, skey, enc);
-            System.out.println(ori + " -------");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-
         titleText.setText("Secrets");
         clearAboutText();
 

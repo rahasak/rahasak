@@ -48,7 +48,6 @@ import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.RSAUtils;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
@@ -60,8 +59,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-
-import javax.crypto.SecretKey;
 
 public class SecretRecordingActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -84,7 +81,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
 
     private User appUser;
     private SecretUser secretUser;
-    private SecretKey key;
 
     private SensorManager sensorManager;
     private Sensor proximitySensor;
@@ -337,8 +333,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         // secret user
         String username = getIntent().getStringExtra("USER");
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
-        if (secretUser.getSessionKey() != null)
-            key = RSAUtils.getSecretKey(secretUser.getSessionKey());
 
         callingUsernameText.setText(PhoneBookUtil.getContactName(this, secretUser.getPhone()));
         if (secretUser.getImage() != null) {
@@ -449,12 +443,12 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
 
         // start recorder
         if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), key);
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
         streamRecorder.start();
 
         // start player
         if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this, socket, key);
+            streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
         streamPlayer.play();
     }
 

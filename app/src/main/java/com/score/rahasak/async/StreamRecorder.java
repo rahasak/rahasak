@@ -25,18 +25,20 @@ public class StreamRecorder {
     private Context context;
     private String from;
     private String to;
-    private SecretKey key;
+    private byte[] salt;
+    private SecretKey secretKey;
 
     private DatagramSocket socket;
     private InetAddress address;
 
     private Recorder recorder;
 
-    public StreamRecorder(Context context, String from, String to, SecretKey key) {
+    public StreamRecorder(Context context, String from, String to, String sessionKey) {
         this.context = context;
         this.from = from;
         this.to = to;
-        this.key = key;
+        this.secretKey = RSAUtils.getSecretKey(sessionKey);
+        this.salt = sessionKey.substring(0, 7).toUpperCase().getBytes();
 
         recorder = new Recorder();
     }
@@ -91,7 +93,7 @@ public class StreamRecorder {
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(key, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(secretKey, salt, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
                     String senz = encodedStream + " @" + to + " ^" + from;
                     Log.d("TAG", senz + " ---");

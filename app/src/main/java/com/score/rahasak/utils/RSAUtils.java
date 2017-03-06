@@ -56,10 +56,6 @@ public class RSAUtils {
         return keyPair;
     }
 
-    static {
-        //Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
-    }
-
     private static void savePublicKey(Context context, KeyPair keyPair) {
         // get public key from keypair
         byte[] keyContent = keyPair.getPublic().getEncoded();
@@ -158,24 +154,6 @@ public class RSAUtils {
         return new SecretKeySpec(key, 0, key.length, "AES");
     }
 
-    public static String encrypt(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
-        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt.substring(0, 7).getBytes("UTF-8")));
-
-        byte[] data = cipher.doFinal(payload.getBytes());
-        System.out.println(payload.getBytes().length + "-------");
-        System.out.println(data.length + "-------");
-        return Base64.encodeToString(data, Base64.DEFAULT);
-    }
-
-    public static String decrypt(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
-        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(salt.substring(0, 7).getBytes("UTF-8")));
-
-        byte[] data = Base64.decode(payload, Base64.DEFAULT);
-        return new String(cipher.doFinal(data));
-    }
-
     public static String encrypt(SecretKey secretKey, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -183,16 +161,33 @@ public class RSAUtils {
         return Base64.encodeToString(payload, Base64.DEFAULT);
     }
 
-    public static byte[] encrypt(SecretKey secretKey, byte[] payload, int offset, int lenght) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+    public static String encrypt(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt.getBytes("UTF-8")));
+
+        byte[] data = cipher.doFinal(payload.getBytes());
+        return Base64.encodeToString(data, Base64.DEFAULT);
+    }
+
+    public static String decrypt(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(salt.getBytes("UTF-8")));
+
+        byte[] data = Base64.decode(payload, Base64.DEFAULT);
+        return new String(cipher.doFinal(data));
+    }
+
+
+    public static byte[] encrypt(SecretKey secretKey, byte[] salt, byte[] payload, int offset, int lenght) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
+        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt));
 
         return cipher.doFinal(payload, offset, lenght);
     }
 
-    public static byte[] decrypt(SecretKey secretKey, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+    public static byte[] decrypt(SecretKey secretKey, byte[] salt, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
+        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(salt));
 
         return cipher.doFinal(payload);
     }

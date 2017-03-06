@@ -224,7 +224,7 @@ class SenHandler {
                 if (senz.getAttributes().containsKey("$msg")) {
                     // encrypted data -> decrypt
                     String sessionKey = dbSource.getSecretUser(senz.getSender().getUsername()).getSessionKey();
-                    rahasa = RSAUtils.decrypt(RSAUtils.getSecretKey(sessionKey), sessionKey, senz.getAttributes().get("$msg"));
+                    rahasa = RSAUtils.decrypt(RSAUtils.getSecretKey(sessionKey), sessionKey.substring(0, 7).toUpperCase(), senz.getAttributes().get("$msg"));
                 } else {
                     // plain data
                     rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");

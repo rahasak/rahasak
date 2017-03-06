@@ -22,7 +22,8 @@ public class StreamPlayer {
 
     private Context context;
     private Player player;
-    private SecretKey key;
+    private byte[] salt;
+    private SecretKey secretKey;
 
     // audio setting
     private int audioMode;
@@ -31,10 +32,11 @@ public class StreamPlayer {
 
     private DatagramSocket socket;
 
-    public StreamPlayer(Context context, DatagramSocket socket, SecretKey key) {
+    public StreamPlayer(Context context, DatagramSocket socket, String sessionKey) {
         this.context = context;
         this.socket = socket;
-        this.key = key;
+        this.secretKey = RSAUtils.getSecretKey(sessionKey);
+        this.salt = sessionKey.substring(0, 7).toUpperCase().getBytes();
 
         player = new Player();
     }
@@ -92,7 +94,7 @@ public class StreamPlayer {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = RSAUtils.decrypt(key, Base64.decode(msg, Base64.DEFAULT));
+                        byte[] stream = RSAUtils.decrypt(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
                         AmrDecoder.decode(state, stream, pcmframs);
