@@ -38,7 +38,7 @@ public class StreamRecorder {
         this.from = from;
         this.to = to;
         this.secretKey = RSAUtils.getSecretKey(sessionKey);
-        this.salt = sessionKey.substring(0, 7).toUpperCase().getBytes();
+        this.salt = sessionKey.substring(0, 8).toUpperCase().getBytes();
 
         recorder = new Recorder();
     }

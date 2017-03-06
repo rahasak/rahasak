@@ -177,7 +177,6 @@ public class RSAUtils {
         return new String(cipher.doFinal(data));
     }
 
-
     public static byte[] encrypt(SecretKey secretKey, byte[] salt, byte[] payload, int offset, int lenght) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
         Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt));

@@ -28,20 +28,9 @@ import com.score.rahasak.R;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.DrawerItem;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.RSAUtils;
 import com.score.senzc.pojos.User;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.ArrayList;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 
 /**
  * Created by eranga on 12/4/16.
