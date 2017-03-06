@@ -12,6 +12,15 @@ class SenzorsDbContract {
     public SenzorsDbContract() {
     }
 
+    static abstract class RecentSecret implements BaseColumns {
+        static final String TABLE_NAME = "recent_secret";
+        static final String COLUMN_TIMESTAMP = "timestamp";
+        static final String COLUMN_NAME_USER = "user";
+        static final String COLUMN_NAME_BLOB = "blob";
+        static final String COLUMN_BLOB_TYPE = "blob_type";
+        static final String UNREAD_COUNT = "unread_count";
+    }
+
     /* Inner class that defines secret table */
     static abstract class Secret implements BaseColumns {
         static final String TABLE_NAME = "secret";
@@ -29,7 +38,7 @@ class SenzorsDbContract {
     }
 
     /* Inner class that defines the user table contents */
-    public static abstract class User implements BaseColumns {
+    static abstract class User implements BaseColumns {
         static final String TABLE_NAME = "user";
         static final String COLUMN_NAME_USERNAME = "username";
         static final String COLUMN_NAME_IS_SMS_REQUESTER = "is_sms_requester";
@@ -45,7 +54,7 @@ class SenzorsDbContract {
 
     /* Inner class that defines permission control for the user
      * Add more permissions here in the future */
-    public static abstract class Permission implements BaseColumns {
+    static abstract class Permission implements BaseColumns {
         static final String TABLE_NAME = "permission";
         static final String COLUMN_NAME_LOCATION = "loc";
         static final String COLUMN_NAME_CAMERA = "cam";

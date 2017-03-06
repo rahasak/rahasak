@@ -3,6 +3,8 @@ package com.score.rahasak.utils;
 import android.content.Context;
 import android.util.Base64;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -12,6 +14,7 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
@@ -24,6 +27,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -50,6 +54,10 @@ public class RSAUtils {
         savePrivateKey(context, keyPair);
 
         return keyPair;
+    }
+
+    static {
+        //Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
     }
 
     private static void savePublicKey(Context context, KeyPair keyPair) {
@@ -150,17 +158,19 @@ public class RSAUtils {
         return new SecretKeySpec(key, 0, key.length, "AES");
     }
 
-    public static String encrypt(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+    public static String encrypt(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt.substring(0, 7).getBytes("UTF-8")));
 
         byte[] data = cipher.doFinal(payload.getBytes());
+        System.out.println(payload.getBytes().length + "-------");
+        System.out.println(data.length + "-------");
         return Base64.encodeToString(data, Base64.DEFAULT);
     }
 
-    public static String decrypt(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+    public static String decrypt(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(salt.substring(0, 7).getBytes("UTF-8")));
 
         byte[] data = Base64.decode(payload, Base64.DEFAULT);
         return new String(cipher.doFinal(data));

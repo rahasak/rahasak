@@ -9,8 +9,11 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.HashMap;
 
 import javax.crypto.BadPaddingException;
@@ -131,7 +134,7 @@ public class SenzUtils {
         return senz;
     }
 
-    public static Senz getSenzFromSecret(Context context, Secret secret) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+    public static Senz getSenzFromSecret(Context context, Secret secret) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
 
@@ -143,7 +146,7 @@ public class SenzUtils {
         senzAttributes.put("uid", secret.getId());
         senzAttributes.put("user", secret.getUser().getUsername());
         if (secret.getUser().getSessionKey() != null && !secret.getUser().getSessionKey().isEmpty()) {
-            senzAttributes.put("$msg", RSAUtils.encrypt(RSAUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getBlob()));
+            senzAttributes.put("$msg", RSAUtils.encrypt(RSAUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getUser().getSessionKey(),secret.getBlob()));
         } else {
             senzAttributes.put("msg", secret.getBlob());
         }
