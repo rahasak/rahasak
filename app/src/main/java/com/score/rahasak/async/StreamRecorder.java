@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
-import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.CryptoUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -37,7 +37,7 @@ public class StreamRecorder {
         this.context = context;
         this.from = from;
         this.to = to;
-        this.secretKey = RSAUtils.getSecretKey(sessionKey);
+        this.secretKey = CryptoUtils.getSecretKey(sessionKey);
         this.salt = sessionKey.substring(0, 8).toUpperCase().getBytes();
 
         recorder = new Recorder();
@@ -93,7 +93,7 @@ public class StreamRecorder {
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(RSAUtils.encryptCCM(secretKey, salt, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    String encodedStream = Base64.encodeToString(CryptoUtils.encryptCCM(secretKey, salt, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
                     String senz = encodedStream + " @" + to + " ^" + from;
                     Log.d("TAG", senz + " ---");

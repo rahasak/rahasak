@@ -21,7 +21,7 @@ import com.score.rahasak.exceptions.InvalidInputFieldsException;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -165,7 +165,7 @@ public class RegistrationActivity extends BaseActivity {
      */
     private void doPreRegistration() {
         try {
-            RSAUtils.initKeys(this);
+            CryptoUtils.initKeys(this);
         } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -179,7 +179,7 @@ public class RegistrationActivity extends BaseActivity {
         // first create create senz
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put(getResources().getString(R.string.pubkey), PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
+        senzAttributes.put(getResources().getString(R.string.pubkey), PreferenceUtils.getRsaKey(this, CryptoUtils.PUBLIC_KEY));
 
         // new senz
         String id = "_ID";

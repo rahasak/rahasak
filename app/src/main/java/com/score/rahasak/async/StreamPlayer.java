@@ -9,7 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.score.rahasak.utils.AudioUtils;
-import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.CryptoUtils;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -35,7 +35,7 @@ public class StreamPlayer {
     public StreamPlayer(Context context, DatagramSocket socket, String sessionKey) {
         this.context = context;
         this.socket = socket;
-        this.secretKey = RSAUtils.getSecretKey(sessionKey);
+        this.secretKey = CryptoUtils.getSecretKey(sessionKey);
         this.salt = sessionKey.substring(0, 8).toUpperCase().getBytes();
 
         player = new Player();
@@ -94,7 +94,7 @@ public class StreamPlayer {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = RSAUtils.decryptCCM(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
+                        byte[] stream = CryptoUtils.decryptCCM(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
                         AmrDecoder.decode(state, stream, pcmframs);

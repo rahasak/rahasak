@@ -24,7 +24,7 @@ import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
@@ -360,7 +360,7 @@ public class SenzService extends Service {
             public void run() {
                 // sign and write senz
                 try {
-                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+                    PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
 
                     // if sender not already set find user(sender) and set it to senz first
                     if (senz.getSender() == null || senz.getSender().toString().isEmpty())
@@ -372,7 +372,7 @@ public class SenzService extends Service {
                     if (senz.getSenzType() == SenzTypeEnum.STREAM) {
                         signature = "SIG";
                     } else {
-                        signature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        signature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
                     }
                     String message = SenzParser.getSenzMessage(senzPayload, signature);
                     Log.d(TAG, "Senz to be send: " + message);
@@ -391,7 +391,7 @@ public class SenzService extends Service {
             @Override
             public void run() {
                 try {
-                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+                    PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
 
                     for (Senz senz : senzList) {
                         // if sender not already set find user(sender) and set it to senz first
@@ -402,7 +402,7 @@ public class SenzService extends Service {
                         String senzPayload = SenzParser.getSenzPayload(senz);
                         String senzSignature;
                         if (senz.getAttributes().containsKey("stream")) {
-                            senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                            senzSignature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
                         } else {
                             senzSignature = "SIGNATURE";
                         }
@@ -425,7 +425,7 @@ public class SenzService extends Service {
             @Override
             public void run() {
                 try {
-                    PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+                    PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
 
                     for (Secret secret : new SenzorsDbSource(SenzService.this).getUnAckSecrects()) {
                         if (secret.getBlobType() == BlobType.TEXT) {
@@ -440,7 +440,7 @@ public class SenzService extends Service {
                             String senzPayload = SenzParser.getSenzPayload(senz);
                             String senzSignature;
                             if (!senz.getAttributes().containsKey("stream")) {
-                                senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                                senzSignature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
                             } else {
                                 senzSignature = "SIGNATURE";
                             }

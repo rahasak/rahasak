@@ -17,7 +17,7 @@ import com.score.rahasak.ui.SelfieCaptureActivity;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PhoneBookUtil;
-import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -75,7 +75,7 @@ class SenHandler {
                 SecretUser secretUser = dbSource.getSecretUser(username);
                 if (secretUser != null) {
                     String encryptedSessionKey = senz.getAttributes().get("$skey");
-                    String sessionKey = RSAUtils.decrypt(RSAUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
+                    String sessionKey = CryptoUtils.decrypt(CryptoUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
                 } else {
                     secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
@@ -109,7 +109,7 @@ class SenHandler {
             try {
                 if (dbSource.isExistingUser(senz.getSender().getUsername())) {
                     String encryptedSessionKey = senz.getAttributes().get("$skey");
-                    String sessionKey = RSAUtils.decrypt(RSAUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
+                    String sessionKey = CryptoUtils.decrypt(CryptoUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
                     dbSource.updateSecretUser(senz.getSender().getUsername(), "session_key", sessionKey);
 
                     broadcastSenz(senz, senzService.getApplicationContext());
@@ -224,7 +224,7 @@ class SenHandler {
                 if (senz.getAttributes().containsKey("$msg")) {
                     // encrypted data -> decrypt
                     String sessionKey = dbSource.getSecretUser(senz.getSender().getUsername()).getSessionKey();
-                    rahasa = RSAUtils.decryptCCM(RSAUtils.getSecretKey(sessionKey), sessionKey.substring(0, 8).toUpperCase(), senz.getAttributes().get("$msg"));
+                    rahasa = CryptoUtils.decryptCCM(CryptoUtils.getSecretKey(sessionKey), sessionKey.substring(0, 8).toUpperCase(), senz.getAttributes().get("$msg"));
                 } else {
                     // plain data
                     rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
@@ -267,10 +267,10 @@ class SenHandler {
             if (secretUser.isSMSRequester()) {
                 try {
                     // create session key for this user
-                    String sessionKey = RSAUtils.getSessionKey();
+                    String sessionKey = CryptoUtils.getSessionKey();
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
 
-                    String encryptedSessionKey = RSAUtils.encrypt(RSAUtils.getPublicKey(pubKey), sessionKey);
+                    String encryptedSessionKey = CryptoUtils.encrypt(CryptoUtils.getPublicKey(pubKey), sessionKey);
                     senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), username, encryptedSessionKey));
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -28,7 +28,7 @@ import com.score.rahasak.R;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.DrawerItem;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.RSAUtils;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.senzc.pojos.User;
 
 import java.io.UnsupportedEncodingException;
@@ -219,18 +219,18 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void loadRahas() {
         try {
-            String skey = RSAUtils.getSessionKey();
-            SecretKey key = RSAUtils.getSecretKey(skey);
-            String enc = RSAUtils.encryptGCM(key, skey.substring(0, 12), "eranga bandara herath 34343434");
+            String skey = CryptoUtils.getSessionKey();
+            SecretKey key = CryptoUtils.getSecretKey(skey);
+            String enc = CryptoUtils.encryptGCM(key, skey.substring(0, 12), "eranga bandara herath 34343434");
             System.out.println(enc + " -------");
 
-            String ori = RSAUtils.decryptGCM(key, skey.substring(0, 12), enc);
+            String ori = CryptoUtils.decryptGCM(key, skey.substring(0, 12), enc);
             System.out.println(ori + " -------");
 
-            String encc = RSAUtils.encryptCCM(key, skey.substring(0, 12), "eranga bandara herath 34343434");
+            String encc = CryptoUtils.encryptCCM(key, skey.substring(0, 12), "eranga bandara herath 34343434");
             System.out.println(encc + " -------");
 
-            String orii = RSAUtils.decryptCCM(key, skey.substring(0, 12), encc);
+            String orii = CryptoUtils.decryptCCM(key, skey.substring(0, 12), encc);
             System.out.println(orii + " -------");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

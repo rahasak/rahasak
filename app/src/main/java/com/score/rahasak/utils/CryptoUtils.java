@@ -32,7 +32,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * RSR encryption
  */
-public class RSAUtils {
+public class CryptoUtils {
 
     public static final String PUBLIC_KEY = "PUBLIC_KEY";
     public static final String PRIVATE_KEY = "PRIVATE_KEY";
@@ -61,7 +61,7 @@ public class RSAUtils {
         String publicKey = Base64.encodeToString(keyContent, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
         // save public key in shared preference
-        PreferenceUtils.saveRsaKey(context, publicKey, RSAUtils.PUBLIC_KEY);
+        PreferenceUtils.saveRsaKey(context, publicKey, CryptoUtils.PUBLIC_KEY);
     }
 
     private static void savePrivateKey(Context context, KeyPair keyPair) {
@@ -70,12 +70,12 @@ public class RSAUtils {
         String privateKey = Base64.encodeToString(keyContent, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
         // save private key in shared preference
-        PreferenceUtils.saveRsaKey(context, privateKey, RSAUtils.PRIVATE_KEY);
+        PreferenceUtils.saveRsaKey(context, privateKey, CryptoUtils.PRIVATE_KEY);
     }
 
     public static PublicKey getPublicKey(Context context) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
         // get key string from shared preference
-        String keyString = PreferenceUtils.getRsaKey(context, RSAUtils.PUBLIC_KEY);
+        String keyString = PreferenceUtils.getRsaKey(context, CryptoUtils.PUBLIC_KEY);
 
         // convert to string key public key
         X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.decode(keyString, Base64.DEFAULT));
@@ -94,7 +94,7 @@ public class RSAUtils {
 
     public static PrivateKey getPrivateKey(Context context) throws InvalidKeySpecException, NoSuchAlgorithmException {
         // get key string from shared preference
-        String keyString = PreferenceUtils.getRsaKey(context, RSAUtils.PRIVATE_KEY);
+        String keyString = PreferenceUtils.getRsaKey(context, CryptoUtils.PRIVATE_KEY);
 
         // convert to string key public key
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.decode(keyString, Base64.DEFAULT));
