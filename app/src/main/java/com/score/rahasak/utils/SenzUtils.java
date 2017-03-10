@@ -146,7 +146,7 @@ public class SenzUtils {
         senzAttributes.put("uid", secret.getId());
         senzAttributes.put("user", secret.getUser().getUsername());
         if (secret.getUser().getSessionKey() != null && !secret.getUser().getSessionKey().isEmpty()) {
-            senzAttributes.put("$msg", RSAUtils.encrypt(RSAUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getUser().getSessionKey().substring(0, 7).toUpperCase(), secret.getBlob()));
+            senzAttributes.put("$msg", RSAUtils.encryptCCM(RSAUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getUser().getSessionKey().substring(0, 7).toUpperCase(), secret.getBlob()));
         } else {
             senzAttributes.put("msg", secret.getBlob());
         }

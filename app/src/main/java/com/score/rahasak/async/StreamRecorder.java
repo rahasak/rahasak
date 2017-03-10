@@ -93,7 +93,7 @@ public class StreamRecorder {
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(RSAUtils.encrypt(secretKey, salt, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    String encodedStream = Base64.encodeToString(RSAUtils.encryptCCM(secretKey, salt, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
                     String senz = encodedStream + " @" + to + " ^" + from;
                     Log.d("TAG", senz + " ---");

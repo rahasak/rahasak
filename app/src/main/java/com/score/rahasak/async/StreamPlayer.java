@@ -94,7 +94,7 @@ public class StreamPlayer {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = RSAUtils.decrypt(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
+                        byte[] stream = RSAUtils.decryptCCM(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
                         AmrDecoder.decode(state, stream, pcmframs);

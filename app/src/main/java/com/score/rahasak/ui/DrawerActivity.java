@@ -28,9 +28,20 @@ import com.score.rahasak.R;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.DrawerItem;
 import com.score.rahasak.utils.PreferenceUtils;
+import com.score.rahasak.utils.RSAUtils;
 import com.score.senzc.pojos.User;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 /**
  * Created by eranga on 12/4/16.
@@ -207,6 +218,39 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
      * Load my sensor list fragment
      */
     private void loadRahas() {
+        try {
+            String skey = RSAUtils.getSessionKey();
+            SecretKey key = RSAUtils.getSecretKey(skey);
+            String enc = RSAUtils.encryptGCM(key, skey.substring(0, 12), "eranga bandara herath 34343434");
+            System.out.println(enc + " -------");
+
+            String ori = RSAUtils.decryptGCM(key, skey.substring(0, 12), enc);
+            System.out.println(ori + " -------");
+
+            String encc = RSAUtils.encryptCCM(key, skey.substring(0, 12), "eranga bandara herath 34343434");
+            System.out.println(encc + " -------");
+
+            String orii = RSAUtils.decryptCCM(key, skey.substring(0, 12), encc);
+            System.out.println(orii + " -------");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
         titleText.setText("Secrets");
         clearAboutText();
 
