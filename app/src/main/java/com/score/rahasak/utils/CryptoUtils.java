@@ -150,6 +150,20 @@ public class CryptoUtils {
         return new SecretKeySpec(key, 0, key.length, "AES");
     }
 
+    public static byte[] encrypt(SecretKey secretKey, byte[] payload, int offset, int lenght) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        return cipher.doFinal(payload, offset, lenght);
+    }
+
+    public static byte[] decrypt(SecretKey secretKey, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        return cipher.doFinal(payload);
+    }
+
     public static String encryptCCM(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         Cipher cipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt.getBytes("UTF-8")));

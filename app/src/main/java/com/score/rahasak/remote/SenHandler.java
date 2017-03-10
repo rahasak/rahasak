@@ -14,10 +14,10 @@ import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.pojo.Stream;
 import com.score.rahasak.ui.SecretRecordingActivity;
 import com.score.rahasak.ui.SelfieCaptureActivity;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PhoneBookUtil;
-import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -224,7 +224,7 @@ class SenHandler {
                 if (senz.getAttributes().containsKey("$msg")) {
                     // encrypted data -> decrypt
                     String sessionKey = dbSource.getSecretUser(senz.getSender().getUsername()).getSessionKey();
-                    rahasa = CryptoUtils.decryptCCM(CryptoUtils.getSecretKey(sessionKey), sessionKey.substring(0, 8).toUpperCase(), senz.getAttributes().get("$msg"));
+                    rahasa = CryptoUtils.decryptGCM(CryptoUtils.getSecretKey(sessionKey), sessionKey.substring(0, 8).toUpperCase(), senz.getAttributes().get("$msg"));
                 } else {
                     // plain data
                     rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");

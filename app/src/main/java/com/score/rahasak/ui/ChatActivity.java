@@ -491,7 +491,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             // encrypt msg
             if (secretUser.getSessionKey() != null && !secretUser.getSessionKey().isEmpty()) {
-                senzAttributes.put("$msg", CryptoUtils.encryptCCM(CryptoUtils.getSecretKey(secretUser.getSessionKey()), secretUser.getSessionKey().substring(0, 8).toUpperCase(),secret.getBlob()));
+                senzAttributes.put("$msg", CryptoUtils.encryptGCM(CryptoUtils.getSecretKey(secretUser.getSessionKey()), secretUser.getSessionKey().substring(0, 8).toUpperCase(),secret.getBlob()));
             } else {
                 senzAttributes.put("msg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
             }

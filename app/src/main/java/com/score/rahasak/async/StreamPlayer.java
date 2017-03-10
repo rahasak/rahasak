@@ -94,7 +94,7 @@ public class StreamPlayer {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = CryptoUtils.decryptCCM(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
+                        byte[] stream = CryptoUtils.decryptGCM(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
                         AmrDecoder.decode(state, stream, pcmframs);

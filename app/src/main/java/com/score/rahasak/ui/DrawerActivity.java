@@ -250,7 +250,6 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
             e.printStackTrace();
         }
 
-
         titleText.setText("Secrets");
         clearAboutText();
 
