@@ -75,7 +75,7 @@ class SenHandler {
                 SecretUser secretUser = dbSource.getSecretUser(username);
                 if (secretUser != null) {
                     String encryptedSessionKey = senz.getAttributes().get("$skey");
-                    String sessionKey = CryptoUtils.decrypt(CryptoUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
+                    String sessionKey = CryptoUtils.decryptRSA(CryptoUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
                 } else {
                     secretUser = new SecretUser(senz.getSender().getId(), senz.getSender().getUsername());
@@ -109,7 +109,7 @@ class SenHandler {
             try {
                 if (dbSource.isExistingUser(senz.getSender().getUsername())) {
                     String encryptedSessionKey = senz.getAttributes().get("$skey");
-                    String sessionKey = CryptoUtils.decrypt(CryptoUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
+                    String sessionKey = CryptoUtils.decryptRSA(CryptoUtils.getPrivateKey(senzService.getApplicationContext()), encryptedSessionKey);
                     dbSource.updateSecretUser(senz.getSender().getUsername(), "session_key", sessionKey);
 
                     broadcastSenz(senz, senzService.getApplicationContext());
@@ -224,7 +224,7 @@ class SenHandler {
                 if (senz.getAttributes().containsKey("$msg")) {
                     // encrypted data -> decrypt
                     String sessionKey = dbSource.getSecretUser(senz.getSender().getUsername()).getSessionKey();
-                    rahasa = CryptoUtils.decryptGCM(CryptoUtils.getSecretKey(sessionKey), sessionKey.substring(0, 8).toUpperCase(), senz.getAttributes().get("$msg"));
+                    rahasa = CryptoUtils.decryptGCM(CryptoUtils.getSecretKey(sessionKey), CryptoUtils.getSalt(sessionKey), senz.getAttributes().get("$msg"));
                 } else {
                     // plain data
                     rahasa = URLDecoder.decode(senz.getAttributes().get("msg"), "UTF-8");
@@ -270,7 +270,7 @@ class SenHandler {
                     String sessionKey = CryptoUtils.getSessionKey();
                     dbSource.updateSecretUser(username, "session_key", sessionKey);
 
-                    String encryptedSessionKey = CryptoUtils.encrypt(CryptoUtils.getPublicKey(pubKey), sessionKey);
+                    String encryptedSessionKey = CryptoUtils.encryptRSA(CryptoUtils.getPublicKey(pubKey), sessionKey);
                     senzService.writeSenz(SenzUtils.getShareSenz(senzService.getApplicationContext(), username, encryptedSessionKey));
                 } catch (Exception e) {
                     e.printStackTrace();

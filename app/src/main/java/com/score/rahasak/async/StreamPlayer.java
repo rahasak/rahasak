@@ -36,7 +36,7 @@ public class StreamPlayer {
         this.context = context;
         this.socket = socket;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
-        this.salt = sessionKey.substring(0, 8).toUpperCase().getBytes();
+        this.salt = CryptoUtils.getSalt(sessionKey);
 
         player = new Player();
     }

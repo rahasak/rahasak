@@ -38,7 +38,7 @@ public class StreamRecorder {
         this.from = from;
         this.to = to;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
-        this.salt = sessionKey.substring(0, 8).toUpperCase().getBytes();
+        this.salt = CryptoUtils.getSalt(sessionKey);
 
         recorder = new Recorder();
     }

@@ -34,11 +34,11 @@ import com.score.rahasak.pojo.Permission;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.ActivityUtils;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.LimitedList;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
-import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -491,7 +491,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             // encrypt msg
             if (secretUser.getSessionKey() != null && !secretUser.getSessionKey().isEmpty()) {
-                senzAttributes.put("$msg", CryptoUtils.encryptGCM(CryptoUtils.getSecretKey(secretUser.getSessionKey()), secretUser.getSessionKey().substring(0, 8).toUpperCase(),secret.getBlob()));
+                senzAttributes.put("$msg", CryptoUtils.encryptGCM(CryptoUtils.getSecretKey(secretUser.getSessionKey()), CryptoUtils.getSalt(secretUser.getSessionKey()), secret.getBlob()));
             } else {
                 senzAttributes.put("msg", URLEncoder.encode(secret.getBlob(), "UTF-8"));
             }

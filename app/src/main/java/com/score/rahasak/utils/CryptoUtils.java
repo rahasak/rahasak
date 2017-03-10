@@ -122,22 +122,6 @@ public class CryptoUtils {
         return signature.verify(signedPayloadContent);
     }
 
-    public static String encrypt(PublicKey publicKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
-        byte[] data = cipher.doFinal(payload.getBytes());
-        return Base64.encodeToString(data, Base64.DEFAULT);
-    }
-
-    public static String decrypt(PrivateKey privateKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-
-        byte[] data = Base64.decode(payload, Base64.DEFAULT);
-        return new String(cipher.doFinal(data));
-    }
-
     public static String getSessionKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(SESSION_KEY_SIZE);
@@ -150,14 +134,50 @@ public class CryptoUtils {
         return new SecretKeySpec(key, 0, key.length, "AES");
     }
 
-    public static byte[] encrypt(SecretKey secretKey, byte[] payload, int offset, int lenght) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public static byte[] getSalt(String key) {
+        return new StringBuilder(key.substring(0, 12)).reverse().toString().getBytes();
+    }
+
+    public static String encryptRSA(PublicKey publicKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        byte[] data = cipher.doFinal(payload.getBytes());
+        return Base64.encodeToString(data, Base64.DEFAULT);
+    }
+
+    public static String decryptRSA(PrivateKey privateKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+        byte[] data = Base64.decode(payload, Base64.DEFAULT);
+        return new String(cipher.doFinal(data));
+    }
+
+    public static String encryptECB(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] data = cipher.doFinal(payload.getBytes());
+        return Base64.encodeToString(data, Base64.DEFAULT);
+    }
+
+    public static String decryptECB(SecretKey secretKey, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        byte[] data = Base64.decode(payload, Base64.DEFAULT);
+        return new String(cipher.doFinal(data));
+    }
+
+    public static byte[] encryptECB(SecretKey secretKey, byte[] payload, int offset, int lenght) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
         return cipher.doFinal(payload, offset, lenght);
     }
 
-    public static byte[] decrypt(SecretKey secretKey, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
+    public static byte[] decryptECB(SecretKey secretKey, byte[] payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
@@ -194,17 +214,17 @@ public class CryptoUtils {
         return cipher.doFinal(payload);
     }
 
-    public static String encryptGCM(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+    public static String encryptGCM(SecretKey secretKey, byte[] salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt.getBytes("UTF-8")));
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(salt));
 
         byte[] data = cipher.doFinal(payload.getBytes());
         return Base64.encodeToString(data, Base64.DEFAULT);
     }
 
-    public static String decryptGCM(SecretKey secretKey, String salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+    public static String decryptGCM(SecretKey secretKey, byte[] salt, String payload) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(salt.getBytes("UTF-8")));
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(salt));
 
         byte[] data = Base64.decode(payload, Base64.DEFAULT);
         return new String(cipher.doFinal(data));
