@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 8
-        versionName "0.26"
+        versionCode 9
+        versionName "0.27"
         applicationId "com.score.rahasak"
 
         renderscriptTargetApi 18
@@ -36,7 +36,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
-    compile 'com.google.android.gms:play-services-appindexing:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.4'
     compile 'com.github.siyamed:android-shape-imageview:0.9.3@aar'
