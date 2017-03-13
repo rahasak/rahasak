@@ -284,7 +284,7 @@ public class SenzService extends Service {
                     write("TUK");
                 } else {
                     Log.d(TAG, "Senz received " + senz);
-                    SenHandler.getInstance().handle(senz, SenzService.this);
+                    SenzHandler.getInstance().handle(senz, SenzService.this);
                 }
 
                 // release wake lock

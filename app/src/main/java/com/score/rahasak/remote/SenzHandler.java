@@ -27,16 +27,16 @@ import com.score.senzc.pojos.User;
 import java.net.URLDecoder;
 import java.util.HashMap;
 
-class SenHandler {
-    private static final String TAG = SenHandler.class.getName();
+class SenzHandler {
+    private static final String TAG = SenzHandler.class.getName();
 
-    private static SenHandler instance;
+    private static SenzHandler instance;
 
     private Stream stream;
 
-    static SenHandler getInstance() {
+    static SenzHandler getInstance() {
         if (instance == null) {
-            instance = new SenHandler();
+            instance = new SenzHandler();
         }
 
         return instance;
