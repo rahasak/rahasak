@@ -25,7 +25,6 @@ public class StreamRecorder {
     private Context context;
     private String from;
     private String to;
-    private byte[] salt;
     private SecretKey secretKey;
 
     private DatagramSocket socket;
@@ -38,7 +37,6 @@ public class StreamRecorder {
         this.from = from;
         this.to = to;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
-        this.salt = CryptoUtils.getSalt(sessionKey);
 
         recorder = new Recorder();
     }
@@ -93,7 +91,7 @@ public class StreamRecorder {
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(CryptoUtils.encryptGCM(secretKey, salt, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
                     String senz = encodedStream + " @" + to + " ^" + from;
                     Log.d("TAG", senz + " ---");

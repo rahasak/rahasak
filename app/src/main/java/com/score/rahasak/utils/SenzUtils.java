@@ -146,7 +146,7 @@ public class SenzUtils {
         senzAttributes.put("uid", secret.getId());
         senzAttributes.put("user", secret.getUser().getUsername());
         if (secret.getUser().getSessionKey() != null && !secret.getUser().getSessionKey().isEmpty()) {
-            senzAttributes.put("$msg", CryptoUtils.encryptGCM(CryptoUtils.getSecretKey(secret.getUser().getSessionKey()), CryptoUtils.getSalt(secret.getUser().getSessionKey()), secret.getBlob()));
+            senzAttributes.put("$msg", CryptoUtils.encryptECB(CryptoUtils.getSecretKey(secret.getUser().getSessionKey()), secret.getBlob()));
         } else {
             senzAttributes.put("msg", secret.getBlob());
         }

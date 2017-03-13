@@ -54,7 +54,7 @@ public class StreamPlayer {
 
     private class Player extends Thread {
         private AudioTrack streamTrack;
-        private int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        private int minBufSize;
 
         private boolean playing = true;
 
@@ -67,11 +67,14 @@ public class StreamPlayer {
         }
 
         private void startPlay() {
+            minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            Log.d("TAG", "Min buffer size: " + minBufSize);
+
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
-                    640,
+                    320,
                     AudioTrack.MODE_STREAM);
             streamTrack.play();
         }
@@ -94,7 +97,7 @@ public class StreamPlayer {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = CryptoUtils.decryptGCM(secretKey, salt, Base64.decode(msg, Base64.DEFAULT));
+                        byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
                         AmrDecoder.decode(state, stream, pcmframs);
