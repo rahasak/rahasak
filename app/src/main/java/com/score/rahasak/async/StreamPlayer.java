@@ -20,9 +20,10 @@ import io.kvh.media.amr.AmrDecoder;
 
 public class StreamPlayer {
 
+    private static final String TAG = StreamPlayer.class.getName();
+
     private Context context;
     private Player player;
-    private byte[] salt;
     private SecretKey secretKey;
 
     // audio setting
@@ -36,7 +37,6 @@ public class StreamPlayer {
         this.context = context;
         this.socket = socket;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
-        this.salt = CryptoUtils.getSalt(sessionKey);
 
         player = new Player();
     }
@@ -58,39 +58,40 @@ public class StreamPlayer {
 
         private boolean playing = true;
 
-        @Override
-        public void run() {
-            if (playing) {
-                startPlay();
-                play();
-            }
-        }
+        private long amrState;
 
-        private void startPlay() {
+        Player() {
             minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            Log.d("TAG", "Min buffer size: " + minBufSize);
-
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     640,
                     AudioTrack.MODE_STREAM);
-            streamTrack.play();
+            Log.d(TAG, "min buffer size: " + minBufSize);
+
+            amrState = AmrDecoder.init();
+        }
+
+        @Override
+        public void run() {
+            if (playing) {
+                play();
+            }
         }
 
         private void play() {
-            long state = AmrDecoder.init();
+            streamTrack.play();
 
             try {
                 short[] pcmframs = new short[160];
                 byte[] message = new byte[64];
-                while (true) {
+                while (playing) {
                     // listen for senz
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-                    Log.d("TAG", "Stream received: " + msg);
+                    Log.d(TAG, "stream received: " + msg);
 
                     // parser and obtain audio data
                     // play it
@@ -100,7 +101,7 @@ public class StreamPlayer {
                         byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
 
                         // decode codec
-                        AmrDecoder.decode(state, stream, pcmframs);
+                        AmrDecoder.decode(amrState, stream, pcmframs);
                         streamTrack.write(pcmframs, 0, pcmframs.length);
                     }
                 }
@@ -108,7 +109,7 @@ public class StreamPlayer {
                 e.printStackTrace();
             }
 
-            AmrDecoder.exit(state);
+            AmrDecoder.exit(amrState);
         }
 
         void shutDown() {

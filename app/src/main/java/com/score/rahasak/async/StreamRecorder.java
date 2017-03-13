@@ -54,29 +54,30 @@ public class StreamRecorder {
         private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
         private AudioRecord audioRecorder;
-        private int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
+        private int minBufSize;
 
         boolean recording = true;
 
-        @Override
-        public void run() {
-            if (recording) {
-                startRecord();
-                record();
-            }
-        }
-
-        private void startRecord() {
+        Recorder() {
+            minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     channelConfig,
                     audioFormat,
                     minBufSize * 10);
-            audioRecorder.startRecording();
+
+            AmrEncoder.init(0);
+        }
+
+        @Override
+        public void run() {
+            if (recording) {
+                record();
+            }
         }
 
         private void record() {
-            AmrEncoder.init(0);
+            audioRecorder.startRecording();
             int mode = AmrEncoder.Mode.MR795.ordinal();
 
             int encoded;

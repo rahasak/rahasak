@@ -271,6 +271,14 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     }
 
     private void initCall() {
+        // init recorder
+        if (streamRecorder == null)
+            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
+
+        // init player
+        if (streamPlayer == null)
+            streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
+
         // connect to UDP
         initUdpSoc();
         initUdpConn();
@@ -336,23 +344,15 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         loadingView.setVisibility(View.INVISIBLE);
         playingText.setVisibility(View.VISIBLE);
 
-        // start recorder
-        if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
+        // start recorder/player
         streamRecorder.start();
-
-        // start player
-        if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
         streamPlayer.play();
     }
 
     private void endCall() {
-        if (streamRecorder != null)
-            streamRecorder.stop();
-
-        if (streamPlayer != null)
-            streamPlayer.stop();
+        // stop recorder/player
+        streamRecorder.stop();
+        streamPlayer.stop();
 
         // send mic off senz
         // send stream off
