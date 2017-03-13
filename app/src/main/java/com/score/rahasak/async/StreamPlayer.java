@@ -74,7 +74,7 @@ public class StreamPlayer {
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
-                    320,
+                    640,
                     AudioTrack.MODE_STREAM);
             streamTrack.play();
         }
