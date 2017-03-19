@@ -357,6 +357,11 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     private void initCall() {
         // connect to UDP
         initUdpSoc();
+
+        // init recorder/player
+        streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
+        streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
+
         initUdpConn();
     }
 
@@ -441,25 +446,17 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         Senz senz = SenzUtils.getMicOnSenz(this, secretUser);
         sendSenz(senz);
 
-        // start recorder
-        if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
+        // start record/play
         streamRecorder.start();
-
-        // start player
-        if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
         streamPlayer.play();
     }
 
     private void endCall() {
         stopVibrations();
 
-        if (streamRecorder != null)
-            streamRecorder.stop();
-
-        if (streamPlayer != null)
-            streamPlayer.stop();
+        // stop record/play
+        streamRecorder.stop();
+        streamPlayer.stop();
 
         // send mic off senz
         // send stream off

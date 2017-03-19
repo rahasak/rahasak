@@ -5,7 +5,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Base64;
-import android.util.Log;
 
 import com.score.rahasak.remote.SenzService;
 import com.score.rahasak.utils.AudioUtils;
@@ -30,7 +29,8 @@ public class StreamRecorder {
     private DatagramSocket socket;
     private InetAddress address;
 
-    private Recorder recorder;
+    private AudioRecord audioRecorder;
+    private boolean recording;
 
     public StreamRecorder(Context context, String from, String to, String sessionKey) {
         this.context = context;
@@ -38,42 +38,31 @@ public class StreamRecorder {
         this.to = to;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
 
-        recorder = new Recorder();
+        int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+        int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
+        audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                AudioUtils.RECORDER_SAMPLE_RATE,
+                channelConfig,
+                audioFormat,
+                minBufSize);
+        AmrEncoder.init(0);
     }
 
     public void start() {
-        recorder.start();
+        recording = true;
+        new Recorder().start();
     }
 
     public void stop() {
-        recorder.shutDown();
+        recording = false;
     }
 
     private class Recorder extends Thread {
-        private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
-        private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-
-        private AudioRecord audioRecorder;
-        private int minBufSize;
-
-        boolean recording = true;
-
-        Recorder() {
-            minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
-            audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                    AudioUtils.RECORDER_SAMPLE_RATE,
-                    channelConfig,
-                    audioFormat,
-                    minBufSize * 10);
-
-            AmrEncoder.init(0);
-        }
 
         @Override
         public void run() {
-            if (recording) {
-                record();
-            }
+            record();
         }
 
         private void record() {
@@ -95,7 +84,6 @@ public class StreamRecorder {
                     String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
                     String senz = encodedStream + " @" + to + " ^" + from;
-                    Log.d("TAG", senz + " ---");
                     sendDatagram(senz);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -103,11 +91,10 @@ public class StreamRecorder {
             }
 
             AmrEncoder.exit();
+            shutDown();
         }
 
         void shutDown() {
-            recording = false;
-
             if (audioRecorder != null) {
                 if (audioRecorder.getState() != AudioRecord.STATE_UNINITIALIZED)
                     audioRecorder.stop();

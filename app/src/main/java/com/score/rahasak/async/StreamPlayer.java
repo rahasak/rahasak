@@ -23,13 +23,17 @@ public class StreamPlayer {
     private static final String TAG = StreamPlayer.class.getName();
 
     private Context context;
-    private Player player;
     private SecretKey secretKey;
 
     // audio setting
     private int audioMode;
     private int ringMode;
     private boolean isSpeakerPhoneOn;
+
+    private AudioTrack streamTrack;
+    private boolean playing = true;
+
+    private long amrState;
 
     private DatagramSocket socket;
 
@@ -38,40 +42,31 @@ public class StreamPlayer {
         this.socket = socket;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
 
-        player = new Player();
+        int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
+                AudioUtils.RECORDER_SAMPLE_RATE,
+                AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                640,
+                AudioTrack.MODE_STREAM);
+        Log.d(TAG, "min buffer size: " + minBufSize);
+
+        amrState = AmrDecoder.init();
     }
 
     public void play() {
         getAudioSettings();
         enableEarpiece();
-        player.start();
+        playing = true;
+        new Player().start();
     }
 
     public void stop() {
-        player.shutDown();
+        playing = false;
         resetAudioSettings();
     }
 
     private class Player extends Thread {
-        private AudioTrack streamTrack;
-        private int minBufSize;
-
-        private boolean playing = true;
-
-        private long amrState;
-
-        Player() {
-            minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
-                    AudioUtils.RECORDER_SAMPLE_RATE,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    640,
-                    AudioTrack.MODE_STREAM);
-            Log.d(TAG, "min buffer size: " + minBufSize);
-
-            amrState = AmrDecoder.init();
-        }
 
         @Override
         public void run() {
@@ -91,7 +86,6 @@ public class StreamPlayer {
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
-                    Log.d(TAG, "stream received: " + msg);
 
                     // parser and obtain audio data
                     // play it
@@ -110,11 +104,10 @@ public class StreamPlayer {
             }
 
             AmrDecoder.exit(amrState);
+            shutDown();
         }
 
         void shutDown() {
-            playing = false;
-
             if (streamTrack != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     streamTrack.pause();

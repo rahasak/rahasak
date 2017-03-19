@@ -271,16 +271,14 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     }
 
     private void initCall() {
+        // connect to UDP
+        initUdpSoc();
         // init recorder
         if (streamRecorder == null)
             streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
-
         // init player
         if (streamPlayer == null)
             streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
-
-        // connect to UDP
-        initUdpSoc();
         initUdpConn();
     }
 
