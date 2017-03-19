@@ -57,6 +57,7 @@ public class StreamPlayer {
     public void play() {
         getAudioSettings();
         enableEarpiece();
+
         playing = true;
         new Player().start();
     }

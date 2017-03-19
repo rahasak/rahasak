@@ -15,11 +15,11 @@ public class TimeUtils {
     }
 
     public static SimpleDateFormat getTimeSimpleDateFormat() {
-        return new SimpleDateFormat("HH:mm a");
+        return new SimpleDateFormat("HH:mm");
     }
 
     public static SimpleDateFormat getDateAndTimeSimpleDateFormat() {
-        return new SimpleDateFormat("MM/dd/yyyy' 'HH:mm a");
+        return new SimpleDateFormat("MM/dd/yyyy' 'HH:mm");
     }
 
     public static String getTimeInWords(long timestamp) {
