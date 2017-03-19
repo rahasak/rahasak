@@ -148,9 +148,6 @@
 
         <!-- Servicves -->
         <service
-            android:name="com.score.rahasak.remote.LocationService"
-            android:enabled="true" />
-        <service
             android:name="com.score.rahasak.remote.LatLonService"
             android:enabled="true" />
         <service
