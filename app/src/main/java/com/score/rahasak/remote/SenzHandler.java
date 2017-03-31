@@ -247,7 +247,7 @@ class SenzHandler {
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getSecretNotification(notificationUser, username, rahasa));
+                        NotificationUtils.getSecretNotification(notificationUser, username, "New message received"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -344,7 +344,7 @@ class SenzHandler {
 
                 // show notification
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getStreamNotification(notificationUser, "Received new selfie", username));
+                        NotificationUtils.getStreamNotification(notificationUser, "New selfie received", username));
             }
         } else {
             // middle stream

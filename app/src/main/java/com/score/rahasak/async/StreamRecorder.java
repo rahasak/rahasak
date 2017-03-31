@@ -31,6 +31,7 @@ public class StreamRecorder {
 
     private AudioRecord audioRecorder;
     private boolean recording;
+    private boolean sending;
 
     public StreamRecorder(Context context, String from, String to, String sessionKey) {
         this.context = context;
@@ -45,13 +46,18 @@ public class StreamRecorder {
                 AudioUtils.RECORDER_SAMPLE_RATE,
                 channelConfig,
                 audioFormat,
-                minBufSize);
+                minBufSize * 10);
         AmrEncoder.init(0);
+
+        recording = true;
+        sending = false;
+        new Recorder().start();
     }
 
     public void start() {
-        recording = true;
-        new Recorder().start();
+        //recording = true;
+        //new Recorder().start();
+        sending = true;
     }
 
     public void stop() {

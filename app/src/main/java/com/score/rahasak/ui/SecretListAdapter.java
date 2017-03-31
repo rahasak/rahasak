@@ -91,11 +91,13 @@ class SecretListAdapter extends BaseAdapter {
             viewHolder.sender.setText("@" + secret.getUser().getUsername());
         }
 
-        if (secret.getBlobType() == BlobType.IMAGE) {
+        if (secret.getBlobType() == BlobType.TEXT) {
+            viewHolder.message.setText("Message");
+        } else if (secret.getBlobType() == BlobType.IMAGE) {
             if (secret.isMissed()) {
                 viewHolder.message.setText("Missed selfie");
             } else {
-                viewHolder.message.setText("Selfie secret");
+                viewHolder.message.setText("Selfie");
             }
         } else if (secret.getBlobType() == BlobType.SOUND) {
             viewHolder.message.setText("Audio secret");
