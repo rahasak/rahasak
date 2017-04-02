@@ -33,32 +33,21 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.application.SenzApplication;
-import com.score.rahasak.async.StreamPlayer;
-import com.score.rahasak.async.StreamRecorder;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.enums.IntentType;
-import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
-import com.score.rahasak.remote.SenzService;
+import com.score.rahasak.remote.CallService;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
-import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
 
 public class SecretRecordingActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -79,7 +68,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     private CircularImageView startBtn;
     private CircularImageView endBtn;
 
-    private User appUser;
     private SecretUser secretUser;
 
     private SensorManager sensorManager;
@@ -88,13 +76,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     // service interface
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
-
-    // we are listing for UDP socket
-    private DatagramSocket socket;
-    private InetAddress address;
-
-    private StreamRecorder streamRecorder;
-    private StreamPlayer streamPlayer;
 
     // current tone
     private Ringtone currentRingtone;
@@ -138,7 +119,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         @Override
         public void onFinish() {
             sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
-            stopVibrations();
+            VibrationUtils.stopVibration(SecretRecordingActivity.this);
             SecretRecordingActivity.this.finish();
         }
 
@@ -157,7 +138,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         initUser();
         initSensor();
         setupWakeLock();
-        startVibrations();
+        VibrationUtils.startVibrate(this);
         startTimerToEndRequest();
         initRinging();
         initCall();
@@ -204,19 +185,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         super.onPause();
         unregisterReceiver(senzReceiver);
         sensorManager.unregisterListener(this);
-
-        if (streamRecorder != null)
-            streamRecorder.stop();
-
-        if (streamPlayer != null)
-            streamPlayer.stop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        clearFlags();
     }
 
     @Override
@@ -246,7 +214,14 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        stopService(new Intent(this, CallService.class));
+        clearFlags();
     }
 
     private void onSenzReceived(Senz senz) {
@@ -255,7 +230,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
                 cancelTimerToServe();
-                endCall();
                 SecretRecordingActivity.this.finish();
             }
         }
@@ -285,7 +259,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
             public void onClick(View v) {
                 cancelTimerToServe();
                 sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
-                endCall();
+                VibrationUtils.stopVibration(SecretRecordingActivity.this);
 
                 // stop ringing
                 if (currentRingtone != null)
@@ -299,7 +273,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopVibrations();
+                VibrationUtils.stopVibration(SecretRecordingActivity.this);
                 cancelTimerToServe();
                 startCall();
             }
@@ -309,7 +283,8 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endCall();
+                sendSenz(SenzUtils.getMicOffSenz(SecretRecordingActivity.this, secretUser));
+
                 SecretRecordingActivity.this.finish();
             }
         });
@@ -323,13 +298,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     }
 
     private void initUser() {
-        // app user
-        try {
-            appUser = PreferenceUtils.getUser(this);
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
-
         // secret user
         String username = getIntent().getStringExtra("USER");
         secretUser = new SenzorsDbSource(this).getSecretUser(username);
@@ -349,56 +317,14 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     private void initRinging() {
         Uri uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
         currentRingtone = RingtoneManager.getRingtone(this, uri);
-
         currentRingtone.play();
     }
 
-
     private void initCall() {
-        // connect to UDP
-        initUdpSoc();
-
-        // init recorder/player
-        streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
-        streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
-
-        initUdpConn();
-    }
-
-    private void initUdpSoc() {
-        if (socket == null || socket.isClosed()) {
-            try {
-                socket = new DatagramSocket();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.e(TAG, "Socket already initialized");
-        }
-    }
-
-    /**
-     * Initialize/Create UDP socket
-     */
-    private void initUdpConn() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    // connect
-                    if (address == null)
-                        address = InetAddress.getByName(SenzService.STREAM_HOST);
-
-                    // send init message
-                    String msg = SenzUtils.getStartStreamMsg(SecretRecordingActivity.this, appUser.getUsername(), secretUser.getUsername());
-                    if (msg != null) {
-                        DatagramPacket sendPacket = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
-                        socket.send(sendPacket);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        // start service to call
+        Intent intent = new Intent(this, CallService.class);
+        intent.putExtra("USER", secretUser);
+        startService(intent);
     }
 
     private void setupWakeLock() {
@@ -424,14 +350,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
             requestTimer.cancel();
     }
 
-    private void startVibrations() {
-        VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
-    }
-
-    private void stopVibrations() {
-        VibrationUtils.stopVibration(this);
-    }
-
     private void startCall() {
         // set up ui
         rootView.setVisibility(View.GONE);
@@ -446,22 +364,11 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         Senz senz = SenzUtils.getMicOnSenz(this, secretUser);
         sendSenz(senz);
 
-        // start record/play
-        streamRecorder.start();
-        streamPlayer.play();
-    }
-
-    private void endCall() {
-        stopVibrations();
-
-        // stop record/play
-        streamRecorder.stop();
-        streamPlayer.stop();
-
-        // send mic off senz
-        // send stream off
-        sendSenz(SenzUtils.getMicOffSenz(this, secretUser));
-        sendDatagram(SenzUtils.getEndStreamMsg(this, appUser.getUsername(), secretUser.getUsername()));
+        // locally broadcast mic on senz
+        Intent intent = new Intent();
+        intent.setAction(IntentProvider.ACTION_SENZ);
+        intent.putExtra("SENZ", senz);
+        sendBroadcast(intent);
     }
 
     private void sendSenz(Senz senz) {
@@ -485,23 +392,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
         newSecret.setDeliveryState(DeliveryState.PENDING);
         new SenzorsDbSource(this).createSecret(newSecret);
-    }
-
-    private void sendDatagram(final String senz) {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    if (address == null)
-                        address = InetAddress.getByName(SenzService.STREAM_HOST);
-                    if (socket == null)
-                        socket = new DatagramSocket();
-                    DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-                    socket.send(sendPacket);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
 }

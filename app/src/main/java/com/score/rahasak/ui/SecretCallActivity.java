@@ -33,28 +33,17 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.application.SenzApplication;
-import com.score.rahasak.async.StreamPlayer;
-import com.score.rahasak.async.StreamRecorder;
 import com.score.rahasak.enums.IntentType;
-import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
-import com.score.rahasak.remote.SenzService;
+import com.score.rahasak.remote.CallService;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
-import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
 
 public class SecretCallActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -75,18 +64,10 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
 
-    private User appUser;
     private SecretUser secretUser;
 
     private SensorManager sensorManager;
     private Sensor proximitySensor;
-
-    private StreamRecorder streamRecorder;
-    private StreamPlayer streamPlayer;
-
-    // we are listing for UDP socket
-    private DatagramSocket socket;
-    private InetAddress address;
 
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -175,12 +156,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         super.onPause();
         unregisterReceiver(senzReceiver);
         sensorManager.unregisterListener(this);
-
-        if (streamRecorder != null)
-            streamRecorder.stop();
-
-        if (streamPlayer != null)
-            streamPlayer.stop();
     }
 
     @Override
@@ -210,7 +185,14 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // stop service
+        stopService(new Intent(this, CallService.class));
     }
 
     private void initUi() {
@@ -236,7 +218,9 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endCall();
+                // send stream off
+                sendSenz(SenzUtils.getMicOffSenz(SecretCallActivity.this, secretUser));
+
                 SecretCallActivity.this.finish();
             }
         });
@@ -257,12 +241,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
             BitmapDrawable drawable = new BitmapDrawable(getResources(), ImageUtils.decodeBitmap(secretUser.getImage()));
             callingUser.setBackground(drawable);
         }
-
-        try {
-            appUser = PreferenceUtils.getUser(this);
-        } catch (NoUserException e) {
-            e.printStackTrace();
-        }
     }
 
     private void initSensor() {
@@ -271,51 +249,10 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     }
 
     private void initCall() {
-        // connect to UDP
-        initUdpSoc();
-        // init recorder
-        if (streamRecorder == null)
-            streamRecorder = new StreamRecorder(this, appUser.getUsername(), secretUser.getUsername(), secretUser.getSessionKey());
-        // init player
-        if (streamPlayer == null)
-            streamPlayer = new StreamPlayer(this, socket, secretUser.getSessionKey());
-        initUdpConn();
-    }
-
-    private void initUdpSoc() {
-        if (socket == null || socket.isClosed()) {
-            try {
-                socket = new DatagramSocket();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.e(TAG, "Socket already initialized");
-        }
-    }
-
-    /**
-     * Initialize/Create UDP socket
-     */
-    private void initUdpConn() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    // connect
-                    if (address == null)
-                        address = InetAddress.getByName(SenzService.STREAM_HOST);
-
-                    // send init message
-                    String msg = SenzUtils.getStartStreamMsg(SecretCallActivity.this, appUser.getUsername(), secretUser.getUsername());
-                    if (msg != null) {
-                        DatagramPacket sendPacket = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
-                        socket.send(sendPacket);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        // start service
+        Intent intent = new Intent(this, CallService.class);
+        intent.putExtra("USER", secretUser);
+        startService(intent);
     }
 
     private void onSenzReceived(Senz senz) {
@@ -332,7 +269,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
                 VibrationUtils.vibrate(this);
                 startCall();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
-                endCall();
                 SecretCallActivity.this.finish();
             }
         }
@@ -341,21 +277,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     private void startCall() {
         loadingView.setVisibility(View.INVISIBLE);
         playingText.setVisibility(View.VISIBLE);
-
-        // start recorder/player
-        streamRecorder.start();
-        streamPlayer.play();
-    }
-
-    private void endCall() {
-        // stop recorder/player
-        streamRecorder.stop();
-        streamPlayer.stop();
-
-        // send mic off senz
-        // send stream off
-        sendSenz(SenzUtils.getMicOffSenz(this, secretUser));
-        sendDatagram(SenzUtils.getEndStreamMsg(this, appUser.getUsername(), secretUser.getUsername()));
     }
 
     public void displayInformationMessageDialog(String title, String message) {
@@ -389,23 +310,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         });
 
         dialog.show();
-    }
-
-    private void sendDatagram(final String senz) {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    if (address == null)
-                        address = InetAddress.getByName(SenzService.STREAM_HOST);
-                    if (socket == null)
-                        socket = new DatagramSocket();
-                    DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-                    socket.send(sendPacket);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     private void sendSenz(Senz senz) {

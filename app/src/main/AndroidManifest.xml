@@ -151,6 +151,9 @@
             android:name="com.score.rahasak.remote.LatLonService"
             android:enabled="true" />
         <service
+            android:name="com.score.rahasak.remote.CallService"
+            android:enabled="true" />
+        <service
             android:name="com.score.rahasak.remote.SenzService"
             android:enabled="true">
             <intent-filter>

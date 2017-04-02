@@ -77,7 +77,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         initFlags();
         initUi();
         initUser();
-        VibrationUtils.startVibrationForPhoto(VibrationUtils.getVibratorPatterIncomingPhotoRequest(), this);
+        VibrationUtils.startVibrate(this);
         startTimerToEndRequest();
         startCameraIfMissedCall();
     }
