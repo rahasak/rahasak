@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -94,14 +95,13 @@ public class SenzNotificationManager {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(senzNotification.getTitle())
                 .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_MAX)
+                .setPriority(Notification.PRIORITY_MAX | Notification.DEFAULT_VIBRATE)
                 .setContentText(senzNotification.getMessage())
                 .setSmallIcon(senzNotification.getIcon())
                 .setWhen(System.currentTimeMillis())
-                .setContentIntent(pendingIntent);
-
-        Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
-        builder.setSound(sound);
+                .setContentIntent(pendingIntent)
+                .setSound(Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.eyes))
+                .setLights(Color.GREEN, 500, 7000);
 
         return builder.build();
     }
@@ -137,10 +137,9 @@ public class SenzNotificationManager {
                 .setWhen(System.currentTimeMillis())
                 .addAction(R.drawable.accept, "Accept", acceptPendingIntent)
                 .addAction(R.drawable.reject, "Reject", cancelPendingIntent)
-                .setContentIntent(contentPendingIntent);
-
-        Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification);
-        builder.setSound(sound);
+                .setContentIntent(contentPendingIntent)
+                .setSound(Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.eyes))
+                .setLights(Color.GREEN, 500, 7000);
 
         return builder.build();
     }
