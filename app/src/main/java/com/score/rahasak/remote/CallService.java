@@ -244,7 +244,7 @@ public class CallService extends Service {
                     AudioUtils.RECORDER_SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
-                    640,
+                    minBufSize,
                     AudioTrack.MODE_STREAM);
             Log.d(TAG, "min buffer size: " + minBufSize);
         }
