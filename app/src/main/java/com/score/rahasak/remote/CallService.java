@@ -19,7 +19,6 @@ import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
-import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzUtils;
@@ -42,6 +41,8 @@ import io.kvh.media.amr.AmrEncoder;
 public class CallService extends Service {
 
     private static final String TAG = CallService.class.getName();
+
+    public static final int SAMPLE_RATE = 44100;
 
     private User appUser;
     private SecretUser secretUser;
@@ -103,7 +104,6 @@ public class CallService extends Service {
         initUdpSoc();
         initUdpConn();
         getAudioSettings();
-        enableEarpiece();
 
         player = new Player();
         recorder = new Recorder();
@@ -189,6 +189,7 @@ public class CallService extends Service {
         if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
                 VibrationUtils.vibrate(this);
+                enableEarpiece();
                 startCall();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
                 VibrationUtils.vibrate(this);
@@ -239,9 +240,9 @@ public class CallService extends Service {
         Player() {
             thread = new Thread(this);
 
-            int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            int minBufSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
-                    AudioUtils.RECORDER_SAMPLE_RATE,
+                    SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize,
@@ -280,6 +281,7 @@ public class CallService extends Service {
                         // decrypt
                         byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
 
+                        //Log.d(TAG, "Time +++++ " + System.currentTimeMillis());
                         // decode codec
                         AmrDecoder.decode(amrState, stream, pcmframs);
                         streamTrack.write(pcmframs, 0, pcmframs.length);
@@ -320,9 +322,9 @@ public class CallService extends Service {
 
             int channelConfig = AudioFormat.CHANNEL_IN_MONO;
             int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-            int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
+            int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, channelConfig, audioFormat);
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                    AudioUtils.RECORDER_SAMPLE_RATE,
+                    SAMPLE_RATE,
                     channelConfig,
                     audioFormat,
                     minBufSize * 10);
@@ -358,6 +360,7 @@ public class CallService extends Service {
                     // base 64 encoded senz
                     String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
+                    //Log.d(TAG, "Time ---- " + System.currentTimeMillis());
                     String senz = encodedStream + " @" + secretUser.getUsername() + " ^" + appUser.getUsername();
                     sendStream(senz);
                 } catch (Exception e) {

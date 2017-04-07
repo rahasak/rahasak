@@ -8,6 +8,7 @@ import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
+import com.score.rahasak.remote.CallService;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 
@@ -42,9 +43,9 @@ public class StreamPlayer {
         this.socket = socket;
         this.secretKey = CryptoUtils.getSecretKey(sessionKey);
 
-        int minBufSize = AudioTrack.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        int minBufSize = AudioTrack.getMinBufferSize(CallService.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
         streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
-                AudioUtils.RECORDER_SAMPLE_RATE,
+                CallService.SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 640,

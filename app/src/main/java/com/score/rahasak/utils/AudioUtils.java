@@ -8,12 +8,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 
-/**
- * Created by Lakmal on 8/28/16.
- */
-public class AudioUtils {
 
-    public static final int RECORDER_SAMPLE_RATE = 8000;
+public class AudioUtils {
 
     public static void disableSpeaker(Context context) {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);

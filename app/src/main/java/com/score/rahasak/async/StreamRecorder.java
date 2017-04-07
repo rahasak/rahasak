@@ -6,8 +6,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Base64;
 
+import com.score.rahasak.remote.CallService;
 import com.score.rahasak.remote.SenzService;
-import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 
 import java.io.IOException;
@@ -41,9 +41,9 @@ public class StreamRecorder {
 
         int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-        int minBufSize = AudioRecord.getMinBufferSize(AudioUtils.RECORDER_SAMPLE_RATE, channelConfig, audioFormat);
+        int minBufSize = AudioRecord.getMinBufferSize(CallService.SAMPLE_RATE, channelConfig, audioFormat);
         audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                AudioUtils.RECORDER_SAMPLE_RATE,
+                CallService.SAMPLE_RATE,
                 channelConfig,
                 audioFormat,
                 minBufSize * 10);
