@@ -13,9 +13,6 @@ import android.widget.TextView;
 
 import com.score.rahasak.R;
 
-/**
- * Created by eranga on 12/5/16.
- */
 public class InviteFragment extends Fragment {
 
     // Ui elements

@@ -20,6 +20,8 @@ import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.CryptoUtils;
+import com.score.rahasak.utils.OpusDecoder;
+import com.score.rahasak.utils.OpusEncoder;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
@@ -34,15 +36,14 @@ import java.net.SocketException;
 
 import javax.crypto.SecretKey;
 
-import io.kvh.media.amr.AmrDecoder;
-import io.kvh.media.amr.AmrEncoder;
-
 
 public class CallService extends Service {
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 44100;
+    public static final int SAMPLE_RATE = 8000;
+    public static final int FRAME_SIZE = 160;
+    public static final int BUF_SIZE = FRAME_SIZE;
 
     private User appUser;
     private SecretUser secretUser;
@@ -131,7 +132,7 @@ public class CallService extends Service {
         if (intent.hasExtra("USER"))
             secretUser = intent.getParcelableExtra("USER");
 
-        secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
+        //secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
     }
 
     private void initUdpSoc() {
@@ -263,11 +264,15 @@ public class CallService extends Service {
 
         private void play() {
             streamTrack.play();
-            final long amrState = AmrDecoder.init();
+
+            // init opus decoder
+            OpusDecoder opusDecoder = new OpusDecoder();
+            opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
 
             try {
-                short[] pcmframs = new short[160];
-                byte[] message = new byte[64];
+                short[] pcmframs = new short[BUF_SIZE];
+                byte[] message = new byte[BUF_SIZE];
+
                 while (calling) {
                     // listen for senz
                     DatagramPacket receivePacket = new DatagramPacket(message, message.length);
@@ -279,11 +284,11 @@ public class CallService extends Service {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
+                        //byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
+                        byte[] stream = Base64.decode(msg, Base64.DEFAULT);
 
-                        //Log.d(TAG, "Time +++++ " + System.currentTimeMillis());
                         // decode codec
-                        AmrDecoder.decode(amrState, stream, pcmframs);
+                        opusDecoder.decode(stream, pcmframs);
                         streamTrack.write(pcmframs, 0, pcmframs.length);
                     }
                 }
@@ -291,7 +296,7 @@ public class CallService extends Service {
                 e.printStackTrace();
             }
 
-            AmrDecoder.exit(amrState);
+            opusDecoder.close();
             shutDown();
         }
 
@@ -320,15 +325,12 @@ public class CallService extends Service {
         Recorder() {
             thread = new Thread(this);
 
-            int channelConfig = AudioFormat.CHANNEL_IN_MONO;
-            int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-            int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, channelConfig, audioFormat);
+            int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
-                    channelConfig,
-                    audioFormat,
-                    minBufSize * 10);
-            AmrEncoder.init(0);
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufSize);
         }
 
         public void start() {
@@ -344,23 +346,27 @@ public class CallService extends Service {
 
         private void record() {
             audioRecorder.startRecording();
-            int mode = AmrEncoder.Mode.MR795.ordinal();
+
+            // init opus encoder
+            OpusEncoder opusEncoder = new OpusEncoder();
+            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
 
             int encoded;
-            short[] inBuf = new short[160];
-            byte[] outBuf = new byte[32];
+            short[] inBuf = new short[BUF_SIZE];
+            byte[] outBuf = new byte[BUF_SIZE];
+
             while (calling) {
                 // read to buffer
                 // encode with codec
                 audioRecorder.read(inBuf, 0, inBuf.length);
-                encoded = AmrEncoder.encode(mode, inBuf, outBuf);
+                encoded = opusEncoder.encode(inBuf, outBuf);
 
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    //String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    String encodedStream = Base64.encodeToString(outBuf, 0, encoded, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
-                    //Log.d(TAG, "Time ---- " + System.currentTimeMillis());
                     String senz = encodedStream + " @" + secretUser.getUsername() + " ^" + appUser.getUsername();
                     sendStream(senz);
                 } catch (Exception e) {
@@ -368,7 +374,7 @@ public class CallService extends Service {
                 }
             }
 
-            AmrEncoder.exit();
+            opusEncoder.close();
             shutDown();
         }
 

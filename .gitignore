@@ -24,3 +24,5 @@ proguard_logs/
 .gradle/
 build/
 senz/build/
+app/src/main/obj/
+app/src/main/libs/
