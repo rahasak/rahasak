@@ -132,7 +132,7 @@ public class CallService extends Service {
         if (intent.hasExtra("USER"))
             secretUser = intent.getParcelableExtra("USER");
 
-        //secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
+        secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
     }
 
     private void initUdpSoc() {

@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_LDLIBS := -llog
 
-LOCAL_MODULE:= opus
+LOCAL_MODULE:= senz
 
 #################### COMPILE OPTIONS #######################
 
@@ -213,8 +213,6 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/opus/include/ \
 	$(LOCAL_PATH)/opus/silk/float/ \
 	$(LOCAL_PATH)/opus/silk/fixed/ \
 	$(LOCAL_PATH)/opus/celt/ \
-	$(LOCAL_PATH)/opus/src/ \
-    com_score_rahasak_utils_OpusEncoder.h \
-    com_score_rahasak_utils_OpusDecoder.h
+	$(LOCAL_PATH)/opus/src/
 
 include $(BUILD_SHARED_LIBRARY)

@@ -2,14 +2,14 @@ package com.score.rahasak.utils;
 
 public class OpusDecoder {
 
-    private native boolean nativeInitDecoder(int samplingRate, int numberOfChannels, int frameSize);
+    public native boolean nativeInitDecoder(int samplingRate, int numberOfChannels, int frameSize);
 
-    private native int nativeDecodeBytes(byte[] in, short[] out);
+    public native int nativeDecodeBytes(byte[] in, short[] out);
 
-    private native boolean nativeReleaseDecoder();
+    public native boolean nativeReleaseDecoder();
 
     static {
-        System.loadLibrary("opus");
+        System.loadLibrary("senz");
     }
 
     public void init(int sampleRate, int channels, int frameSize) {

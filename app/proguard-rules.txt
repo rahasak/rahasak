@@ -30,3 +30,7 @@
 -dontwarn de.tavendo.autobahn.**
 -dontwarn com.github.siyamed.**
 -dontwarn com.squareup.picasso.**
+
+-keepclasseswithmembers class * {
+    native <methods>;
+}

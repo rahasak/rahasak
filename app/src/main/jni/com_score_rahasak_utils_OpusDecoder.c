@@ -35,14 +35,9 @@ opus_int32 SAMPLING_RATE;
 int CHANNELS;
 //int APPLICATION_TYPE = OPUS_APPLICATION_VOIP;
 int FRAME_SIZE;
-//--
 
-/*
- * Class:
- * Method:    nativeInitDecoder
- * Signature: (I;I;I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusDecoder_nativeInitDecoder (JNIEnv *env, jobject obj, jint samplingRate, jint numberOfChannels, jint frameSize )
+
+JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusDecoder_nativeInitDecoder (JNIEnv *env, jobject obj, jint samplingRate, jint numberOfChannels, jint frameSize)
 {
 	FRAME_SIZE = frameSize;
 	SAMPLING_RATE = samplingRate;
@@ -61,11 +56,6 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusDecoder_nativeInitDe
 	return error;
 }
 
-/*
- * Class:
- * Method:    nativeDecodeBytes
- * Signature: ([B;[S)I
- */
 JNIEXPORT jint JNICALL Java_com_score_rahasak_utils_OpusDecoder_nativeDecodeBytes (JNIEnv *env, jobject obj, jbyteArray in, jshortArray out)
 {
 	__android_log_write(ANDROID_LOG_DEBUG, "Native Code:", "Opus decoding");
@@ -110,7 +100,6 @@ JNIEXPORT jint JNICALL Java_com_score_rahasak_utils_OpusDecoder_nativeDecodeByte
 
 JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusDecoder_nativeReleaseDecoder (JNIEnv *env, jobject obj)
 {
-    //opus_decoder_destroy(dec);
     free(dec);
 
     return 1;

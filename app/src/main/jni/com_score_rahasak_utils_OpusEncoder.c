@@ -7,19 +7,13 @@
 char logMsg[255];
 OpusEncoder *enc;
 
-//Config
 opus_int32 SAMPLING_RATE;
 int CHANNELS;
 int APPLICATION_TYPE = OPUS_APPLICATION_VOIP;
 int FRAME_SIZE;
 const int MAX_PAYLOAD_BYTES = 1500;
-//--
 
-/*
- * Class:     de_stuttgart_hdm_opuswalkietalkie_OpusEncoder
- * Method:    nativeInitEncoder
- * Signature: (I;I;I)Z
- */
+
 JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeInitEncoder (JNIEnv *env, jobject obj, jint samplingRate, jint numberOfChannels, jint frameSize)
 {
 	FRAME_SIZE = frameSize;
@@ -39,11 +33,6 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeInitEn
 	return error;
 }
 
-/*
- * Class:     de_stuttgart_hdm_opuswalkietalkie_OpusEncoder
- * Method:    nativeEncodeBytes
- * Signature: ([S;[B)I
- */
 JNIEXPORT jint JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeEncodeBytes (JNIEnv *env, jobject obj, jshortArray in, jbyteArray out)
 {
 	__android_log_write(ANDROID_LOG_DEBUG, "Native Code:", "Opus Encoding");
@@ -87,7 +76,6 @@ JNIEXPORT jint JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeEncodeByte
 
 JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeReleaseEncoder (JNIEnv *env, jobject obj)
 {
-    //opus_encoder_destroy(enc);
     free(enc);
 
     return 1;
