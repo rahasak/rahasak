@@ -9,6 +9,9 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -238,6 +241,8 @@ public class CallService extends Service {
 
         private AudioTrack streamTrack;
 
+        private OpusDecoder opusDecoder;
+
         Player() {
             thread = new Thread(this);
 
@@ -248,7 +253,11 @@ public class CallService extends Service {
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize,
                     AudioTrack.MODE_STREAM);
-            Log.d(TAG, "min buffer size: " + minBufSize);
+            Log.d(TAG, "AudioTrack min buffer size: ---- " + minBufSize);
+
+            // init opus decoder
+            opusDecoder = new OpusDecoder();
+            opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
         }
 
         public void start() {
@@ -265,10 +274,6 @@ public class CallService extends Service {
         private void play() {
             streamTrack.play();
 
-            // init opus decoder
-            OpusDecoder opusDecoder = new OpusDecoder();
-            opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
-
             try {
                 short[] pcmframs = new short[BUF_SIZE];
                 byte[] message = new byte[BUF_SIZE];
@@ -284,8 +289,8 @@ public class CallService extends Service {
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        //byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
-                        byte[] stream = Base64.decode(msg, Base64.DEFAULT);
+                        byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
+                        //byte[] stream = Base64.decode(msg, Base64.DEFAULT);
 
                         // decode codec
                         opusDecoder.decode(stream, pcmframs);
@@ -322,6 +327,12 @@ public class CallService extends Service {
 
         private AudioRecord audioRecorder;
 
+        private AutomaticGainControl agc;
+        private NoiseSuppressor ns;
+        private AcousticEchoCanceler aec;
+
+        private OpusEncoder opusEncoder;
+
         Recorder() {
             thread = new Thread(this);
 
@@ -331,6 +342,12 @@ public class CallService extends Service {
                     AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize);
+
+            Log.d(TAG, "AudioRecorder min buffer size: ---- " + minBufSize);
+
+            // init opus encoder
+            opusEncoder = new OpusEncoder();
+            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
         }
 
         public void start() {
@@ -347,9 +364,15 @@ public class CallService extends Service {
         private void record() {
             audioRecorder.startRecording();
 
-            // init opus encoder
-            OpusEncoder opusEncoder = new OpusEncoder();
-            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+            // enable
+            // 1. AutomaticGainControl
+            // 2. NoiseSuppressor
+            // 3. AcousticEchoCanceler
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                enableAGC();
+                enableNS();
+                enableAEC();
+            }
 
             int encoded;
             short[] inBuf = new short[BUF_SIZE];
@@ -364,8 +387,8 @@ public class CallService extends Service {
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    //String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
-                    String encodedStream = Base64.encodeToString(outBuf, 0, encoded, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
+                    //String encodedStream = Base64.encodeToString(outBuf, 0, encoded, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
                     String senz = encodedStream + " @" + secretUser.getUsername() + " ^" + appUser.getUsername();
                     sendStream(senz);
@@ -376,6 +399,27 @@ public class CallService extends Service {
 
             opusEncoder.close();
             shutDown();
+        }
+
+        private void enableAGC() {
+            if (AutomaticGainControl.isAvailable()) {
+                agc = AutomaticGainControl.create(audioRecorder.getAudioSessionId());
+                if (agc != null) agc.setEnabled(true);
+            }
+        }
+
+        private void enableNS() {
+            if (NoiseSuppressor.isAvailable()) {
+                ns = NoiseSuppressor.create(audioRecorder.getAudioSessionId());
+                if (ns != null) ns.setEnabled(true);
+            }
+        }
+
+        private void enableAEC() {
+            if (AcousticEchoCanceler.isAvailable()) {
+                aec = AcousticEchoCanceler.create(audioRecorder.getAudioSessionId());
+                if (aec != null) aec.setEnabled(true);
+            }
         }
 
         private void sendStream(String senz) {

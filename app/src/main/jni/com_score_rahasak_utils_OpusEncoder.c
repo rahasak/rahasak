@@ -35,24 +35,13 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeInitEn
 
 JNIEXPORT jint JNICALL Java_com_score_rahasak_utils_OpusEncoder_nativeEncodeBytes (JNIEnv *env, jobject obj, jshortArray in, jbyteArray out)
 {
-	__android_log_write(ANDROID_LOG_DEBUG, "Native Code:", "Opus Encoding");
-
-	sprintf(logMsg, "FrameSize: %d - SamplingRate: %d - Channels: %d", FRAME_SIZE, SAMPLING_RATE, CHANNELS);
-	__android_log_write(ANDROID_LOG_DEBUG, "Native Code:", logMsg);
-
 	jint inputArraySize = (*env)->GetArrayLength(env, in);
 	jint outputArraySize = (*env)->GetArrayLength(env, out);
 
 	jshort* audioSignal = (*env)->GetShortArrayElements(env, in, 0);
 
-	sprintf(logMsg, "Length of Input Data: %d", inputArraySize);
-	__android_log_write(ANDROID_LOG_DEBUG, "Native Code:", logMsg);
-
 	unsigned char *data = (unsigned char*)calloc(MAX_PAYLOAD_BYTES,sizeof(unsigned char));
 	int dataArraySize = opus_encode(enc, audioSignal, FRAME_SIZE, data, MAX_PAYLOAD_BYTES);
-
-	sprintf(logMsg, "Length of Encoded Data: %d", dataArraySize);
-	__android_log_write(ANDROID_LOG_DEBUG, "Native Code:", logMsg);
 
 	if (dataArraySize >=0)
 	{
