@@ -212,26 +212,6 @@ public class CallService extends Service {
         calling = false;
     }
 
-    private void enableEarpiece() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-        audioManager.setSpeakerphoneOn(false);
-    }
-
-    private void getAudioSettings() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioMode = audioManager.getMode();
-        ringMode = audioManager.getRingerMode();
-        isSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
-    }
-
-    private void resetAudioSettings() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(audioMode);
-        audioManager.setRingerMode(ringMode);
-        audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
-    }
-
     /**
      * Player thread
      */
@@ -327,10 +307,6 @@ public class CallService extends Service {
 
         private AudioRecord audioRecorder;
 
-        private AutomaticGainControl agc;
-        private NoiseSuppressor ns;
-        private AcousticEchoCanceler aec;
-
         private OpusEncoder opusEncoder;
 
         Recorder() {
@@ -369,9 +345,9 @@ public class CallService extends Service {
             // 2. NoiseSuppressor
             // 3. AcousticEchoCanceler
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                enableAGC();
-                enableNS();
-                enableAEC();
+                enableAGC(audioRecorder.getAudioSessionId());
+                enableNS(audioRecorder.getAudioSessionId());
+                enableAEC(audioRecorder.getAudioSessionId());
             }
 
             int encoded;
@@ -401,27 +377,6 @@ public class CallService extends Service {
             shutDown();
         }
 
-        private void enableAGC() {
-            if (AutomaticGainControl.isAvailable()) {
-                agc = AutomaticGainControl.create(audioRecorder.getAudioSessionId());
-                if (agc != null) agc.setEnabled(true);
-            }
-        }
-
-        private void enableNS() {
-            if (NoiseSuppressor.isAvailable()) {
-                ns = NoiseSuppressor.create(audioRecorder.getAudioSessionId());
-                if (ns != null) ns.setEnabled(true);
-            }
-        }
-
-        private void enableAEC() {
-            if (AcousticEchoCanceler.isAvailable()) {
-                aec = AcousticEchoCanceler.create(audioRecorder.getAudioSessionId());
-                if (aec != null) aec.setEnabled(true);
-            }
-        }
-
         private void sendStream(String senz) {
             try {
                 if (sendSoc == null)
@@ -442,4 +397,46 @@ public class CallService extends Service {
             }
         }
     }
+
+    private void enableEarpiece() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        audioManager.setSpeakerphoneOn(false);
+    }
+
+    private void getAudioSettings() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioMode = audioManager.getMode();
+        ringMode = audioManager.getRingerMode();
+        isSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
+    }
+
+    private void resetAudioSettings() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(audioMode);
+        audioManager.setRingerMode(ringMode);
+        audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
+    }
+
+    private void enableAGC(int sessionId) {
+        if (AutomaticGainControl.isAvailable()) {
+            AutomaticGainControl agc = AutomaticGainControl.create(sessionId);
+            if (agc != null) agc.setEnabled(true);
+        }
+    }
+
+    private void enableNS(int sessionId) {
+        if (NoiseSuppressor.isAvailable()) {
+            NoiseSuppressor ns = NoiseSuppressor.create(sessionId);
+            if (ns != null) ns.setEnabled(true);
+        }
+    }
+
+    private void enableAEC(int sessionId) {
+        if (AcousticEchoCanceler.isAvailable()) {
+            AcousticEchoCanceler aec = AcousticEchoCanceler.create(sessionId);
+            if (aec != null) aec.setEnabled(true);
+        }
+    }
+
 }
