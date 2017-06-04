@@ -52,6 +52,10 @@ public class TimeUtils {
         return time;
     }
 
+    public static boolean isInLine(long t1, long t2) {
+        return (t2 - t1) <= 60;
+    }
+
     /**
      * Return true is the date supplied is older than timeInMinues.
      *

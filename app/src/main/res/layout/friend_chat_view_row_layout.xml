@@ -79,7 +79,6 @@
             android:text="Hi This is a message"
             android:textColor="@color/white"
             android:textSize="20dp" />
-
     </LinearLayout>
 
     <FrameLayout

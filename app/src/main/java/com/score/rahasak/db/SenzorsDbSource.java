@@ -413,6 +413,33 @@ public class SenzorsDbSource {
     }
 
     /**
+     * Mark message as viewed state
+     *
+     * @param isViewed viewed state
+     * @param uid uid
+     */
+    public void updateViewedState(boolean isViewed, String uid) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, isViewed ? 1 : 0);
+
+            // update
+            db.update(SenzorsDbContract.Secret.TABLE_NAME,
+                    values,
+                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
+                    new String[]{uid});
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    /**
      * Get ALl secrets to be display in chat list
      *
      * @return sensor list

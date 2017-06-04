@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -92,6 +93,8 @@ class ChatListAdapter extends BaseAdapter {
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
                     holder.chatMic = (ImageView) view.findViewById(R.id.chat_mic);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
+
+                    holder.chatStatus = (FrameLayout) view.findViewById(R.id.chat_status);
                     holder.chatTime = (TextView) view.findViewById(R.id.chat_time);
                     holder.chatDelivered = (ImageView) view.findViewById(R.id.chat_delivered);
                     holder.chatPending = (ImageView) view.findViewById(R.id.chat_pending);
@@ -106,6 +109,8 @@ class ChatListAdapter extends BaseAdapter {
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
                     holder.chatMic = (ImageView) view.findViewById(R.id.chat_mic);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
+
+                    holder.chatStatus = (FrameLayout) view.findViewById(R.id.chat_status);
                     holder.chatTime = (TextView) view.findViewById(R.id.chat_time);
                     holder.chatDelivered = (ImageView) view.findViewById(R.id.chat_delivered);
                     holder.chatPending = (ImageView) view.findViewById(R.id.chat_pending);
@@ -176,6 +181,12 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
+        if (secret.isViewed()) {
+            holder.chatStatus.setVisibility(View.GONE);
+        } else {
+            holder.chatStatus.setVisibility(View.VISIBLE);
+        }
+
         holder.chatCam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,6 +232,7 @@ class ChatListAdapter extends BaseAdapter {
         ImageView chatMic;
         TextView chatMsg;
 
+        FrameLayout chatStatus;
         TextView chatTime;
         ImageView chatDelivered;
         ImageView chatPending;

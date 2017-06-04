@@ -41,6 +41,7 @@ import com.score.rahasak.utils.LimitedList;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.SenzUtils;
+import com.score.rahasak.utils.TimeUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -326,6 +327,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void addSecret(Secret secret) {
+        // visible/hide previous chat status according to time diff
+        Secret preSecret = secretList.getYongest();
+        if (preSecret.isSender() == secret.isSender() && TimeUtils.isInLine(preSecret.getTimeStamp(), secret.getTimeStamp())) {
+            // time diff less than 1 min, so hide status of previous chat
+            preSecret.setViewed(true);
+            dbSource.updateViewedState(true, preSecret.getId());
+        }
+
         // update list view
         secretList.add(secret);
         secretAdapter.notifyDataSetChanged();
