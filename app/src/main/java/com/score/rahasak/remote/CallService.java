@@ -420,7 +420,7 @@ public class CallService extends Service {
     private class Ringer implements Runnable {
         private final Thread thread;
 
-        MediaPlayer mediaPlayer;
+        private MediaPlayer mediaPlayer;
 
         Ringer() {
             thread = new Thread(this);

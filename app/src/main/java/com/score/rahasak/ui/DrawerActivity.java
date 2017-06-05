@@ -142,7 +142,6 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         drawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 
-
     private void setupToolbar() {
         toolbar = (Toolbar) findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
