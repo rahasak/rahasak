@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 11
-        versionName "0.29"
+        versionCode 12
+        versionName "0.30"
         applicationId "com.score.rahasak"
 
         renderscriptTargetApi 18

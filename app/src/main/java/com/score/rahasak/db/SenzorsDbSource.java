@@ -11,6 +11,7 @@ import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Permission;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
+import com.score.rahasak.utils.TimeUtils;
 
 import java.util.ArrayList;
 
@@ -358,7 +359,8 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_MISSED, secret.isMissed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.DELIVERY_STATE, secret.getDeliveryState().getState());
 
-        // TODO update recent_secret table
+        // update previous secret
+        updatePreviousSecretViewedState(secret);
 
         // insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
@@ -415,24 +417,39 @@ public class SenzorsDbSource {
     /**
      * Mark message as viewed state
      *
-     * @param isViewed viewed state
-     * @param uid uid
+     * @param curSecret cur secret
      */
-    public void updateViewedState(boolean isViewed, String uid) {
+    private void updatePreviousSecretViewedState(Secret curSecret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         try {
             db.beginTransaction();
 
-            // content values to inset
-            ContentValues values = new ContentValues();
-            values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, isViewed ? 1 : 0);
+            // update viewed statues
+            Cursor cursor = db.query(SenzorsDbContract.Secret.TABLE_NAME, // table
+                    null, // columns
+                    null,
+                    null, // selection
+                    null, // order by
+                    null, // group by
+                    null); // join
+            if (cursor.moveToLast()) {
+                String uid = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
+                long time = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+                boolean isSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER)) == 1;
+                if ((curSecret.isSender() == isSender) && TimeUtils.isInLine(time, curSecret.getTimeStamp())) {
+                    // secret is inline, viewed true
+                    ContentValues values = new ContentValues();
+                    values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 1);
 
-            // update
-            db.update(SenzorsDbContract.Secret.TABLE_NAME,
-                    values,
-                    SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
-                    new String[]{uid});
+                    // update
+                    db.update(SenzorsDbContract.Secret.TABLE_NAME,
+                            values,
+                            SenzorsDbContract.Secret.COLUMN_UNIQUE_ID + " = ?",
+                            new String[]{uid});
+                }
+            }
 
+            cursor.close();
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

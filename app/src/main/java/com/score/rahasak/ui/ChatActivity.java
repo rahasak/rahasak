@@ -329,10 +329,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void addSecret(Secret secret) {
         // visible/hide previous chat status according to time diff
         Secret preSecret = secretList.getYongest();
-        if (preSecret.isSender() == secret.isSender() && TimeUtils.isInLine(preSecret.getTimeStamp(), secret.getTimeStamp())) {
+        if (preSecret != null && preSecret.isSender() == secret.isSender() && TimeUtils.isInLine(preSecret.getTimeStamp(), secret.getTimeStamp())) {
             // time diff less than 1 min, so hide status of previous chat
             preSecret.setViewed(true);
-            dbSource.updateViewedState(true, preSecret.getId());
         }
 
         // update list view
