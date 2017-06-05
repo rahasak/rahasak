@@ -3,7 +3,6 @@ package com.score.rahasak.utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 public class TimeUtils {
     private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm a");
