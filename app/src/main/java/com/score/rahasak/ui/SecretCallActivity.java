@@ -39,6 +39,7 @@ import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.remote.CallService;
 import com.score.rahasak.utils.ActivityUtils;
+import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PhoneBookUtil;
@@ -122,6 +123,7 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         initCall();
 
         // ring
+        AudioUtils.enableEarpiece(this);
         ringer = new Ringer();
         startRing();
     }

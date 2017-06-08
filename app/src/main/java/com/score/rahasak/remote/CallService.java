@@ -9,9 +9,6 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
-import android.media.audiofx.AcousticEchoCanceler;
-import android.media.audiofx.AutomaticGainControl;
-import android.media.audiofx.NoiseSuppressor;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -22,6 +19,7 @@ import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
+import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.OpusDecoder;
 import com.score.rahasak.utils.OpusEncoder;
@@ -62,6 +60,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     private DatagramSocket recvSoc;
     private DatagramSocket sendSoc;
 
+    // audio
+    private AudioManager audioManager;
+
     // player/recorder and state
     private Player player;
     private Recorder recorder;
@@ -98,6 +99,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     public void onCreate() {
         super.onCreate();
 
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
     }
 
@@ -109,8 +111,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         initUdpSoc();
         initUdpConn();
         getAudioSettings();
-        enableEarpiece();
-        requestAudioFocus();
+        audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
 
         player = new Player();
         recorder = new Recorder();
@@ -126,7 +127,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         clrUdpConn();
         unregisterReceiver(senzReceiver);
         resetAudioSettings();
-        releaseAudioFocus();
+        audioManager.abandonAudioFocus(this);
     }
 
     @Override
@@ -155,8 +156,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         if (recvSoc == null || recvSoc.isClosed()) {
             try {
                 recvSoc = new DatagramSocket();
-                //recvSoc.setReuseAddress(true);
-                //recvSoc.setSoTimeout()
             } catch (SocketException e) {
                 e.printStackTrace();
             }
@@ -165,9 +164,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
     }
 
-    /**
-     * Initialize/Create UDP socket
-     */
     private void initUdpConn() {
         new Thread(new Runnable() {
             public void run() {
@@ -218,63 +214,26 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     private void startCall() {
         calling = true;
 
-        player.start();
         recorder.start();
+        player.start();
+
+        AudioUtils.enableEarpiece(CallService.this);
     }
 
     private void endCall() {
         calling = false;
     }
 
-    private void requestAudioFocus() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-    }
-
-    private void releaseAudioFocus() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.abandonAudioFocus(this);
-    }
-
-    private void enableEarpiece() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-        audioManager.setSpeakerphoneOn(false);
-    }
-
     private void getAudioSettings() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioMode = audioManager.getMode();
         ringMode = audioManager.getRingerMode();
         isSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
     }
 
     private void resetAudioSettings() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(audioMode);
         audioManager.setRingerMode(ringMode);
         audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
-    }
-
-    private void enableAGC(int sessionId) {
-        if (AutomaticGainControl.isAvailable()) {
-            AutomaticGainControl agc = AutomaticGainControl.create(sessionId);
-            if (agc != null) agc.setEnabled(true);
-        }
-    }
-
-    private void enableNS(int sessionId) {
-        if (NoiseSuppressor.isAvailable()) {
-            NoiseSuppressor ns = NoiseSuppressor.create(sessionId);
-            if (ns != null) ns.setEnabled(true);
-        }
-    }
-
-    private void enableAEC(int sessionId) {
-        if (AcousticEchoCanceler.isAvailable()) {
-            AcousticEchoCanceler aec = AcousticEchoCanceler.create(sessionId);
-            if (aec != null) aec.setEnabled(true);
-        }
     }
 
     /**
@@ -296,7 +255,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
-                    minBufSize * 2,
+                    minBufSize,
                     AudioTrack.MODE_STREAM);
             Log.d(TAG, "AudioTrack min buffer size: ---- " + minBufSize);
 
@@ -378,10 +337,10 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             thread = new Thread(this);
 
             int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            if (minBufSize < 4096) {
-                // opus require a 4KB buffer to work correctly
-                minBufSize = 4096;
-            }
+            //if (minBufSize < 4096) {
+            // opus require a 4KB buffer to work correctly
+            //minBufSize = 4096;
+            //}
 
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
@@ -415,9 +374,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             // 2. NoiseSuppressor
             // 3. AcousticEchoCanceler
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                enableAGC(audioRecorder.getAudioSessionId());
-                enableNS(audioRecorder.getAudioSessionId());
-                enableAEC(audioRecorder.getAudioSessionId());
+                AudioUtils.enableAGC(audioRecorder.getAudioSessionId());
+                AudioUtils.enableNS(audioRecorder.getAudioSessionId());
+                AudioUtils.enableAEC(audioRecorder.getAudioSessionId());
             }
 
             int encoded;

@@ -1,12 +1,12 @@
 package com.score.rahasak.utils;
 
 import android.content.Context;
-import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.AudioRecord;
 import android.media.MediaPlayer;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
 import android.net.Uri;
-import android.util.Log;
 
 
 public class AudioUtils {
@@ -23,16 +23,6 @@ public class AudioUtils {
         audioManager.setSpeakerphoneOn(true);
     }
 
-    public static void resetAudioManager(Context context) {
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_NORMAL);
-    }
-
-    public static void removeNoice(Context context) {
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setParameters("noise_suppression=auto");
-    }
-
     public static void shootSound(Context context) {
         AudioManager meng = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int volume = meng.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
@@ -42,14 +32,32 @@ public class AudioUtils {
         }
     }
 
-    public static void getValidSampleRates() {
-        for (int rate : new int[]{8000, 11025, 16000, 22050, 44100}) {  // add the rates you wish to check against
-            int bufferSize = AudioRecord.getMinBufferSize(rate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            if (bufferSize > 0) {
-                // buffer size is valid, Sample rate supported
-                Log.d("TAG", "Support ----" + rate);
-            }
+    public static void enableEarpiece(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        audioManager.setSpeakerphoneOn(false);
+    }
+
+    public static void enableAGC(int sessionId) {
+        if (AutomaticGainControl.isAvailable()) {
+            AutomaticGainControl agc = AutomaticGainControl.create(sessionId);
+            if (agc != null) agc.setEnabled(true);
         }
     }
+
+    public static void enableNS(int sessionId) {
+        if (NoiseSuppressor.isAvailable()) {
+            NoiseSuppressor ns = NoiseSuppressor.create(sessionId);
+            if (ns != null) ns.setEnabled(true);
+        }
+    }
+
+    public static void enableAEC(int sessionId) {
+        if (AcousticEchoCanceler.isAvailable()) {
+            AcousticEchoCanceler aec = AcousticEchoCanceler.create(sessionId);
+            if (aec != null) aec.setEnabled(true);
+        }
+    }
+
 
 }
