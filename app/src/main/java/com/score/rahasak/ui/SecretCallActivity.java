@@ -378,9 +378,7 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
 
         @Override
         public void run() {
-            if (ringing) {
-                mediaPlayer.start();
-            }
+            mediaPlayer.start();
         }
     }
 
