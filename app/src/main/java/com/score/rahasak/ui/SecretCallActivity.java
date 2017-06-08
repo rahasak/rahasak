@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,6 +29,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.rahasak.R;
@@ -63,6 +65,10 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     // service interface
     protected ISenzService senzService = null;
     protected boolean isServiceBound = false;
+
+    // for ringing
+    private Ringer ringer;
+    private boolean ringing;
 
     private SecretUser secretUser;
 
@@ -114,6 +120,10 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         initUser();
         initSensor();
         initCall();
+
+        // ring
+        ringer = new Ringer();
+        startRing();
     }
 
     @Override
@@ -218,8 +228,14 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // send stream off
-                sendSenz(SenzUtils.getMicOffSenz(SecretCallActivity.this, secretUser));
+                if (ringing) {
+                    // ringing means call not started yet, send busy status
+                    endRing();
+                    sendSenz(SenzUtils.getMicBusySenz(SecretCallActivity.this, secretUser));
+                } else {
+                    // not ringing means call started, so send mic off
+                    sendSenz(SenzUtils.getMicOffSenz(SecretCallActivity.this, secretUser));
+                }
 
                 SecretCallActivity.this.finish();
             }
@@ -255,18 +271,33 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         startService(intent);
     }
 
+    private void startRing() {
+        ringing = true;
+        ringer.start();
+    }
+
+    private void endRing() {
+        ringing = false;
+        ringer.stop();
+    }
+
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
             if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
                 // user busy
-                displayInformationMessageDialog("BUSY", "User busy at this moment");
+                Toast.makeText(this, "User busy", Toast.LENGTH_LONG).show();
+                endRing();
+                SecretCallActivity.this.finish();
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("offline")) {
                 // offline
-                displayInformationMessageDialog("OFFLINE", "User not available at this moment");
+                Toast.makeText(this, "User offline", Toast.LENGTH_LONG).show();
+                endRing();
+                SecretCallActivity.this.finish();
             }
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
                 VibrationUtils.vibrate(this);
+                endRing();
                 startCall();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
                 SecretCallActivity.this.finish();
@@ -325,4 +356,32 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
             ActivityUtils.showCustomToast(getResources().getString(R.string.no_internet), this);
         }
     }
+
+    private class Ringer implements Runnable {
+        private final Thread thread;
+
+        private MediaPlayer mediaPlayer;
+
+        Ringer() {
+            thread = new Thread(this);
+            mediaPlayer = MediaPlayer.create(SecretCallActivity.this, R.raw.ring);
+            mediaPlayer.setLooping(true);
+        }
+
+        public void start() {
+            thread.start();
+        }
+
+        public void stop() {
+            mediaPlayer.stop();
+        }
+
+        @Override
+        public void run() {
+            if (ringing) {
+                mediaPlayer.start();
+            }
+        }
+    }
+
 }

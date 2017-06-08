@@ -8,7 +8,6 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
@@ -19,7 +18,6 @@ import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
 
-import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
@@ -67,10 +65,8 @@ public class CallService extends Service {
     // player/recorder and state
     private Player player;
     private Recorder recorder;
-    private Ringer ringer;
 
     private boolean calling;
-    private boolean ringing;
 
     // senz message
     private BroadcastReceiver senzReceiver = new BroadcastReceiver() {
@@ -117,8 +113,6 @@ public class CallService extends Service {
 
         player = new Player();
         recorder = new Recorder();
-        ringer = new Ringer();
-        startRing();
 
         return START_STICKY;
     }
@@ -128,7 +122,6 @@ public class CallService extends Service {
         super.onDestroy();
 
         endCall();
-        endRing();
         clrUdpConn();
         unregisterReceiver(senzReceiver);
         resetAudioSettings();
@@ -204,7 +197,6 @@ public class CallService extends Service {
         if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
                 VibrationUtils.vibrate(this);
-                endRing();
                 startCall();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
                 VibrationUtils.vibrate(this);
@@ -221,16 +213,6 @@ public class CallService extends Service {
 
     private void endCall() {
         calling = false;
-    }
-
-    private void startRing() {
-        ringing = true;
-        ringer.start();
-    }
-
-    private void endRing() {
-        ringing = false;
-        ringer.stop();
     }
 
     /**
@@ -420,33 +402,6 @@ public class CallService extends Service {
                     audioRecorder.stop();
                 audioRecorder.release();
                 audioRecorder = null;
-            }
-        }
-    }
-
-    private class Ringer implements Runnable {
-        private final Thread thread;
-
-        private MediaPlayer mediaPlayer;
-
-        Ringer() {
-            thread = new Thread(this);
-            mediaPlayer = MediaPlayer.create(CallService.this, R.raw.ring);
-            mediaPlayer.setLooping(true);
-        }
-
-        public void start() {
-            thread.start();
-        }
-
-        public void stop() {
-            mediaPlayer.stop();
-        }
-
-        @Override
-        public void run() {
-            if (ringing) {
-                mediaPlayer.start();
             }
         }
     }

@@ -119,7 +119,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         @Override
         public void onFinish() {
             sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
-            VibrationUtils.stopVibration(SecretRecordingActivity.this);
+            stopRinging();
             SecretRecordingActivity.this.finish();
         }
 
@@ -138,7 +138,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         initUser();
         initSensor();
         setupWakeLock();
-        VibrationUtils.startVibrate(this);
         startTimerToEndRequest();
         initRinging();
         initCall();
@@ -173,7 +172,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         }
 
         stopService(new Intent(this, CallService.class));
-        //clearFlags();
     }
 
     @Override
@@ -228,10 +226,15 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
 
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
-            // TODO
+            if (senz.getAttributes().get("status").equalsIgnoreCase("BUSY")) {
+                // busy
+                cancelTimerToServe();
+                stopRinging();
+
+                SecretRecordingActivity.this.finish();
+            }
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
-                cancelTimerToServe();
                 SecretRecordingActivity.this.finish();
             }
         }
@@ -255,27 +258,11 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         AnimationDrawable anim = (AnimationDrawable) waitingIcon.getBackground();
         anim.start();
 
-        cancelBtn = (CircularImageView) findViewById(R.id.cancel);
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelTimerToServe();
-                sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
-                VibrationUtils.stopVibration(SecretRecordingActivity.this);
-
-                // stop ringing
-                if (currentRingtone != null)
-                    currentRingtone.stop();
-
-                SecretRecordingActivity.this.finish();
-            }
-        });
-
         startBtn = (CircularImageView) findViewById(R.id.start);
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VibrationUtils.stopVibration(SecretRecordingActivity.this);
+                stopRinging();
                 cancelTimerToServe();
                 startCall();
             }
@@ -286,6 +273,19 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
             @Override
             public void onClick(View v) {
                 sendSenz(SenzUtils.getMicOffSenz(SecretRecordingActivity.this, secretUser));
+
+                SecretRecordingActivity.this.finish();
+            }
+        });
+
+        cancelBtn = (CircularImageView) findViewById(R.id.cancel);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelTimerToServe();
+                stopRinging();
+
+                sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
 
                 SecretRecordingActivity.this.finish();
             }
@@ -317,9 +317,17 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     }
 
     private void initRinging() {
+        VibrationUtils.startVibrate(this);
+
         Uri uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE);
         currentRingtone = RingtoneManager.getRingtone(this, uri);
         currentRingtone.play();
+    }
+
+    private void stopRinging() {
+        VibrationUtils.stopVibration(this);
+
+        if (currentRingtone != null) currentRingtone.stop();
     }
 
     private void initCall() {
