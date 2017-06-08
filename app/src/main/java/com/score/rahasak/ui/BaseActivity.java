@@ -193,7 +193,7 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
-                    senzService.sendInOrder(senzList);
+                    senzService.sendStream(senzList);
                 } else {
                     ActivityUtils.showCustomToast("Failed to connected to service.", this);
                 }

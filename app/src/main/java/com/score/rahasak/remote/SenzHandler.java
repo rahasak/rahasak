@@ -25,7 +25,9 @@ import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 class SenzHandler {
     private static final String TAG = SenzHandler.class.getName();
@@ -43,25 +45,45 @@ class SenzHandler {
     }
 
     void handle(String senzMsg, SenzService senzService) {
-        Senz senz = SenzParser.parse(senzMsg);
-        switch (senz.getSenzType()) {
-            case SHARE:
-                Log.d(TAG, "SHARE received");
-                handleShare(senz, senzService);
-                break;
-            case GET:
-                Log.d(TAG, "GET received");
-                handleGet(senz, senzService);
-                break;
-            case DATA:
-                Log.d(TAG, "DATA received");
-                handleData(senz, senzService);
-                break;
-            case STREAM:
-                Log.d(TAG, "STREAM received");
-                handleStream(senz, senzService);
-                break;
+        if (senzMsg.equalsIgnoreCase("TAK")) {
+            // senz service connected, send unack senzes if available
+            handleConnect(senzService);
+        } else {
+            Senz senz = SenzParser.parse(senzMsg);
+            switch (senz.getSenzType()) {
+                case SHARE:
+                    Log.d(TAG, "SHARE received");
+                    handleShare(senz, senzService);
+                    break;
+                case GET:
+                    Log.d(TAG, "GET received");
+                    handleGet(senz, senzService);
+                    break;
+                case DATA:
+                    Log.d(TAG, "DATA received");
+                    handleData(senz, senzService);
+                    break;
+                case STREAM:
+                    Log.d(TAG, "STREAM received");
+                    handleStream(senz, senzService);
+                    break;
+            }
         }
+    }
+
+    private void handleConnect(SenzService senzService) {
+        // get all un-ack senzes from db
+        List<Senz> unackSenzes = new ArrayList<>();
+        for (Secret secret : new SenzorsDbSource(senzService.getApplicationContext()).getUnAckSecrects()) {
+            try {
+                unackSenzes.add(SenzUtils.getSenzFromSecret(senzService.getApplicationContext(), secret));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // send them
+        senzService.writeSenzes(unackSenzes);
     }
 
     private void handleShare(Senz senz, SenzService senzService) {

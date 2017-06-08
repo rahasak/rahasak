@@ -4,8 +4,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
@@ -16,20 +14,18 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.score.rahasak.application.IntentProvider;
-import com.score.rahasak.db.SenzorsDbSource;
-import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
-import com.score.rahasak.pojo.Secret;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -43,12 +39,6 @@ public class SenzService extends Service {
 
     private static final String TAG = SenzService.class.getName();
 
-    // socket host, port
-    //public static final String SENZ_HOST = "10.2.2.49";
-    //public static final String SENZ_HOST = "udp.mysensors.info";
-
-    //private static final String SENZ_HOST = "52.77.228.195";
-    //private static final String SENZ_HOST = "connect.rahasak.com";
     private static final String SENZ_HOST = "senz.rahasak.com";
     public static final int SENZ_PORT = 7070;
 
@@ -72,8 +62,8 @@ public class SenzService extends Service {
     private PowerManager powerManager;
     private PowerManager.WakeLock senzWakeLock;
 
-    // API end point of this service, we expose the endpoints define in ISenzService.aidl
-    private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
+    // stubs that service expose(defines in ISenzService.aidl)
+    private final ISenzService.Stub stubs = new ISenzService.Stub() {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
@@ -81,25 +71,8 @@ public class SenzService extends Service {
         }
 
         @Override
-        public void sendInOrder(List<Senz> senzList) throws RemoteException {
-            writeSenzList(senzList);
-        }
-
-        @Override
-        public void sendFromUri(String uri, Senz senz, String uid) throws RemoteException {
-        }
-    };
-
-    // broadcast receiver to check network status changes
-    private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (NetworkUtil.isAvailableNetwork(context)) {
-                Log.d(TAG, "Network status changed[online]");
-
-                // init comm
-                initSenzComm();
-            }
+        public void sendStream(List<Senz> senzList) throws RemoteException {
+            writeSenzes(senzList);
         }
     };
 
@@ -115,7 +88,7 @@ public class SenzService extends Service {
                     sendSMS(phone, "#Rahasak #confirm\nI have confirmed your request. #username " + PreferenceUtils.getUser(SenzService.this).getUsername() + " #code 31e3e");
 
                     // get pubkey
-                    requestPubKey(username);
+                    getPubKey(username);
                 } catch (NoUserException e) {
                     e.printStackTrace();
                 }
@@ -138,27 +111,20 @@ public class SenzService extends Service {
             String username = intent.getStringExtra("USERNAME").trim();
 
             // get pubkey
-            requestPubKey(username);
-        }
-    };
-
-    private BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            sendUnAckSenzList();
+            getPubKey(username);
         }
     };
 
     @Override
     public IBinder onBind(Intent intent) {
-        return apiEndPoints;
+        return stubs;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        Log.d(TAG, "onCreate..");
+        Log.d(TAG, "onCreate ---");
 
         registerReceivers();
         initWakeLock();
@@ -168,7 +134,7 @@ public class SenzService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        Log.d(TAG, "onStartCommand..");
+        Log.d(TAG, "onStartCommand --- ");
 
         initSenzComm();
 
@@ -179,7 +145,7 @@ public class SenzService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        Log.d(TAG, "onDestroy");
+        Log.d(TAG, "onDestroy --- ");
 
         unRegisterReceivers();
 
@@ -190,23 +156,16 @@ public class SenzService extends Service {
     }
 
     private void registerReceivers() {
-        // Register network status receiver
-        IntentFilter networkFilter = new IntentFilter();
-        networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkStatusReceiver, networkFilter);
         registerReceiver(smsRequestAcceptReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_ACCEPT));
         registerReceiver(smsRequestRejectReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_REJECT));
         registerReceiver(smsRequestConfirmReceiver, IntentProvider.getIntentFilter(IntentType.SMS_REQUEST_CONFIRM));
-        registerReceiver(connectedReceiver, IntentProvider.getIntentFilter(IntentType.CONNECTED));
     }
 
     private void unRegisterReceivers() {
         // un register receivers
-        unregisterReceiver(networkStatusReceiver);
         unregisterReceiver(smsRequestAcceptReceiver);
         unregisterReceiver(smsRequestRejectReceiver);
         unregisterReceiver(smsRequestConfirmReceiver);
-        unregisterReceiver(connectedReceiver);
     }
 
     private void initWakeLock() {
@@ -226,7 +185,7 @@ public class SenzService extends Service {
                 }
             } else {
                 Log.d(TAG, "Already connectedSwitch");
-                sendPing();
+                ping();
             }
         } else {
             Log.d(TAG, "No network to init senzcomm");
@@ -244,7 +203,7 @@ public class SenzService extends Service {
         RETRY_COUNT = 0;
     }
 
-    private void resetSoc() throws IOException {
+    private void clrSoc() throws IOException {
         Log.d(TAG, "Reset socket");
         connectedSwitch = false;
 
@@ -273,13 +232,7 @@ public class SenzService extends Service {
                 String senz = builder.toString();
                 builder = new StringBuilder();
 
-                // handle senz
-                if (senz.equalsIgnoreCase("TAK")) {
-                    // connected
-                    // broadcast connected message
-                    Intent intent = new Intent(IntentProvider.ACTION_CONNECTED);
-                    sendBroadcast(intent);
-                } else if (senz.equalsIgnoreCase("TIK")) {
+                if (senz.equalsIgnoreCase("TIK")) {
                     // send tuk
                     write("TUK");
                 } else {
@@ -329,29 +282,18 @@ public class SenzService extends Service {
         }
     }
 
-    private void write(String msg) throws IOException {
-        //  sends the message to the server
-        if (connectedSwitch) {
-            outStream.writeBytes(msg + ";");
-            outStream.flush();
-        } else {
-            Log.e(TAG, "Socket disconnected");
-        }
-    }
-
-    private void sendPing() {
+    private void ping() {
         Senz senz = SenzUtils.getPingSenz(SenzService.this);
         if (senz != null) writeSenz(senz);
     }
 
-    private void requestPubKey(String username) {
+    private void getPubKey(String username) {
         Senz senz = SenzUtils.getPubkeySenz(this, username);
         writeSenz(senz);
     }
 
     private void sendSMS(String phoneNumber, String message) {
         SmsManager sms = SmsManager.getDefault();
-        Log.i(TAG, "SMS Body -> " + message);
         sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
@@ -362,9 +304,8 @@ public class SenzService extends Service {
                 try {
                     PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
 
-                    // if sender not already set find user(sender) and set it to senz first
-                    if (senz.getSender() == null || senz.getSender().toString().isEmpty())
-                        senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+                    // set sender
+                    senz.setSender(PreferenceUtils.getUser(getBaseContext()));
 
                     // get digital signature of the senz
                     String senzPayload = SenzParser.getSenzPayload(senz);
@@ -386,17 +327,16 @@ public class SenzService extends Service {
         }).start();
     }
 
-    void writeSenzList(final List<Senz> senzList) {
+    void writeSenzes(final List<Senz> senzList) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
+                    User sender = PreferenceUtils.getUser(SenzService.this);
 
                     for (Senz senz : senzList) {
-                        // if sender not already set find user(sender) and set it to senz first
-                        if (senz.getSender() == null || senz.getSender().toString().isEmpty())
-                            senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+                        senz.setSender(sender);
 
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);
@@ -420,43 +360,14 @@ public class SenzService extends Service {
         }).start();
     }
 
-    private void sendUnAckSenzList() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
-
-                    for (Secret secret : new SenzorsDbSource(SenzService.this).getUnAckSecrects()) {
-                        if (secret.getBlobType() == BlobType.TEXT) {
-                            // create senz
-                            Senz senz = SenzUtils.getSenzFromSecret(SenzService.this, secret);
-
-                            // if sender not already set find user(sender) and set it to senz first
-                            if (senz.getSender() == null || senz.getSender().toString().isEmpty())
-                                senz.setSender(PreferenceUtils.getUser(getBaseContext()));
-
-                            // get digital signature of the senz
-                            String senzPayload = SenzParser.getSenzPayload(senz);
-                            String senzSignature;
-                            if (!senz.getAttributes().containsKey("stream")) {
-                                senzSignature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                            } else {
-                                senzSignature = "SIGNATURE";
-                            }
-                            String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-                            Log.d(TAG, "Senz to be send: " + message);
-
-                            //  sends the message to the server
-                            write(message);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    private void write(String msg) throws IOException {
+        //  sends the message to the server
+        if (connectedSwitch) {
+            outStream.writeBytes(msg + ";");
+            outStream.flush();
+        } else {
+            Log.e(TAG, "Socket disconnected");
+        }
     }
 
     class SenzComm extends AsyncTask<String, String, Integer> {
@@ -466,14 +377,14 @@ public class SenzService extends Service {
                 Log.d(TAG, "Not online, so init comm");
                 try {
                     initSoc();
-                    sendPing();
+                    ping();
                     initReader();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
                 Log.d(TAG, "Connected, so send ping");
-                sendPing();
+                ping();
             }
 
             return 0;
@@ -485,7 +396,7 @@ public class SenzService extends Service {
             senzCommRunning = false;
 
             try {
-                resetSoc();
+                clrSoc();
             } catch (IOException e) {
                 e.printStackTrace();
             }

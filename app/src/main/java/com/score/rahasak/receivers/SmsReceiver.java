@@ -18,9 +18,7 @@ import com.score.rahasak.utils.PhoneBookUtil;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by Lakmal on 11/2/16.
- */
+
 public class SmsReceiver extends BroadcastReceiver {
     private static final String TAG = SmsReceiver.class.getName();
 

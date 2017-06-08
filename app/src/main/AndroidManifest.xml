@@ -162,10 +162,15 @@
         </service>
 
         <!-- Receievers -->
-        <receiver android:name="com.score.rahasak.receivers.SenzRestartReceiver">
+        <receiver android:name="com.score.rahasak.receivers.SenzStartReceiver">
             <intent-filter>
                 <action android:name="com.score.rahasak.RESTART" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.score.rahasak.receivers.NetworkStatusReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />.
             </intent-filter>
         </receiver>
         <receiver android:name="com.score.rahasak.receivers.SmsReceiver">
