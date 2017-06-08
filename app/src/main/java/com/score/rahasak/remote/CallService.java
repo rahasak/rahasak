@@ -40,7 +40,7 @@ import java.net.SocketException;
 import javax.crypto.SecretKey;
 
 
-public class CallService extends Service {
+public class CallService extends Service implements AudioManager.OnAudioFocusChangeListener {
 
     private static final String TAG = CallService.class.getName();
 
@@ -110,6 +110,7 @@ public class CallService extends Service {
         initUdpConn();
         getAudioSettings();
         enableEarpiece();
+        requestAudioFocus();
 
         player = new Player();
         recorder = new Recorder();
@@ -125,6 +126,16 @@ public class CallService extends Service {
         clrUdpConn();
         unregisterReceiver(senzReceiver);
         resetAudioSettings();
+        releaseAudioFocus();
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        if (focusChange <= 0) {
+            // loss audio focus
+            // stop service
+            stopSelf();
+        }
     }
 
     private void initPrefs(Intent intent) {
@@ -213,6 +224,57 @@ public class CallService extends Service {
 
     private void endCall() {
         calling = false;
+    }
+
+    private void requestAudioFocus() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
+    }
+
+    private void releaseAudioFocus() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.abandonAudioFocus(this);
+    }
+
+    private void enableEarpiece() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        audioManager.setSpeakerphoneOn(false);
+    }
+
+    private void getAudioSettings() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioMode = audioManager.getMode();
+        ringMode = audioManager.getRingerMode();
+        isSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
+    }
+
+    private void resetAudioSettings() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(audioMode);
+        audioManager.setRingerMode(ringMode);
+        audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
+    }
+
+    private void enableAGC(int sessionId) {
+        if (AutomaticGainControl.isAvailable()) {
+            AutomaticGainControl agc = AutomaticGainControl.create(sessionId);
+            if (agc != null) agc.setEnabled(true);
+        }
+    }
+
+    private void enableNS(int sessionId) {
+        if (NoiseSuppressor.isAvailable()) {
+            NoiseSuppressor ns = NoiseSuppressor.create(sessionId);
+            if (ns != null) ns.setEnabled(true);
+        }
+    }
+
+    private void enableAEC(int sessionId) {
+        if (AcousticEchoCanceler.isAvailable()) {
+            AcousticEchoCanceler aec = AcousticEchoCanceler.create(sessionId);
+            if (aec != null) aec.setEnabled(true);
+        }
     }
 
     /**
@@ -403,47 +465,6 @@ public class CallService extends Service {
                 audioRecorder.release();
                 audioRecorder = null;
             }
-        }
-    }
-
-    private void enableEarpiece() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-        audioManager.setSpeakerphoneOn(false);
-    }
-
-    private void getAudioSettings() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioMode = audioManager.getMode();
-        ringMode = audioManager.getRingerMode();
-        isSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
-    }
-
-    private void resetAudioSettings() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(audioMode);
-        audioManager.setRingerMode(ringMode);
-        audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
-    }
-
-    private void enableAGC(int sessionId) {
-        if (AutomaticGainControl.isAvailable()) {
-            AutomaticGainControl agc = AutomaticGainControl.create(sessionId);
-            if (agc != null) agc.setEnabled(true);
-        }
-    }
-
-    private void enableNS(int sessionId) {
-        if (NoiseSuppressor.isAvailable()) {
-            NoiseSuppressor ns = NoiseSuppressor.create(sessionId);
-            if (ns != null) ns.setEnabled(true);
-        }
-    }
-
-    private void enableAEC(int sessionId) {
-        if (AcousticEchoCanceler.isAvailable()) {
-            AcousticEchoCanceler aec = AcousticEchoCanceler.create(sessionId);
-            if (aec != null) aec.setEnabled(true);
         }
     }
 

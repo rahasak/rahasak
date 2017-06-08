@@ -170,8 +170,6 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
 
             isServiceBound = false;
         }
-
-        stopService(new Intent(this, CallService.class));
     }
 
     @Override
@@ -222,6 +220,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         super.onDestroy();
 
         clearFlags();
+        stopService(new Intent(this, CallService.class));
     }
 
     private void onSenzReceived(Senz senz) {
