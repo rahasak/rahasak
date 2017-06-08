@@ -151,6 +151,8 @@ public class CallService extends Service {
         if (recvSoc == null || recvSoc.isClosed()) {
             try {
                 recvSoc = new DatagramSocket();
+                //recvSoc.setReuseAddress(true);
+                //recvSoc.setSoTimeout()
             } catch (SocketException e) {
                 e.printStackTrace();
             }
@@ -250,7 +252,7 @@ public class CallService extends Service {
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
-                    minBufSize,
+                    minBufSize * 2,
                     AudioTrack.MODE_STREAM);
             Log.d(TAG, "AudioTrack min buffer size: ---- " + minBufSize);
 
@@ -332,13 +334,18 @@ public class CallService extends Service {
             thread = new Thread(this);
 
             int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            if (minBufSize < 4096) {
+                // opus require a 4KB buffer to work correctly
+                minBufSize = 4096;
+            }
+
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize);
 
-            Log.d(TAG, "AudioRecorder min buffer size: ---- " + minBufSize);
+            Log.d(TAG, " min buffer size: ---- " + minBufSize);
 
             // init opus encoder
             opusEncoder = new OpusEncoder();

@@ -6,7 +6,7 @@ import java.util.Date;
 public class TimeUtils {
     private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm a");
-    private static SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyyMMdd hh:mm a");
+    private static SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
 
     public static String getTimeInWords(long timestamp) {
         String time = null;

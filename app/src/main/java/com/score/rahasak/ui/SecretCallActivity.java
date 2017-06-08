@@ -142,6 +142,9 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
 
             isServiceBound = false;
         }
+
+        // stop service for end call
+        stopService(new Intent(this, CallService.class));
     }
 
     @Override
@@ -190,9 +193,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        // stop service
-        stopService(new Intent(this, CallService.class));
     }
 
     private void initUi() {
