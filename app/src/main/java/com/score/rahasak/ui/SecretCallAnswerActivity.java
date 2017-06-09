@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -49,9 +50,9 @@ import com.score.rahasak.utils.VibrationUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 
-public class SecretRecordingActivity extends AppCompatActivity implements SensorEventListener {
+public class SecretCallAnswerActivity extends AppCompatActivity implements SensorEventListener {
 
-    private static final String TAG = SecretRecordingActivity.class.getName();
+    private static final String TAG = SecretCallAnswerActivity.class.getName();
 
     private static final int TIME_TO_SERVE_REQUEST = 15000;
 
@@ -79,6 +80,8 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
 
     // current tone
     private Ringtone currentRingtone;
+
+    private PowerManager.WakeLock wakeLock;
 
     // service connection
     protected ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -118,9 +121,9 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     private CountDownTimer requestTimer = new CountDownTimer(TIME_TO_SERVE_REQUEST, TIME_TO_SERVE_REQUEST) {
         @Override
         public void onFinish() {
-            sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
+            sendSenz(SenzUtils.getMicBusySenz(SecretCallAnswerActivity.this, secretUser));
             stopRinging();
-            SecretRecordingActivity.this.finish();
+            SecretCallAnswerActivity.this.finish();
         }
 
         @Override
@@ -137,7 +140,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         initStatusBar();
         initUser();
         initSensor();
-        setupWakeLock();
+        acquireWakeLock();
         startTimerToEndRequest();
         initRinging();
         initCall();
@@ -219,7 +222,7 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
     protected void onDestroy() {
         super.onDestroy();
 
-        clearFlags();
+        releaseWakeLock();
         stopService(new Intent(this, CallService.class));
     }
 
@@ -230,11 +233,11 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
                 cancelTimerToServe();
                 stopRinging();
 
-                SecretRecordingActivity.this.finish();
+                SecretCallAnswerActivity.this.finish();
             }
         } else if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
-                SecretRecordingActivity.this.finish();
+                SecretCallAnswerActivity.this.finish();
             }
         }
     }
@@ -271,9 +274,9 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendSenz(SenzUtils.getMicOffSenz(SecretRecordingActivity.this, secretUser));
+                sendSenz(SenzUtils.getMicOffSenz(SecretCallAnswerActivity.this, secretUser));
 
-                SecretRecordingActivity.this.finish();
+                SecretCallAnswerActivity.this.finish();
             }
         });
 
@@ -284,9 +287,9 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
                 cancelTimerToServe();
                 stopRinging();
 
-                sendSenz(SenzUtils.getMicBusySenz(SecretRecordingActivity.this, secretUser));
+                sendSenz(SenzUtils.getMicBusySenz(SecretCallAnswerActivity.this, secretUser));
 
-                SecretRecordingActivity.this.finish();
+                SecretCallAnswerActivity.this.finish();
             }
         });
     }
@@ -336,14 +339,20 @@ public class SecretRecordingActivity extends AppCompatActivity implements Sensor
         startService(intent);
     }
 
-    private void setupWakeLock() {
+    private void acquireWakeLock() {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+        wakeLock.acquire();
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
-    private void clearFlags() {
+    private void releaseWakeLock() {
+        wakeLock.release();
+
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);

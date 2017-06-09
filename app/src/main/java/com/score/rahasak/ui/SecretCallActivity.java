@@ -1,6 +1,5 @@
 package com.score.rahasak.ui;
 
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,13 +18,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -310,39 +305,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     private void startCall() {
         loadingView.setVisibility(View.INVISIBLE);
         playingText.setVisibility(View.VISIBLE);
-    }
-
-    public void displayInformationMessageDialog(String title, String message) {
-        final Dialog dialog = new Dialog(this);
-
-        //set layout for dialog
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.information_message_dialog);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(true);
-
-        // set dialog texts
-        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
-        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
-        messageHeaderTextView.setText(title);
-        messageTextView.setText(Html.fromHtml(message));
-
-        // set custom font
-        messageHeaderTextView.setTypeface(typeface, Typeface.BOLD);
-        messageTextView.setTypeface(typeface);
-
-        //set ok button
-        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(typeface, Typeface.BOLD);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                dialog.cancel();
-                SecretCallActivity.this.finish();
-            }
-        });
-
-        dialog.show();
     }
 
     private void sendSenz(Senz senz) {

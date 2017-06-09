@@ -12,7 +12,7 @@ import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.pojo.Stream;
-import com.score.rahasak.ui.SecretRecordingActivity;
+import com.score.rahasak.ui.SecretCallAnswerActivity;
 import com.score.rahasak.ui.SelfieCaptureActivity;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.ImageUtils;
@@ -396,7 +396,7 @@ class SenzHandler {
     private void handleMic(Senz senz, SenzService senzService) {
         if (!SenzApplication.isOnCall()) {
             Intent intent = new Intent();
-            intent.setClass(senzService.getApplicationContext(), SecretRecordingActivity.class);
+            intent.setClass(senzService.getApplicationContext(), SecretCallAnswerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("USER", senz.getSender().getUsername());
             senzService.getApplicationContext().startActivity(intent);
