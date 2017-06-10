@@ -222,7 +222,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == btnPhoto) {
             onClickPhoto();
         } else if (v == btnMic) {
-            onClickCall();
+            navigateMicWait();
         } else if (v == btnBack) {
             finish();
         } else if (v == btnUserSetting) {
@@ -459,7 +459,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             SenzTypeEnum senzType = SenzTypeEnum.GET;
             Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
-            send(senz);
+            sendSenz(senz);
         } else {
             Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }
@@ -467,34 +467,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void onClickPhoto() {
         if (NetworkUtil.isAvailableNetwork(this)) {
+            // request selfie call
             navigateToPhotoWait();
-
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("cam", "");
-
-            Long timestamp = System.currentTimeMillis() / 1000;
-            senzAttributes.put("time", timestamp.toString());
-            senzAttributes.put("uid", SenzUtils.getUid(this, timestamp.toString()));
-
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.GET;
-            Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-
-            send(senz);
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void onClickCall() {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            // request call (DATA #mic on)
-            navigateMicWait();
-            Senz senz = SenzUtils.getInitMicSenz(this, secretUser);
-            send(senz);
+            Senz senz = SenzUtils.getCamSenz(this, secretUser);
+            sendSenz(senz);
         } else {
             Toast.makeText(this, getResources().getString(R.string.no_internet), Toast.LENGTH_LONG).show();
         }
@@ -522,7 +498,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
             Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
-            send(senz);
+            sendSenz(senz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -558,16 +534,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Secret secret;
             if (senz.getAttributes().containsKey("cam")) {
                 secret = new Secret(senz.getAttributes().get("cam"), BlobType.IMAGE, secretUser, true);
-            } else {
-                secret = new Secret(senz.getAttributes().get("mic"), BlobType.SOUND, secretUser, true);
-            }
-            secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
-            secret.setId(senz.getAttributes().get("uid"));
-            secret.setDeliveryState(DeliveryState.PENDING);
+                secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
+                secret.setId(senz.getAttributes().get("uid"));
+                secret.setDeliveryState(DeliveryState.PENDING);
 
-            // add and delete
-            addSecret(secret);
-            if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
+                // add and delete
+                addSecret(secret);
+                if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
+            }
         }
     }
 
@@ -642,7 +616,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void send(Senz senz) {
+    private void sendSenz(Senz senz) {
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {

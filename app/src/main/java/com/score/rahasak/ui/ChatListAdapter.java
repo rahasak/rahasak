@@ -106,6 +106,7 @@ class ChatListAdapter extends BaseAdapter {
 
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
+                    holder.chatMis = (RelativeLayout) view.findViewById(R.id.chat_mis);
                     holder.missedSecret = (TextView) view.findViewById(R.id.missed_secret);
 
                     holder.chatStatus = (FrameLayout) view.findViewById(R.id.chat_status);
@@ -122,6 +123,7 @@ class ChatListAdapter extends BaseAdapter {
 
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
+                    holder.chatMis = (RelativeLayout) view.findViewById(R.id.chat_mis);
                     holder.missedSecret = (TextView) view.findViewById(R.id.missed_secret);
 
                     holder.chatStatus = (FrameLayout) view.findViewById(R.id.chat_status);
@@ -170,6 +172,7 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatMisHolder.setVisibility(View.VISIBLE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
+            holder.chatMis.setBackgroundResource(R.drawable.mis_selfie_bg);
             holder.missedSecret.setText("Missed selfie");
         } else if (secret.getBlobType() == BlobType.MISSED_CALL) {
             // mis call
@@ -177,6 +180,7 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatMisHolder.setVisibility(View.VISIBLE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
+            holder.chatMis.setBackgroundResource(R.drawable.mis_call_bg);
             holder.missedSecret.setText("Missed call");
         }
 
@@ -228,6 +232,11 @@ class ChatListAdapter extends BaseAdapter {
                     Intent intent = new Intent(context, SecretCallActivity.class);
                     intent.putExtra("USER", secretUser);
                     context.startActivity(intent);
+
+                    // remove item
+                    secretList.remove(secret);
+                    dbSource.deleteSecret(secret);
+                    notifyDataSetChanged();
                 }
             }
         });
@@ -242,8 +251,9 @@ class ChatListAdapter extends BaseAdapter {
         LinearLayout chatMsgHolder;
 
         ImageView chatCam;
-        TextView missedSecret;
         TextView chatMsg;
+        RelativeLayout chatMis;
+        TextView missedSecret;
 
         FrameLayout chatStatus;
         TextView chatTime;
