@@ -320,16 +320,6 @@ public class SelfieCallAnswerActivity extends BaseActivity {
         }.start();
     }
 
-    private void saveMissedSelfie() {
-        Long timestamp = (System.currentTimeMillis() / 1000);
-        Secret newSecret = new Secret("", BlobType.MISSED_SELFIE, secretUser, true);
-        newSecret.setTimeStamp(timestamp);
-        newSecret.setId(SenzUtils.getUid(this, timestamp.toString()));
-        newSecret.setMissed(true);
-        newSecret.setDeliveryState(DeliveryState.NONE);
-        new SenzorsDbSource(this).createSecret(newSecret);
-    }
-
     private void sendBusySenz() {
         Long timestamp = (System.currentTimeMillis() / 1000);
         String uid = SenzUtils.getUid(this, timestamp.toString());
@@ -465,6 +455,19 @@ public class SelfieCallAnswerActivity extends BaseActivity {
         for (int i = 0; i < result.length; i++)
             result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
         return result;
+    }
+
+    private void saveMissedSelfie() {
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        Secret newSecret = new Secret("", BlobType.MISSED_SELFIE, secretUser, true);
+        newSecret.setTimeStamp(timestamp);
+        newSecret.setId(SenzUtils.getUid(this, timestamp.toString()));
+        newSecret.setMissed(true);
+        newSecret.setDeliveryState(DeliveryState.NONE);
+        new SenzorsDbSource(this).createSecret(newSecret);
+
+        // update unread count by one
+        new SenzorsDbSource(this).updateUnreadSecretCount(secretUser.getUsername(), 1);
     }
 
 }

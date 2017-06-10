@@ -98,15 +98,11 @@ class SecretListAdapter extends BaseAdapter {
         if (secret.getBlobType() == BlobType.TEXT) {
             viewHolder.message.setText("Message");
         } else if (secret.getBlobType() == BlobType.IMAGE) {
-            if (secret.isMissed()) {
-                viewHolder.message.setText("Missed selfie");
-            } else {
-                viewHolder.message.setText("Selfie");
-            }
-        } else if (secret.getBlobType() == BlobType.SOUND) {
-            viewHolder.message.setText("Audio secret");
-        } else if (secret.getBlobType() == BlobType.TEXT) {
-            viewHolder.message.setText(secret.getBlob());
+            viewHolder.message.setText("Selfie");
+        } else if (secret.getBlobType() == BlobType.MISSED_SELFIE) {
+            viewHolder.message.setText("Missed selfie");
+        } else if (secret.getBlobType() == BlobType.MISSED_CALL) {
+            viewHolder.message.setText("Missed call");
         }
 
         if (secret.getTimeStamp() != null) {

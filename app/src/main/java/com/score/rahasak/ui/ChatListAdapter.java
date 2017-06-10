@@ -172,16 +172,16 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatMisHolder.setVisibility(View.VISIBLE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
-            holder.chatMis.setBackgroundResource(R.drawable.mis_selfie_bg);
-            holder.missedSecret.setText("Missed selfie");
+            //holder.chatMis.setBackgroundResource(R.drawable.mis_selfie_bg);
+            holder.missedSecret.setText("missed selfie");
         } else if (secret.getBlobType() == BlobType.MISSED_CALL) {
             // mis call
             holder.chatCamHolder.setVisibility(View.GONE);
             holder.chatMisHolder.setVisibility(View.VISIBLE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
-            holder.chatMis.setBackgroundResource(R.drawable.mis_call_bg);
-            holder.missedSecret.setText("Missed call");
+            //holder.chatMis.setBackgroundResource(R.drawable.mis_call_bg);
+            holder.missedSecret.setText("missed call");
         }
 
         if (secret.isSender()) {

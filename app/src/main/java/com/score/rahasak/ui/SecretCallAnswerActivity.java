@@ -423,6 +423,9 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
         newSecret.setMissed(true);
         newSecret.setDeliveryState(DeliveryState.NONE);
         new SenzorsDbSource(this).createSecret(newSecret);
+
+        // update unread count by one
+        new SenzorsDbSource(this).updateUnreadSecretCount(secretUser.getUsername(), 1);
     }
 
 }

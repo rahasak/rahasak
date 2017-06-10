@@ -134,7 +134,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initSecretList();
         updatePermissions();
         setupUserImage();
-        //dbSource.resetUnreadSecretCount(secretUser.getUsername());
     }
 
     @Override
@@ -145,7 +144,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initSecretList();
         updatePermissions();
         setupUserImage();
-        //dbSource.resetUnreadSecretCount(secretUser.getUsername());
     }
 
     @Override
