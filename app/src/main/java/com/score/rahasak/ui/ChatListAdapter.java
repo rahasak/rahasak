@@ -19,6 +19,7 @@ import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Secret;
+import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.LimitedList;
 import com.score.rahasak.utils.TimeUtils;
 import com.squareup.picasso.Picasso;
@@ -31,6 +32,7 @@ import java.io.File;
 class ChatListAdapter extends BaseAdapter {
 
     private Context context;
+    private SecretUser secretUser;
     private LimitedList<Secret> secretList;
     private SenzorsDbSource dbSource;
 
@@ -40,10 +42,14 @@ class ChatListAdapter extends BaseAdapter {
     private static final int FRIEND_CHAT_ITEM = 1;
     private static final int MAX_TYPE_COUNT = 2;
 
-    ChatListAdapter(Context context, LimitedList<Secret> secretList) {
+    ChatListAdapter(Context context, SecretUser user, LimitedList<Secret> secretList) {
         this.context = context;
+        this.secretUser = user;
         this.secretList = secretList;
         this.dbSource = new SenzorsDbSource(context);
+
+        // reset users unread secret count
+        dbSource.resetUnreadSecretCount(secretUser.getUsername());
 
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
@@ -66,6 +72,14 @@ class ChatListAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         return secretList.get(position);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+        // reset users unread secret count
+        dbSource.resetUnreadSecretCount(secretUser.getUsername());
     }
 
     @Override

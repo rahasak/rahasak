@@ -1,6 +1,5 @@
 package com.score.rahasak.ui;
 
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,15 +9,12 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
@@ -142,18 +138,18 @@ public class SelfieCallActivity extends AppCompatActivity {
 
     private void onSenzReceived(Senz senz) {
         if (senz.getAttributes().containsKey("status")) {
-            if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED")) {
-                // GET msg delivered
-            } else if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_BUSY")) {
+            if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_BUSY")) {
                 // user busy
-                displayInformationMessageDialog("BUSY", "User busy at this moment");
+                Toast.makeText(this, "User busy", Toast.LENGTH_LONG).show();
+                SelfieCallActivity.this.finish();
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_ERROR")) {
                 // camera error
-                displayInformationMessageDialog("ERROR", "Cam error");
+                Toast.makeText(this, "Busy", Toast.LENGTH_LONG).show();
+                SelfieCallActivity.this.finish();
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("OFFLINE")) {
                 // offline
-                // offline
-                displayInformationMessageDialog("OFFLINE", "User not available at this moment");
+                Toast.makeText(this, "User offline", Toast.LENGTH_LONG).show();
+                SelfieCallActivity.this.finish();
             }
         }
     }
@@ -176,38 +172,5 @@ public class SelfieCallActivity extends AppCompatActivity {
                 .load(file)
                 .error(R.drawable.rahaslogo_3)
                 .into(view);
-    }
-
-    public void displayInformationMessageDialog(String title, String message) {
-        final Dialog dialog = new Dialog(this);
-
-        //set layout for dialog
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.information_message_dialog);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(true);
-
-        // set dialog texts
-        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
-        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
-        messageHeaderTextView.setText(title);
-        messageTextView.setText(Html.fromHtml(message));
-
-        // set custom font
-        messageHeaderTextView.setTypeface(typeface, Typeface.BOLD);
-        messageTextView.setTypeface(typeface);
-
-        //set ok button
-        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
-        okButton.setTypeface(typeface, Typeface.BOLD);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                dialog.cancel();
-                SelfieCallActivity.this.finish();
-            }
-        });
-
-        dialog.show();
     }
 }

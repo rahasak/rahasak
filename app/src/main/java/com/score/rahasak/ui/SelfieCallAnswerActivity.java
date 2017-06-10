@@ -327,7 +327,7 @@ public class SelfieCallAnswerActivity extends BaseActivity {
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(true);
-        newSecret.setDeliveryState(DeliveryState.PENDING);
+        newSecret.setDeliveryState(DeliveryState.NONE);
         new SenzorsDbSource(this).createSecret(newSecret);
     }
 
