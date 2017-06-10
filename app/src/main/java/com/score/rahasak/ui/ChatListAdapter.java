@@ -101,12 +101,12 @@ class ChatListAdapter extends BaseAdapter {
                 case MY_CHAT_ITEM:
                     view = layoutInflater.inflate(R.layout.my_chat_view_row_layout, parent, false);
                     holder.chatCamHolder = (RelativeLayout) view.findViewById(R.id.chat_cam_holder);
-                    holder.chatMicHolder = (RelativeLayout) view.findViewById(R.id.chat_mic_holder);
+                    holder.chatMisHolder = (RelativeLayout) view.findViewById(R.id.chat_mis_holder);
                     holder.chatMsgHolder = (LinearLayout) view.findViewById(R.id.chat_msg_holder);
 
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
-                    holder.chatMic = (ImageView) view.findViewById(R.id.chat_mic);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
+                    holder.missedSecret = (TextView) view.findViewById(R.id.missed_secret);
 
                     holder.chatStatus = (FrameLayout) view.findViewById(R.id.chat_status);
                     holder.chatTime = (TextView) view.findViewById(R.id.chat_time);
@@ -117,12 +117,12 @@ class ChatListAdapter extends BaseAdapter {
                 case FRIEND_CHAT_ITEM:
                     view = layoutInflater.inflate(R.layout.friend_chat_view_row_layout, parent, false);
                     holder.chatCamHolder = (RelativeLayout) view.findViewById(R.id.chat_cam_holder);
-                    holder.chatMicHolder = (RelativeLayout) view.findViewById(R.id.chat_mic_holder);
+                    holder.chatMisHolder = (RelativeLayout) view.findViewById(R.id.chat_mis_holder);
                     holder.chatMsgHolder = (LinearLayout) view.findViewById(R.id.chat_msg_holder);
 
                     holder.chatCam = (ImageView) view.findViewById(R.id.chat_cam);
-                    holder.chatMic = (ImageView) view.findViewById(R.id.chat_mic);
                     holder.chatMsg = (TextView) view.findViewById(R.id.chat_msg);
+                    holder.missedSecret = (TextView) view.findViewById(R.id.missed_secret);
 
                     holder.chatStatus = (FrameLayout) view.findViewById(R.id.chat_status);
                     holder.chatTime = (TextView) view.findViewById(R.id.chat_time);
@@ -134,6 +134,7 @@ class ChatListAdapter extends BaseAdapter {
 
             holder.chatMsg.setTypeface(typeface, Typeface.BOLD);
             holder.chatTime.setTypeface(typeface);
+            holder.missedSecret.setTypeface(typeface, Typeface.BOLD);
 
             view.setTag(holder);
         } else {
@@ -147,29 +148,36 @@ class ChatListAdapter extends BaseAdapter {
     private void setupRow(final Secret secret, ViewHolder holder) {
         if (secret.getBlobType() == BlobType.TEXT) {
             holder.chatCamHolder.setVisibility(View.GONE);
-            holder.chatMicHolder.setVisibility(View.GONE);
+            holder.chatMisHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.VISIBLE);
 
             holder.chatMsg.setText(secret.getBlob());
         } else if (secret.getBlobType() == BlobType.IMAGE) {
             holder.chatCamHolder.setVisibility(View.VISIBLE);
-            holder.chatMicHolder.setVisibility(View.GONE);
+            holder.chatMisHolder.setVisibility(View.GONE);
             holder.chatMsgHolder.setVisibility(View.GONE);
 
-            if (secret.isMissed()) {
-                holder.chatCam.setImageResource(R.drawable.missed_selfie_call);
-            } else {
-                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak/" + secret.getId() + ".jpg");
-                Picasso.with(context)
-                        .load(file)
-                        .resize(150, 150)
-                        .centerCrop()
-                        .into(holder.chatCam);
-            }
-        } else if (secret.getBlobType() == BlobType.SOUND) {
+            // load thumbnail
+            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Rahasak/" + secret.getId() + ".jpg");
+            Picasso.with(context)
+                    .load(file)
+                    .resize(150, 150)
+                    .centerCrop()
+                    .into(holder.chatCam);
+        } else if (secret.getBlobType() == BlobType.MISSED_SELFIE) {
+            // mis selfie
             holder.chatCamHolder.setVisibility(View.GONE);
-            holder.chatMicHolder.setVisibility(View.VISIBLE);
+            holder.chatMisHolder.setVisibility(View.VISIBLE);
             holder.chatMsgHolder.setVisibility(View.GONE);
+
+            holder.missedSecret.setText("Missed selfie");
+        } else if (secret.getBlobType() == BlobType.MISSED_CALL) {
+            // mis call
+            holder.chatCamHolder.setVisibility(View.GONE);
+            holder.chatMisHolder.setVisibility(View.VISIBLE);
+            holder.chatMsgHolder.setVisibility(View.GONE);
+
+            holder.missedSecret.setText("Missed call");
         }
 
         if (secret.isSender()) {
@@ -201,12 +209,11 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatStatus.setVisibility(View.VISIBLE);
         }
 
-        holder.chatCam.setOnClickListener(new View.OnClickListener() {
+        holder.chatMisHolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (secret.isMissed()) {
-                    // missed
-                    // start photo activity
+                if (secret.getBlobType() == BlobType.MISSED_SELFIE) {
+                    // start selfie answer activity
                     Intent intent = new Intent(context, SelfieCallAnswerActivity.class);
                     intent.putExtra("USER", secret.getUser().getUsername());
                     intent.putExtra("CAM_MIS", true);
@@ -216,20 +223,12 @@ class ChatListAdapter extends BaseAdapter {
                     secretList.remove(secret);
                     dbSource.deleteSecret(secret);
                     notifyDataSetChanged();
-                } else {
-                    Intent intent = new Intent(context, SelfieCallActivity.class);
-                    intent.putExtra("UID", secret.getId());
+                } else if (secret.getBlobType() == BlobType.MISSED_CALL) {
+                    // start call activity
+                    Intent intent = new Intent(context, SecretCallActivity.class);
+                    intent.putExtra("USER", secretUser);
                     context.startActivity(intent);
                 }
-            }
-        });
-
-        holder.chatMic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, SecretCallActivity.class);
-                intent.putExtra("SOUND", secret.getBlob());
-                context.startActivity(intent);
             }
         });
     }
@@ -239,11 +238,11 @@ class ChatListAdapter extends BaseAdapter {
      */
     private static class ViewHolder {
         RelativeLayout chatCamHolder;
-        RelativeLayout chatMicHolder;
+        RelativeLayout chatMisHolder;
         LinearLayout chatMsgHolder;
 
         ImageView chatCam;
-        ImageView chatMic;
+        TextView missedSecret;
         TextView chatMsg;
 
         FrameLayout chatStatus;

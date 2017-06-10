@@ -322,10 +322,9 @@ public class SelfieCallAnswerActivity extends BaseActivity {
 
     private void saveMissedSelfie() {
         Long timestamp = (System.currentTimeMillis() / 1000);
-        String uid = SenzUtils.getUid(this, timestamp.toString());
-        Secret newSecret = new Secret("", BlobType.IMAGE, secretUser, true);
+        Secret newSecret = new Secret("", BlobType.MISSED_SELFIE, secretUser, true);
         newSecret.setTimeStamp(timestamp);
-        newSecret.setId(uid);
+        newSecret.setId(SenzUtils.getUid(this, timestamp.toString()));
         newSecret.setMissed(true);
         newSecret.setDeliveryState(DeliveryState.NONE);
         new SenzorsDbSource(this).createSecret(newSecret);

@@ -124,6 +124,7 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
             sendSenz(SenzUtils.getMicBusySenz(SecretCallAnswerActivity.this, secretUser));
             stopRinging();
 
+            saveMissedCall();
             SecretCallAnswerActivity.this.finish();
         }
 
@@ -293,7 +294,7 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
                 cancelTimerToServe();
 
                 sendSenz(SenzUtils.getMicBusySenz(SecretCallAnswerActivity.this, secretUser));
-
+                saveMissedCall();
                 SecretCallAnswerActivity.this.finish();
             }
         });
@@ -415,11 +416,12 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
     }
 
     private void saveMissedCall() {
-        Secret newSecret = new Secret("", BlobType.SOUND, secretUser, true);
-        Long timeStamp = System.currentTimeMillis() / 1000;
-        newSecret.setTimeStamp(timeStamp);
-        newSecret.setId(SenzUtils.getUid(this, timeStamp.toString()));
-        newSecret.setDeliveryState(DeliveryState.PENDING);
+        Long timestamp = (System.currentTimeMillis() / 1000);
+        Secret newSecret = new Secret("", BlobType.MISSED_CALL, secretUser, true);
+        newSecret.setTimeStamp(timestamp);
+        newSecret.setId(SenzUtils.getUid(this, timestamp.toString()));
+        newSecret.setMissed(true);
+        newSecret.setDeliveryState(DeliveryState.NONE);
         new SenzorsDbSource(this).createSecret(newSecret);
     }
 

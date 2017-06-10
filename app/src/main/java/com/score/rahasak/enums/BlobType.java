@@ -1,12 +1,12 @@
 package com.score.rahasak.enums;
 
-/**
- * Created by eranga on 10/1/16.
- */
+
 public enum BlobType {
     TEXT(1),
     IMAGE(2),
-    SOUND(3);
+    SOUND(3),
+    MISSED_SELFIE(4),
+    MISSED_CALL(5);
 
     private int type;
 

@@ -187,6 +187,23 @@ public class SenzUtils {
         return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
     }
 
+    public static Senz getCamSenz(Context context, SecretUser secretUser) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("cam", "");
+
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", SenzUtils.getUid(context, timestamp.toString()));
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.GET;
+
+        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
+    }
+
     public static Senz getMicOnSenz(Context context, SecretUser secretUser) {
         Long timeStamp = System.currentTimeMillis() / 1000;
         String uid = SenzUtils.getUid(context, timeStamp.toString());
