@@ -156,6 +156,29 @@ public class SenzorsDbSource {
                 new String[]{username});
     }
 
+    public void updateUnreadSecretCount(String username, int count) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        db.execSQL("UPDATE " + SenzorsDbContract.User.TABLE_NAME +
+                        " SET " + SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT + " = " + SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT + " + ? " +
+                        " WHERE " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ? ",
+                new String[]{String.valueOf(count), username});
+    }
+
+    public void resetUnreadSecretCount(String username) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT, 0);
+
+        // update
+        db.update(SenzorsDbContract.User.TABLE_NAME,
+                values,
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+                new String[]{username});
+    }
+
     public void activateSecretUser(String username, boolean isActive) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
@@ -669,10 +692,25 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(secret._id), secret._id, secret.blob, secret.blob_type, secret.user, secret.is_sender, secret.timestamp, user._id, user.image, user.is_active, user.is_sms_requester, user.phone  " +
-                "FROM secret " +
-                "INNER JOIN user " +
-                "ON user.username = secret.user GROUP BY user.username ORDER BY timestamp DESC";
+        String query =
+                "SELECT " +
+                        "MAX(secret._id), " +
+                        "secret._id, " +
+                        "secret.blob, " +
+                        "secret.blob_type, " +
+                        "secret.user, " +
+                        "secret.is_sender, " +
+                        "secret.timestamp, " +
+                        "user._id, " +
+                        "user.image, " +
+                        "user.is_active, " +
+                        "user.is_sms_requester, " +
+                        "user.phone, " +
+                        "user.unread_secret_count " +
+                        "FROM secret " +
+                        "INNER JOIN user ON user.username = secret.user " +
+                        "GROUP BY user.username " +
+                        "ORDER BY timestamp DESC";
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -687,6 +725,7 @@ public class SenzorsDbSource {
         int _isActive;
         int _isRequester;
         String _phone;
+        int _unreadSecretCount;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -703,12 +742,14 @@ public class SenzorsDbSource {
             _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
             _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             _isRequester = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER));
+            _unreadSecretCount = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT));
 
             SecretUser secretUser = new SecretUser(_userID, _secretUser);
             secretUser.setImage(_image);
             secretUser.setActive(_isActive == 1);
             secretUser.setSMSRequester(_isRequester == 1);
             secretUser.setPhone(_phone);
+            secretUser.setUnreadSecretCount(_unreadSecretCount);
 
             Secret secret = new Secret(_secretBlob, BlobType.valueOfType(_secretBlobType), secretUser, _secretIsSender == 1);
             secret.setTimeStamp(_secretTimestamp);

@@ -122,7 +122,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_chat);
 
         dbSource = new SenzorsDbSource(this);
@@ -134,6 +134,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initSecretList();
         updatePermissions();
         setupUserImage();
+        dbSource.resetUnreadSecretCount(secretUser.getUsername());
     }
 
     @Override
@@ -144,6 +145,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initSecretList();
         updatePermissions();
         setupUserImage();
+        dbSource.resetUnreadSecretCount(secretUser.getUsername());
     }
 
     @Override
@@ -262,6 +264,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void initUser(Intent intent) {
         String username = intent.getStringExtra("SENDER");
         secretUser = dbSource.getSecretUser(username);
+    }
+
+    private void resetUnread() {
     }
 
     private void setupToolbar() {

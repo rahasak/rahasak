@@ -5,6 +5,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,8 +33,8 @@ import com.score.senzc.pojos.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SelfieCaptureActivity extends BaseActivity {
-    protected static final String TAG = SelfieCaptureActivity.class.getName();
+public class SelfieCallAnswerActivity extends BaseActivity {
+    protected static final String TAG = SelfieCallAnswerActivity.class.getName();
 
     // call details
     private FrameLayout callDeatilsLayout;
@@ -65,6 +66,8 @@ public class SelfieCaptureActivity extends BaseActivity {
     private static final int TIME_TO_SERVE_REQUEST = 15000;
     private static final int TIME_TO_QUICK_PHOTO = 3000;
 
+    private PowerManager.WakeLock wakeLock;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +77,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         initCameraPreview(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
         // init activity
-        initFlags();
+        acquireWakeLock();
         initUi();
         initUser();
         VibrationUtils.startVibrate(this);
@@ -122,19 +125,25 @@ public class SelfieCaptureActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        clearFlags();
+        releaseWakeLock();
         VibrationUtils.stopVibration(this);
         releaseCamera();
     }
 
-    private void initFlags() {
+    private void acquireWakeLock() {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "senz");
+        wakeLock.acquire();
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
-    private void clearFlags() {
+    private void releaseWakeLock() {
+        wakeLock.release();
+
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -155,9 +164,9 @@ public class SelfieCaptureActivity extends BaseActivity {
                     isPhotoCancelled = true;
                     cancelTimerToServe();
                     sendBusySenz();
-                    VibrationUtils.stopVibration(SelfieCaptureActivity.this);
+                    VibrationUtils.stopVibration(SelfieCallAnswerActivity.this);
                     saveMissedSelfie();
-                    SelfieCaptureActivity.this.finish();
+                    SelfieCallAnswerActivity.this.finish();
                 }
             }
         });
@@ -165,7 +174,7 @@ public class SelfieCaptureActivity extends BaseActivity {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VibrationUtils.stopVibration(SelfieCaptureActivity.this);
+                VibrationUtils.stopVibration(SelfieCallAnswerActivity.this);
                 if (!isPhotoTaken) {
                     cancelTimerToServe();
                     startQuickCountdownToPhoto();
@@ -280,7 +289,7 @@ public class SelfieCaptureActivity extends BaseActivity {
                 byte[] resizedImage = ImageUtils.compressImage(bytes, camId);
                 Log.d(TAG, "Compressed size: " + resizedImage.length / 1024);
 
-                sendPhotoSenz(resizedImage, SelfieCaptureActivity.this);
+                sendPhotoSenz(resizedImage, SelfieCallAnswerActivity.this);
                 finish();
             }
         });
@@ -301,7 +310,7 @@ public class SelfieCaptureActivity extends BaseActivity {
             public void onFinish() {
                 sendBusySenz();
                 saveMissedSelfie();
-                SelfieCaptureActivity.this.finish();
+                SelfieCallAnswerActivity.this.finish();
             }
 
             @Override

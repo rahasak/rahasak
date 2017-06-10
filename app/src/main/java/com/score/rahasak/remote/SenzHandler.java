@@ -1,5 +1,8 @@
 package com.score.rahasak.remote;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Base64;
@@ -13,7 +16,7 @@ import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.pojo.Stream;
 import com.score.rahasak.ui.SecretCallAnswerActivity;
-import com.score.rahasak.ui.SelfieCaptureActivity;
+import com.score.rahasak.ui.SelfieCallAnswerActivity;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NotificationUtils;
@@ -26,6 +29,7 @@ import com.score.senzc.pojos.User;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -379,10 +383,14 @@ class SenzHandler {
     private void handleCam(Senz senz, SenzService senzService) {
         if (!SenzApplication.isOnCall()) {
             try {
-                Intent intent = new Intent(senzService.getApplicationContext(), SelfieCaptureActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.SECOND, 2);
+
+                Intent intent = new Intent(senzService.getApplicationContext(), SelfieCallAnswerActivity.class);
                 intent.putExtra("USER", senz.getSender().getUsername());
-                senzService.getApplicationContext().startActivity(intent);
+                PendingIntent pendingIntent = PendingIntent.getActivity(senzService.getApplicationContext(), 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager am = (AlarmManager) senzService.getApplicationContext().getSystemService(Activity.ALARM_SERVICE);
+                am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
             } catch (Exception e) {
                 // fail to access camera
                 senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "CAM_ERROR"));
@@ -395,11 +403,14 @@ class SenzHandler {
 
     private void handleMic(Senz senz, SenzService senzService) {
         if (!SenzApplication.isOnCall()) {
-            Intent intent = new Intent();
-            intent.setClass(senzService.getApplicationContext(), SecretCallAnswerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.SECOND, 2);
+
+            Intent intent = new Intent(senzService.getApplicationContext(), SecretCallAnswerActivity.class);
             intent.putExtra("USER", senz.getSender().getUsername());
-            senzService.getApplicationContext().startActivity(intent);
+            PendingIntent pendingIntent = PendingIntent.getActivity(senzService.getApplicationContext(), 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager am = (AlarmManager) senzService.getApplicationContext().getSystemService(Activity.ALARM_SERVICE);
+            am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
         } else {
             // user in another call
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
@@ -419,14 +430,17 @@ class SenzHandler {
     }
 
     private void saveSecret(Long timestamp, String uid, String blob, BlobType blobType, User user, boolean missed, final Context context) {
-        // create secret
         try {
+            // create secret
             final Secret secret = new Secret(blob, blobType, new SecretUser(user.getId(), user.getUsername()), true);
             secret.setId(uid);
             secret.setTimeStamp(timestamp);
             secret.setMissed(missed);
             secret.setDeliveryState(DeliveryState.NONE);
             new SenzorsDbSource(context).createSecret(secret);
+
+            // update unread count by one
+            new SenzorsDbSource(context).updateUnreadSecretCount(user.getUsername(), 1);
         } catch (Exception e) {
             e.printStackTrace();
         }

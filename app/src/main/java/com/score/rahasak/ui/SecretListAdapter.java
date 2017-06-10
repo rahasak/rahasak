@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -69,10 +70,13 @@ class SecretListAdapter extends BaseAdapter {
             holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
             holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
             holder.selected = (ImageView) view.findViewById(R.id.selected);
+            holder.unreadCount = (FrameLayout) view.findViewById(R.id.unread_msg_count);
+            holder.unreadText = (TextView) view.findViewById(R.id.unread_msg_text);
 
             holder.sender.setTypeface(typeface, Typeface.NORMAL);
             holder.message.setTypeface(typeface, Typeface.NORMAL);
             holder.sentTime.setTypeface(typeface, Typeface.NORMAL);
+            holder.unreadText.setTypeface(typeface, Typeface.BOLD);
 
             view.setTag(holder);
         } else {
@@ -115,10 +119,23 @@ class SecretListAdapter extends BaseAdapter {
             viewHolder.userImage.setImageResource(R.drawable.default_user);
         }
 
+        // selected state
         if (secret.isViewed()) {
             viewHolder.selected.setVisibility(View.VISIBLE);
         } else {
             viewHolder.selected.setVisibility(View.GONE);
+        }
+
+        // unread secret count
+        if (secret.getUser().getUnreadSecretCount() > 0) {
+            viewHolder.sentTime.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+            viewHolder.sentTime.setTypeface(typeface, Typeface.BOLD);
+            viewHolder.unreadCount.setVisibility(View.VISIBLE);
+            viewHolder.unreadText.setText(secret.getUser().getUnreadSecretCount() + "");
+        } else {
+            viewHolder.sentTime.setTextColor(context.getResources().getColor(R.color.android_grey));
+            viewHolder.sentTime.setTypeface(typeface, Typeface.NORMAL);
+            viewHolder.unreadCount.setVisibility(View.GONE);
         }
     }
 
@@ -131,5 +148,8 @@ class SecretListAdapter extends BaseAdapter {
         TextView sentTime;
         com.github.siyamed.shapeimageview.RoundedImageView userImage;
         ImageView selected;
+
+        FrameLayout unreadCount;
+        TextView unreadText;
     }
 }

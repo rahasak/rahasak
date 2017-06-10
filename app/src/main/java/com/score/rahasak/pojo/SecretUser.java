@@ -19,6 +19,7 @@ public class SecretUser extends User implements Parcelable {
     private boolean isSMSRequester;
     private boolean isActive;
     private boolean selected;
+    private int unreadSecretCount;
 
     public SecretUser(String id, String username) {
         super(id, username);
@@ -37,10 +38,12 @@ public class SecretUser extends User implements Parcelable {
         this.pubKey = in.readString();
         this.pubKeyHash = in.readString();
         this.sessionKey = in.readString();
-        this.isActive = in.readByte() != 0;
-        this.isSMSRequester = in.readByte() != 0;
         this.givenPermission = in.readParcelable(Permission.class.getClassLoader());
         this.recvPermission = in.readParcelable(Permission.class.getClassLoader());
+        this.isActive = in.readByte() != 0;
+        this.isSMSRequester = in.readByte() != 0;
+        this.selected = in.readByte() != 0;
+        this.unreadSecretCount = in.readInt();
     }
 
     /**
@@ -67,10 +70,12 @@ public class SecretUser extends User implements Parcelable {
         dest.writeString(pubKey);
         dest.writeString(pubKeyHash);
         dest.writeString(sessionKey);
-        dest.writeByte((byte) (isActive ? 1 : 0));
-        dest.writeByte((byte) (isSMSRequester ? 1 : 0));
         dest.writeParcelable(givenPermission, flags);
         dest.writeParcelable(recvPermission, flags);
+        dest.writeByte((byte) (isActive ? 1 : 0));
+        dest.writeByte((byte) (isSMSRequester ? 1 : 0));
+        dest.writeByte((byte) (selected ? 1 : 0));
+        dest.writeInt(unreadSecretCount);
     }
 
     /**
@@ -168,5 +173,13 @@ public class SecretUser extends User implements Parcelable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public int getUnreadSecretCount() {
+        return unreadSecretCount;
+    }
+
+    public void setUnreadSecretCount(int unreadSecretCount) {
+        this.unreadSecretCount = unreadSecretCount;
     }
 }

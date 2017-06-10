@@ -26,6 +26,7 @@
 
     <!-- keep screen active when camera is open -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <!-- access to vibrate phone -->
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -116,7 +117,7 @@
             android:theme="@style/MyMaterialTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.score.rahasak.ui.SelfieCaptureActivity"
+            android:name="com.score.rahasak.ui.SelfieCallAnswerActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />

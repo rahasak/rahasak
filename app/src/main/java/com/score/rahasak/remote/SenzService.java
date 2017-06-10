@@ -304,8 +304,9 @@ public class SenzService extends Service {
                 try {
                     PrivateKey privateKey = CryptoUtils.getPrivateKey(SenzService.this);
 
-                    // set sender
-                    senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+                    // if sender not already set find user(sender) and set it to senz first
+                    if (senz.getSender() == null || senz.getSender().toString().isEmpty())
+                        senz.setSender(PreferenceUtils.getUser(getBaseContext()));
 
                     // get digital signature of the senz
                     String senzPayload = SenzParser.getSenzPayload(senz);

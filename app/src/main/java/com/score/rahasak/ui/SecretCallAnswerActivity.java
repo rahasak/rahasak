@@ -123,6 +123,7 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
         public void onFinish() {
             sendSenz(SenzUtils.getMicBusySenz(SecretCallAnswerActivity.this, secretUser));
             stopRinging();
+
             SecretCallAnswerActivity.this.finish();
         }
 
@@ -140,6 +141,7 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
         initStatusBar();
         initUser();
         initSensor();
+        initFlags();
         acquireWakeLock();
         startTimerToEndRequest();
         initRinging();
@@ -223,6 +225,8 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
         super.onDestroy();
 
         releaseWakeLock();
+        clearFlags();
+
         stopService(new Intent(this, CallService.class));
     }
 
@@ -266,6 +270,7 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
             public void onClick(View v) {
                 stopRinging();
                 cancelTimerToServe();
+                releaseWakeLock();
                 startCall();
             }
         });
@@ -284,8 +289,8 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelTimerToServe();
                 stopRinging();
+                cancelTimerToServe();
 
                 sendSenz(SenzUtils.getMicBusySenz(SecretCallAnswerActivity.this, secretUser));
 
@@ -341,18 +346,24 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
 
     private void acquireWakeLock() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
-        wakeLock.acquire();
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "senz");
+        if (!wakeLock.isHeld())
+            wakeLock.acquire();
+    }
 
+    private void releaseWakeLock() {
+        if (wakeLock.isHeld())
+            wakeLock.release();
+    }
+
+    private void initFlags() {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
-    private void releaseWakeLock() {
-        wakeLock.release();
-
+    private void clearFlags() {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);

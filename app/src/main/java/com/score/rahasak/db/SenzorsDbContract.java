@@ -50,6 +50,7 @@ class SenzorsDbContract {
         static final String COLUMN_NAME_IMAGE = "image";
         static final String COLUMN_NAME_GIVEN_PERM = "given_perm";
         static final String COLUMN_NAME_RECV_PERM = "recv_perm";
+        static final String COLOMN_UNREAD_SECRET_COUNT = "unread_secret_count";
     }
 
     /* Inner class that defines permission control for the user
