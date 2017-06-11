@@ -4,7 +4,7 @@ package com.score.rahasak.enums;
 public enum BlobType {
     TEXT(1),
     IMAGE(2),
-    SOUND(3),
+    CALL(3),
     MISSED_SELFIE(4),
     MISSED_CALL(5);
 

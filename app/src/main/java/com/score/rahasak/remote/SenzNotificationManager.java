@@ -161,9 +161,9 @@ public class SenzNotificationManager {
      * Cancel notification
      * need to cancel when disconnect from web socket
      */
-    void cancelNotification(Context context) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(NotificationUtils.MESSAGE_NOTIFICATION_ID);
+    void cancelNotification(int NotificationId, Context context) {
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(NotificationId);
     }
 
 }

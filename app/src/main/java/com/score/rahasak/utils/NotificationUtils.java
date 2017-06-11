@@ -1,8 +1,5 @@
 package com.score.rahasak.utils;
 
-import android.app.NotificationManager;
-import android.content.Context;
-
 import com.score.rahasak.R;
 import com.score.rahasak.enums.NotificationType;
 import com.score.rahasak.pojo.SenzNotification;
@@ -53,12 +50,6 @@ public class NotificationUtils {
         senzNotification.setSenderPhone(contactPhone);
 
         return senzNotification;
-    }
-
-    // Remove notification from tray
-    public static void cancelNotification(int NotificationId, Context context) {
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(NotificationId);
     }
 
 }

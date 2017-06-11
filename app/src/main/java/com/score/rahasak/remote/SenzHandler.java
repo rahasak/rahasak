@@ -114,8 +114,7 @@ class SenzHandler {
                 // notification user
                 String notificationUser = username;
                 if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                    notificationUser = contactName + "(@" + username + ")";
+                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
                 }
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(NotificationUtils.getUserNotification(notificationUser));
 
@@ -158,8 +157,7 @@ class SenzHandler {
             // notification user
             String notificationUser = secretUser.getUsername();
             if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                notificationUser = contactName + "(@" + secretUser.getUsername() + ")";
+                notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
             }
 
             if (senz.getAttributes().containsKey("cam")) {
@@ -232,8 +230,7 @@ class SenzHandler {
                 // notification user
                 String notificationUser = username;
                 if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                    notificationUser = contactName + "(@" + username + ")";
+                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
                 }
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(NotificationUtils.getUserConfirmNotification(notificationUser));
             }
@@ -267,8 +264,7 @@ class SenzHandler {
                 SecretUser secretUser = dbSource.getSecretUser(username);
                 String notificationUser = secretUser.getUsername();
                 if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                    notificationUser = contactName + "(@" + username + ")";
+                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
                 }
 
                 // show notification
@@ -319,8 +315,7 @@ class SenzHandler {
                 SecretUser secretUser = dbSource.getSecretUser(username);
                 String notificationUser = secretUser.getUsername();
                 if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                    notificationUser = contactName + "(@" + username + ")";
+                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
                 }
 
                 // show notification
@@ -364,8 +359,7 @@ class SenzHandler {
                 SecretUser secretUser = new SenzorsDbSource(senzService.getApplicationContext()).getSecretUser(username);
                 String notificationUser = secretUser.getUsername();
                 if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    String contactName = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                    notificationUser = contactName + "(@" + username + ")";
+                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
                 }
 
                 // show notification
