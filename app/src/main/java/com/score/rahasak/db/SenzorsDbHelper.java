@@ -132,7 +132,7 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
 
         int version = oldVersion + 1;
-        while (version == newVersion) {
+        while (true) {
             switch (version) {
                 case 47:
                     // delete recent secret
@@ -145,9 +145,13 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
                 case 49:
                     // add in_order column
                     db.execSQL(SQL_ADD_COLUMN_IN_ORDER);
+                    break;
             }
 
-            version++;
+            if (version == newVersion)
+                break;
+            else
+                version++;
         }
     }
 
