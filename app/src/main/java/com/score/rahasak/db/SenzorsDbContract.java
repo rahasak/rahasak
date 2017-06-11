@@ -27,6 +27,8 @@ class SenzorsDbContract {
         static final String COLUMN_UNIQUE_ID = "uid";
         static final String COLUMN_TIMESTAMP = "timestamp";
         static final String COLUMN_NAME_USER = "user";
+        // is_sender = true -> friends secret
+        // is_sender = false -> my secret
         // TODO change this to my_secret
         static final String COLUMN_NAME_IS_SENDER = "is_sender";
         static final String COLUMN_NAME_BLOB = "blob";
@@ -34,6 +36,7 @@ class SenzorsDbContract {
         static final String COLUMN_NAME_VIEWED = "viewed";
         static final String COLUMN_NAME_VIEWED_TIMESTAMP = "view_timestamp";
         static final String COLUMN_NAME_MISSED = "missed";
+        static final String COLUMN_NAME_IN_ORDER = "in_order";
         static final String DELIVERY_STATE = "delivery_state";
     }
 
@@ -50,7 +53,7 @@ class SenzorsDbContract {
         static final String COLUMN_NAME_IMAGE = "image";
         static final String COLUMN_NAME_GIVEN_PERM = "given_perm";
         static final String COLUMN_NAME_RECV_PERM = "recv_perm";
-        static final String COLOMN_UNREAD_SECRET_COUNT = "unread_secret_count";
+        static final String COLUMN_NAME_UNREAD_SECRET_COUNT = "unread_secret_count";
     }
 
     /* Inner class that defines permission control for the user

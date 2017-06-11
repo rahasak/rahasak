@@ -160,7 +160,7 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         db.execSQL("UPDATE " + SenzorsDbContract.User.TABLE_NAME +
-                        " SET " + SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT + " = " + SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT + " + ? " +
+                        " SET " + SenzorsDbContract.User.COLUMN_NAME_UNREAD_SECRET_COUNT + " = " + SenzorsDbContract.User.COLUMN_NAME_UNREAD_SECRET_COUNT + " + ? " +
                         " WHERE " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ? ",
                 new String[]{String.valueOf(count), username});
     }
@@ -170,7 +170,7 @@ public class SenzorsDbSource {
 
         // content values to inset
         ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT, 0);
+        values.put(SenzorsDbContract.User.COLUMN_NAME_UNREAD_SECRET_COUNT, 0);
 
         // update
         db.update(SenzorsDbContract.User.TABLE_NAME,
@@ -380,10 +380,11 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, secret.isViewed() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP, 0);
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_MISSED, secret.isMissed() ? 1 : 0);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER, secret.isInOrder() ? 1 : 0);
         values.put(SenzorsDbContract.Secret.DELIVERY_STATE, secret.getDeliveryState().getState());
 
         // update previous secret
-        updatePreviousSecretViewedState(secret);
+        updatePreviousSecretInOrderState(secret);
 
         // insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
@@ -437,12 +438,7 @@ public class SenzorsDbSource {
         }
     }
 
-    /**
-     * Mark message as viewed state
-     *
-     * @param curSecret cur secret
-     */
-    private void updatePreviousSecretViewedState(Secret curSecret) {
+    private void updatePreviousSecretInOrderState(Secret curSecret) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         try {
             db.beginTransaction();
@@ -462,7 +458,7 @@ public class SenzorsDbSource {
                 if ((curSecret.isSender() == isSender) && TimeUtils.isInLine(time, curSecret.getTimeStamp())) {
                     // secret is inline, viewed true
                     ContentValues values = new ContentValues();
-                    values.put(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED, 1);
+                    values.put(SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER, 1);
 
                     // update
                     db.update(SenzorsDbContract.Secret.TABLE_NAME,
@@ -488,8 +484,11 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
-                "FROM secret WHERE user = ? ORDER BY _id ASC";
+        String query =
+                "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, in_order, delivery_state " +
+                        "FROM secret " +
+                        "WHERE user = ? " +
+                        "ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{secretUser.getUsername()});
 
         // secret attr
@@ -499,6 +498,7 @@ public class SenzorsDbSource {
         int _secretIsSender;
         int _isViewed;
         int _isMissed;
+        int _inOrder;
         Long _secretTimestamp;
         Long _secretViewTimestamp;
         int _deliveryState;
@@ -514,6 +514,7 @@ public class SenzorsDbSource {
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
             _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
             _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
+            _inOrder = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER));
             _deliveryState = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.DELIVERY_STATE));
 
             // create secret
@@ -521,6 +522,7 @@ public class SenzorsDbSource {
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
             secret.setMissed(_isMissed == 1);
+            secret.setInOrder(_inOrder == 1);
             secret.setTimeStamp(_secretTimestamp);
             secret.setViewedTimeStamp(_secretViewTimestamp);
             secret.setDeliveryState(DeliveryState.valueOfState(_deliveryState));
@@ -532,7 +534,7 @@ public class SenzorsDbSource {
         // clean
         cursor.close();
 
-        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        Log.d(TAG, "got secrets count " + secretList.size());
         return secretList;
     }
 
@@ -547,8 +549,11 @@ public class SenzorsDbSource {
         ArrayList secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, delivery_state " +
-                "FROM secret WHERE user = ? AND timestamp > ? ORDER BY _id ASC";
+        String query =
+                "SELECT _id, uid, blob, blob_type, user, is_sender, viewed, view_timestamp, missed, timestamp, in_order, delivery_state " +
+                        "FROM secret " +
+                        "WHERE user = ? AND timestamp > ? " +
+                        "ORDER BY _id ASC";
         Cursor cursor = db.rawQuery(query, new String[]{secretUser.getUsername(), timestamp.toString()});
 
         // secret attr
@@ -558,6 +563,7 @@ public class SenzorsDbSource {
         int _secretIsSender;
         int _isViewed;
         int _isMissed;
+        int _inOrder;
         Long _secretTimestamp;
         Long _secretViewTimestamp;
         int _deliveryState;
@@ -573,6 +579,7 @@ public class SenzorsDbSource {
             _isViewed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED));
             _secretViewTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP));
             _isMissed = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_MISSED));
+            _inOrder = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER));
             _deliveryState = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.DELIVERY_STATE));
 
             // create secret
@@ -580,6 +587,7 @@ public class SenzorsDbSource {
             secret.setId(_secretId);
             secret.setViewed(_isViewed == 1);
             secret.setMissed(_isMissed == 1);
+            secret.setInOrder(_inOrder == 1);
             secret.setTimeStamp(_secretTimestamp);
             secret.setViewedTimeStamp(_secretViewTimestamp);
             secret.setDeliveryState(DeliveryState.valueOfState(_deliveryState));
@@ -742,7 +750,7 @@ public class SenzorsDbSource {
             _isActive = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_ACTIVE));
             _phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             _isRequester = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_IS_SMS_REQUESTER));
-            _unreadSecretCount = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT));
+            _unreadSecretCount = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_UNREAD_SECRET_COUNT));
 
             SecretUser secretUser = new SecretUser(_userID, _secretUser);
             secretUser.setImage(_image);

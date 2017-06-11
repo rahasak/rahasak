@@ -3,19 +3,17 @@ package com.score.rahasak.pojo;
 import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
 
-/**
- * Created by Lakmal on 7/31/16.
- */
 public class Secret {
     private String id;
     private String blob;
     private BlobType blobType;
     private SecretUser user;
+    private boolean isSender;
     private boolean isViewed;
-    private boolean isMissed;
     private Long timeStamp;
     private Long viewedTimeStamp;
-    private boolean isSender;
+    private boolean isMissed;
+    private boolean inOrder;
     private DeliveryState deliveryState;
 
     public Secret(String blob, BlobType blobType, SecretUser user, boolean isSender) {
@@ -53,16 +51,16 @@ public class Secret {
         return user;
     }
 
+    public boolean isSender() {
+        return isSender;
+    }
+
+    public void setSender(boolean sender) {
+        isSender = sender;
+    }
+
     public void setUser(SecretUser user) {
         this.user = user;
-    }
-
-    public boolean isViewed() {
-        return isViewed;
-    }
-
-    public void setViewed(boolean viewed) {
-        isViewed = viewed;
     }
 
     public boolean isMissed() {
@@ -89,12 +87,20 @@ public class Secret {
         this.viewedTimeStamp = viewedTimeStamp;
     }
 
-    public boolean isSender() {
-        return isSender;
+    public boolean isViewed() {
+        return isViewed;
     }
 
-    public void setSender(boolean sender) {
-        isSender = sender;
+    public void setViewed(boolean viewed) {
+        isViewed = viewed;
+    }
+
+    public boolean isInOrder() {
+        return inOrder;
+    }
+
+    public void setInOrder(boolean inOrder) {
+        this.inOrder = inOrder;
     }
 
     public DeliveryState getDeliveryState() {

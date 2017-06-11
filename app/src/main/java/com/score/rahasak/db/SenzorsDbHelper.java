@@ -18,7 +18,7 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 48;
+    private static final int DATABASE_VERSION = 49;
     private static final String DATABASE_NAME = "Rahasak.db";
 
     // data types, keywords and queries
@@ -37,6 +37,7 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Secret.COLUMN_NAME_VIEWED + INT_TYPE + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_VIEWED_TIMESTAMP + INT_TYPE + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_MISSED + INT_TYPE + ", " +
+                    SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER + INT_TYPE + ", " +
                     SenzorsDbContract.Secret.DELIVERY_STATE + INT_TYPE +
                     " )";
 
@@ -53,7 +54,7 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.User.COLUMN_NAME_IMAGE + TEXT_TYPE + "," +
                     SenzorsDbContract.User.COLUMN_NAME_GIVEN_PERM + INT_TYPE + "," +
                     SenzorsDbContract.User.COLUMN_NAME_RECV_PERM + INT_TYPE + "," +
-                    SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT + INT_TYPE + " DEFAULT 0" +
+                    SenzorsDbContract.User.COLUMN_NAME_UNREAD_SECRET_COUNT + INT_TYPE + " DEFAULT 0" +
                     " )";
 
     private static final String SQL_CREATE_PERMISSION =
@@ -67,9 +68,13 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_RECENT_SECRET =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.RecentSecret.TABLE_NAME;
 
-    private static final String SQL_ADD_UNREAD_SECRET_COUNT_TO_SECRET_USER =
+    private static final String SQL_ADD_COLUMN_UNREAD_SECRET_COUNT =
             "ALTER TABLE " + SenzorsDbContract.User.TABLE_NAME + " ADD COLUMN " +
-                    SenzorsDbContract.User.COLOMN_UNREAD_SECRET_COUNT + INT_TYPE + " DEFAULT 0";
+                    SenzorsDbContract.User.COLUMN_NAME_UNREAD_SECRET_COUNT + INT_TYPE + " DEFAULT 0";
+
+    private static final String SQL_ADD_COLUMN_IN_ORDER =
+            "ALTER TABLE " + SenzorsDbContract.Secret.TABLE_NAME + " ADD COLUMN " +
+                    SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER + INT_TYPE + " DEFAULT 0";
 
     /**
      * Init context
@@ -124,8 +129,6 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
      * {@inheritDoc}
      */
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
 
         int version = oldVersion + 1;
@@ -137,8 +140,11 @@ class SenzorsDbHelper extends SQLiteOpenHelper {
                     break;
                 case 48:
                     // update secret user with unread count
-                    db.execSQL(SQL_ADD_UNREAD_SECRET_COUNT_TO_SECRET_USER);
+                    db.execSQL(SQL_ADD_COLUMN_UNREAD_SECRET_COUNT);
                     break;
+                case 49:
+                    // add in_order column
+                    db.execSQL(SQL_ADD_COLUMN_IN_ORDER);
             }
 
             version++;

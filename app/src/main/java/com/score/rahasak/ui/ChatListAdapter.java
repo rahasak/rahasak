@@ -207,7 +207,8 @@ class ChatListAdapter extends BaseAdapter {
             holder.chatTime.setText(TimeUtils.getTimeInWords(secret.getTimeStamp()));
         }
 
-        if (secret.isViewed()) {
+        // disable status panel if secret time is aligned(in range of 5 mins) with previous secret
+        if (secret.isInOrder()) {
             holder.chatStatus.setVisibility(View.GONE);
         } else {
             holder.chatStatus.setVisibility(View.VISIBLE);
