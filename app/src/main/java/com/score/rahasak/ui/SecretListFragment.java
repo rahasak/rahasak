@@ -24,7 +24,6 @@ import android.widget.TextView;
 import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.db.SenzorsDbSource;
-import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.pojo.Secret;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -39,7 +38,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
 
     private ActionBar actionBar;
     private ImageView actionBarDelete;
-    //private TextView actionBarName;
 
     private ArrayList<Secret> allSecretsList;
     private SecretListAdapter adapter;
@@ -98,7 +96,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
     private void initActionBar() {
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBarDelete = (ImageView) actionBar.getCustomView().findViewById(R.id.delete);
-        //actionBarName = (TextView) actionBar.getCustomView().findViewById(R.id.user_name);
     }
 
     /**
@@ -116,29 +113,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
         allSecretsList.clear();
         allSecretsList.addAll(dbSource.getRecentSecretList());
         adapter.notifyDataSetChanged();
-    }
-
-    private void updateList(Senz senz) {
-        for (Secret secret : allSecretsList) {
-            if (senz.getSender().getUsername().equalsIgnoreCase(secret.getUser().getUsername())) {
-                if (senz.getAttributes().containsKey("cam")) {
-                    secret.setBlob(senz.getAttributes().get("cam"));
-                    secret.setBlobType(BlobType.IMAGE);
-                    secret.setTimeStamp((System.currentTimeMillis() / 1000));
-                    adapter.notifyDataSetChanged();
-                } else if (senz.getAttributes().containsKey("mic")) {
-                    secret.setBlob(senz.getAttributes().get("mic"));
-                    secret.setBlobType(BlobType.SOUND);
-                    secret.setTimeStamp((System.currentTimeMillis() / 1000));
-                    adapter.notifyDataSetChanged();
-                } else if (senz.getAttributes().containsKey("msg")) {
-                    secret.setBlob(senz.getAttributes().get("msg"));
-                    secret.setBlobType(BlobType.TEXT);
-                    secret.setTimeStamp((System.currentTimeMillis() / 1000));
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        }
     }
 
     @Override
@@ -163,7 +137,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
         adapter.notifyDataSetChanged();
 
         actionBarDelete.setVisibility(View.VISIBLE);
-        //actionBarName.setVisibility(View.GONE);
         actionBarDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,7 +190,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
                 new SenzorsDbSource(getActivity()).deleteAllSecretsThatBelongToUser(secret.getUser().getUsername());
 
                 actionBarDelete.setVisibility(View.GONE);
-                //actionBarName.setVisibility(View.VISIBLE);
             }
         });
 
@@ -228,7 +200,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
             public void onClick(View v) {
                 dialog.cancel();
                 actionBarDelete.setVisibility(View.GONE);
-                //actionBarName.setVisibility(View.VISIBLE);
             }
         });
 

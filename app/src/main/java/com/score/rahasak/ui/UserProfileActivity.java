@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -37,9 +39,9 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     private Switch cameraSwitch;
     private Switch locationSwitch;
 
+    private FloatingActionButton captureSelfie;
     private ImageView backImageView;
     private ImageView userImageView;
-    private ImageView getPicImageView;
 
     private TextView info;
     private TextView camText;
@@ -149,12 +151,12 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
         camText.setTypeface(typeface);
         locText.setTypeface(typeface);
 
+        captureSelfie = (FloatingActionButton) findViewById(R.id.capture_selfie);
+        captureSelfie.setOnClickListener(this);
+
         userImageView = (ImageView) findViewById(R.id.clickable_image);
         if (secretUser.getImage() != null)
             userImageView.setImageBitmap(ImageUtils.decodeBitmap(secretUser.getImage()));
-
-        getPicImageView = (ImageView) findViewById(R.id.profile_camera_icon);
-        getPicImageView.setOnClickListener(this);
     }
 
     private void initPermissions() {
@@ -167,15 +169,16 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
     }
 
     private void initToolbar() {
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("@" + secretUser.getUsername());
-        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
-        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         View header = getLayoutInflater().inflate(R.layout.profile_header, null);
         toolbar.setContentInsetsAbsolute(0, 0);
         toolbar.addView(header);
+        setSupportActionBar(toolbar);
+
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(PhoneBookUtil.getContactName(this, secretUser.getPhone()));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.colorPrimary));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));
 
         backImageView = (ImageView) findViewById(R.id.back_btn);
         backImageView.setOnClickListener(this);
@@ -249,9 +252,19 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
                 updatePermission();
             } else if (senz.getAttributes().get("status").equalsIgnoreCase("OFFLINE")) {
                 ActivityUtils.cancelProgressDialog();
-                Toast.makeText(this, "@" + secretUser.getUsername() + " not available at this moment", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "User offline", Toast.LENGTH_LONG).show();
 
                 resetPermission();
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_BUSY")) {
+                ActivityUtils.cancelProgressDialog();
+
+                // user busy
+                Toast.makeText(this, "User busy", Toast.LENGTH_LONG).show();
+            } else if (senz.getAttributes().get("status").equalsIgnoreCase("CAM_ERROR")) {
+                ActivityUtils.cancelProgressDialog();
+
+                // camera error
+                Toast.makeText(this, "Busy", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -304,7 +317,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     @Override
     public void onClick(View v) {
-        if (v == getPicImageView) {
+        if (v == captureSelfie) {
             getProfilePhoto();
         } else if (v == backImageView) {
             finish();
