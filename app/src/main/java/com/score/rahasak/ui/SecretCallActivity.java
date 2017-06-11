@@ -78,7 +78,9 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
             senzService = ISenzService.Stub.asInterface(service);
             isServiceBound = true;
 
-            initCall();
+            // send init mic senz from here
+            Senz senz = SenzUtils.getInitMicSenz(SecretCallActivity.this, secretUser);
+            sendSenz(senz);
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -117,6 +119,7 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         initStatusBar();
         initUser();
         initSensor();
+        initCall();
 
         // ring
         AudioUtils.enableEarpiece(this);
@@ -263,10 +266,6 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
     }
 
     private void initCall() {
-        // send init mic senz from here
-        Senz senz = SenzUtils.getInitMicSenz(SecretCallActivity.this, secretUser);
-        sendSenz(senz);
-
         // start service
         Intent intent = new Intent(this, CallService.class);
         intent.putExtra("USER", secretUser);

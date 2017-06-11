@@ -36,7 +36,7 @@ public class TimeUtils {
         return time;
     }
 
-    public static boolean isInLine(long t1, long t2) {
+    public static boolean isInOrder(long t1, long t2) {
         return (t2 - t1) < 60 * 5;
     }
 }

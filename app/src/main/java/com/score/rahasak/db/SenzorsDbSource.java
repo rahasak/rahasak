@@ -455,7 +455,7 @@ public class SenzorsDbSource {
                 String uid = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_UNIQUE_ID));
                 long time = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
                 boolean isSender = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_IS_SENDER)) == 1;
-                if ((curSecret.isSender() == isSender) && TimeUtils.isInLine(time, curSecret.getTimeStamp())) {
+                if ((curSecret.isSender() == isSender) && TimeUtils.isInOrder(time, curSecret.getTimeStamp())) {
                     // secret is inline, viewed true
                     ContentValues values = new ContentValues();
                     values.put(SenzorsDbContract.Secret.COLUMN_NAME_IN_ORDER, 1);
