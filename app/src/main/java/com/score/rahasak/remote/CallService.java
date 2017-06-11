@@ -42,7 +42,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 8000;
+    public static final int SAMPLE_RATE = 16000;
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
@@ -305,18 +305,15 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 e.printStackTrace();
             }
 
-            opusDecoder.close();
             shutDown();
+            opusDecoder.close();
         }
 
         void shutDown() {
             if (streamTrack != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    streamTrack.pause();
-                    streamTrack.flush();
-                } else {
-                    streamTrack.stop();
-                }
+                streamTrack.pause();
+                streamTrack.flush();
+                streamTrack.release();
 
                 streamTrack = null;
             }
@@ -348,7 +345,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize);
 
-            Log.d(TAG, " min buffer size: ---- " + minBufSize);
+            Log.d(TAG, "Recorder min buffer size: ---- " + minBufSize);
 
             // init opus encoder
             opusEncoder = new OpusEncoder();
@@ -402,8 +399,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 }
             }
 
-            opusEncoder.close();
             shutDown();
+            opusEncoder.close();
         }
 
         private void sendStream(String senz) {
