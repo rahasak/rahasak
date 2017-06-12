@@ -41,8 +41,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 16000;
-    public static final int FRAME_SIZE = 320;
+    public static final int SAMPLE_RATE = 8000;
+    public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
     private User appUser;
@@ -61,6 +61,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     // audio
     private AudioManager audioManager;
+
+    // crypto
+    private CryptoManager cryptoManager;
 
     // player/recorder and state
     private Player player;
@@ -107,6 +110,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         super.onStartCommand(intent, flags, startId);
 
         initPrefs(intent);
+        initCrypto();
         initUdpSoc();
         initUdpConn();
         getAudioSettings();
@@ -149,6 +153,15 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             secretUser = intent.getParcelableExtra("USER");
 
         secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
+    }
+
+    private void initCrypto() {
+        try {
+            cryptoManager = CryptoManager.getInstance();
+            cryptoManager.initCiphers(secretKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void initUdpSoc() {
@@ -294,12 +307,13 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                         // base64 decode
                         // decrypt
                         // decode codec
-                        opusDecoder.decode(CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT)), pcmframs);
+                        opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
                         streamTrack.write(pcmframs, 0, pcmframs.length);
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.d(TAG, "Player error --- " + calling);
             }
 
             shutDown();
@@ -332,11 +346,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             thread = new Thread(this);
 
             int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-            //if (minBufSize < 4096) {
-            // opus require a 4KB buffer to work correctly
-            //minBufSize = 4096;
-            //}
-
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO,
@@ -386,9 +395,11 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    sendStream(Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
+                    sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).
+                            replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.d(TAG, "Recorder error --- " + calling);
                 }
             }
 

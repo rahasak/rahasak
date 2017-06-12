@@ -1,7 +1,5 @@
 package com.score.rahasak.remote;
 
-import android.content.Context;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -23,7 +21,7 @@ public class CryptoManager {
     private CryptoManager() {
     }
 
-    public static CryptoManager getInstance(Context context) {
+    public static CryptoManager getInstance() {
         if (instance == null) {
             instance = new CryptoManager();
         }
