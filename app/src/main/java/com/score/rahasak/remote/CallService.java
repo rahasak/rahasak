@@ -1,5 +1,7 @@
 package com.score.rahasak.remote;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,10 +20,14 @@ import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
+import com.score.rahasak.ui.SecretCallActivity;
+import com.score.rahasak.ui.SecretCallAnswerActivity;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
+import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.OpusDecoder;
 import com.score.rahasak.utils.OpusEncoder;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.rahasak.utils.VibrationUtils;
@@ -45,6 +51,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
+    private String activity;
     private User appUser;
     private SecretUser secretUser;
     private SecretKey secretKey;
@@ -114,6 +121,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         initUdpSoc();
         initUdpConn();
         getAudioSettings();
+        startForegroundCall();
         audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
 
         player = new Player();
@@ -131,6 +139,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         unregisterReceiver(senzReceiver);
         resetAudioSettings();
         audioManager.abandonAudioFocus(this);
+        stopForeground(true);
     }
 
     @Override
@@ -152,6 +161,11 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         if (intent.hasExtra("USER"))
             secretUser = intent.getParcelableExtra("USER");
 
+        if (intent.hasExtra("ACTIVITY"))
+            activity = intent.getStringExtra("ACTIVITY");
+        else
+            activity = SecretCallActivity.class.getName();
+
         secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
     }
 
@@ -162,6 +176,17 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void startForegroundCall() {
+        Intent notificationIntent = new Intent(this, activity.equalsIgnoreCase(SecretCallActivity.class.getName()) ? SecretCallActivity.class : SecretCallAnswerActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String title = PhoneBookUtil.getContactName(CallService.this, secretUser.getPhone());
+        String message = "Calling...";
+        Notification notification = NotificationUtils.getCallNotification(CallService.this, title, message, intent);
+        startForeground(SenzNotificationManager.CALL_NOTIFICATION_ID, notification);
     }
 
     private void initUdpSoc() {

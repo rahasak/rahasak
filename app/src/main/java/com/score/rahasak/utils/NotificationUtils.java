@@ -1,5 +1,10 @@
 package com.score.rahasak.utils;
 
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.support.v4.app.NotificationCompat;
+
 import com.score.rahasak.R;
 import com.score.rahasak.enums.NotificationType;
 import com.score.rahasak.pojo.SenzNotification;
@@ -11,9 +16,6 @@ import com.score.rahasak.pojo.SenzNotification;
  */
 public class NotificationUtils {
 
-    // notification Id
-    public static final int MESSAGE_NOTIFICATION_ID = 1;
-    public static final int SMS_NOTIFICATION_ID = 2;
 
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         String msg;
@@ -50,6 +52,17 @@ public class NotificationUtils {
         senzNotification.setSenderPhone(contactPhone);
 
         return senzNotification;
+    }
+
+    public static Notification getCallNotification(Context context, String title, String message, PendingIntent intent) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setContentTitle(title)
+                .setContentText(message)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(intent)
+                .setOngoing(true);
+
+        return builder.build();
     }
 
 }

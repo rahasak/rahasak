@@ -342,6 +342,7 @@ public class SecretCallAnswerActivity extends AppCompatActivity implements Senso
         // start service to call
         Intent intent = new Intent(this, CallService.class);
         intent.putExtra("USER", secretUser);
+        intent.putExtra("ACTIVITY", SecretCallAnswerActivity.class.getName());
         startService(intent);
     }
 

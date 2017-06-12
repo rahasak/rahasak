@@ -17,11 +17,15 @@ import com.score.rahasak.enums.NotificationType;
 import com.score.rahasak.pojo.SenzNotification;
 import com.score.rahasak.ui.ChatActivity;
 import com.score.rahasak.ui.DrawerActivity;
-import com.score.rahasak.utils.NotificationUtils;
 
 public class SenzNotificationManager {
 
     private static final String TAG = SenzNotificationManager.class.getName();
+
+    // notification ids
+    public static final int MESSAGE_NOTIFICATION_ID = 1;
+    public static final int SMS_NOTIFICATION_ID = 2;
+    public static final int CALL_NOTIFICATION_ID = 3;
 
     private Context context;
     private static SenzNotificationManager instance;
@@ -48,7 +52,7 @@ public class SenzNotificationManager {
             Notification notification = getNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+            notificationManager.notify(SenzNotificationManager.MESSAGE_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
             if (SenzApplication.isOnChat() && SenzApplication.getOnChatUser().equalsIgnoreCase(senzNotification.getSender())) {
                 // message for currently chatting user
@@ -58,14 +62,14 @@ public class SenzNotificationManager {
                 Notification notification = getNotification(senzNotification);
                 notification.flags |= Notification.FLAG_AUTO_CANCEL;
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
+                notificationManager.notify(SenzNotificationManager.MESSAGE_NOTIFICATION_ID, notification);
             }
         } else if (senzNotification.getNotificationType() == NotificationType.SMS_REQUEST) {
             // SMS request
             Notification notification = getSmsNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtils.SMS_NOTIFICATION_ID, notification);
+            notificationManager.notify(SenzNotificationManager.SMS_NOTIFICATION_ID, notification);
         } else if (senzNotification.getNotificationType() == NotificationType.SMS_CONFIRM) {
             // SMS confirm
         }

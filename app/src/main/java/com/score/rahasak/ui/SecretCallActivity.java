@@ -269,6 +269,7 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         // start service
         Intent intent = new Intent(this, CallService.class);
         intent.putExtra("USER", secretUser);
+        intent.putExtra("ACTIVITY", SecretCallActivity.class.getName());
         startService(intent);
     }
 

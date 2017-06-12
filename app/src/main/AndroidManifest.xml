@@ -137,6 +137,7 @@
         <activity
             android:name="com.score.rahasak.ui.SecretCallActivity"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:theme="@style/MyMaterialTheme" />
         <activity
             android:name="com.score.rahasak.ui.ContactListActivity"
