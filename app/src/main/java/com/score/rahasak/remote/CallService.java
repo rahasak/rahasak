@@ -42,7 +42,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 16000;
+    public static final int SAMPLE_RATE = 8000;
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
@@ -276,6 +276,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
 
         private void play() {
+            Log.d(TAG, "Player started --- " + calling);
             streamTrack.play();
 
             try {
@@ -310,6 +311,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
 
         void shutDown() {
+            Log.d(TAG, "Player finished --- " + calling);
             if (streamTrack != null) {
                 streamTrack.pause();
                 streamTrack.flush();
@@ -364,6 +366,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
 
         private void record() {
+            Log.d(TAG, "Recorder started --- " + calling);
             audioRecorder.startRecording();
 
             // enable
@@ -415,6 +418,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
 
         void shutDown() {
+            Log.d(TAG, "Recorder finished --- " + calling);
             if (audioRecorder != null) {
                 if (audioRecorder.getState() != AudioRecord.STATE_UNINITIALIZED)
                     audioRecorder.stop();
