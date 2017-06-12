@@ -9,7 +9,6 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -42,8 +41,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 8000;
-    public static final int FRAME_SIZE = 160;
+    public static final int SAMPLE_RATE = 16000;
+    public static final int FRAME_SIZE = 320;
     public static final int BUF_SIZE = FRAME_SIZE;
 
     private User appUser;
@@ -282,10 +281,10 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             try {
                 short[] pcmframs = new short[BUF_SIZE];
                 byte[] message = new byte[BUF_SIZE];
+                DatagramPacket receivePacket = new DatagramPacket(message, message.length);
 
                 while (calling) {
                     // listen for senz
-                    DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     recvSoc.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
 
@@ -294,11 +293,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     if (!msg.isEmpty()) {
                         // base64 decode
                         // decrypt
-                        byte[] stream = CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT));
-                        //byte[] stream = Base64.decode(msg, Base64.DEFAULT);
-
                         // decode codec
-                        opusDecoder.decode(stream, pcmframs);
+                        opusDecoder.decode(CryptoUtils.decryptECB(secretKey, Base64.decode(msg, Base64.DEFAULT)), pcmframs);
                         streamTrack.write(pcmframs, 0, pcmframs.length);
                     }
                 }
@@ -373,11 +369,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             // 1. AutomaticGainControl
             // 2. NoiseSuppressor
             // 3. AcousticEchoCanceler
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                AudioUtils.enableAGC(audioRecorder.getAudioSessionId());
-                AudioUtils.enableNS(audioRecorder.getAudioSessionId());
-                AudioUtils.enableAEC(audioRecorder.getAudioSessionId());
-            }
+            AudioUtils.enableAGC(audioRecorder.getAudioSessionId());
+            AudioUtils.enableNS(audioRecorder.getAudioSessionId());
+            AudioUtils.enableAEC(audioRecorder.getAudioSessionId());
 
             int encoded;
             short[] inBuf = new short[BUF_SIZE];
@@ -392,11 +386,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    String encodedStream = Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
-                    //String encodedStream = Base64.encodeToString(outBuf, 0, encoded, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
-
-                    String senz = encodedStream + " @" + secretUser.getUsername() + " ^" + appUser.getUsername();
-                    sendStream(senz);
+                    sendStream(Base64.encodeToString(CryptoUtils.encryptECB(secretKey, outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
