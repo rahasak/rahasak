@@ -371,7 +371,7 @@ public class SenzService extends Service {
         }
     }
 
-    class SenzComm extends AsyncTask<String, String, Integer> {
+    private class SenzComm extends AsyncTask<String, String, Integer> {
         @Override
         protected Integer doInBackground(String[] params) {
             if (!connectedSwitch) {

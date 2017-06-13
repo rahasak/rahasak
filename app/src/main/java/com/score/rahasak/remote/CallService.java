@@ -11,6 +11,7 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -51,7 +52,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
-    private String activity;
+    // coming activity
+    private String activity = SecretCallActivity.class.getName();
+
     private User appUser;
     private SecretUser secretUser;
     private SecretKey secretKey;
@@ -72,9 +75,12 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     // crypto
     private CryptoManager cryptoManager;
 
-    // player/recorder and state
-    private Player player;
+    // player/recorder
     private Recorder recorder;
+    private Player player;
+
+    //private AsyncRecorder asyncRecorder;
+    //private AsyncPlayer asyncPlayer;
 
     private boolean calling;
 
@@ -108,8 +114,13 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     public void onCreate() {
         super.onCreate();
 
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         registerReceiver(senzReceiver, IntentProvider.getIntentFilter(IntentType.SENZ));
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
+
+        recorder = new Recorder();
+        player = new Player();
     }
 
     @Override
@@ -122,10 +133,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         initUdpConn();
         getAudioSettings();
         startForegroundCall();
-        audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-
-        player = new Player();
-        recorder = new Recorder();
 
         return START_STICKY;
     }
@@ -163,8 +170,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         if (intent.hasExtra("ACTIVITY"))
             activity = intent.getStringExtra("ACTIVITY");
-        else
-            activity = SecretCallActivity.class.getName();
 
         secretKey = CryptoUtils.getSecretKey(secretUser.getSessionKey());
     }
@@ -251,10 +256,13 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     private void startCall() {
         calling = true;
 
+        AudioUtils.enableEarpiece(CallService.this);
+
         recorder.start();
         player.start();
 
-        AudioUtils.enableEarpiece(CallService.this);
+        //asyncRecorder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        //asyncPlayer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void endCall() {
@@ -276,17 +284,13 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     /**
      * Player thread
      */
-    private class Player implements Runnable {
-
-        private final Thread thread;
+    private class Player extends Thread {
 
         private AudioTrack streamTrack;
 
         private OpusDecoder opusDecoder;
 
         Player() {
-            thread = new Thread(this);
-
             int minBufSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
                     SAMPLE_RATE,
@@ -299,10 +303,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             // init opus decoder
             opusDecoder = new OpusDecoder();
             opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
-        }
-
-        public void start() {
-            thread.start();
         }
 
         @Override
@@ -319,22 +319,18 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             try {
                 short[] pcmframs = new short[BUF_SIZE];
                 byte[] message = new byte[BUF_SIZE];
-                DatagramPacket receivePacket = new DatagramPacket(message, message.length);
 
                 while (calling) {
                     // listen for senz
+                    DatagramPacket receivePacket = new DatagramPacket(message, message.length);
                     recvSoc.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
 
-                    // parser and obtain audio data
-                    // play it
-                    if (!msg.isEmpty()) {
-                        // base64 decode
-                        // decrypt
-                        // decode codec
-                        opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
-                        streamTrack.write(pcmframs, 0, pcmframs.length);
-                    }
+                    // base64 decode
+                    // decrypt
+                    // decode codec
+                    opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
+                    streamTrack.write(pcmframs, 0, pcmframs.length);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -357,19 +353,15 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
     }
 
+
     /**
      * Recorder thread
      */
-    private class Recorder implements Runnable {
-        private final Thread thread;
-
+    private class Recorder extends Thread {
         private AudioRecord audioRecorder;
-
         private OpusEncoder opusEncoder;
 
         Recorder() {
-            thread = new Thread(this);
-
             int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
@@ -382,10 +374,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             // init opus encoder
             opusEncoder = new OpusEncoder();
             opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
-        }
-
-        public void start() {
-            thread.start();
         }
 
         @Override
@@ -450,6 +438,159 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     audioRecorder.stop();
                 audioRecorder.release();
                 audioRecorder = null;
+            }
+        }
+    }
+
+    private class AsyncRecorder extends AsyncTask {
+
+        private AudioRecord audioRecorder;
+        private OpusEncoder opusEncoder;
+
+        AsyncRecorder() {
+            super.onPreExecute();
+
+            int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                    SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufSize);
+
+            Log.d(TAG, "Recorder min buffer size: ---- " + minBufSize);
+
+            // init opus encoder
+            opusEncoder = new OpusEncoder();
+            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            audioRecorder.startRecording();
+
+            // enable
+            // 1. AutomaticGainControl
+            // 2. NoiseSuppressor
+            // 3. AcousticEchoCanceler
+            AudioUtils.enableAGC(audioRecorder.getAudioSessionId());
+            AudioUtils.enableNS(audioRecorder.getAudioSessionId());
+            AudioUtils.enableAEC(audioRecorder.getAudioSessionId());
+
+            int encoded;
+            short[] inBuf = new short[BUF_SIZE];
+            byte[] outBuf = new byte[BUF_SIZE];
+
+            while (calling) {
+                // read to buffer
+                // encode with codec
+                audioRecorder.read(inBuf, 0, inBuf.length);
+                encoded = opusEncoder.encode(inBuf, outBuf);
+
+                try {
+                    // encrypt
+                    // base 64 encoded senz
+                    sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).
+                            replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "Recorder error --- " + calling);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            opusEncoder.close();
+
+            if (audioRecorder != null) {
+                if (audioRecorder.getState() != AudioRecord.STATE_UNINITIALIZED)
+                    audioRecorder.stop();
+                audioRecorder.release();
+                audioRecorder = null;
+            }
+        }
+
+        private void sendStream(String senz) {
+            try {
+                if (sendSoc == null)
+                    sendSoc = new DatagramSocket();
+                DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
+                sendSoc.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class AsyncPlayer extends AsyncTask {
+
+        private AudioTrack streamTrack;
+        private OpusDecoder opusDecoder;
+
+        AsyncPlayer() {
+            int minBufSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
+                    SAMPLE_RATE,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufSize,
+                    AudioTrack.MODE_STREAM);
+            Log.d(TAG, "AudioTrack min buffer size: ---- " + minBufSize);
+
+            // init opus decoder
+            opusDecoder = new OpusDecoder();
+            opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            Log.d(TAG, "Player started --- " + calling);
+            streamTrack.play();
+
+            try {
+                short[] pcmframs = new short[BUF_SIZE];
+                byte[] message = new byte[BUF_SIZE];
+                DatagramPacket receivePacket = new DatagramPacket(message, message.length);
+
+                while (calling) {
+                    // listen for senz
+                    recvSoc.receive(receivePacket);
+                    String msg = new String(message, 0, receivePacket.getLength());
+
+                    // parser and obtain audio data
+                    // play it
+                    if (!msg.isEmpty()) {
+                        // base64 decode
+                        // decrypt
+                        // decode codec
+                        opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
+                        streamTrack.write(pcmframs, 0, pcmframs.length);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d(TAG, "Player error --- " + calling);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            opusDecoder.close();
+
+            if (streamTrack != null) {
+                streamTrack.pause();
+                streamTrack.flush();
+                streamTrack.release();
+
+                streamTrack = null;
             }
         }
     }
