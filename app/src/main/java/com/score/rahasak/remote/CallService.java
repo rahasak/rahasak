@@ -191,14 +191,20 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     private void initUdpSoc() {
-        if (recvSoc == null || recvSoc.isClosed()) {
-            try {
+        try {
+            if (recvSoc == null) {
                 recvSoc = new DatagramSocket();
-            } catch (SocketException e) {
-                e.printStackTrace();
+            } else {
+                Log.e(TAG, "Recv socket already initialized");
             }
-        } else {
-            Log.e(TAG, "Socket already initialized");
+
+            if (sendSoc == null)
+                sendSoc = new DatagramSocket();
+            else {
+                Log.e(TAG, "Send socket already initialized");
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
     }
 
@@ -300,9 +306,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         @Override
         public void run() {
-            if (calling) {
-                play();
-            }
+            play();
         }
 
         private void play() {
@@ -331,7 +335,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             }
 
             shutDown();
-            opusDecoder.close();
         }
 
         void shutDown() {
@@ -343,6 +346,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
                 streamTrack = null;
             }
+
+            opusDecoder.close();
         }
     }
 
@@ -371,9 +376,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         @Override
         public void run() {
-            if (calling) {
-                record();
-            }
+            record();
         }
 
         private void record() {
@@ -410,18 +413,11 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             }
 
             shutDown();
-            opusEncoder.close();
         }
 
-        private void sendStream(String senz) {
-            try {
-                if (sendSoc == null)
-                    sendSoc = new DatagramSocket();
-                DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-                sendSoc.send(sendPacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        private void sendStream(String senz) throws IOException {
+            DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
+            sendSoc.send(sendPacket);
         }
 
         void shutDown() {
@@ -432,6 +428,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 audioRecorder.release();
                 audioRecorder = null;
             }
+
+            opusEncoder.close();
         }
     }
 
