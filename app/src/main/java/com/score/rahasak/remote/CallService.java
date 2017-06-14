@@ -302,9 +302,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
             Log.d(TAG, "Recorder min buffer size: ---- " + minBufSize);
 
-            // init amr
-            //AmrEncoder.init(0);
-
             // init opus encoder
             opusEncoder = new OpusEncoder();
             opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
@@ -319,7 +316,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         private void record() {
             audioRecorder.startRecording();
             Log.d(TAG, "Recorder started --- " + calling);
-            //int mode = AmrEncoder.Mode.MR795.ordinal();
 
             // enable
             // 1. AutomaticGainControl
@@ -339,7 +335,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     // encode with codec
                     audioRecorder.read(inBuf, 0, inBuf.length);
                     encoded = opusEncoder.encode(inBuf, outBuf);
-                    //encoded = AmrEncoder.encode(mode, inBuf, outBuf);
 
                     try {
                         // encrypt
@@ -371,7 +366,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             }
 
             opusEncoder.close();
-            //AmrEncoder.exit();
         }
     }
 
@@ -406,7 +400,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         private void play() {
             Log.d(TAG, "Player started --- " + calling);
             streamTrack.play();
-            //final long amrState = AmrDecoder.init();
 
             try {
                 byte[] message = new byte[80];
@@ -423,7 +416,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                         // decrypt
                         // decode codec
                         opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
-                        //AmrDecoder.decode(amrState, cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
                         streamTrack.write(pcmframs, 0, pcmframs.length);
                     }
                 }
@@ -432,7 +424,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 Log.d(TAG, "Player error --- " + calling);
             }
 
-            //AmrDecoder.exit(amrState);
             shutDown();
         }
 
