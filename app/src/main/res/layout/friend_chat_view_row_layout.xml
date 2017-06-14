@@ -45,18 +45,16 @@
             android:id="@+id/chat_mis"
             android:layout_height="43dp"
             android:layout_alignParentLeft="true"
+            android:gravity="center_horizontal"
             android:background="@drawable/my_messsage"
             android:padding="5dp">
 
             <ImageView
                 android:id="@+id/chat_mis_img"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="4dp"
-                android:padding="3dp"
-                android:layout_marginLeft="5dp"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:layout_centerVertical="true"
                 android:visibility="visible"
-                android:layout_alignParentLeft="true"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/missed_w" />
@@ -64,9 +62,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_toRightOf="@+id/chat_mis_img"
+                android:layout_marginLeft="10dp"
                 android:id="@+id/missed_secret"
                 android:textSize="20sp"
+                android:layout_centerVertical="true"
                 android:textColor="@color/white"
                 android:text="missed call" />
         </RelativeLayout>
@@ -88,7 +88,11 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="40dp"
             android:background="@drawable/my_messsage"
-            android:padding="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:minWidth="40dp"
             android:text="Hi This is a message"
             android:textColor="@color/white"
             android:textSize="20dp" />
