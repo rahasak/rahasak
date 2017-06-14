@@ -18,7 +18,6 @@ import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.NetworkUtil;
-import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
