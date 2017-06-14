@@ -112,7 +112,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
     @Override
     public void onPause() {
-        super.onStop();
+        super.onPause();
         if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 

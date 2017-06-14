@@ -68,7 +68,7 @@ class SecretListAdapter extends BaseAdapter {
             holder.message = (TextView) view.findViewById(R.id.message);
             holder.sender = (TextView) view.findViewById(R.id.sender);
             holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
-            holder.userImage = (com.github.siyamed.shapeimageview.RoundedImageView) view.findViewById(R.id.user_image);
+            holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
             holder.selected = (ImageView) view.findViewById(R.id.selected);
             holder.unreadCount = (FrameLayout) view.findViewById(R.id.unread_msg_count);
             holder.unreadText = (TextView) view.findViewById(R.id.unread_msg_text);
@@ -142,7 +142,8 @@ class SecretListAdapter extends BaseAdapter {
         TextView message;
         TextView sender;
         TextView sentTime;
-        com.github.siyamed.shapeimageview.RoundedImageView userImage;
+        //com.github.siyamed.shapeimageview.RoundedImageView userImage;
+        com.github.siyamed.shapeimageview.CircularImageView userImage;
         ImageView selected;
 
         FrameLayout unreadCount;
