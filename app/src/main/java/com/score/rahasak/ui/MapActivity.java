@@ -31,6 +31,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.rahasak.R;
+import com.score.rahasak.pojo.SecretUser;
+import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.senzc.pojos.Senz;
 
 /**
@@ -53,6 +55,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private GoogleApiClient mGoogleApiClient;
     private LatLng thisUserLatLng;
     private Senz thisSenz;
+    private SecretUser secretUser;
 
     /**
      * {@inheritDoc}
@@ -124,6 +127,10 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
             double lan = Double.parseDouble(thisSenz.getAttributes().get("lon"));
             thisUserLatLng = new LatLng(lat, lan);
         }
+
+        if (getIntent().hasExtra("USER")) {
+            secretUser = getIntent().getExtras().getParcelable("USER");
+        }
     }
 
     private void initUi() {
@@ -146,7 +153,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
         TextView header = ((TextView) findViewById(R.id.title));
         header.setTypeface(typeface, Typeface.BOLD);
-        header.setText("@" + thisSenz.getSender().getUsername());
+        header.setText(PhoneBookUtil.getContactName(this, secretUser.getPhone()));
 
         btnBack = (ImageView) getSupportActionBar().getCustomView().findViewById(R.id.back_btn);
         btnBack.setOnClickListener(this);
@@ -198,7 +205,11 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
         // add location marker
         try {
-            marker = map.addMarker(new MarkerOptions().position(this.thisUserLatLng).title("@" + thisSenz.getSender().getUsername()).icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2)));
+            MarkerOptions markerOptions = new MarkerOptions().
+                    position(this.thisUserLatLng).
+                    title(PhoneBookUtil.getContactName(this, secretUser.getPhone())).
+                    icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2));
+            marker = map.addMarker(markerOptions);
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.thisUserLatLng, 10));
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();

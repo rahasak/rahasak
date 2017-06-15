@@ -15,16 +15,16 @@ public class TimeUtils {
             long deltaSeconds = now.getTime() / 1000 - timestamp;
 
             if (deltaSeconds < 10) {
-                time = "now";
+                time = "Now";
             } else if (deltaSeconds < 60) {
                 time = "1 minute ago";
             } else if (deltaSeconds < (60 * 60)) {
                 time = deltaSeconds / 60 + " minutes ago";
-            } else if (deltaSeconds < (60 * 60 * 24)) {
+            } else if (deltaSeconds < (60 * 60 * 24 * 2)) {
                 if (DATE_FORMAT.format(new Date(timestamp * 1000)).equalsIgnoreCase(DATE_FORMAT.format(now))) {
                     time = TIME_FORMAT.format(new Date(timestamp * 1000));
                 } else {
-                    time = DATE_TIME_FORMAT.format(new Date(timestamp * 1000));
+                    time = "Yesterday, " + TIME_FORMAT.format(new Date(timestamp * 1000));
                 }
             } else {
                 time = DATE_TIME_FORMAT.format(new Date(timestamp * 1000));
