@@ -86,7 +86,7 @@
                             android:background="@drawable/border_bottom"
                             android:gravity="bottom"
                             android:hint="@string/enter_secret_here_hint"
-                            android:inputType="textMultiLine"
+                            android:inputType="textMultiLine|textCapSentences"
                             android:maxLines="4"
                             android:minLines="1"
                             android:paddingBottom="12dp"
@@ -115,8 +115,8 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:layout_gravity="top"
-                                    android:paddingTop="3dp"
                                     android:background="@color/transparent"
+                                    android:paddingTop="3dp"
                                     android:scaleType="centerInside"
                                     android:src="@drawable/secret_call" />
                             </FrameLayout>
@@ -124,8 +124,8 @@
                             <FrameLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/left_border"
-                                android:layout_weight="1">
+                                android:layout_weight="1"
+                                android:background="@drawable/left_border">
 
                                 <ImageButton
                                     android:id="@+id/getLocBtn"
