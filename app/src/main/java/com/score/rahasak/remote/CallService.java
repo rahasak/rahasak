@@ -47,7 +47,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 8000;
+    public static final int SAMPLE_RATE = 16000;
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
@@ -63,6 +63,10 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     private int ringMode;
     private boolean isSpeakerPhoneOn;
 
+    // audio recorder/player
+    private Recorder recorder;
+    private Player player;
+
     // we are listing for UDP socket
     private InetAddress address;
     private DatagramSocket recvSoc;
@@ -74,8 +78,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     // crypto
     private CryptoManager cryptoManager;
 
-    private boolean recording;
-    private boolean playing;
     private boolean calling;
 
     // senz message
@@ -112,11 +114,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
         getAudioSettings();
 
-        Recorder recorder = new Recorder();
-        recorder.start();
-
-        Player player = new Player();
-        player.start();
+        recorder = new Recorder();
+        player = new Player();
     }
 
     @Override
@@ -265,11 +264,11 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         AudioUtils.enableEarpiece(CallService.this);
 
         calling = true;
+        recorder.start();
+        player.start();
     }
 
     private void endCall() {
-        recording = false;
-        playing = false;
         calling = false;
     }
 
@@ -294,28 +293,14 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         Recorder() {
             int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            Log.d(TAG, "Recorder min buffer size: ---- " + minBufSize);
+
             audioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize);
-
-            Log.d(TAG, "Recorder min buffer size: ---- " + minBufSize);
-
-            // init opus encoder
-            opusEncoder = new OpusEncoder();
-            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
-        }
-
-        @Override
-        public void run() {
-            recording = true;
-            record();
-        }
-
-        private void record() {
             audioRecorder.startRecording();
-            Log.d(TAG, "Recorder started --- " + calling);
 
             // enable
             // 1. AutomaticGainControl
@@ -325,26 +310,37 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             AudioUtils.enableNS(audioRecorder.getAudioSessionId());
             AudioUtils.enableAEC(audioRecorder.getAudioSessionId());
 
+            // init opus encoder
+            opusEncoder = new OpusEncoder();
+            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+        }
+
+        @Override
+        public void run() {
+            record();
+        }
+
+        private void record() {
+            Log.d(TAG, "Recorder started --- " + calling);
+
             int encoded;
             short[] inBuf = new short[BUF_SIZE];
             byte[] outBuf = new byte[48];
 
-            while (recording) {
-                while (calling) {
-                    // read to buffer
-                    // encode with codec
-                    audioRecorder.read(inBuf, 0, inBuf.length);
-                    encoded = opusEncoder.encode(inBuf, outBuf);
+            while (calling) {
+                // read to buffer
+                // encode with codec
+                audioRecorder.read(inBuf, 0, inBuf.length);
+                encoded = opusEncoder.encode(inBuf, outBuf);
 
-                    try {
-                        // encrypt
-                        // base 64 encoded senz
-                        sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).
-                                replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "Recorder error --- " + calling);
-                    }
+                try {
+                    // encrypt
+                    // base 64 encoded senz
+                    sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).
+                            replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "Recorder error --- " + calling);
                 }
             }
 
@@ -378,13 +374,14 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         Player() {
             int minBufSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            Log.d(TAG, "AudioTrack min buffer size: ---- " + minBufSize);
+
             streamTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
                     SAMPLE_RATE,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
                     minBufSize,
                     AudioTrack.MODE_STREAM);
-            Log.d(TAG, "AudioTrack min buffer size: ---- " + minBufSize);
 
             // init opus decoder
             opusDecoder = new OpusDecoder();
@@ -393,31 +390,28 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         @Override
         public void run() {
-            playing = true;
             play();
         }
 
         private void play() {
-            Log.d(TAG, "Player started --- " + calling);
             streamTrack.play();
+            Log.d(TAG, "Player started --- " + calling);
 
             try {
                 byte[] message = new byte[80];
                 short[] pcmframs = new short[BUF_SIZE];
                 DatagramPacket receivePacket = new DatagramPacket(message, message.length);
 
-                while (playing) {
-                    while (calling) {
-                        // listen for senz
-                        recvSoc.receive(receivePacket);
-                        String msg = new String(message, 0, receivePacket.getLength());
+                while (calling) {
+                    // listen for senz
+                    recvSoc.receive(receivePacket);
+                    String msg = new String(message, 0, receivePacket.getLength());
 
-                        // base64 decode
-                        // decrypt
-                        // decode codec
-                        opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
-                        streamTrack.write(pcmframs, 0, pcmframs.length);
-                    }
+                    // base64 decode
+                    // decrypt
+                    // decode codec
+                    opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
+                    streamTrack.write(pcmframs, 0, pcmframs.length);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
