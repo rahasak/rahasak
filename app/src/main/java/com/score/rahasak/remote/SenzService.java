@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -51,10 +50,6 @@ public class SenzService extends Service {
     private Socket socket;
     private DataInputStream inStream;
     private DataOutputStream outStream;
-
-    // keep retry count
-    private static int MAX_RETRY_COUNT = 3;
-    private static int RETRY_COUNT = 0;
 
     // comm running
     private boolean running;
@@ -137,7 +132,7 @@ public class SenzService extends Service {
         if (running) {
             ping();
         } else {
-            new SenzReader().start();
+            new SenzCom().start();
         }
 
         return START_STICKY;
@@ -268,7 +263,7 @@ public class SenzService extends Service {
         }
     }
 
-    private class SenzReader extends Thread {
+    private class SenzCom extends Thread {
 
         @Override
         public void run() {
@@ -331,38 +326,6 @@ public class SenzService extends Service {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-        }
-
-        private void reconnectCom() {
-            final int delay;
-
-            // retry
-            RETRY_COUNT++;
-            if (RETRY_COUNT <= MAX_RETRY_COUNT) {
-                switch (RETRY_COUNT) {
-                    case 1:
-                        delay = 1000;
-                        break;
-                    case 2:
-                        delay = 3000;
-                        break;
-                    case 3:
-                        delay = 5000;
-                        break;
-                    default:
-                        delay = 1000;
-                }
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "retry after " + delay + " seconds");
-
-                        // restart comm
-                        new SenzReader().start();
-                    }
-                }, delay);
             }
         }
     }
