@@ -47,7 +47,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 16000;
+    public static final int SAMPLE_RATE = 8000;
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 

@@ -52,7 +52,11 @@ class SenzHandler {
         if (senzMsg.equalsIgnoreCase("TAK")) {
             // senz service connected, send unack senzes if available
             handleConnect(senzService);
+        } else if (senzMsg.equalsIgnoreCase("TIK")) {
+            // write tuk from here
+            senzService.write("TUK");
         } else {
+            // actual senz received
             Senz senz = SenzParser.parse(senzMsg);
             switch (senz.getSenzType()) {
                 case SHARE:
