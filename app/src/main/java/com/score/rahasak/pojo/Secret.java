@@ -10,6 +10,7 @@ public class Secret {
     private SecretUser user;
     private boolean isSender;
     private boolean isViewed;
+    private boolean isSelected;
     private Long timeStamp;
     private Long viewedTimeStamp;
     private boolean isMissed;
@@ -93,6 +94,14 @@ public class Secret {
 
     public void setViewed(boolean viewed) {
         isViewed = viewed;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     public boolean isInOrder() {

@@ -277,7 +277,6 @@ public class SenzService extends Service {
                 e.printStackTrace();
             } finally {
                 closeCom();
-                //reconnectCom();
             }
         }
 

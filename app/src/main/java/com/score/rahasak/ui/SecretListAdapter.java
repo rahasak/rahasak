@@ -116,7 +116,7 @@ class SecretListAdapter extends BaseAdapter {
         }
 
         // selected state
-        if (secret.isViewed()) {
+        if (secret.isSelected()) {
             viewHolder.selected.setVisibility(View.VISIBLE);
         } else {
             viewHolder.selected.setVisibility(View.GONE);
@@ -142,10 +142,8 @@ class SecretListAdapter extends BaseAdapter {
         TextView message;
         TextView sender;
         TextView sentTime;
-        //com.github.siyamed.shapeimageview.RoundedImageView userImage;
         com.github.siyamed.shapeimageview.CircularImageView userImage;
         ImageView selected;
-
         FrameLayout unreadCount;
         TextView unreadText;
     }

@@ -31,7 +31,6 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
         typeface = Typeface.createFromAsset(context.getAssets(), "fonts/GeosansLight.ttf");
     }
 
-
     /**
      * Create list row view
      *
@@ -135,7 +134,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
     /**
      * Keep reference to children view to avoid unnecessary calls
      */
-    static class ViewHolder {
+    private static class ViewHolder {
         CircularImageView userImageView;
         ImageView selected;
         TextView usernameView;

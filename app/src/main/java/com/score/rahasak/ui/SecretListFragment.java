@@ -118,11 +118,10 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Secret secret = allSecretsList.get(position);
-        if (secret.isViewed()) {
-            secret.setViewed(false);
+        if (secret.isSelected()) {
+            secret.setSelected(false);
             adapter.notifyDataSetChanged();
             actionBarDelete.setVisibility(View.GONE);
-            //actionBarName.setVisibility(View.VISIBLE);
         } else {
             Intent intent = new Intent(this.getActivity(), ChatActivity.class);
             intent.putExtra("SENDER", allSecretsList.get(position).getUser().getUsername());
@@ -133,7 +132,7 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
         final Secret secret = allSecretsList.get(position);
-        secret.setViewed(true);
+        secret.setSelected(true);
         adapter.notifyDataSetChanged();
 
         actionBarDelete.setVisibility(View.VISIBLE);
