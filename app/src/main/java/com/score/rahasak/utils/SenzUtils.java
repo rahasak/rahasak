@@ -160,11 +160,15 @@ public class SenzUtils {
         return senz;
     }
 
-    public static String getStartStreamMsg(Context context, String sender, String receiver) {
-        return "DATA #STREAM ON" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+    public static String getOStreamMsg(String sender, String receiver) {
+        return "DATA #STREAM O" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
     }
 
-    public static String getEndStreamMsg(Context context, String sender, String receiver) {
+    public static String getNStreamMsg(String sender, String receiver) {
+        return "DATA #STREAM N" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+    }
+
+    public static String getEndStreamMsg(String sender, String receiver) {
         return "DATA #STREAM OFF" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
     }
 

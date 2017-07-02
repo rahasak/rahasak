@@ -136,7 +136,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         super.onDestroy();
 
         endCall();
-        clrUdpConn();
         unregisterReceiver(senzReceiver);
         resetAudioSettings();
         audioManager.abandonAudioFocus(this);
@@ -196,16 +195,16 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private void initUdpSoc() {
         try {
-            if (recvSoc == null) {
-                recvSoc = new DatagramSocket();
-            } else {
-                Log.e(TAG, "Recv socket already initialized");
-            }
-
             if (sendSoc == null) {
                 sendSoc = new DatagramSocket();
             } else {
                 Log.e(TAG, "Send socket already initialized");
+            }
+
+            if (recvSoc == null) {
+                recvSoc = new DatagramSocket();
+            } else {
+                Log.e(TAG, "Recv socket already initialized");
             }
         } catch (SocketException e) {
             e.printStackTrace();
@@ -220,12 +219,15 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     if (address == null)
                         address = InetAddress.getByName(SenzService.STREAM_HOST);
 
-                    // send init message
-                    String msg = SenzUtils.getStartStreamMsg(CallService.this, appUser.getUsername(), secretUser.getUsername());
-                    if (msg != null) {
-                        DatagramPacket sendPacket = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
-                        recvSoc.send(sendPacket);
-                    }
+                    // send O message
+                    String oMsg = SenzUtils.getOStreamMsg(appUser.getUsername(), secretUser.getUsername());
+                    DatagramPacket oPacket = new DatagramPacket(oMsg.getBytes(), oMsg.length(), address, SenzService.STREAM_PORT);
+                    sendSoc.send(oPacket);
+
+                    // send N message
+                    String nMsg = SenzUtils.getNStreamMsg(appUser.getUsername(), secretUser.getUsername());
+                    DatagramPacket nPacket = new DatagramPacket(nMsg.getBytes(), nMsg.length(), address, SenzService.STREAM_PORT);
+                    recvSoc.send(nPacket);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -233,20 +235,16 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }).start();
     }
 
-    private void clrUdpConn() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    // send mic off
-                    String senz = SenzUtils.getEndStreamMsg(CallService.this, appUser.getUsername(), secretUser.getUsername());
-                    DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-                    if (recvSoc != null)
-                        recvSoc.send(sendPacket);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    void clrUdpConn() {
+        // send end stream message
+        try {
+            // send OFF message
+            String offMsg = SenzUtils.getEndStreamMsg(appUser.getUsername(), secretUser.getUsername());
+            DatagramPacket offPacket = new DatagramPacket(offMsg.getBytes(), offMsg.length(), address, SenzService.STREAM_PORT);
+            sendSoc.send(offPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void onSenzReceived(Senz senz) {
@@ -269,7 +267,17 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     private void endCall() {
-        calling = false;
+        if (calling) {
+            // calling
+            calling = false;
+        } else {
+            // not calling yet, we have to clear udp conn
+            new Thread(new Runnable() {
+                public void run() {
+                    clrUdpConn();
+                }
+            }).start();
+        }
     }
 
     private void getAudioSettings() {
@@ -336,23 +344,18 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).
-                            replaceAll("\n", "").replaceAll("\r", "") + " @" + secretUser.getUsername() + " ^" + appUser.getUsername());
+                    sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", ""));
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d(TAG, "Recorder error --- " + calling);
                 }
             }
 
-            shutDown();
+            shutdown();
+            clrUdpConn();
         }
 
-        private void sendStream(String senz) throws IOException {
-            DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-            sendSoc.send(sendPacket);
-        }
-
-        void shutDown() {
+        void shutdown() {
             Log.d(TAG, "Recorder finished --- " + calling);
             if (audioRecorder != null) {
                 if (audioRecorder.getState() != AudioRecord.STATE_UNINITIALIZED)
@@ -360,8 +363,12 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 audioRecorder.release();
                 audioRecorder = null;
             }
-
             opusEncoder.close();
+        }
+
+        private void sendStream(String senz) throws IOException {
+            DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
+            sendSoc.send(sendPacket);
         }
     }
 

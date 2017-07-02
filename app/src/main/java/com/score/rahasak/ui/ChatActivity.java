@@ -538,7 +538,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 // add and delete
                 addSecret(secret);
-                if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
             }
         }
     }
@@ -568,7 +567,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 // add and delete
                 addSecret(secret);
-                if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
             }
         }
     }
