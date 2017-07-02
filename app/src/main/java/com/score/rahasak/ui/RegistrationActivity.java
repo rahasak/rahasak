@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,9 +20,9 @@ import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.InvalidInputFieldsException;
 import com.score.rahasak.utils.ActivityUtils;
+import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.CryptoUtils;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -169,6 +170,14 @@ public class RegistrationActivity extends BaseActivity {
         } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Initialize registering user
+     * username will generated via public key hash
+     */
+    private void initRegUser() {
+
     }
 
     /**

@@ -49,4 +49,8 @@ dependencies {
     compile 'com.googlecode.libphonenumber:libphonenumber:7.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'io.kvh:amr:1.1.1'
+    compile 'com.madgag.spongycastle:pkix:1.54.0.0'
+    compile 'com.madgag.spongycastle:pg:1.54.0.0'
+    compile 'com.madgag.spongycastle:core:1.54.0.0'
+    compile 'com.madgag.spongycastle:prov:1.54.0.0'
 }

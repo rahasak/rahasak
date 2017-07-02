@@ -20,13 +20,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.score.rahasak.R;
-import com.score.rahasak.interfaces.ISendingComHandler;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
-
-import java.util.List;
 
 /**
  * This the mother of all activities.. its contains things that are reusable by all activities.. things such as
@@ -38,7 +35,7 @@ import java.util.List;
  * <p>
  * Created by lakmal.caldera on 9/11/2016.
  */
-public class BaseActivity extends AppCompatActivity implements ISendingComHandler {
+public class BaseActivity extends AppCompatActivity {
 
     private static final String TAG = BaseActivity.class.getName();
 
@@ -172,28 +169,11 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         dialog.show();
     }
 
-    @Override
     public void send(Senz senz) {
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
                     senzService.send(senz);
-                } else {
-                    ActivityUtils.showCustomToast("Failed to connected to service.", this);
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } else {
-            ActivityUtils.showCustomToast(this.getResources().getString(R.string.no_internet), this);
-        }
-    }
-
-    public void sendInOrder(List<Senz> senzList) {
-        if (NetworkUtil.isAvailableNetwork(this)) {
-            try {
-                if (isServiceBound) {
-                    senzService.sendStream(senzList);
                 } else {
                     ActivityUtils.showCustomToast("Failed to connected to service.", this);
                 }

@@ -3,12 +3,15 @@ package com.score.rahasak.utils;
 import android.content.Context;
 import android.util.Base64;
 
+import org.spongycastle.crypto.digests.RIPEMD160Digest;
+
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -101,6 +104,21 @@ public class CryptoUtils {
         KeyFactory kf = KeyFactory.getInstance("RSA");
 
         return kf.generatePrivate(spec);
+    }
+
+    public static String getSenzieAddress() throws NoSuchAlgorithmException {
+        // get public key
+        byte[] key = Base64.decode(PreferenceUtils.getRsaKey(this, CryptoUtils.PUBLIC_KEY), Base64.DEFAULT);
+
+        // generate digest
+        byte[] ph = new byte[20];
+        byte[] sha256 = MessageDigest.getInstance("SHA-256").digest(key);
+        RIPEMD160Digest digest = new RIPEMD160Digest();
+        digest.update(sha256, 0, sha256.length);
+        digest.doFinal(ph, 0);
+
+        // encode base58
+        return Base58.encode(ph);
     }
 
     public static String getDigitalSignature(String payload, PrivateKey privateKey) throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {
