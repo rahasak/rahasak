@@ -106,9 +106,9 @@ public class CryptoUtils {
         return kf.generatePrivate(spec);
     }
 
-    public static String getSenzieAddress() throws NoSuchAlgorithmException {
+    public static String getSenzieAddress(Context context) throws NoSuchAlgorithmException {
         // get public key
-        byte[] key = Base64.decode(PreferenceUtils.getRsaKey(this, CryptoUtils.PUBLIC_KEY), Base64.DEFAULT);
+        byte[] key = Base64.decode(PreferenceUtils.getRsaKey(context, CryptoUtils.PUBLIC_KEY), Base64.DEFAULT);
 
         // generate digest
         byte[] ph = new byte[20];

@@ -5,7 +5,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +12,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.score.rahasak.R;
-import com.score.rahasak.utils.Base58;
-import com.score.rahasak.utils.CryptoUtils;
-import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.SenzParser;
-
-import java.security.NoSuchAlgorithmException;
 
 public class InviteFragment extends Fragment {
 
@@ -55,17 +48,8 @@ public class InviteFragment extends Fragment {
         openContactsBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Click action
-                //Intent intent = new Intent(getActivity(), ContactListActivity.class);
-                //startActivity(intent);
-                String keyString = PreferenceUtils.getRsaKey(InviteFragment.this.getActivity(), CryptoUtils.PUBLIC_KEY);
-                byte[] key = Base64.decode(keyString, Base64.DEFAULT);
-                try {
-                    String kh = Base58.encode(SenzParser.keyHash(key));
-                    System.out.println(kh);
-                    System.out.println(kh.length());
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(getActivity(), ContactListActivity.class);
+                startActivity(intent);
             }
         });
     }

@@ -23,7 +23,7 @@
     <string name="default_user_image">default_user_image</string>
     <string name="enter_secret_here_hint">Enter your secret here...</string>
     <string name="register_welcome_text">Welcome</string>
-    <string name="register_button_text">Register</string>
+    <string name="register_button_text">Continue</string>
     <string name="register_user_id">Username</string>
     <string name="home_page_tab_one">Rahas</string>
     <string name="home_page_tab_two">Friends</string>

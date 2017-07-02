@@ -83,7 +83,7 @@ public class ActivityUtils {
      * @return valid or not
      */
     public static boolean isValidRegistrationFields(User user) throws InvalidInputFieldsException {
-        if (user.getUsername().isEmpty() || user.getUsername().contains("@") || user.getUsername().contains("#")) {
+        if (user.getUsername().isEmpty() || user.getUsername().contains("@") || user.getUsername().contains("#") || user.getUsername().contains(" ")) {
             throw new InvalidInputFieldsException();
         }
 

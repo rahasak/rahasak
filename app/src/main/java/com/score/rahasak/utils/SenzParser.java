@@ -4,20 +4,12 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import org.spongycastle.crypto.CryptoException;
-import org.spongycastle.crypto.digests.RIPEMD160Digest;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.util.encoders.Hex;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.util.HashMap;
 
-/**
- * Created by eranga on 8/27/15.
- */
+
 public class SenzParser {
 
     static {
@@ -70,12 +62,6 @@ public class SenzParser {
             }
         }
 
-//        System.out.println(senz.getSender().getUsername());
-//        System.out.println(senz.getReceiver().getUsername());
-//        System.out.println(senz.getSenzType());
-//        System.out.println(senz.getSignature());
-//        System.out.println(senz.getAttributes().entrySet());
-
         return senz;
     }
 
@@ -112,80 +98,6 @@ public class SenzParser {
         return senzMessage.replaceAll("\n", "").replaceAll("\r", "");
     }
 
-    private static byte[] hash() throws CryptoException {
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("RIPEMD160", "SC"); // It's SpongyCastle on Android
-            digest.update("eranga bandara".getBytes());
-            return digest.digest();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw new CryptoException("Hashing error: " + e.getMessage(), e);
-        }
-    }
-
-    public static byte[] keyHash(byte[] key) throws NoSuchAlgorithmException {
-        byte[] ph = new byte[20];
-        byte[] sha256 = MessageDigest.getInstance("SHA-256").digest(key);
-        RIPEMD160Digest digest = new RIPEMD160Digest();
-        digest.update(sha256, 0, sha256.length);
-        digest.doFinal(ph, 0);
-
-        return ph;
-    }
-
-    public static void enc() throws Exception {
-        byte[] r = "Rosetta Code".getBytes("US-ASCII");
-        RIPEMD160Digest d = new RIPEMD160Digest();
-        d.update(r, 0, r.length);
-        byte[] o = new byte[d.getDigestSize()];
-        d.doFinal(o, 0);
-        System.out.println();
-    }
-
-    public static String byteArrayToHex(byte[] a) {
-        StringBuilder sb = new StringBuilder(a.length * 2);
-        for (byte b : a)
-            sb.append(String.format("%02x", b));
-        return sb.toString();
-    }
-
     public static void main(String args[]) {
-        try {
-            byte[] in = keyHash("eranga".getBytes());
-            String s = Base58.encode(in);
-            System.out.println(s);
-            System.out.println(s.length());
-            System.out.println(byteArrayToHex(in));
-            System.out.println(byteArrayToHex(in).length());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-//        String senzMessage3 = "STREAM " +
-//                "#msg UserCreated " +
-//                "#pubkey sd23453451234sfsdfd==  " +
-//                "#time 1441806897.71 " +
-//                "#msg1 #msg2 rtt " +
-//                "@senzswitch " +
-//                "^era " +
-//                "v50I88VzgvBvubCjGitTMO9";
-//
-//        //parse(senzMessage3);
-//
-//        LimitedList<String> list = new LimitedList<>(3);
-//        list.add("era");
-//        System.out.println(list);
-//
-//        list.add("nan");
-//        System.out.println(list);
-//
-//        list.add("edsd");
-//        System.out.println(list);
-//
-//        list.add("kesdf");
-//        System.out.println(list);
-//
-//        list.add("ioio");
-//        System.out.println(list);
     }
 }

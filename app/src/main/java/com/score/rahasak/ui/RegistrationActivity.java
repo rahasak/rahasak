@@ -7,7 +7,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -57,13 +56,9 @@ public class RegistrationActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        setupToolbar();
-        setupUi();
-        setupRegisterBtn();
-        setupActionBar();
-
-        // generate RSA keys
-        doPreRegistration();
+        initUi();
+        initToolbar();
+        initActionBar();
     }
 
     @Override
@@ -99,28 +94,26 @@ public class RegistrationActivity extends BaseActivity {
         if (senzReceiver != null) unregisterReceiver(senzReceiver);
     }
 
-    private void setupActionBar() {
+    private void initActionBar() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.registration_header, null));
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
-    private void setupToolbar() {
+    private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setCollapsible(false);
         toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
         setSupportActionBar(toolbar);
     }
 
-    private void setupUi() {
+    private void initUi() {
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
         editTextUserId.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextUserId.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         ((TextView) findViewById(R.id.welcome_message)).setTypeface(typefaceThin, Typeface.NORMAL);
-    }
 
-    private void setupRegisterBtn() {
         registerBtn = (Button) findViewById(R.id.register_btn);
         registerBtn.setTypeface(typefaceThin, Typeface.BOLD);
         registerBtn.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +121,7 @@ public class RegistrationActivity extends BaseActivity {
                 if (NetworkUtil.isAvailableNetwork(RegistrationActivity.this)) {
                     onClickRegister();
                 } else {
-                    Toast.makeText(RegistrationActivity.this, "No internet connection", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegistrationActivity.this, "No network connectivity", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -139,45 +132,29 @@ public class RegistrationActivity extends BaseActivity {
      * create user and validate fields from here
      */
     private void onClickRegister() {
-        // create user
-        String username = editTextUserId.getText().toString().toLowerCase().trim();
-        registeringUser = new User("0", username);
         try {
-            ActivityUtils.isValidRegistrationFields(registeringUser);
-            String confirmationMessage = "<font size=10>Are you sure you want to register with Rahasak using </font> <font color=#F88F8C>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
-            displayConfirmationMessageDialog(confirmationMessage, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ActivityUtils.showProgressDialog(RegistrationActivity.this, "Please wait...");
-                    doRegistration();
-                }
-            });
-        } catch (InvalidInputFieldsException e) {
-            ActivityUtils.showCustomToast("Invalid inputs in username field", this);
-            e.printStackTrace();
-        }
-    }
+            // validate input field
+            ActivityUtils.isValidRegistrationFields(new User("0", editTextUserId.getText().toString().trim()));
 
-    /**
-     * Create user
-     * First initialize key pair
-     * start service
-     * bind service
-     */
-    private void doPreRegistration() {
-        try {
+            // pre registration
             CryptoUtils.initKeys(this);
+
+            // init reg user
+            String senzieAddress = CryptoUtils.getSenzieAddress(this);
+            registeringUser = new User("0", senzieAddress);
+
+            // register
+            ActivityUtils.showProgressDialog(this, "Please wait...");
+            doRegistration();
         } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
             e.printStackTrace();
+
+            Toast.makeText(this, "Registration failed", Toast.LENGTH_LONG).show();
+        } catch (InvalidInputFieldsException e) {
+            e.printStackTrace();
+
+            Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();
         }
-    }
-
-    /**
-     * Initialize registering user
-     * username will generated via public key hash
-     */
-    private void initRegUser() {
-
     }
 
     /**
@@ -185,7 +162,7 @@ public class RegistrationActivity extends BaseActivity {
      * Send register senz to senz service via service binder
      */
     private void doRegistration() {
-        // first create create senz
+        // create create senz
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put(getResources().getString(R.string.time), ((Long) (System.currentTimeMillis() / 1000)).toString());
         senzAttributes.put(getResources().getString(R.string.pubkey), PreferenceUtils.getRsaKey(this, CryptoUtils.PUBLIC_KEY));
@@ -198,7 +175,7 @@ public class RegistrationActivity extends BaseActivity {
         User receiver = new User("", getResources().getString(R.string.switch_name));
         Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
 
-        // Sending senz to service
+        // sending senz to service
         send(senz);
     }
 
@@ -214,7 +191,7 @@ public class RegistrationActivity extends BaseActivity {
             ActivityUtils.cancelProgressDialog();
             String msg = senz.getAttributes().get("status");
             if (msg != null && (msg.equalsIgnoreCase("REG_DONE") || msg.equalsIgnoreCase("REG_ALR"))) {
-                ActivityUtils.showCustomToast("Successfully registered", this);
+                Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
                 // save user
                 // navigate home
                 PreferenceUtils.saveUser(this, registeringUser);
