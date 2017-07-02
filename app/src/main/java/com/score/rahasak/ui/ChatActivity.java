@@ -515,7 +515,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (msg.equalsIgnoreCase("OFFLINE")) {
                 // user offline
                 ActivityUtils.cancelProgressDialog();
-                Toast.makeText(this, "@" + secretUser.getUsername() + " not available at this moment", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, PhoneBookUtil.getContactName(this, secretUser.getPhone()) + " not available at this moment", Toast.LENGTH_LONG).show();
             }
         } else if (senz.getAttributes().containsKey("msg")) {
             // chat message

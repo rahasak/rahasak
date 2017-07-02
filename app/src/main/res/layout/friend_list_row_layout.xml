@@ -85,7 +85,8 @@
                         android:lines="1"
                         android:text="Lakmal"
                         android:textColor="@color/android_grey"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <ImageView
@@ -116,8 +117,8 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:visibility="gone"
-                android:background="@drawable/bottom_border" />
+                android:background="@drawable/bottom_border"
+                android:visibility="gone" />
         </LinearLayout>
     </FrameLayout>
 

@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
-import com.github.siyamed.shapeimageview.RoundedImageView;
 import com.score.rahasak.R;
 import com.score.rahasak.pojo.Permission;
 import com.score.rahasak.pojo.SecretUser;
@@ -99,26 +98,14 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
 
         // request text
         if (secretUser.isActive()) {
-            if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                viewHolder.usernameView.setText(PhoneBookUtil.getContactName(context, secretUser.getPhone()));
-                viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
-                viewHolder.phoneBookNameView.setText("@" + secretUser.getUsername());
-            } else {
-                viewHolder.phoneBookNameView.setVisibility(View.GONE);
-                viewHolder.usernameView.setText("@" + secretUser.getUsername());
-            }
-
+            viewHolder.usernameView.setText(PhoneBookUtil.getContactName(context, secretUser.getPhone()));
+            viewHolder.phoneBookNameView.setVisibility(View.GONE);
             viewHolder.userCameraPermView.setVisibility(View.VISIBLE);
             viewHolder.userLocationPermView.setVisibility(View.VISIBLE);
         } else {
-            if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                viewHolder.usernameView.setText(PhoneBookUtil.getContactName(context, secretUser.getPhone()) + " @" + secretUser.getUsername());
-            } else {
-                viewHolder.usernameView.setText("@" + secretUser.getUsername());
-            }
-
+            viewHolder.usernameView.setText(PhoneBookUtil.getContactName(context, secretUser.getPhone()));
             viewHolder.phoneBookNameView.setText(secretUser.isSMSRequester() ? "Sent friend request" : "Received friend request");
-
+            viewHolder.phoneBookNameView.setVisibility(View.VISIBLE);
             viewHolder.userCameraPermView.setVisibility(View.GONE);
             viewHolder.userLocationPermView.setVisibility(View.GONE);
         }
