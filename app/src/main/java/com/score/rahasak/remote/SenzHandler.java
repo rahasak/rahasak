@@ -14,7 +14,6 @@ import com.score.rahasak.enums.BlobType;
 import com.score.rahasak.enums.DeliveryState;
 import com.score.rahasak.pojo.Secret;
 import com.score.rahasak.pojo.SecretUser;
-import com.score.rahasak.pojo.Stream;
 import com.score.rahasak.ui.SecretCallAnswerActivity;
 import com.score.rahasak.ui.SelfieCallAnswerActivity;
 import com.score.rahasak.utils.CryptoUtils;
@@ -23,22 +22,18 @@ import com.score.rahasak.utils.NotificationUtils;
 import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
 class SenzHandler {
     private static final String TAG = SenzHandler.class.getName();
 
     private static SenzHandler instance;
-
-    private Stream stream;
 
     static SenzHandler getInstance() {
         if (instance == null) {
@@ -330,51 +325,29 @@ class SenzHandler {
     }
 
     private void handleStream(Senz senz, SenzService senzService) {
-        if (SenzUtils.isStreamOn(senz)) {
-            // stream on, first stream
-            Log.d(TAG, "stream ON from " + senz.getSender().getUsername());
-            stream = new Stream(senz.getSender().getUsername());
-        } else if (SenzUtils.isStreamOff(senz)) {
-            // stream off, last stream
-            Log.d(TAG, "stream OFF from " + senz.getSender().getUsername());
+        // handle for img
+        if (senz.getAttributes().containsKey("cam")) {
+            // send status back first
+            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
 
-            // handle for cam
-            if (senz.getAttributes().containsKey("cam")) {
-                // send status back first
-                senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
+            // save and broadcast
+            Long timestamp = (System.currentTimeMillis() / 1000);
+            saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), false, senzService.getApplicationContext());
+            String imgName = senz.getAttributes().get("uid") + ".jpg";
+            ImageUtils.saveImg(imgName, senz.getAttributes().get("cam"));
+            broadcastSenz(senz, senzService.getApplicationContext());
 
-                // new stream
-                HashMap<String, String> attributes = new HashMap<>();
-                Long timestamp = (System.currentTimeMillis() / 1000);
-                attributes.put("cam", stream.getStream());
-                attributes.put("uid", senz.getAttributes().get("uid"));
-                attributes.put("time", timestamp.toString());
-
-                // save
-                saveSecret(timestamp, senz.getAttributes().get("uid"), "", BlobType.IMAGE, senz.getSender(), false, senzService.getApplicationContext());
-                String imgName = senz.getAttributes().get("uid") + ".jpg";
-                ImageUtils.saveImg(imgName, stream.getStream());
-
-                Senz streamSenz = new Senz("_id", "_signature", SenzTypeEnum.STREAM, senz.getSender(), senz.getReceiver(), attributes);
-                broadcastSenz(streamSenz, senzService.getApplicationContext());
-
-                // notification user
-                String username = senz.getSender().getUsername();
-                SecretUser secretUser = new SenzorsDbSource(senzService.getApplicationContext()).getSecretUser(username);
-                String notificationUser = secretUser.getUsername();
-                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                }
-
-                // show notification
-                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getStreamNotification(notificationUser, "New selfie received", username));
+            // notification user
+            String username = senz.getSender().getUsername();
+            SecretUser secretUser = new SenzorsDbSource(senzService.getApplicationContext()).getSecretUser(username);
+            String notificationUser = secretUser.getUsername();
+            if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
+                notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
             }
-        } else {
-            // middle stream
-            if (senz.getAttributes().containsKey("cam")) {
-                stream.appendStream(senz.getAttributes().get("cam"));
-            }
+
+            // show notification
+            SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
+                    NotificationUtils.getStreamNotification(notificationUser, "New selfie received", username));
         }
     }
 

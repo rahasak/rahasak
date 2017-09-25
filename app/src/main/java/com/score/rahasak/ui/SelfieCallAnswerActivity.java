@@ -30,7 +30,6 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SelfieCallAnswerActivity extends BaseActivity {
@@ -289,7 +288,11 @@ public class SelfieCallAnswerActivity extends BaseActivity {
                 byte[] resizedImage = ImageUtils.compressImage(bytes, camId);
                 Log.d(TAG, "Compressed size: " + resizedImage.length / 1024);
 
-                sendPhotoSenz(resizedImage, SelfieCallAnswerActivity.this);
+                Long timestamp = (System.currentTimeMillis() / 1000);
+                String uid = SenzUtils.getUid(SelfieCallAnswerActivity.this, timestamp.toString());
+                String img = ImageUtils.encodeBitmap(resizedImage);
+                sendSelfieSenz(timestamp, uid, img);
+                saveSelfieSecret(timestamp, uid, img);
                 finish();
             }
         });
@@ -343,118 +346,30 @@ public class SelfieCallAnswerActivity extends BaseActivity {
             cancelTimer.cancel();
     }
 
-    /**
-     * Util methods
-     */
-    private void sendPhotoSenz(final byte[] image, final Context context) {
-        // compose senz
-        Long timestamp = (System.currentTimeMillis() / 1000);
-        String uid = SenzUtils.getUid(this, timestamp.toString());
+    private void sendSelfieSenz(Long timestamp, String uid, String img) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("uid", uid);
+        senzAttributes.put("cam", img);
 
-        // stream on senz
-        // stream content
-        // stream off senz
-        Senz startStreamSenz = getStartStreamSenz(uid, timestamp);
-        ArrayList<Senz> photoSenzList = getPhotoStreamSenz(image, context, uid, timestamp);
-        Senz stopStreamSenz = getStopStreamSenz(uid, timestamp);
-
-        // populate list
-        ArrayList<Senz> senzList = new ArrayList<>();
-        senzList.add(startStreamSenz);
-        senzList.addAll(photoSenzList);
-        senzList.add(stopStreamSenz);
-
-        sendInOrder(senzList);
+        String id = "_ID";
+        String signature = "_SIG";
+        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+        Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
+        send(senz);
     }
 
-    /**
-     * Decompose image stream in to multiple data/stream senz's
-     *
-     * @param image   image content
-     * @param context app context
-     * @param uid     unique id
-     * @return list of decomposed senz's
-     */
-    private ArrayList<Senz> getPhotoStreamSenz(byte[] image, Context context, String uid, Long timestamp) {
-        String imageString = ImageUtils.encodeBitmap(image);
-
+    private void saveSelfieSecret(Long timestamp, String uid, String image) {
         Secret newSecret = new Secret("", BlobType.IMAGE, secretUser, false);
         newSecret.setTimeStamp(timestamp);
         newSecret.setId(uid);
         newSecret.setMissed(false);
         newSecret.setDeliveryState(DeliveryState.PENDING);
-        new SenzorsDbSource(context).createSecret(newSecret);
+        new SenzorsDbSource(SelfieCallAnswerActivity.this).createSecret(newSecret);
 
         String imgName = uid + ".jpg";
         ImageUtils.saveImg(imgName, image);
-
-        ArrayList<Senz> senzList = new ArrayList<>();
-        String[] packets = split(imageString, 1024);
-
-        for (String packet : packets) {
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", timestamp.toString());
-            senzAttributes.put("cam", packet.trim());
-            senzAttributes.put("uid", uid);
-
-            Senz _senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-            senzList.add(_senz);
-        }
-
-        return senzList;
-    }
-
-    /**
-     * Create start stream senz
-     *
-     * @return senz
-     */
-    private Senz getStartStreamSenz(String uid, Long timestamp) {
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("cam", "on");
-        senzAttributes.put("uid", uid);
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-    }
-
-    /**
-     * Create stop stream senz
-     *
-     * @return senz
-     */
-    private Senz getStopStreamSenz(String uid, Long timestamp) {
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", timestamp.toString());
-        senzAttributes.put("cam", "off");
-        senzAttributes.put("uid", uid);
-
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
-
-        return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-    }
-
-    private String[] split(String src, int len) {
-        String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
-        for (int i = 0; i < result.length; i++)
-            result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
-        return result;
     }
 
     private void saveMissedSelfie() {
