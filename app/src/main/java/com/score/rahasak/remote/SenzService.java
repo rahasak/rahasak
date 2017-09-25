@@ -15,6 +15,7 @@ import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.enums.IntentType;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.utils.CryptoUtils;
+import com.score.rahasak.utils.ImageUtils;
 import com.score.rahasak.utils.NetworkUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzParser;
@@ -37,6 +38,7 @@ public class SenzService extends Service {
     private static final String TAG = SenzService.class.getName();
 
     private static final String SENZ_HOST = "senz.rahasak.com";
+    //private static final String SENZ_HOST = "10.2.2.1";
     public static final int SENZ_PORT = 7070;
 
     public static final String STREAM_HOST = "senz.rahasak.com";
@@ -58,13 +60,17 @@ public class SenzService extends Service {
     private final ISenzService.Stub stubs = new ISenzService.Stub() {
         @Override
         public void send(Senz senz) throws RemoteException {
-            Log.d(TAG, "Senz service call with senz " + senz.getId());
             writeSenz(senz);
         }
 
         @Override
-        public void sendStream(List<Senz> senzList) throws RemoteException {
+        public void sendInOrder(List<Senz> senzList) throws RemoteException {
             writeSenzes(senzList);
+        }
+
+        @Override
+        public void sendStream(Senz senz) throws RemoteException {
+            writeStream(senz);
         }
     };
 
@@ -116,8 +122,6 @@ public class SenzService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Log.d(TAG, "onCreate ---");
-
         registerReceivers();
         initWakeLock();
     }
@@ -125,8 +129,6 @@ public class SenzService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-
-        Log.d(TAG, "onStartCommand --- ");
 
         // start com or ping
         if (running) {
@@ -141,8 +143,6 @@ public class SenzService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        Log.d(TAG, "onDestroy --- ");
 
         unregisterReceivers();
 
@@ -229,18 +229,37 @@ public class SenzService extends Service {
 
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);
-                        String senzSignature;
-                        if (senz.getAttributes().containsKey("stream")) {
-                            senzSignature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        String signature;
+                        if (senz.getSenzType() == SenzTypeEnum.STREAM) {
+                            signature = "_SIG";
                         } else {
-                            senzSignature = "SIGNATURE";
+                            signature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
                         }
-                        String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-                        Log.d(TAG, "Senz to be send: " + message);
 
                         // sends the message to the server
+                        String message = SenzParser.getSenzMessage(senzPayload, signature);
                         write(message);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    void writeStream(final Senz senz) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // set sender
+                    if (senz.getSender() == null || senz.getSender().toString().isEmpty())
+                        senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+
+                    // send img
+                    if (senz.getAttributes().containsKey("img")) {
+                        for (String packet : ImageUtils.splitImg(senz.getAttributes().get("img"), 1024))
+                            write(packet);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -189,4 +189,11 @@ public class ImageUtils {
             file.delete();
         }
     }
+
+    public static String[] splitImg(String src, int len) {
+        String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
+        for (int i = 0; i < result.length; i++)
+            result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
+        return result;
+    }
 }

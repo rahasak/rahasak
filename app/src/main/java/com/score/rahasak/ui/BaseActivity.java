@@ -189,11 +189,29 @@ public class BaseActivity extends AppCompatActivity implements ISendingComHandle
         }
     }
 
+    @Override
     public void sendInOrder(List<Senz> senzList) {
         if (NetworkUtil.isAvailableNetwork(this)) {
             try {
                 if (isServiceBound) {
-                    senzService.sendStream(senzList);
+                    senzService.sendInOrder(senzList);
+                } else {
+                    ActivityUtils.showCustomToast("Failed to connected to service.", this);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ActivityUtils.showCustomToast(this.getResources().getString(R.string.no_internet), this);
+        }
+    }
+
+    @Override
+    public void sendStream(Senz senz) {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            try {
+                if (isServiceBound) {
+                    senzService.sendStream(senz);
                 } else {
                     ActivityUtils.showCustomToast("Failed to connected to service.", this);
                 }

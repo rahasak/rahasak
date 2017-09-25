@@ -6,5 +6,7 @@ import com.score.senzc.pojos.Senz;
 interface ISenzService {
     void send(in Senz senz);
 
-    void sendStream(in List<Senz> senzList);
+    void sendInOrder(in List<Senz> senzList);
+
+    void sendStream(in Senz senz);
 }
