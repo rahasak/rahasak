@@ -355,7 +355,7 @@ public class SelfieCallAnswerActivity extends BaseActivity {
 
         String id = "_ID";
         String signature = "_SIG";
-        SenzTypeEnum senzType = SenzTypeEnum.STREAM;
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
         Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
         send(senz);
     }

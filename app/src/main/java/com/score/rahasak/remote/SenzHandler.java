@@ -66,10 +66,6 @@ class SenzHandler {
                     Log.d(TAG, "DATA received");
                     handleData(senz, senzService);
                     break;
-                case STREAM:
-                    Log.d(TAG, "STREAM received");
-                    handleStream(senz, senzService);
-                    break;
             }
         }
     }
@@ -272,9 +268,6 @@ class SenzHandler {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
-            // location, broadcast
-            broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("pubkey")) {
             // pubkey from switch
             String username = senz.getAttributes().get("name");
@@ -297,6 +290,9 @@ class SenzHandler {
                     e.printStackTrace();
                 }
             }
+        } else if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
+            // location, broadcast
+            broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("mic")) {
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("senz")) {
@@ -321,12 +317,7 @@ class SenzHandler {
                 SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
                         NotificationUtils.getStreamNotification(notificationUser, "Missed selfie call", username));
             }
-        }
-    }
-
-    private void handleStream(Senz senz, SenzService senzService) {
-        // handle for img
-        if (senz.getAttributes().containsKey("cam")) {
+        } else if (senz.getAttributes().containsKey("cam")) {
             // send status back first
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
 

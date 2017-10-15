@@ -105,9 +105,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     case DATA:
                         onDataReceived(senz);
                         break;
-                    case STREAM:
-                        onSenzStreamReceived(senz);
-                        break;
                     case SHARE:
                         onShareReceived(senz);
                         break;
@@ -315,7 +312,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 // delete secrets from top
                 for (Secret secret : tmpList) {
                     secretList.add(secret);
-                    if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
+                    //if (secretList.size() > 7) deleteSecret(0, secretList.get(0));
                 }
                 secretAdapter.notifyDataSetChanged();
 
@@ -428,12 +425,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             addSecret(secret);
 
             // delete top most items if list contains more than 7
-            int count = secretList.size();
-            if (count > 7) {
-                for (int i = 0; i < count - 7; i++) {
-                    deleteSecret(0, secretList.get(0));
-                }
-            }
+//            int count = secretList.size();
+//            if (count > 7) {
+//                for (int i = 0; i < count - 7; i++) {
+//                    deleteSecret(0, secretList.get(0));
+//                }
+//            }
         }
     }
 
@@ -524,13 +521,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             // location received
             ActivityUtils.cancelProgressDialog();
             onLocationReceived(senz);
-        }
-    }
-
-    private void onSenzStreamReceived(Senz senz) {
-        if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
-            Secret secret;
-            if (senz.getAttributes().containsKey("cam")) {
+        } else if (senz.getAttributes().containsKey("cam")) {
+            if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
+                Secret secret;
                 secret = new Secret(senz.getAttributes().get("cam"), BlobType.IMAGE, secretUser, true);
                 secret.setTimeStamp(Long.parseLong(senz.getAttributes().get("time")));
                 secret.setId(senz.getAttributes().get("uid"));

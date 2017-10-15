@@ -217,7 +217,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 try {
                     // connect
                     if (address == null)
-                        address = InetAddress.getByName(SenzService.STREAM_HOST);
+                        address = InetAddress.getByName(SenzService.SENZ_HOST);
 
                     // send O message
                     String oMsg = SenzUtils.getOStreamMsg(appUser.getUsername(), secretUser.getUsername());

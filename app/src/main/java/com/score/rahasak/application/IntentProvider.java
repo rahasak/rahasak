@@ -16,15 +16,10 @@ public class IntentProvider {
 
     // intent actions
     public static final String ACTION_SENZ = "com.score.rahasak.SENZ";
-    public static final String ACTION_TIMEOUT = "com.score.rahasak.TIMEOUT";
     public static final String ACTION_SMS_REQUEST_ACCEPT = "com.score.rahasak.SMS_REQUEST_ACCEPT";
     public static final String ACTION_SMS_REQUEST_REJECT = "com.score.rahasak.SMS_REQUEST_REJECT";
     public static final String ACTION_SMS_REQUEST_CONFIRM = "com.score.rahasak.SMS_REQUEST_CONFIRM";
     public static final String ACTION_RESTART = "com.score.rahasak.RESTART";
-    public static final String ACTION_CONNECTED = "com.score.rahasak.CONNECTED";
-    public static final String ACTION_PHONE_STATE = "android.intent.action.PHONE_STATE";
-    public static final String ACTION_START_CALL_SERVICE = "com.score.rahasak.START_CALL_SERVICE";
-    public static final String ACTION_STOP_CALL_SERVICE = "com.score.rahasak.STOP_CALL_SERVICE";
 
     /**
      * Return the intent filter for the intent_type.
@@ -49,26 +44,16 @@ public class IntentProvider {
      * @param intentType intent type
      * @return
      */
-    public static String getIntentAction(IntentType intentType) throws InvalidIntentType {
+    private static String getIntentAction(IntentType intentType) throws InvalidIntentType {
         switch (intentType) {
             case SENZ:
                 return ACTION_SENZ;
-            case TIMEOUT:
-                return ACTION_TIMEOUT;
             case SMS_REQUEST_ACCEPT:
                 return ACTION_SMS_REQUEST_ACCEPT;
             case SMS_REQUEST_REJECT:
                 return ACTION_SMS_REQUEST_REJECT;
             case SMS_REQUEST_CONFIRM:
                 return ACTION_SMS_REQUEST_CONFIRM;
-            case CONNECTED:
-                return ACTION_CONNECTED;
-            case PHONE_STATE:
-                return ACTION_PHONE_STATE;
-            case START_CALL_SERVICE:
-                return ACTION_START_CALL_SERVICE;
-            case STOP_CALL_SERVICE:
-                return ACTION_STOP_CALL_SERVICE;
             default:
                 throw new InvalidIntentType();
         }

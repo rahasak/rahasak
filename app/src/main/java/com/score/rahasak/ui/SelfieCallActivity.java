@@ -50,9 +50,6 @@ public class SelfieCallActivity extends AppCompatActivity {
                     case DATA:
                         onSenzReceived(senz);
                         break;
-                    case STREAM:
-                        onSenzStreamReceived(senz);
-                        break;
                     default:
                         break;
                 }
@@ -151,11 +148,7 @@ public class SelfieCallActivity extends AppCompatActivity {
                 Toast.makeText(this, "User offline", Toast.LENGTH_LONG).show();
                 SelfieCallActivity.this.finish();
             }
-        }
-    }
-
-    private void onSenzStreamReceived(Senz senz) {
-        if (senz.getAttributes().containsKey("cam")) {
+        } else if (senz.getAttributes().containsKey("cam")) {
             // display stream
             loadingView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);

@@ -21,7 +21,6 @@ import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzParser;
 import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -37,11 +36,9 @@ public class SenzService extends Service {
 
     private static final String TAG = SenzService.class.getName();
 
-    private static final String SENZ_HOST = "senz.rahasak.com";
-    //private static final String SENZ_HOST = "10.2.2.1";
+    public static final String SENZ_HOST = "senz.rahasak.com";
+    //public static final String SENZ_HOST = "10.2.2.2";
     public static final int SENZ_PORT = 7070;
-
-    public static final String STREAM_HOST = "senz.rahasak.com";
     public static final int STREAM_PORT = 9090;
 
     // wake lock to keep
@@ -198,16 +195,10 @@ public class SenzService extends Service {
 
                     // get digital signature of the senz
                     String senzPayload = SenzParser.getSenzPayload(senz);
-                    String signature;
-                    if (senz.getSenzType() == SenzTypeEnum.STREAM) {
-                        signature = "SIG";
-                    } else {
-                        signature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                    }
-                    String message = SenzParser.getSenzMessage(senzPayload, signature);
-                    Log.d(TAG, "Senz to be send: " + message);
+                    String signature = senz.getAttributes().containsKey("cam") ? "_SIG" : CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
 
                     //  sends the message to the server
+                    String message = SenzParser.getSenzMessage(senzPayload, signature);
                     write(message);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -229,12 +220,7 @@ public class SenzService extends Service {
 
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);
-                        String signature;
-                        if (senz.getSenzType() == SenzTypeEnum.STREAM) {
-                            signature = "_SIG";
-                        } else {
-                            signature = CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                        }
+                        String signature = senz.getAttributes().containsKey("cam") ? "_SIG" : CryptoUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
 
                         // sends the message to the server
                         String message = SenzParser.getSenzMessage(senzPayload, signature);
@@ -257,7 +243,7 @@ public class SenzService extends Service {
                         senz.setSender(PreferenceUtils.getUser(getBaseContext()));
 
                     // send img
-                    if (senz.getAttributes().containsKey("img")) {
+                    if (senz.getAttributes().containsKey("cam")) {
                         for (String packet : ImageUtils.splitImg(senz.getAttributes().get("img"), 1024))
                             write(packet);
                     }

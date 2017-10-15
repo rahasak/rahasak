@@ -61,9 +61,6 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
                 case DATA:
                     handleDataSenz(senz);
                     break;
-                case STREAM:
-                    handleStreamSenz(senz);
-                    break;
                 default:
                     break;
             }
@@ -265,6 +262,17 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
                 // camera error
                 Toast.makeText(this, "Busy", Toast.LENGTH_LONG).show();
+            } else if (senz.getAttributes().containsKey("cam")) {
+                if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
+                    ActivityUtils.cancelProgressDialog();
+
+                    // save profile picture in db
+                    String encodedImage = senz.getAttributes().get("cam");
+                    dbSource.updateSecretUser(secretUser.getUsername(), "image", encodedImage);
+
+                    // display image
+                    userImageView.setImageBitmap(ImageUtils.decodeBitmap(encodedImage));
+                }
             }
         }
     }

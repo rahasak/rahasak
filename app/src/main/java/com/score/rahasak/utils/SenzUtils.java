@@ -20,9 +20,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-/**
- * Created by eranga on 6/27/16.
- */
 public class SenzUtils {
     public static Senz getPingSenz(Context context) {
         try {
@@ -91,14 +88,6 @@ public class SenzUtils {
         }
 
         return timestamp;
-    }
-
-    public static boolean isStreamOn(Senz senz) {
-        return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("on");
-    }
-
-    public static boolean isStreamOff(Senz senz) {
-        return senz.getAttributes().containsKey("cam") && senz.getAttributes().get("cam").equalsIgnoreCase("off");
     }
 
     public static boolean isCurrentUser(String username, Context context) {
@@ -244,11 +233,6 @@ public class SenzUtils {
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
 
         return new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
-    }
-
-    public static String getSenzStream(String data, String sender, String receiver) {
-        String msg = "STREAM #mic " + data + " @" + receiver + " ^" + sender + " SIG;";
-        return msg.replaceAll("\n", "").replaceAll("\r", "");
     }
 
     public static Senz getMicBusySenz(Context context, SecretUser secretUser) {
