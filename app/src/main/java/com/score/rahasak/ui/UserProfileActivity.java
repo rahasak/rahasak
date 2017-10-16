@@ -197,7 +197,7 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
                 SenzTypeEnum senzType = SenzTypeEnum.GET;
                 Senz senz = new Senz(id, signature, senzType, null, new User(secretUser.getId(), secretUser.getUsername()), senzAttributes);
 
-                ActivityUtils.showProgressDialog(this, "Calling selfie...");
+                ActivityUtils.showProgressDialog(this, "Selfie calling...");
                 send(senz);
             } else {
                 Toast.makeText(this, "Cannot connect with service", Toast.LENGTH_LONG).show();

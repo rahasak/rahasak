@@ -25,29 +25,29 @@ public class NotificationUtils {
             msg = "Your " + permissionName + " permission has been revoked";
         }
 
-        return new SenzNotification(R.drawable.c_eyes, user, msg, user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.ic_notification, user, msg, user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getUserNotification(String user) {
-        return new SenzNotification(R.drawable.c_eyes, user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.ic_notification, user, "You have been invited to share secrets", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getUserConfirmNotification(String user) {
-        return new SenzNotification(R.drawable.c_eyes, user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
+        return new SenzNotification(R.drawable.ic_notification, user, "Confirmed your secret request", user, NotificationType.NEW_PERMISSION);
     }
 
     public static SenzNotification getSecretNotification(String title, String user, String message) {
-        return new SenzNotification(R.drawable.c_eyes, title, message, user, NotificationType.NEW_SECRET);
+        return new SenzNotification(R.drawable.ic_notification, title, message, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getStreamNotification(String title, String message, String user) {
-        return new SenzNotification(R.drawable.c_eyes, title, message, user, NotificationType.NEW_SECRET);
+        return new SenzNotification(R.drawable.ic_notification, title, message, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getSmsNotification(String contactName, String contactPhone, String rahasakUsername) {
         String msg = "Would you like share secrets?";
 
-        SenzNotification senzNotification = new SenzNotification(R.drawable.c_eyes, contactName, msg, rahasakUsername, NotificationType.SMS_REQUEST);
+        SenzNotification senzNotification = new SenzNotification(R.drawable.ic_notification, contactName, msg, rahasakUsername, NotificationType.SMS_REQUEST);
         senzNotification.setSenderPhone(contactPhone);
 
         return senzNotification;
@@ -57,7 +57,7 @@ public class NotificationUtils {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.c_eyes)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentIntent(intent)
                 .setOngoing(true);
 
