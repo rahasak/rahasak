@@ -37,7 +37,7 @@ public class NotificationUtils {
     }
 
     public static SenzNotification getSecretNotification(String title, String user, String message) {
-        return new SenzNotification(R.drawable.notification_icon, title, message, user, NotificationType.NEW_SECRET);
+        return new SenzNotification(R.drawable.c_eyes, title, message, user, NotificationType.NEW_SECRET);
     }
 
     public static SenzNotification getStreamNotification(String title, String message, String user) {
