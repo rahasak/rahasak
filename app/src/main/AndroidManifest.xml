@@ -114,6 +114,7 @@
         <activity
             android:name="com.score.rahasak.ui.SelfieCallAnswerActivity"
             android:launchMode="singleTask"
+            android:showOnLockScreen="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
@@ -127,6 +128,7 @@
         <activity
             android:name="com.score.rahasak.ui.SecretCallAnswerActivity"
             android:launchMode="singleTask"
+            android:showOnLockScreen="true"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity

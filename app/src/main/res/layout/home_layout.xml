@@ -54,10 +54,10 @@
 
                 <ImageView
                     android:id="@+id/contact_image"
-                    android:layout_width="55dp"
-                    android:layout_height="55dp"
+                    android:layout_width="65dp"
+                    android:layout_height="70dp"
                     android:layout_centerHorizontal="true"
-                    android:src="@drawable/owl_out" />
+                    android:src="@drawable/eyes" />
 
                 <TextView
                     android:id="@+id/home_user_text"

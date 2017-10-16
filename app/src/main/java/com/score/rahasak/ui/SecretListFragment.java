@@ -90,7 +90,8 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void setupEmptyTextFont() {
-        ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf"));
+        Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
+        ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(typeface);
     }
 
     private void initActionBar() {
