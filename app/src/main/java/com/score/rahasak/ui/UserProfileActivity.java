@@ -262,31 +262,18 @@ public class UserProfileActivity extends BaseActivity implements Switch.OnChecke
 
                 // camera error
                 Toast.makeText(this, "Busy", Toast.LENGTH_LONG).show();
-            } else if (senz.getAttributes().containsKey("cam")) {
-                if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
-                    ActivityUtils.cancelProgressDialog();
-
-                    // save profile picture in db
-                    String encodedImage = senz.getAttributes().get("cam");
-                    dbSource.updateSecretUser(secretUser.getUsername(), "image", encodedImage);
-
-                    // display image
-                    userImageView.setImageBitmap(ImageUtils.decodeBitmap(encodedImage));
-                }
             }
-        }
-    }
+        } else if (senz.getAttributes().containsKey("cam")) {
+            if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername())) {
+                ActivityUtils.cancelProgressDialog();
 
-    private void handleStreamSenz(Senz senz) {
-        if (senz.getSender().getUsername().equalsIgnoreCase(secretUser.getUsername()) && senz.getAttributes().containsKey("cam")) {
-            ActivityUtils.cancelProgressDialog();
+                // save profile picture in db
+                String encodedImage = senz.getAttributes().get("cam");
+                dbSource.updateSecretUser(secretUser.getUsername(), "image", encodedImage);
 
-            // save profile picture in db
-            String encodedImage = senz.getAttributes().get("cam");
-            dbSource.updateSecretUser(secretUser.getUsername(), "image", encodedImage);
-
-            // display image
-            userImageView.setImageBitmap(ImageUtils.decodeBitmap(encodedImage));
+                // display image
+                userImageView.setImageBitmap(ImageUtils.decodeBitmap(encodedImage));
+            }
         }
     }
 

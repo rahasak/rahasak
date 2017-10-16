@@ -1,12 +1,10 @@
 package com.score.rahasak.remote;
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Base64;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.score.rahasak.application.SenzApplication;
 import com.score.rahasak.db.SenzorsDbSource;
@@ -27,7 +25,6 @@ import com.score.senzc.pojos.User;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 class SenzHandler {
@@ -345,14 +342,14 @@ class SenzHandler {
     private void handleCam(Senz senz, SenzService senzService) {
         if (!SenzApplication.isOnCall()) {
             try {
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.SECOND, 2);
-
                 Intent intent = new Intent(senzService.getApplicationContext(), SelfieCallAnswerActivity.class);
                 intent.putExtra("USER", senz.getSender().getUsername());
-                PendingIntent pendingIntent = PendingIntent.getActivity(senzService.getApplicationContext(), 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                AlarmManager am = (AlarmManager) senzService.getApplicationContext().getSystemService(Activity.ALARM_SERVICE);
-                am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+                senzService.getApplicationContext().startActivity(intent);
             } catch (Exception e) {
                 // fail to access camera
                 senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "CAM_ERROR"));
@@ -365,14 +362,14 @@ class SenzHandler {
 
     private void handleMic(Senz senz, SenzService senzService) {
         if (!SenzApplication.isOnCall()) {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.SECOND, 2);
-
             Intent intent = new Intent(senzService.getApplicationContext(), SecretCallAnswerActivity.class);
             intent.putExtra("USER", senz.getSender().getUsername());
-            PendingIntent pendingIntent = PendingIntent.getActivity(senzService.getApplicationContext(), 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager am = (AlarmManager) senzService.getApplicationContext().getSystemService(Activity.ALARM_SERVICE);
-            am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            senzService.getApplicationContext().startActivity(intent);
         } else {
             // user in another call
             senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "BUSY"));
