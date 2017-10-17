@@ -49,7 +49,7 @@ public class SenzNotificationManager {
      */
     public void showNotification(SenzNotification senzNotification) {
         if (senzNotification.getNotificationType() == NotificationType.NEW_PERMISSION) {
-            Notification notification = getNotification(senzNotification);
+            Notification notification = buildNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(SenzNotificationManager.MESSAGE_NOTIFICATION_ID, notification);
@@ -59,14 +59,14 @@ public class SenzNotificationManager {
                 Log.d(TAG, "Message for chatting user " + senzNotification.getSender());
             } else {
                 // display other types of notification when user not on chat
-                Notification notification = getNotification(senzNotification);
+                Notification notification = buildNotification(senzNotification);
                 notification.flags |= Notification.FLAG_AUTO_CANCEL;
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(SenzNotificationManager.MESSAGE_NOTIFICATION_ID, notification);
             }
         } else if (senzNotification.getNotificationType() == NotificationType.SMS_REQUEST) {
             // SMS request
-            Notification notification = getSmsNotification(senzNotification);
+            Notification notification = buildSmsNotification(senzNotification);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(SenzNotificationManager.SMS_NOTIFICATION_ID, notification);
@@ -81,7 +81,7 @@ public class SenzNotificationManager {
      *
      * @return notification
      */
-    private Notification getNotification(SenzNotification senzNotification) {
+    private Notification buildNotification(SenzNotification senzNotification) {
         // set up pending intent
         Intent intent;
         if (senzNotification.getNotificationType() == NotificationType.NEW_SECRET) {
@@ -110,7 +110,7 @@ public class SenzNotificationManager {
         return builder.build();
     }
 
-    private Notification getSmsNotification(SenzNotification senzNotification) {
+    private Notification buildSmsNotification(SenzNotification senzNotification) {
         // accept
         Intent acceptIntent = new Intent();
         acceptIntent.setAction(IntentProvider.ACTION_SMS_REQUEST_ACCEPT);

@@ -16,7 +16,6 @@ import com.score.rahasak.pojo.SenzNotification;
  */
 public class NotificationUtils {
 
-
     public static SenzNotification getPermissionNotification(String user, String permissionName, String isEnabled) {
         String msg;
         if (isEnabled.equalsIgnoreCase("on")) {
