@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.IntentType;
+import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.utils.ActivityUtils;
 import com.score.rahasak.utils.NetworkUtil;
@@ -40,8 +42,11 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
     private static final String TAG = FriendListFragment.class.getName();
 
+    private IFragmentTransitionListener listener;
+
     private ActionBar actionBar;
     private ImageView actionBarDelete;
+    private FloatingActionButton newButton;
 
     private ArrayList<SecretUser> friendsList;
     private FriendListAdapter adapter;
@@ -83,6 +88,16 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            listener = (IFragmentTransitionListener) context;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -100,6 +115,16 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
     private void initUi() {
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
         ((TextView) getActivity().findViewById(R.id.empty_view_friend)).setTypeface(typeface);
+
+        // new
+        newButton = (FloatingActionButton) getActivity().findViewById(R.id.done);
+        newButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // move to invite
+                listener.onTransition("invite");
+            }
+        });
     }
 
     private void initActionBar() {

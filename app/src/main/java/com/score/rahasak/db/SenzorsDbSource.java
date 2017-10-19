@@ -305,6 +305,19 @@ public class SenzorsDbSource {
         return secretUserList;
     }
 
+    public boolean isAvailableUsers() {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
+                null, // columns
+                null,
+                null, // selection
+                null, // order by
+                null, // group by
+                null); // join
+
+        return cursor.moveToNext();
+    }
+
     private String createPermission(Permission permission) {
         Log.d(TAG, "Add new permission with isGiven=" + permission.isGiven());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();

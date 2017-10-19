@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import com.score.rahasak.R;
 import com.score.rahasak.application.IntentProvider;
 import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.enums.IntentType;
+import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.Secret;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -36,8 +38,12 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
 
     private static final String TAG = SecretListFragment.class.getName();
 
+    private IFragmentTransitionListener listener;
+
+    private Typeface typeface;
     private ActionBar actionBar;
     private ImageView actionBarDelete;
+    private FloatingActionButton newButton;
 
     private ArrayList<Secret> allSecretsList;
     private SecretListAdapter adapter;
@@ -67,11 +73,21 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
         super.onActivityCreated(savedInstanceState);
 
         dbSource = new SenzorsDbSource(getContext());
-        setupEmptyTextFont();
+        initUi();
         initActionBar();
         displayList();
         getListView().setOnItemClickListener(this);
         getListView().setOnItemLongClickListener(this);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            listener = (IFragmentTransitionListener) context;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -89,9 +105,24 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
         getActivity().unregisterReceiver(senzReceiver);
     }
 
-    private void setupEmptyTextFont() {
-        Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
+    private void initUi() {
+        typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GeosansLight.ttf");
         ((TextView) getActivity().findViewById(R.id.empty_view_chat)).setTypeface(typeface);
+
+        // new
+        newButton = (FloatingActionButton) getActivity().findViewById(R.id.done);
+        newButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (new SenzorsDbSource(getActivity()).isAvailableUsers()) {
+                    // move to friends
+                    listener.onTransition("friends");
+                } else {
+                    // move to invite
+                    listener.onTransition("invite");
+                }
+            }
+        });
     }
 
     private void initActionBar() {
@@ -99,10 +130,6 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
         actionBarDelete = (ImageView) actionBar.getCustomView().findViewById(R.id.delete);
     }
 
-    /**
-     * Display sensor list
-     * Basically setup list adapter if have items to display otherwise display empty view
-     */
     private void displayList() {
         allSecretsList = dbSource.getRecentSecretList();
         adapter = new SecretListAdapter(getContext(), allSecretsList);
@@ -114,6 +141,14 @@ public class SecretListFragment extends ListFragment implements AdapterView.OnIt
         allSecretsList.clear();
         allSecretsList.addAll(dbSource.getRecentSecretList());
         adapter.notifyDataSetChanged();
+    }
+
+    private void moveToFriends() {
+
+    }
+
+    private void moveToInvite() {
+
     }
 
     @Override

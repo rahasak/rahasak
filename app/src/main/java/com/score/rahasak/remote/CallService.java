@@ -344,7 +344,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 try {
                     // encrypt
                     // base 64 encoded senz
-                    sendStream(Base64.encodeToString(cryptoManager.encrypt(outBuf, 0, encoded), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", ""));
+                    sendStream(Base64.encodeToString(outBuf, 0, encoded, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", ""));
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d(TAG, "Recorder error --- " + calling);
@@ -417,7 +417,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     // base64 decode
                     // decrypt
                     // decode codec
-                    opusDecoder.decode(cryptoManager.decrypt(Base64.decode(msg, Base64.DEFAULT)), pcmframs);
+                    opusDecoder.decode(Base64.decode(msg, Base64.DEFAULT), pcmframs);
                     streamTrack.write(pcmframs, 0, pcmframs.length);
                 }
             } catch (Exception e) {

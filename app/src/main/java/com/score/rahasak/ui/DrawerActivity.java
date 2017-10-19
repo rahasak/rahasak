@@ -23,7 +23,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.rahasak.R;
+import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.exceptions.NoUserException;
+import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.DrawerItem;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
@@ -31,7 +33,7 @@ import com.score.senzc.pojos.User;
 import java.util.ArrayList;
 
 
-public class DrawerActivity extends AppCompatActivity implements View.OnClickListener {
+public class DrawerActivity extends AppCompatActivity implements View.OnClickListener, IFragmentTransitionListener {
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -62,7 +64,10 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         setupActionBar();
         setupDrawer();
         initDrawerList();
-        loadRahas();
+
+        // load initial fragment
+        if (new SenzorsDbSource(this).isAvailableUsers()) loadRahas();
+        else loadInvite();
     }
 
     @Override
@@ -166,6 +171,17 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    @Override
+    public void onTransition(String type) {
+        if (type.equalsIgnoreCase("secret")) {
+            loadRahas();
+        } else if (type.equalsIgnoreCase("friends")) {
+            loadFriends();
+        } else if (type.equalsIgnoreCase("invite")) {
+            loadInvite();
+        }
+    }
+
     /**
      * Drawer click event handler
      */
@@ -229,7 +245,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         transaction.commit();
     }
 
-    private void loadInvite() {
+    public void loadInvite() {
         titleText.setText("Invite");
         clearAboutText();
 
