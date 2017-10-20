@@ -118,6 +118,11 @@ public class FriendListFragment extends ListFragment implements AdapterView.OnIt
 
         // new
         newButton = (FloatingActionButton) getActivity().findViewById(R.id.done);
+        if (new SenzorsDbSource(getActivity()).isAvailableUsers())
+            newButton.setVisibility(View.GONE);
+        else
+            newButton.setVisibility(View.VISIBLE);
+
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

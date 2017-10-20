@@ -53,7 +53,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
 
             //create view holder to store reference to child views
             holder = new ViewHolder();
-            holder.userImageView = (CircularImageView) view.findViewById(R.id.user_image);
+            holder.userImageView = (ImageView) view.findViewById(R.id.user_image);
             holder.selected = (ImageView) view.findViewById(R.id.selected);
             holder.usernameView = (TextView) view.findViewById(R.id.user_name);
             holder.phoneBookNameView = (TextView) view.findViewById(R.id.user_name_from_contacts);
@@ -122,7 +122,7 @@ class FriendListAdapter extends ArrayAdapter<SecretUser> {
      * Keep reference to children view to avoid unnecessary calls
      */
     private static class ViewHolder {
-        CircularImageView userImageView;
+        ImageView userImageView;
         ImageView selected;
         TextView usernameView;
         TextView phoneBookNameView;

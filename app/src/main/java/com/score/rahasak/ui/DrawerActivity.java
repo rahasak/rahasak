@@ -23,7 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.rahasak.R;
-import com.score.rahasak.db.SenzorsDbSource;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.DrawerItem;
@@ -66,8 +65,7 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
         initDrawerList();
 
         // load initial fragment
-        if (new SenzorsDbSource(this).isAvailableUsers()) loadRahas();
-        else loadInvite();
+        loadRahas();
     }
 
     @Override
