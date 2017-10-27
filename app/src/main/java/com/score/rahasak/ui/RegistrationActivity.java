@@ -99,12 +99,17 @@ public class RegistrationActivity extends BaseActivity {
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.registration_header, null));
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        TextView header = ((TextView) findViewById(R.id.title));
+        header.setTypeface(typeface, Typeface.BOLD);
+
+
     }
 
     private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setCollapsible(false);
-        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
+        //toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
         setSupportActionBar(toolbar);
     }
 

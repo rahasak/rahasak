@@ -32,15 +32,6 @@
             android:gravity="center_vertical"
             android:orientation="vertical">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/welcome_message"
-                android:layout_centerInParent="false"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-            </RelativeLayout>
-
             <TextView
                 android:id="@+id/welcome_message"
                 android:layout_width="match_parent"
@@ -48,7 +39,6 @@
                 android:layout_above="@+id/registering_user_id"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
-                android:layout_marginTop="30dp"
                 android:text="Register with username before start sharing secrets \n\nStay anonymous by choosing anonymous username :)"
                 android:textSize="28sp" />
 
@@ -60,29 +50,30 @@
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
                 android:layout_marginTop="15dp"
+                android:background="@drawable/border_bottom"
                 android:hint="@string/register_user_id"
+                android:inputType="textNoSuggestions"
                 android:paddingBottom="10dp"
                 android:textColor="@color/android_grey"
                 android:textColorHint="@color/clouds"
-                android:inputType="textNoSuggestions"
-                android:background="@drawable/border_bottom"
                 android:textSize="25sp" />
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
-            <Button
-                android:id="@+id/register_btn"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_below="@+id/registering_user_id"
-                android:layout_marginBottom="100dp"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/rounded_corner_button"
-                android:text="@string/register_button_text"
-                android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/register_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_below="@+id/registering_user_id"
+                    android:layout_marginBottom="100dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/rounded_corner_button"
+                    android:text="@string/register_button_text"
+                    android:textColor="@color/white" />
             </FrameLayout>
 
         </LinearLayout>
