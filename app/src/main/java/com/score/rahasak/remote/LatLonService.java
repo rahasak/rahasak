@@ -25,9 +25,7 @@ import com.score.senzc.pojos.Senz;
 
 import java.util.HashMap;
 
-/**
- * Created by eranga on 10/16/16.
- */
+
 public class LatLonService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final static String TAG = LatLonService.class.getName();

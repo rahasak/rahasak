@@ -21,23 +21,25 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 public class SenzUtils {
-    public static Senz getPingSenz(Context context) {
+
+    public static Senz getRegSenz(Context context) {
         try {
             User user = PreferenceUtils.getUser(context);
 
-            // create senz attributes
+            // create create senz
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(context, CryptoUtils.PUBLIC_KEY));
 
-            // new senz object
+            // new senz
             Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.PING);
+            senz.setSenzType(SenzTypeEnum.SHARE);
             senz.setSender(new User("", user.getUsername()));
             senz.setReceiver(new User("", "senzswitch"));
             senz.setAttributes(senzAttributes);
 
             return senz;
-        } catch (NoUserException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
