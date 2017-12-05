@@ -154,8 +154,8 @@ public class SenzUtils {
         return senz;
     }
 
-    public static String getBeginStreamMsg(String sender, String receiver) {
-        return "DATA #STREAM ON" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+    public static String getOStreamMsg(String sender, String receiver) {
+        return "DATA #STREAM O" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
     }
 
     public static String getNStreamMsg(String sender, String receiver) {
