@@ -71,7 +71,7 @@ public class SenzParser {
             if (key.equalsIgnoreCase(senz.getAttributes().get(key)) || senz.getAttributes().get(key).isEmpty()) {
                 // GET or SHARE query
                 // param and value equal since no value to store (SHARE #lat #lon)
-                payload = payload.concat(" ").concat("#").concat(key).concat(" ").concat(senz.getAttributes().get(key));
+                payload = payload.concat(" ").concat("#").concat(key);
             } else if (key.startsWith("$")) {
                 // Encrypted DATA query
                 payload = payload.concat(" ").concat(key).concat(" ").concat(senz.getAttributes().get(key));

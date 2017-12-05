@@ -69,8 +69,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     // we are listing for UDP socket
     private InetAddress address;
-    private DatagramSocket recvSoc;
-    private DatagramSocket sendSoc;
+    private DatagramSocket socket;
 
     // audio
     private AudioManager audioManager;
@@ -195,16 +194,10 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private void initUdpSoc() {
         try {
-            if (sendSoc == null) {
-                sendSoc = new DatagramSocket();
+            if (socket == null) {
+                socket = new DatagramSocket();
             } else {
                 Log.e(TAG, "Send socket already initialized");
-            }
-
-            if (recvSoc == null) {
-                recvSoc = new DatagramSocket();
-            } else {
-                Log.e(TAG, "Recv socket already initialized");
             }
         } catch (SocketException e) {
             e.printStackTrace();
@@ -219,15 +212,10 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     if (address == null)
                         address = InetAddress.getByName(SenzService.SENZ_HOST);
 
-                    // send O message
-                    String oMsg = SenzUtils.getOStreamMsg(appUser.getUsername(), secretUser.getUsername());
-                    DatagramPacket oPacket = new DatagramPacket(oMsg.getBytes(), oMsg.length(), address, SenzService.STREAM_PORT);
-                    sendSoc.send(oPacket);
-
-                    // send N message
-                    String nMsg = SenzUtils.getNStreamMsg(appUser.getUsername(), secretUser.getUsername());
-                    DatagramPacket nPacket = new DatagramPacket(nMsg.getBytes(), nMsg.length(), address, SenzService.STREAM_PORT);
-                    recvSoc.send(nPacket);
+                    // send ON message
+                    String msg = SenzUtils.getBeginStreamMsg(appUser.getUsername(), secretUser.getUsername());
+                    DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), address, SenzService.STREAM_PORT);
+                    socket.send(packet);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -241,7 +229,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             // send OFF message
             String offMsg = SenzUtils.getEndStreamMsg(appUser.getUsername(), secretUser.getUsername());
             DatagramPacket offPacket = new DatagramPacket(offMsg.getBytes(), offMsg.length(), address, SenzService.STREAM_PORT);
-            sendSoc.send(offPacket);
+            socket.send(offPacket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -368,7 +356,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         private void sendStream(String senz) throws IOException {
             DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SenzService.STREAM_PORT);
-            sendSoc.send(sendPacket);
+            socket.send(sendPacket);
         }
     }
 
@@ -411,7 +399,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
                 while (calling) {
                     // listen for senz
-                    recvSoc.receive(receivePacket);
+                    socket.receive(receivePacket);
                     String msg = new String(message, 0, receivePacket.getLength());
 
                     // base64 decode

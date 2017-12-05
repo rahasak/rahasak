@@ -46,7 +46,7 @@ class SenzHandler {
             handleConnect(senzService);
         } else if (senzMsg.equalsIgnoreCase("TIK")) {
             // write tuk from here
-            senzService.write("TUK");
+            senzService.tuk();
         } else {
             // actual senz received
             Senz senz = SenzParser.parse(senzMsg);

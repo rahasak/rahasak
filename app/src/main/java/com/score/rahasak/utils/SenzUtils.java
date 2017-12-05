@@ -28,7 +28,10 @@ public class SenzUtils {
 
             // create create senz
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+            Long timestamp = System.currentTimeMillis() / 1000;
+            senzAttributes.put("time", timestamp.toString());
+            senzAttributes.put("uid", getUid(context, timestamp.toString()));
             senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(context, CryptoUtils.PUBLIC_KEY));
 
             // new senz
@@ -151,8 +154,8 @@ public class SenzUtils {
         return senz;
     }
 
-    public static String getOStreamMsg(String sender, String receiver) {
-        return "DATA #STREAM O" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+    public static String getBeginStreamMsg(String sender, String receiver) {
+        return "DATA #STREAM ON" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
     }
 
     public static String getNStreamMsg(String sender, String receiver) {

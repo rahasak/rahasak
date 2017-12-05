@@ -37,8 +37,9 @@ public class SenzService extends Service {
     private static final String TAG = SenzService.class.getName();
 
     //public static final String SENZ_HOST = "senz.rahasak.com";
-    public static final String SENZ_HOST = "10.2.2.1";
-    public static final int SENZ_PORT = 7070;
+    public static final String SENZ_HOST = "52.77.242.96";
+    //public static final String SENZ_HOST = "10.2.2.1";
+    public static final int SENZ_PORT = 3000;
     public static final int STREAM_PORT = 9090;
 
     // wake lock to keep
@@ -127,10 +128,11 @@ public class SenzService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        // start com or ping
         if (running) {
-            ping();
+            // tuk
+            tuk();
         } else {
+            // reg
             new SenzCom().start();
         }
 
@@ -180,6 +182,14 @@ public class SenzService extends Service {
     private void sendSMS(String phoneNumber, String message) {
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, null, null);
+    }
+
+    void tuk() {
+        new Thread(new Runnable() {
+            public void run() {
+                write("TUK");
+            }
+        }).start();
     }
 
     void writeSenz(final Senz senz) {
@@ -306,13 +316,15 @@ public class SenzService extends Service {
                 c = (char) z;
                 if (c == ';') {
                     String senz = builder.toString();
-                    Log.d(TAG, "Senz received " + senz);
+                    if (!senz.isEmpty()) {
+                        Log.d(TAG, "Senz received " + senz);
 
-                    builder = new StringBuilder();
-                    SenzHandler.getInstance().handle(senz, SenzService.this);
+                        builder = new StringBuilder();
+                        SenzHandler.getInstance().handle(senz, SenzService.this);
 
-                    // release wake lock
-                    if (senzWakeLock != null && senzWakeLock.isHeld()) senzWakeLock.release();
+                        // release wake lock
+                        if (senzWakeLock != null && senzWakeLock.isHeld()) senzWakeLock.release();
+                    }
                 } else {
                     builder.append(c);
                 }
