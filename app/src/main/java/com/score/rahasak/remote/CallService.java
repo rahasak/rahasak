@@ -47,7 +47,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 8000;
+    public static final int SAMPLE_RATE = 16000;
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
@@ -113,6 +113,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.requestAudioFocus(this, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
         getAudioSettings();
+
+        Log.d(TAG, " --- " + audioManager.getProperty("PROPERTY_OUTPUT_SAMPLE_RATE"));
+        Log.d(TAG, "---- " + audioManager.getProperty("PROPERTY_OUTPUT_FRAMES_PER_BUFFER"));
 
         recorder = new Recorder();
         player = new Player();
