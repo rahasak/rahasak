@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -71,9 +70,8 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
         // record
         AudioHandler handler = new AudioHandler();
-        String rahasPath = Environment.getExternalStorageDirectory().getPath() + "/Rahasak/rahas.pcm";
-        handler.init(44100, 1, rahasPath);
-        //handler.startRecord();
+        handler.init(16000, 1);
+        handler.startRecord();
         handler.startPlayback();
     }
 
