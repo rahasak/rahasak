@@ -2,7 +2,7 @@ celt/rate.lo: celt/rate.c config.h /usr/include/math.h \
   /usr/include/sys/cdefs.h /usr/include/sys/_symbol_aliasing.h \
   /usr/include/sys/_posix_availability.h /usr/include/Availability.h \
   /usr/include/AvailabilityInternal.h celt/modes.h include/opus_types.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
   /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
   /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
@@ -14,10 +14,10 @@ celt/rate.lo: celt/rate.c config.h /usr/include/math.h \
   /usr/include/sys/_types/_uintptr_t.h /usr/include/_types/_intmax_t.h \
   /usr/include/_types/_uintmax_t.h celt/celt.h include/opus_defines.h \
   include/opus_custom.h celt/entenc.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stddef.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/__stddef_max_align_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stddef.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h \
   celt/entcode.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/limits.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/limits.h \
   /usr/include/limits.h /usr/include/machine/limits.h \
   /usr/include/i386/limits.h /usr/include/i386/_limits.h \
   /usr/include/sys/syslimits.h celt/ecintrin.h celt/arch.h celt/entdec.h \
@@ -40,8 +40,12 @@ celt/rate.lo: celt/rate.c config.h /usr/include/math.h \
   /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
   /usr/include/sys/_types/_wchar_t.h /usr/include/sys/_types/_null.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/sys/_types/_dev_t.h /usr/include/sys/_types/_mode_t.h \
-  celt/cwrs.h celt/stack_alloc.h celt/os_support.h /usr/include/string.h \
+  /usr/include/sys/_types/_u_int8_t.h \
+  /usr/include/sys/_types/_u_int16_t.h \
+  /usr/include/sys/_types/_u_int32_t.h \
+  /usr/include/sys/_types/_u_int64_t.h /usr/include/sys/_types/_dev_t.h \
+  /usr/include/sys/_types/_mode_t.h celt/cwrs.h celt/stack_alloc.h \
+  celt/os_support.h /usr/include/string.h \
   /usr/include/sys/_types/_rsize_t.h /usr/include/sys/_types/_errno_t.h \
   /usr/include/sys/_types/_ssize_t.h /usr/include/strings.h \
   /usr/include/secure/_string.h /usr/include/secure/_common.h \
@@ -67,7 +71,7 @@ celt/modes.h:
 
 include/opus_types.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
@@ -111,13 +115,13 @@ include/opus_custom.h:
 
 celt/entenc.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stddef.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stddef.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/__stddef_max_align_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h:
 
 celt/entcode.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/limits.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/limits.h:
 
 /usr/include/limits.h:
 
@@ -202,6 +206,14 @@ celt/kiss_fft.h:
 /usr/include/machine/types.h:
 
 /usr/include/i386/types.h:
+
+/usr/include/sys/_types/_u_int8_t.h:
+
+/usr/include/sys/_types/_u_int16_t.h:
+
+/usr/include/sys/_types/_u_int32_t.h:
+
+/usr/include/sys/_types/_u_int64_t.h:
 
 /usr/include/sys/_types/_dev_t.h:
 

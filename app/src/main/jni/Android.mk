@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_LDLIBS := -llog
+LOCAL_LDLIBS := -llog -lOpenSLES
 
 LOCAL_MODULE:= senz
 
@@ -196,6 +196,8 @@ $(LOCAL_PATH)/opus/src/opus_encoder.c \
 $(LOCAL_PATH)/opus/src/opus_multistream.c \
 $(LOCAL_PATH)/opus/src/repacketizer.c
 
+OPENSL_SOURCES = $(LOCAL_PATH)/opensl/opensl_io.c
+
 ifdef FIXED_POINT
 SILK_SOURCES += $(SILK_SOURCES_FIXED)
 else
@@ -205,8 +207,10 @@ endif
 LOCAL_SRC_FILES := $(SILK_SOURCES) \
     $(CELT_SOURCES) \
     $(OPUS_SOURCES) \
+    $(OPENSL_SOURCES) \
     com_score_rahasak_utils_OpusEncoder.c \
-    com_score_rahasak_utils_OpusDecoder.c
+    com_score_rahasak_utils_OpusDecoder.c \
+    com_score_rahasak_utils_AudioHandler.c \
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/opus/include/ \
 	$(LOCAL_PATH)/opus/silk/ \

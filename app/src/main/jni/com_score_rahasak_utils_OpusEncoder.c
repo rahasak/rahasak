@@ -1,7 +1,7 @@
 #include <com_score_rahasak_utils_OpusEncoder.h>
 #include <string.h>
 #include <android/log.h>
-#include <opus/opus.h>
+#include <opus/include/opus.h>
 #include <stdio.h>
 
 char logMsg[255];

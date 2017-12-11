@@ -20,7 +20,7 @@ tests/test_opus_api.o: tests/test_opus_api.c config.h \
   /usr/include/sys/_types/_ucontext.h \
   /usr/include/sys/_types/_sigset_t.h /usr/include/sys/_types/_uid_t.h \
   /usr/include/sys/resource.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
   /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
   /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
@@ -33,7 +33,10 @@ tests/test_opus_api.o: tests/test_opus_api.c config.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
   /usr/include/sys/_types/_wchar_t.h /usr/include/machine/types.h \
-  /usr/include/i386/types.h /usr/include/sys/_types/_dev_t.h \
+  /usr/include/i386/types.h /usr/include/sys/_types/_u_int8_t.h \
+  /usr/include/sys/_types/_u_int16_t.h \
+  /usr/include/sys/_types/_u_int32_t.h \
+  /usr/include/sys/_types/_u_int64_t.h /usr/include/sys/_types/_dev_t.h \
   /usr/include/sys/_types/_mode_t.h /usr/include/string.h \
   /usr/include/sys/_types/_rsize_t.h /usr/include/sys/_types/_errno_t.h \
   /usr/include/strings.h /usr/include/secure/_string.h celt/arch.h \
@@ -114,7 +117,7 @@ config.h:
 
 /usr/include/sys/resource.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
@@ -165,6 +168,14 @@ config.h:
 /usr/include/machine/types.h:
 
 /usr/include/i386/types.h:
+
+/usr/include/sys/_types/_u_int8_t.h:
+
+/usr/include/sys/_types/_u_int16_t.h:
+
+/usr/include/sys/_types/_u_int32_t.h:
+
+/usr/include/sys/_types/_u_int64_t.h:
 
 /usr/include/sys/_types/_dev_t.h:
 

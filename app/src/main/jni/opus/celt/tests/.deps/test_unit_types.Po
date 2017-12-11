@@ -1,6 +1,6 @@
 celt/tests/test_unit_types.o: celt/tests/test_unit_types.c config.h \
   include/opus_types.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
   /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
   /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
@@ -23,7 +23,7 @@ config.h:
 
 include/opus_types.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 

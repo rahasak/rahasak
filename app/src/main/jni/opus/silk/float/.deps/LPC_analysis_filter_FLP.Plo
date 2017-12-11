@@ -15,7 +15,7 @@ silk/float/LPC_analysis_filter_FLP.lo: \
   /usr/include/sys/_types/_ucontext.h \
   /usr/include/sys/_types/_sigset_t.h /usr/include/sys/_types/_size_t.h \
   /usr/include/sys/_types/_uid_t.h /usr/include/sys/resource.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
   /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
   /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
@@ -29,13 +29,17 @@ silk/float/LPC_analysis_filter_FLP.lo: \
   /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
   /usr/include/sys/_types/_wchar_t.h /usr/include/sys/_types/_null.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/sys/_types/_dev_t.h /usr/include/sys/_types/_mode_t.h \
-  silk/float/main_FLP.h silk/float/SigProc_FLP.h silk/SigProc_FIX.h \
-  /usr/include/string.h /usr/include/sys/_types/_rsize_t.h \
-  /usr/include/sys/_types/_errno_t.h /usr/include/sys/_types/_ssize_t.h \
-  /usr/include/strings.h /usr/include/secure/_string.h \
-  /usr/include/secure/_common.h silk/typedef.h include/opus_types.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h \
+  /usr/include/sys/_types/_u_int8_t.h \
+  /usr/include/sys/_types/_u_int16_t.h \
+  /usr/include/sys/_types/_u_int32_t.h \
+  /usr/include/sys/_types/_u_int64_t.h /usr/include/sys/_types/_dev_t.h \
+  /usr/include/sys/_types/_mode_t.h silk/float/main_FLP.h \
+  silk/float/SigProc_FLP.h silk/SigProc_FIX.h /usr/include/string.h \
+  /usr/include/sys/_types/_rsize_t.h /usr/include/sys/_types/_errno_t.h \
+  /usr/include/sys/_types/_ssize_t.h /usr/include/strings.h \
+  /usr/include/secure/_string.h /usr/include/secure/_common.h \
+  silk/typedef.h include/opus_types.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/float.h \
   silk/resampler_structs.h silk/macros.h silk/Inlines.h \
   silk/MacroCount.h /usr/include/stdio.h \
   /usr/include/sys/_types/_va_list.h /usr/include/sys/stdio.h \
@@ -43,10 +47,10 @@ silk/float/LPC_analysis_filter_FLP.lo: \
   silk/MacroDebug.h celt/float_cast.h celt/arch.h /usr/include/math.h \
   silk/float/structs_FLP.h silk/main.h silk/define.h silk/errors.h \
   silk/structs.h celt/entenc.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stddef.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/__stddef_max_align_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stddef.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h \
   celt/entcode.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/limits.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/limits.h \
   /usr/include/limits.h /usr/include/machine/limits.h \
   /usr/include/i386/limits.h /usr/include/i386/_limits.h \
   /usr/include/sys/syslimits.h celt/ecintrin.h celt/entdec.h \
@@ -110,7 +114,7 @@ config.h:
 
 /usr/include/sys/resource.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
@@ -164,6 +168,14 @@ config.h:
 
 /usr/include/i386/types.h:
 
+/usr/include/sys/_types/_u_int8_t.h:
+
+/usr/include/sys/_types/_u_int16_t.h:
+
+/usr/include/sys/_types/_u_int32_t.h:
+
+/usr/include/sys/_types/_u_int64_t.h:
+
 /usr/include/sys/_types/_dev_t.h:
 
 /usr/include/sys/_types/_mode_t.h:
@@ -192,7 +204,7 @@ silk/typedef.h:
 
 include/opus_types.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/float.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/float.h:
 
 silk/resampler_structs.h:
 
@@ -232,13 +244,13 @@ silk/structs.h:
 
 celt/entenc.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stddef.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stddef.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/__stddef_max_align_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h:
 
 celt/entcode.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/limits.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/limits.h:
 
 /usr/include/limits.h:
 

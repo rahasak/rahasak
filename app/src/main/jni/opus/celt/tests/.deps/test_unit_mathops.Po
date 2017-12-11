@@ -1,6 +1,6 @@
 celt/tests/test_unit_mathops.o: celt/tests/test_unit_mathops.c config.h \
   celt/mathops.c celt/mathops.h celt/arch.h include/opus_types.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
   /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
   /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
@@ -12,12 +12,12 @@ celt/tests/test_unit_mathops.o: celt/tests/test_unit_mathops.c config.h \
   /usr/include/sys/_types/_intptr_t.h \
   /usr/include/sys/_types/_uintptr_t.h /usr/include/_types/_intmax_t.h \
   /usr/include/_types/_uintmax_t.h celt/entcode.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/limits.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/limits.h \
   /usr/include/limits.h /usr/include/machine/limits.h \
   /usr/include/i386/limits.h /usr/include/i386/_limits.h \
   /usr/include/sys/syslimits.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stddef.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/__stddef_max_align_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stddef.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h \
   celt/ecintrin.h /usr/include/math.h /usr/include/Availability.h \
   /usr/include/AvailabilityInternal.h celt/os_support.h \
   /usr/include/string.h /usr/include/_types.h \
@@ -43,7 +43,10 @@ celt/tests/test_unit_mathops.o: celt/tests/test_unit_mathops.c config.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
   /usr/include/sys/_types/_wchar_t.h /usr/include/machine/types.h \
-  /usr/include/i386/types.h /usr/include/sys/_types/_dev_t.h \
+  /usr/include/i386/types.h /usr/include/sys/_types/_u_int8_t.h \
+  /usr/include/sys/_types/_u_int16_t.h \
+  /usr/include/sys/_types/_u_int32_t.h \
+  /usr/include/sys/_types/_u_int64_t.h /usr/include/sys/_types/_dev_t.h \
   /usr/include/sys/_types/_mode_t.h celt/entenc.c celt/entenc.h \
   celt/mfrngcod.h celt/entdec.c celt/entdec.h celt/entcode.c \
   celt/bands.c celt/bands.h celt/modes.h celt/celt.h \
@@ -61,7 +64,7 @@ celt/arch.h:
 
 include/opus_types.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stdint.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
@@ -105,7 +108,7 @@ include/opus_types.h:
 
 celt/entcode.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/limits.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/limits.h:
 
 /usr/include/limits.h:
 
@@ -117,9 +120,9 @@ celt/entcode.h:
 
 /usr/include/sys/syslimits.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/stddef.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/stddef.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.0.2/include/__stddef_max_align_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h:
 
 celt/ecintrin.h:
 
@@ -218,6 +221,14 @@ celt/os_support.h:
 /usr/include/machine/types.h:
 
 /usr/include/i386/types.h:
+
+/usr/include/sys/_types/_u_int8_t.h:
+
+/usr/include/sys/_types/_u_int16_t.h:
+
+/usr/include/sys/_types/_u_int32_t.h:
+
+/usr/include/sys/_types/_u_int64_t.h:
 
 /usr/include/sys/_types/_dev_t.h:
 
