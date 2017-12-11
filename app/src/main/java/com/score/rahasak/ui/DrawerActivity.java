@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -26,6 +27,7 @@ import com.score.rahasak.R;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.DrawerItem;
+import com.score.rahasak.utils.AudioHandler;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
@@ -66,6 +68,13 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
         // load initial fragment
         loadRahas();
+
+        // record
+        AudioHandler handler = new AudioHandler();
+        String rahasPath = Environment.getExternalStorageDirectory().getPath() + "/Rahasak/rahas.pcm";
+        handler.init(44100, 1, rahasPath);
+        //handler.startRecord();
+        handler.startPlayback();
     }
 
     @Override

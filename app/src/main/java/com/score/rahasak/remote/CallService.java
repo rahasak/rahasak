@@ -25,8 +25,6 @@ import com.score.rahasak.ui.SecretCallAnswerActivity;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.NotificationUtils;
-import com.score.rahasak.utils.OpusDecoder;
-import com.score.rahasak.utils.OpusEncoder;
 import com.score.rahasak.utils.PhoneBookUtil;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.rahasak.utils.SenzUtils;
@@ -42,12 +40,15 @@ import java.net.SocketException;
 
 import javax.crypto.SecretKey;
 
+import io.kvh.media.amr.AmrDecoder;
+import io.kvh.media.amr.AmrEncoder;
+
 
 public class CallService extends Service implements AudioManager.OnAudioFocusChangeListener {
 
     private static final String TAG = CallService.class.getName();
 
-    public static final int SAMPLE_RATE = 16000;
+    public static final int SAMPLE_RATE = 44100;
     public static final int FRAME_SIZE = 160;
     public static final int BUF_SIZE = FRAME_SIZE;
 
@@ -300,7 +301,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
      */
     private class Recorder extends Thread {
         private AudioRecord audioRecorder;
-        private OpusEncoder opusEncoder;
+        //private OpusEncoder opusEncoder;
 
         Recorder() {
             int minBufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
@@ -322,8 +323,11 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             AudioUtils.enableAEC(audioRecorder.getAudioSessionId());
 
             // init opus encoder
-            opusEncoder = new OpusEncoder();
-            opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+            //opusEncoder = new OpusEncoder();
+            //opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+
+            // amr encoder
+            AmrEncoder.init(0);
         }
 
         @Override
@@ -334,15 +338,18 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         private void record() {
             Log.d(TAG, "Recorder started --- " + calling);
 
+            int mode = AmrEncoder.Mode.MR795.ordinal();
+
             int encoded;
             short[] inBuf = new short[BUF_SIZE];
-            byte[] outBuf = new byte[48];
+            byte[] outBuf = new byte[32];
 
             while (calling) {
                 // read to buffer
                 // encode with codec
                 audioRecorder.read(inBuf, 0, inBuf.length);
-                encoded = opusEncoder.encode(inBuf, outBuf);
+                //encoded = opusEncoder.encode(inBuf, outBuf);
+                encoded = AmrEncoder.encode(mode, inBuf, outBuf);
 
                 try {
                     // encrypt
@@ -354,6 +361,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 }
             }
 
+            AmrEncoder.exit();
             shutdown();
             clrUdpConn();
         }
@@ -366,7 +374,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 audioRecorder.release();
                 audioRecorder = null;
             }
-            opusEncoder.close();
+            //opusEncoder.close();
         }
 
         private void sendStream(String senz) throws IOException {
@@ -380,7 +388,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
      */
     private class Player extends Thread {
         private AudioTrack streamTrack;
-        private OpusDecoder opusDecoder;
+        //private OpusDecoder opusDecoder;
 
         Player() {
             int minBufSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
@@ -394,8 +402,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     AudioTrack.MODE_STREAM);
 
             // init opus decoder
-            opusDecoder = new OpusDecoder();
-            opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
+            //opusDecoder = new OpusDecoder();
+            //opusDecoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
         }
 
         @Override
@@ -404,11 +412,12 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
 
         private void play() {
+            final long amrState = AmrDecoder.init();
             streamTrack.play();
             Log.d(TAG, "Player started --- " + calling);
 
             try {
-                byte[] message = new byte[80];
+                byte[] message = new byte[64];
                 short[] pcmframs = new short[BUF_SIZE];
                 DatagramPacket receivePacket = new DatagramPacket(message, message.length);
 
@@ -420,7 +429,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     // base64 decode
                     // decrypt
                     // decode codec
-                    opusDecoder.decode(Base64.decode(msg, Base64.DEFAULT), pcmframs);
+                    //opusDecoder.decode(Base64.decode(msg, Base64.DEFAULT), pcmframs);
+                    AmrDecoder.decode(amrState, Base64.decode(msg, Base64.DEFAULT), pcmframs);
                     streamTrack.write(pcmframs, 0, pcmframs.length);
                 }
             } catch (Exception e) {
@@ -428,6 +438,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 Log.d(TAG, "Player error --- " + calling);
             }
 
+            AmrDecoder.exit(amrState);
             shutDown();
         }
 
@@ -441,7 +452,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 streamTrack = null;
             }
 
-            opusDecoder.close();
+            //opusDecoder.close();
         }
     }
 
