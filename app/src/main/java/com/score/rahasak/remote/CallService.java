@@ -22,6 +22,7 @@ import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.ui.SecretCallActivity;
 import com.score.rahasak.ui.SecretCallAnswerActivity;
+import com.score.rahasak.utils.AudioHandler;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.NotificationUtils;
@@ -79,6 +80,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     // crypto
     private CryptoManager cryptoManager;
 
+    private AudioHandler audioHandler;
+
     private boolean calling;
 
     // senz message
@@ -118,8 +121,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         Log.d(TAG, " --- " + audioManager.getProperty("PROPERTY_OUTPUT_SAMPLE_RATE"));
         Log.d(TAG, "---- " + audioManager.getProperty("PROPERTY_OUTPUT_FRAMES_PER_BUFFER"));
 
-        recorder = new Recorder();
-        player = new Player();
+        //recorder = new Recorder();
+        //player = new Player();
+        audioHandler = new AudioHandler();
     }
 
     @Override
@@ -129,8 +133,10 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         initPrefs(intent);
         initCrypto();
         initForegroundService();
-        initUdpSoc();
-        initUdpConn();
+        //initUdpSoc();
+        //initUdpConn();
+
+        init();
 
         return START_STICKY;
     }
@@ -139,7 +145,7 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     public void onDestroy() {
         super.onDestroy();
 
-        endCall();
+        //endCall();
         unregisterReceiver(senzReceiver);
         resetAudioSettings();
         audioManager.abandonAudioFocus(this);
@@ -255,11 +261,21 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         if (senz.getAttributes().containsKey("mic")) {
             if (senz.getAttributes().get("mic").equalsIgnoreCase("on")) {
                 VibrationUtils.vibrate(this);
-                startCall();
+                //startCall();
+                start();
             } else if (senz.getAttributes().get("mic").equalsIgnoreCase("off")) {
                 VibrationUtils.vibrate(this);
             }
         }
+    }
+
+    private void init() {
+        audioHandler.init(16000, 1, appUser.getUsername(), secretUser.getUsername());
+    }
+
+    private void start() {
+        audioHandler.startRecord();
+        audioHandler.startPlayback();
     }
 
     private void startCall() {

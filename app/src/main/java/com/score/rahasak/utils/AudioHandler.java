@@ -4,13 +4,13 @@ import android.util.Log;
 
 public class AudioHandler {
 
-    public native boolean nativeInit(int samplingRate, int numberOfChannels);
+    public native boolean nativeInit(int samplingRate, int numberOfChannels, String oSenz, String nSenz);
 
-    public native boolean nativeStartCapture(String oSenz);
+    public native boolean nativeStartCapture();
 
     public native boolean nativeStopCapture();
 
-    private native boolean nativeStartPlayback(String nSenz);
+    private native boolean nativeStartPlayback();
 
     private native boolean nativeStopPlayback();
 
@@ -18,17 +18,18 @@ public class AudioHandler {
         System.loadLibrary("senz");
     }
 
-    public void init(int samplingRate, int numberOfChannels) {
-        this.nativeInit(samplingRate, numberOfChannels);
+    public void init(int samplingRate, int numberOfChannels, String sender, String receiver) {
+        String oSenz = SenzUtils.getOStreamMsg(sender, receiver);
+        String nSenz = SenzUtils.getNStreamMsg(sender, receiver);
+        nativeInit(samplingRate, numberOfChannels, oSenz, nSenz);
     }
 
     public void startRecord() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("Tag", "---start recording");
-                String oSenz = SenzUtils.getOStreamMsg("eranga", "lakmal");
-                nativeStartCapture(oSenz);
+                Log.d("Tag", "--- start recording");
+                nativeStartCapture();
             }
         }).start();
     }
@@ -37,9 +38,8 @@ public class AudioHandler {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("Tag", "---start playback");
-                String nSenz = SenzUtils.getNStreamMsg("eranga", "lakmal");
-                nativeStartPlayback(nSenz);
+                Log.d("Tag", "--- start playback");
+                nativeStartPlayback();
             }
         }).start();
     }

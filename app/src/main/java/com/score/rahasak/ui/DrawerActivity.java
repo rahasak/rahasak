@@ -26,7 +26,6 @@ import com.score.rahasak.R;
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.DrawerItem;
-import com.score.rahasak.utils.AudioHandler;
 import com.score.rahasak.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
@@ -67,12 +66,6 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
         // load initial fragment
         loadRahas();
-
-        // record
-        AudioHandler handler = new AudioHandler();
-        handler.init(16000, 1);
-        handler.startRecord();
-        handler.startPlayback();
     }
 
     @Override
