@@ -210,7 +210,8 @@ LOCAL_SRC_FILES := $(SILK_SOURCES) \
     $(OPENSL_SOURCES) \
     opus_encoder.c \
     opus_decoder.c \
-    com_score_rahasak_utils_AudioHandler.c \
+    com_score_rahasak_utils_Recorder.c \
+    com_score_rahasak_utils_Player.c \
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/opus/include/ \
 	$(LOCAL_PATH)/opus/silk/ \

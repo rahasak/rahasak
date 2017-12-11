@@ -22,7 +22,6 @@ import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.SecretUser;
 import com.score.rahasak.ui.SecretCallActivity;
 import com.score.rahasak.ui.SecretCallAnswerActivity;
-import com.score.rahasak.utils.AudioHandler;
 import com.score.rahasak.utils.AudioUtils;
 import com.score.rahasak.utils.CryptoUtils;
 import com.score.rahasak.utils.NotificationUtils;
@@ -66,8 +65,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     private boolean isSpeakerPhoneOn;
 
     // audio recorder/player
-    private Recorder recorder;
-    private Player player;
+    //private Recorder recorder;
+    //private Player player;
 
     // we are listing for UDP socket
     private InetAddress address;
@@ -80,7 +79,9 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     // crypto
     private CryptoManager cryptoManager;
 
-    private AudioHandler audioHandler;
+    private com.score.rahasak.utils.Recorder recorder;
+    private com.score.rahasak.utils.Player player;
+
 
     private boolean calling;
 
@@ -123,7 +124,8 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
 
         //recorder = new Recorder();
         //player = new Player();
-        audioHandler = new AudioHandler();
+        recorder = new com.score.rahasak.utils.Recorder();
+        player = new com.score.rahasak.utils.Player();
     }
 
     @Override
@@ -270,20 +272,26 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     private void init() {
-        audioHandler.init(16000, 1, appUser.getUsername(), secretUser.getUsername());
+        recorder.init(16000, 1, appUser.getUsername(), secretUser.getUsername());
+        player.init(16000, 1, appUser.getUsername(), secretUser.getUsername());
+
+        new R().start();
+        new P().start();
     }
 
     private void start() {
-        audioHandler.startRecord();
-        audioHandler.startPlayback();
+        //recorder.startRecord();
+        //player.startPlayback();
+        new R().start();
+        new P().start();
     }
 
     private void startCall() {
         AudioUtils.enableEarpiece(CallService.this);
 
         calling = true;
-        recorder.start();
-        player.start();
+        //recorder.start();
+        //player.start();
     }
 
     private void endCall() {
@@ -310,6 +318,21 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         audioManager.setMode(audioMode);
         audioManager.setRingerMode(ringMode);
         audioManager.setSpeakerphoneOn(isSpeakerPhoneOn);
+    }
+
+
+    private class R extends Thread {
+        @Override
+        public void run() {
+            recorder.startRecord();
+        }
+    }
+
+    private class P extends Thread {
+        @Override
+        public void run() {
+            player.startPlayback();
+        }
     }
 
     /**

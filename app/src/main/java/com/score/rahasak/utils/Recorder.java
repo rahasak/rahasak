@@ -1,0 +1,27 @@
+package com.score.rahasak.utils;
+
+public class Recorder {
+
+    public native boolean nativeInit(int samplingRate, int numberOfChannels, String oSenz);
+
+    public native boolean nativeStartCapture();
+
+    public native boolean nativeStopCapture();
+
+    static {
+        System.loadLibrary("senz");
+    }
+
+    public void init(int samplingRate, int numberOfChannels, String sender, String receiver) {
+        String oSenz = SenzUtils.getOStreamMsg(sender, receiver);
+        this.nativeInit(samplingRate, numberOfChannels, oSenz);
+    }
+
+    public void startRecord() {
+        this.nativeStartCapture();
+    }
+
+    public void stop() {
+        this.nativeStopCapture();
+    }
+}
