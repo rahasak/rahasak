@@ -38,7 +38,7 @@ public class SenzService extends Service {
 
     //public static final String SENZ_HOST = "senz.rahasak.com";
     public static final String SENZ_HOST = "52.77.242.96";
-    //public static final String SENZ_HOST = "10.2.2.1";
+    public static final String STREAM_HOST = "10.2.2.1";
     public static final int SENZ_PORT = 3000;
     public static final int STREAM_PORT = 9090;
 

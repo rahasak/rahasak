@@ -67,8 +67,9 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_Recorder_nativeStartCapt
 
         // opus encode
         // send stream
-        enc = encode(buffer, 160, opusBuf, 32);
-        sendto(sendSoc, opusBuf, enc, 0, (struct sockaddr *)&server_addr, addr_size);
+        //enc = encode(buffer, 160, opusBuf, 32);
+        //sendto(sendSoc, opusBuf, enc, 0, (struct sockaddr *)&server_addr, addr_size);
+        sendto(sendSoc, (unsigned char *)buffer, samples * sizeof(short), 0, (struct sockaddr *)&server_addr, addr_size);
         LOG("--- sent %d \n", enc);
     }
 
@@ -85,3 +86,34 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_Recorder_nativeStopCaptu
     g_loop_exit = 1;
     return JNI_TRUE;
 }
+
+#define BUFFERFRAMES 1024
+#define VECSAMPS_MONO 64
+#define SR 16000
+
+OPENSL_STREAM *p;
+
+static int on;
+
+JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStart(JNIEnv *env, jobject obj) {
+  p = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
+}
+
+JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStartPlay(JNIEnv *env, jobject obj) {
+  int samps;
+  float inbuffer[VECSAMPS_MONO];
+  if(p == NULL) return;
+
+  on = 1;
+  while(on) {
+   samps = android_AudioIn(p,inbuffer,VECSAMPS_MONO);
+   android_AudioOut(p,inbuffer,samps);
+
+   LOG("--- samps %d inbuffer %d \n", samps, (sizeof(inbuffer)/sizeof(inbuffer[0])));
+  }
+  android_CloseAudioDevice(p);
+}
+
+
+
+

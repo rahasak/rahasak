@@ -8,6 +8,10 @@ public class Recorder {
 
     public native boolean nativeStopCapture();
 
+    public native void nativeStart();
+
+    public native void nativeStartPlay();
+
     static {
         System.loadLibrary("senz");
     }
@@ -23,5 +27,17 @@ public class Recorder {
 
     public void stop() {
         this.nativeStopCapture();
+    }
+
+    public void start() {
+        nativeStart();
+    }
+
+    public void startPlay() {
+        new Thread(new Runnable() {
+            public void run() {
+                nativeStartPlay();
+            }
+        }).start();
     }
 }

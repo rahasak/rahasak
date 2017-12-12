@@ -57,16 +57,17 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_Player_nativeStartPlayba
 
     int recvBytes, samples, dec;
     short buffer[BUFFER_SIZE];
-    char opusBuf[160];
+    char opusBuf[320];
     g_loop_exit = 0;
     while (!g_loop_exit) {
         // read from socket
         LOG("waiting +++++++ ");
-        recvBytes = recvfrom(recvSoc, opusBuf, 160, 0, (struct sockaddr *) &server_addr, &addr_size);
+        recvBytes = recvfrom(recvSoc, opusBuf, 320, 0, (struct sockaddr *) &server_addr, &addr_size);
         LOG("received --- %d \n", recvBytes);
 
         // decode
-        dec = decode(opusBuf, recvBytes, buffer, 160);
+        //dec = decode(opusBuf, recvBytes, buffer, 160);
+        //samples = android_AudioOut(stream, buffer, dec);
         samples = android_AudioOut(stream, buffer, dec);
         if (samples < 0) {
             LOG("android_AudioOut failed !\n");
