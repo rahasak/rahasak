@@ -10,6 +10,8 @@ public class Recorder {
 
     public native void nativeStart();
 
+    public native void nativeStartRecord();
+
     public native void nativeStartPlay();
 
     static {
@@ -34,6 +36,12 @@ public class Recorder {
     }
 
     public void startPlay() {
+        new Thread(new Runnable() {
+            public void run() {
+                nativeStartRecord();
+            }
+        }).start();
+
         new Thread(new Runnable() {
             public void run() {
                 nativeStartPlay();

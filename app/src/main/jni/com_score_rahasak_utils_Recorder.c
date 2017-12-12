@@ -15,7 +15,7 @@ int PERIOD_TIME;
 int FRAME_SIZE;
 int BUFFER_SIZE;
 
-int sendSoc, addr_size;
+int sendSoc, recvSoc, addr_size;
 struct sockaddr_in server_addr;
 
 static volatile int g_loop_exit = 0;
@@ -89,27 +89,63 @@ JNIEXPORT jboolean JNICALL Java_com_score_rahasak_utils_Recorder_nativeStopCaptu
 
 #define BUFFERFRAMES 1024
 #define VECSAMPS_MONO 64
-#define SR 16000
+#define SR 44100
 
-OPENSL_STREAM *p;
+short inbuffer[VECSAMPS_MONO], outbuffer[VECSAMPS_MONO];
 
 static int on;
 
 JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStart(JNIEnv *env, jobject obj) {
-  p = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
+  // socket
+  sendSoc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  recvSoc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+  // configure server socket address struct
+  memset((char *) &server_addr, 0, sizeof(server_addr));
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(9090);
+  inet_aton("10.2.2.1" , &server_addr.sin_addr);
+
+  // initialize size variable to be used later on
+  addr_size = sizeof(server_addr);
+
+  // send oStream message
+  // send nStream message
+  char *oStream = "DATA #STREAM O #TO lakmal @senzswitch ^eranga; SIG";
+  char *nStream = "DATA #STREAM N #TO lakmal @senzswitch ^eranga; SIG";
+  sendto(sendSoc, oStream, strlen(oStream), 0, (struct sockaddr *)&server_addr, addr_size);
+  sendto(recvSoc, nStream, strlen(nStream), 0, (struct sockaddr *)&server_addr, addr_size);
 }
 
-JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStartPlay(JNIEnv *env, jobject obj) {
-  int samps;
-  float inbuffer[VECSAMPS_MONO];
-  if(p == NULL) return;
+JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStartRecord(JNIEnv *env, jobject obj) {
+  OPENSL_STREAM* p = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
 
   on = 1;
   while(on) {
-   samps = android_AudioIn(p,inbuffer,VECSAMPS_MONO);
-   android_AudioOut(p,inbuffer,samps);
+   android_AudioIn(p,inbuffer,VECSAMPS_MONO);
+   android_AudioOut(p, inbuffer, VECSAMPS_MONO);
 
-   LOG("--- samps %d inbuffer %d \n", samps, (sizeof(inbuffer)/sizeof(inbuffer[0])));
+   // send over udp
+   //sendto(sendSoc, inbuffer, VECSAMPS_MONO, 0, (struct sockaddr *)&server_addr, addr_size);
+
+   LOG("--- inbuffer - %d \n", (sizeof(inbuffer)/sizeof(inbuffer[0])));
+  }
+  android_CloseAudioDevice(p);
+}
+
+JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStartPlay(JNIEnv *env, jobject obj) {
+  OPENSL_STREAM* p = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
+
+  int samps;
+  on = 1;
+  while(on) {
+   // recv from udp
+   samps = recvfrom(recvSoc, outbuffer, VECSAMPS_MONO, 0, (struct sockaddr *) &server_addr, &addr_size);
+
+   // play
+   android_AudioOut(p, outbuffer, VECSAMPS_MONO);
+
+   LOG("--- outbuffering - %d \n", (sizeof(outbuffer)/sizeof(outbuffer[0])));
   }
   android_CloseAudioDevice(p);
 }

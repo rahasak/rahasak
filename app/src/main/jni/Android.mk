@@ -196,7 +196,7 @@ $(LOCAL_PATH)/opus/src/opus_encoder.c \
 $(LOCAL_PATH)/opus/src/opus_multistream.c \
 $(LOCAL_PATH)/opus/src/repacketizer.c
 
-OPENSL_SOURCES = $(LOCAL_PATH)/opensl/opensl_io.c
+OPENSL_SOURCES = $(LOCAL_PATH)/opensl/opensl_io.c \
 
 ifdef FIXED_POINT
 SILK_SOURCES += $(SILK_SOURCES_FIXED)

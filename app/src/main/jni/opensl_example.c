@@ -48,7 +48,7 @@ void start_process() {
    for(i = 0, j=0; i < samps; i++, j+=2)
      outbuffer[j] = outbuffer[j+1] = inbuffer[i];
    android_AudioOut(p,outbuffer,samps*2); 
-  }  
+  }
   android_CloseAudioDevice(p);
 }
 
