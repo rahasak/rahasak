@@ -338,7 +338,7 @@ public class SecretCallActivity extends AppCompatActivity implements SensorEvent
         }
 
         public void start() {
-            thread.start();
+            //thread.start();
         }
 
         public void stop() {

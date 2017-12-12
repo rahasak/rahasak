@@ -27,7 +27,6 @@ import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.interfaces.IFragmentTransitionListener;
 import com.score.rahasak.pojo.DrawerItem;
 import com.score.rahasak.utils.PreferenceUtils;
-import com.score.rahasak.utils.Recorder;
 import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
@@ -67,10 +66,6 @@ public class DrawerActivity extends AppCompatActivity implements View.OnClickLis
 
         // load initial fragment
         loadRahas();
-
-        Recorder recorder = new Recorder();
-        recorder.start();
-        recorder.startPlay();
     }
 
     @Override
