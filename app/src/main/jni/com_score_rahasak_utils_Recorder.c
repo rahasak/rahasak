@@ -22,8 +22,6 @@ OPENSL_STREAM* p;
 
 short inbuf[VECSAMPS_MONO], outbuf[VECSAMPS_MONO];
 
-static int on;
-
 JNIEXPORT void JNICALL Java_com_score_rahasak_utils_Recorder_nativeStart(JNIEnv *env, jobject obj) {
   p = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
 }
