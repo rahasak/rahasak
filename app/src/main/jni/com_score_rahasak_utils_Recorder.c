@@ -1,3 +1,4 @@
+#include <com_score_rahasak_utils_Recorder.h>
 #include <stdio.h>
 #include <jni.h>
 #include <sys/socket.h>

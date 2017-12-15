@@ -38,9 +38,6 @@ import java.net.SocketException;
 
 import javax.crypto.SecretKey;
 
-import io.kvh.media.amr.AmrDecoder;
-import io.kvh.media.amr.AmrEncoder;
-
 
 public class CallService extends Service implements AudioManager.OnAudioFocusChangeListener {
 
@@ -130,8 +127,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         initUdpConn();
 
         jniRecorder.nativeStart();
-
-        //startCall();
 
         return START_STICKY;
     }
@@ -307,9 +302,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             // init opus encoder
             opusEncoder = new OpusEncoder();
             opusEncoder.init(SAMPLE_RATE, 1, FRAME_SIZE);
-
-            // amr encoder
-            //AmrEncoder.init(0);
         }
 
         @Override
@@ -320,8 +312,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         private void record() {
             Log.d(TAG, "Recorder started --- " + calling);
 
-            //int mode = AmrEncoder.Mode.MR795.ordinal();
-
             int encoded;
             short[] inBuf = new short[BUF_SIZE];
             byte[] outBuf = new byte[32];
@@ -331,7 +321,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 // encode with codec
                 jniRecorder.nativeStartRecord(inBuf);
                 encoded = opusEncoder.encode(inBuf, outBuf);
-                //encoded = AmrEncoder.encode(mode, inBuf, outBuf);
 
                 try {
                     // encrypt
@@ -343,7 +332,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 }
             }
 
-            AmrEncoder.exit();
             shutdown();
             clrUdpConn();
         }
@@ -377,7 +365,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
         }
 
         private void play() {
-            //final long amrState = AmrDecoder.init();
             Log.d(TAG, "Player started --- " + calling);
 
             try {
@@ -394,7 +381,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                     // decrypt
                     // decode codec
                     opusDecoder.decode(Base64.decode(msg, Base64.DEFAULT), pcmframs);
-                    //AmrDecoder.decode(amrState, Base64.decode(msg, Base64.DEFAULT), pcmframs);
                     jniRecorder.nativeStartPlay(pcmframs);
                 }
             } catch (Exception e) {
@@ -402,7 +388,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
                 Log.d(TAG, "Player error --- " + calling);
             }
 
-            //AmrDecoder.exit(amrState);
             shutDown();
         }
 
@@ -410,14 +395,6 @@ public class CallService extends Service implements AudioManager.OnAudioFocusCha
             Log.d(TAG, "Player finished --- " + calling);
             opusDecoder.close();
         }
-    }
-
-    public static short readShort(byte[] data, int offset) {
-        return (short) (((data[offset] << 8)) | ((data[offset + 1] & 0xff)));
-    }
-
-    public static byte[] shortToByteArray(short s) {
-        return new byte[] { (byte) ((s & 0xFF00) >> 8), (byte) (s & 0x00FF) };
     }
 
 }
