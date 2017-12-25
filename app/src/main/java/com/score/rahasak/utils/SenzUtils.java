@@ -1,6 +1,7 @@
 package com.score.rahasak.utils;
 
 import android.content.Context;
+import android.location.Location;
 
 import com.score.rahasak.exceptions.NoUserException;
 import com.score.rahasak.pojo.Secret;
@@ -78,6 +79,21 @@ public class SenzUtils {
         // new senz object
         Senz senz = new Senz();
         senz.setSenzType(SenzTypeEnum.DATA);
+        senz.setReceiver(user);
+        senz.setAttributes(senzAttributes);
+
+        return senz;
+    }
+
+    public static Senz getAwaSenz(User user, String uid) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("uid", uid);
+
+        // new senz object
+        Senz senz = new Senz();
+        senz.setSenzType(SenzTypeEnum.AWA);
         senz.setReceiver(user);
         senz.setAttributes(senzAttributes);
 
@@ -164,6 +180,22 @@ public class SenzUtils {
 
     public static String getEndStreamMsg(String sender, String receiver) {
         return "DATA #STREAM OFF" + " #TO " + receiver + " @streamswitch" + " ^" + sender + " SIG;";
+    }
+
+    public static Senz getLocationSenz(Context context, User user, Location location) {
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        Long timestamp = System.currentTimeMillis() / 1000;
+        senzAttributes.put("time", timestamp.toString());
+        senzAttributes.put("lat", Double.toString(location.getLatitude()));
+        senzAttributes.put("lon", Double.toString(location.getLongitude()));
+        senzAttributes.put("uid", SenzUtils.getUid(context, timestamp.toString()));
+
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+        return new Senz(id, signature, senzType, null, user, senzAttributes);
     }
 
     public static Senz getInitMicSenz(Context context, SecretUser secretUser) {

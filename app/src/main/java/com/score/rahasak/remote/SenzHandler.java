@@ -2,7 +2,6 @@ package com.score.rahasak.remote;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Base64;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -63,6 +62,16 @@ class SenzHandler {
                     Log.d(TAG, "DATA received");
                     handleData(senz, senzService);
                     break;
+                case AWA:
+                    Log.d(TAG, "AWA received");
+                    new SenzorsDbSource(senzService).updateDeliveryStatus(DeliveryState.RECEIVED, senz.getAttributes().get("uid"));
+                    broadcastSenz(senz, senzService.getApplicationContext());
+                    break;
+                case GIYA:
+                    Log.d(TAG, "GIYA received");
+                    new SenzorsDbSource(senzService).updateDeliveryStatus(DeliveryState.DELIVERED, senz.getAttributes().get("uid"));
+                    broadcastSenz(senz, senzService.getApplicationContext());
+                    break;
             }
         }
     }
@@ -83,6 +92,9 @@ class SenzHandler {
     }
 
     private void handleShare(Senz senz, SenzService senzService) {
+        // first write AWA to switch
+        senzService.writeSenz(SenzUtils.getAwaSenz(new User("", "senzswitch"), senz.getAttributes().get("uid")));
+
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().containsKey("status")) {
             // new user
             // new user permissions, save to db
@@ -174,16 +186,13 @@ class SenzHandler {
     }
 
     private void handleGet(Senz senz, SenzService senzService) {
-        if (senz.getAttributes().containsKey("cam")) {
-            // send ack back
-            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
+        // first write AWA to switch
+        senzService.writeSenz(SenzUtils.getAwaSenz(new User("", "senzswitch"), senz.getAttributes().get("uid")));
 
+        if (senz.getAttributes().containsKey("cam")) {
             // launch camera
             handleCam(senz, senzService);
         } else if (senz.getAttributes().containsKey("mic")) {
-            // send ack back
-            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
-
             // launch mic
             handleMic(senz, senzService);
         } else if (senz.getAttributes().containsKey("lat")) {
@@ -199,8 +208,6 @@ class SenzHandler {
         if (senz.getAttributes().containsKey("status")) {
             // status coming from switch
             // broadcast
-            updateStatus(senz, senzService.getApplicationContext());
-
             String status = senz.getAttributes().get("status");
             if (status.equalsIgnoreCase("USER_SHARED")) {
                 // user added successfully
@@ -230,8 +237,8 @@ class SenzHandler {
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("msg") || senz.getAttributes().containsKey("$msg")) {
             // rahasa
-            // send ack
-            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), senz.getAttributes().get("uid"), "DELIVERED"));
+            // send AWA back
+            senzService.writeSenz(SenzUtils.getAwaSenz(new User("", "senzswitch"), senz.getAttributes().get("uid")));
 
             try {
                 // save and broadcast
@@ -288,35 +295,20 @@ class SenzHandler {
                 }
             }
         } else if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
+            // send AWA back first
+            senzService.writeSenz(SenzUtils.getAwaSenz(new User("", "senzswitch"), senz.getAttributes().get("uid")));
+
             // location, broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
         } else if (senz.getAttributes().containsKey("mic")) {
+            // send AWA back first
+            senzService.writeSenz(SenzUtils.getAwaSenz(new User("", "senzswitch"), senz.getAttributes().get("uid")));
+
+            // mic broadcast
             broadcastSenz(senz, senzService.getApplicationContext());
-        } else if (senz.getAttributes().containsKey("senz")) {
-            String senzMsg = new String(Base64.decode(senz.getAttributes().get("senz"), Base64.DEFAULT));
-            Senz innerSenz = SenzParser.parse(senzMsg);
-
-            senzService.writeSenz(SenzUtils.getAckSenz(new User("", "senzswitch"), innerSenz.getAttributes().get("uid"), "DELIVERED"));
-            if (innerSenz.getAttributes().containsKey("cam")) {
-                // selfie mis
-                Long timestamp = (System.currentTimeMillis() / 1000);
-                saveSecret(timestamp, innerSenz.getAttributes().get("uid"), "", BlobType.IMAGE, innerSenz.getSender(), true, senzService.getApplicationContext());
-
-                // notification user
-                String username = innerSenz.getSender().getUsername();
-                SecretUser secretUser = dbSource.getSecretUser(username);
-                String notificationUser = secretUser.getUsername();
-                if (secretUser.getPhone() != null && !secretUser.getPhone().isEmpty()) {
-                    notificationUser = PhoneBookUtil.getContactName(senzService, secretUser.getPhone());
-                }
-
-                // show notification
-                SenzNotificationManager.getInstance(senzService.getApplicationContext()).showNotification(
-                        NotificationUtils.getStreamNotification(notificationUser, "Missed selfie call", username));
-            }
         } else if (senz.getAttributes().containsKey("cam")) {
-            // send status back first
-            senzService.writeSenz(SenzUtils.getAckSenz(senz.getSender(), senz.getAttributes().get("uid"), "DELIVERED"));
+            // send AWA back first
+            senzService.writeSenz(SenzUtils.getAwaSenz(new User("", "senzswitch"), senz.getAttributes().get("uid")));
 
             // save and broadcast
             Long timestamp = (System.currentTimeMillis() / 1000);
@@ -400,20 +392,6 @@ class SenzHandler {
 
             // update unread count by one
             new SenzorsDbSource(context).updateUnreadSecretCount(user.getUsername(), 1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateStatus(Senz senz, final Context context) {
-        try {
-            final String uid = senz.getAttributes().get("uid");
-            String status = senz.getAttributes().get("status");
-            if (status.equalsIgnoreCase("DELIVERED")) {
-                new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.DELIVERED, uid);
-            } else if (status.equalsIgnoreCase("RECEIVED")) {
-                new SenzorsDbSource(context).updateDeliveryStatus(DeliveryState.RECEIVED, uid);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

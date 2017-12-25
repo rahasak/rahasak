@@ -108,6 +108,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     case SHARE:
                         onShareReceived(senz);
                         break;
+                    case AWA:
+                        updateStatus(senz.getAttributes().get("uid"), "RECEIVED");
+                        break;
+                    case GIYA:
+                        updateStatus(senz.getAttributes().get("uid"), "DELIVERED");
+                        break;
                     default:
                         break;
                 }
@@ -505,10 +511,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (senz.getAttributes().containsKey("status")) {
             // status message
             String msg = senz.getAttributes().get("status");
-            if (msg.equalsIgnoreCase("DELIVERED") || msg.equalsIgnoreCase("RECEIVED")) {
-                // message delivered to user
-                onSenzStatusReceived(senz);
-            } else if (msg.equalsIgnoreCase("NO_LOCATION")) {
+            if (msg.equalsIgnoreCase("NO_LOCATION")) {
                 ActivityUtils.cancelProgressDialog();
                 Toast.makeText(this, "No location available", Toast.LENGTH_LONG).show();
             } else if (msg.equalsIgnoreCase("OFFLINE")) {
@@ -533,20 +536,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 // add and delete
                 addSecret(secret);
-            }
-        }
-    }
-
-    private void onSenzStatusReceived(Senz senz) {
-        // update senz in db
-        String uid = senz.getAttributes().get("uid");
-
-        if (senz.getAttributes().get("status").equalsIgnoreCase("DELIVERED") || senz.getAttributes().get("status").equalsIgnoreCase("RECEIVED")) {
-            for (Secret secret : secretList) {
-                if (secret.getId().equalsIgnoreCase(uid)) {
-                    secret.setDeliveryState(DeliveryState.valueOf(senz.getAttributes().get("status")));
-                    secretAdapter.notifyDataSetChanged();
-                }
             }
         }
     }
@@ -582,6 +571,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             updatePermissions();
         } else if (senz.getAttributes().containsKey("lat")) {
             updatePermissions();
+        }
+    }
+
+    private void updateStatus(String uid, String status) {
+        if (status.equalsIgnoreCase("DELIVERED") || status.equalsIgnoreCase("RECEIVED")) {
+            for (Secret secret : secretList) {
+                if (secret.getId().equalsIgnoreCase(uid)) {
+                    secret.setDeliveryState(DeliveryState.valueOf(status));
+                    secretAdapter.notifyDataSetChanged();
+                }
+            }
         }
     }
 

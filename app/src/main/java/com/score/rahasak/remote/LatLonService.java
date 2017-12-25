@@ -19,6 +19,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.score.rahasak.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -68,8 +69,8 @@ public class LatLonService extends Service implements GoogleApiClient.Connection
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        if(intent.hasExtra("SENZ"))
-        this.thisSenz = intent.getExtras().getParcelable("SENZ");
+        if (intent.hasExtra("SENZ"))
+            this.thisSenz = intent.getExtras().getParcelable("SENZ");
         bindService();
         return START_STICKY;
     }
@@ -144,17 +145,7 @@ public class LatLonService extends Service implements GoogleApiClient.Connection
 
     private void sendLocation(Location location) {
         try {
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            senzAttributes.put("lat", Double.toString(location.getLatitude()));
-            senzAttributes.put("lon", Double.toString(location.getLongitude()));
-
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.DATA;
-            Senz senz = new Senz(id, signature, senzType, null, thisSenz.getSender(), senzAttributes);
-
+            Senz senz = SenzUtils.getLocationSenz(this, thisSenz.getSender(), location);
             senzService.send(senz);
         } catch (RemoteException e) {
             e.printStackTrace();

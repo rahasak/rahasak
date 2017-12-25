@@ -5,4 +5,6 @@ public enum SenzTypeEnum {
     SHARE,
     DATA,
     PUT,
+    AWA,
+    GIYA
 }
